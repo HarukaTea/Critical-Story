@@ -1,0 +1,58 @@
+{
+  "name": "Critical-Story",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedFirst": {
+      "LoadingScreen": {
+        "$path": "src/LoadingScreen.client.lua"
+      }
+    },
+    "ReplicatedStorage": {
+      "Modules": {
+        "$className": "Folder",
+        "$path": "src/modules"
+      },
+      "Resources": {
+        "$className": "Folder",
+        "$path": "src/resource"
+      }
+    },
+    "ServerScriptService": {
+      "$path": "src/server"
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "RbxCharacterSounds": {
+          "$path": "src/RbxCharacterSounds.client.lua"
+        }
+      },
+      "StarterCharacterScripts": {
+        "Animate": {
+          "$path": "src/Animate.client.lua"
+        },
+        "Health": {
+          "$path": "src/Health.server.lua"
+        }
+      },
+      "$properties": {
+        "CameraMaxZoomDistance": 64,
+        "CameraMinZoomDistance": 5,
+        "CharacterWalkSpeed": 30,
+        "EnableDynamicHeads": "Disabled",
+        "UserEmotesEnabled": false,
+        "CharacterUseJumpPower": true
+      }
+    },
+    "StarterGui": {
+      "$properties": {
+        "ScreenOrientation": "LandscapeSensor"
+      }
+    },
+    "TextChatService": {
+      "$properties": {
+        "ChatTranslationEnabled": false,
+        "ChatVersion": "LegacyChatService"
+      }
+    }
+  }
+}
