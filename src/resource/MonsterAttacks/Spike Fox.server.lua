@@ -2,12 +2,11 @@
 
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 local TS = game:GetService("TweenService")
 
-local HarukaFrameworkServer = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer)
-
-local AssetBook = require(RepS.Modules.HarukaFrameworkClient).AssetBook
-local ServerUtil = HarukaFrameworkServer.ServerUtil
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent :: Model
 

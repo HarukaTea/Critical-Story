@@ -5,7 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
-local HarukaLib = require(RepS.Modules.HarukaFrameworkClient).HarukaLib
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local delay = task.delay
 local ceil, floor = math.ceil, math.floor

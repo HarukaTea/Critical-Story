@@ -13,6 +13,6 @@
   "robloxLsp.workspace.ignoreDir": [
     ".vscode",
     "**/_Index/**",
-    "src/modules/Packages/evaera_cmdr/cmdr/cmdr/Shared/Util.lua"
+    "src/modules/Packages/Cmdr/Shared/Util.lua"
   ]
 }

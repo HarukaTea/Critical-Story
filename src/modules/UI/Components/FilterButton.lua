@@ -2,12 +2,10 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
-local Events = HarukaFrameworkClient.Events
-local Fusion = HarukaFrameworkClient.Fusion
+local Events = require(RepS.Modules.Data.Events)
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local peek = Fusion.peek
 

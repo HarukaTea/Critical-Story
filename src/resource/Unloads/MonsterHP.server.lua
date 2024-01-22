@@ -1,6 +1,6 @@
 --!nocheck
 
-local Signals = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer).Signals
+local Signals = require(game:GetService("ServerScriptService").Modules.Data.ServerSignals)
 
 local char = script.Parent :: Model
 local isDead = false

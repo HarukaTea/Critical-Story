@@ -1,6 +1,6 @@
 --!nocheck
 
-local HarukaLib = require(game:GetService("ReplicatedStorage").Modules.HarukaFrameworkClient).HarukaLib
+local HarukaLib = require(game:GetService("ReplicatedStorage").Modules.Packages.HarukaLib)
 
 local PassiveUtil = {}
 

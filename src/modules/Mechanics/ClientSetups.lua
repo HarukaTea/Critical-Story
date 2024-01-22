@@ -5,13 +5,11 @@ local RepS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")
 local UGS = UserSettings():GetService("UserGameSettings")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
 local Cmdr = require(RepS:WaitForChild("CmdrClient"))
-local Clock = HarukaFrameworkClient.Clock
-local Events = HarukaFrameworkClient.Events
-local FastSpawn = HarukaFrameworkClient.FastSpawn
-local HarukaLib = HarukaFrameworkClient.HarukaLib
+local Clock = require(RepS.Modules.Packages.Clock)
+local Events = require(RepS.Modules.Data.Events)
+local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local ClientSetups = {}
 ClientSetups.__index = ClientSetups

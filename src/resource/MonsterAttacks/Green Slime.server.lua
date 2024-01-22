@@ -2,7 +2,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local ServerUtil = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer).ServerUtil
+local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
 
 local char = script.Parent
 

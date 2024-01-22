@@ -2,11 +2,9 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
-local Fusion = HarukaFrameworkClient.Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
 
@@ -33,7 +31,7 @@ local function LocationTitleFrame(self: table) : Frame
         [Children] = {
             Components.TextLabel({
                 Name = "Title",
-                Text = "Now  Entering  Area :",
+                Text = "Now Entering Area :",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0),
                 Size = fromScale(1, 0.45),

@@ -2,13 +2,11 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = HarukaFrameworkClient.Events
-local Fusion = HarukaFrameworkClient.Fusion
-local HarukaLib = HarukaFrameworkClient.HarukaLib
-local Signals = HarukaFrameworkClient.Signals
+local Events = require(RepS.Modules.Data.Events)
+local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local PointsButton = require(RepS.Modules.UI.Components.PointsButton)
 

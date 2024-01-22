@@ -3,16 +3,15 @@
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 
-local HarukaFrameworkServer = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer)
-
-local AttackUtil = HarukaFrameworkServer.AttackUtil
-local Clock = HarukaFrameworkServer.Clock
-local Events = HarukaFrameworkServer.Events
-local Fusion = HarukaFrameworkServer.Fusion
-local HarukaLib = HarukaFrameworkServer.HarukaLib
-local ServerUtil = HarukaFrameworkServer.ServerUtil
-local Signals = HarukaFrameworkServer.Signals
+local AttackUtil = require(SSS.Modules.Utils.AttackUtil)
+local Clock = require(RepS.Modules.Packages.Clock)
+local Events = require(SSS.Modules.Data.ServerEvents)
+local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local Signals = require(SSS.Modules.Data.ServerSignals)
 
 local AttributeChange = Fusion.AttributeChange
 

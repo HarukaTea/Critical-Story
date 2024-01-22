@@ -13,12 +13,10 @@ local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
 local PPS = game:GetService("ProximityPromptService")
 
-local HarukaFrameworkServer = require(SSS.Modules.HarukaFrameworkServer)
-
-local Cmdr = HarukaFrameworkServer.Cmdr
-local Events = HarukaFrameworkServer.Events
-local FastSpawn = HarukaFrameworkServer.FastSpawn
-local ServerUtil = HarukaFrameworkServer.ServerUtil
+local Cmdr = require(RepS.Modules.Packages.Cmdr)
+local Events = require(SSS.Modules.Data.ServerEvents)
+local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local package = RepS.Package
 local resources = RepS.Resources

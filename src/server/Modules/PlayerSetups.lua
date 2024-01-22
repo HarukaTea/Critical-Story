@@ -1,14 +1,13 @@
 --!nocheck
 
-local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 
-local HarukaFrameworkServer = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer)
-
-local AssetBook = require(RepS.Modules.HarukaFrameworkClient).AssetBook
-local FastSpawn = HarukaFrameworkServer.FastSpawn
-local SuphiDataStore = HarukaFrameworkServer.SuphiDataStore
-local Signals = HarukaFrameworkServer.Signals
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
+local Signals = require(SSS.Modules.Data.ServerSignals)
 
 local newInstance = Instance.new
 local wait = task.wait

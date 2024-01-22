@@ -1,6 +1,6 @@
 --!nocheck
 
-local Fusion = require(game:GetService("ReplicatedStorage").Modules.HarukaFrameworkClient).Fusion
+local Fusion = require(game:GetService("ReplicatedStorage").Modules.Packages.Fusion)
 
 local udNew = UDim.new
 local fromScale = UDim2.fromScale

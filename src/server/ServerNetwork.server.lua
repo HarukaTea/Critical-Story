@@ -5,15 +5,13 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local TeleS = game:GetService("TeleportService")
 
-local HarukaFrameworkServer = require(SSS.Modules.HarukaFrameworkServer)
-
-local CSAttackUtil = HarukaFrameworkServer.CSAttackUtil
-local Events = HarukaFrameworkServer.Events
-local FastSpawn = HarukaFrameworkServer.FastSpawn
-local HarukaLib = HarukaFrameworkServer.HarukaLib
-local Signals = HarukaFrameworkServer.Signals
-local ServerUtil = HarukaFrameworkServer.ServerUtil
-local PassiveUtil = HarukaFrameworkServer.PassiveUtil
+local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
+local Events = require(SSS.Modules.Data.ServerEvents)
+local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(SSS.Modules.Data.ServerSignals)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local PassiveUtil = require(SSS.Modules.Utils.PassiveUtil)
 
 local floor = math.floor
 local fromRGB = Color3.fromRGB

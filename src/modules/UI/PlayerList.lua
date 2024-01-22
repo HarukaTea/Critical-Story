@@ -3,11 +3,9 @@
 local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Fusion = HarukaFrameworkClient.Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local PlayerItemSlot = require(RepS.Modules.UI.Components.PlayerItemSlot)
 local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
@@ -56,7 +54,7 @@ return function(plr: Player)
 				Position = Fusion.Tween(Computed(function(use)
 					local state = use(self.isOpen)
 
-					return if state then fromScale(0.868, 0.013) else fromScale(1.2, 0.013)
+					return if state then ud2New(0.868, 0, 0.013, 20) else ud2New(1.2, 0, 0.013, 20)
 				end), AssetBook.TweenInfos.half),
 				Size = fromScale(0.127, 0.32),
 				ZIndex = 2,
@@ -91,7 +89,7 @@ return function(plr: Player)
 				Name = "Desc",
 				BackgroundTransparency = 0.1,
 				AnchorPoint = v2New(),
-				Position = fromScale(0.7, 0.013),
+				Position = ud2New(0.7, 0, 0.013, 20),
 				Size = fromScale(0.16, 0.475),
 				Visible = false,
 				[Ref] = self.desc,
@@ -156,7 +154,7 @@ return function(plr: Player)
 			Components.HoverImageButton({
 				Name = "Hover",
 				AnchorPoint = v2New(),
-				Position = fromScale(0.868, 0.013),
+				Position = ud2New(0.868, 0, 0.013, 20),
 				Size = Computed(function(use)
 					return ud2New(0.127, 0, 0, min(use(self.absContentSize), use(self.absSize)))
 				end),

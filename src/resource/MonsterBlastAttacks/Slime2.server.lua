@@ -1,6 +1,6 @@
 --!nocheck
 
-local ServerUtil = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer).ServerUtil
+local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
 
 local model = script.Parent
 local char = model.Owner.Value

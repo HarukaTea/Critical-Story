@@ -3,9 +3,7 @@
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 
-local HarukaFrameworkServer = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer)
-
-local ServerUtil = HarukaFrameworkServer.ServerUtil
+local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
 
 local char = script.Parent
 

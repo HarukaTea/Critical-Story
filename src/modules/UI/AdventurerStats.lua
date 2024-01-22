@@ -5,14 +5,12 @@ local RepS = game:GetService("ReplicatedStorage")
 local PPS = game:GetService("ProximityPromptService")
 local TS = game:GetService("TweenService")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Bin = require(RepS.Modules.Packages.Bin)
 local Components = require(RepS.Modules.UI.Vanilla)
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
-local Bin = HarukaFrameworkClient.Bin
-local Events = HarukaFrameworkClient.Events
-local Fusion = HarukaFrameworkClient.Fusion
-local HarukaLib = HarukaFrameworkClient.HarukaLib
+local Events = require(RepS.Modules.Data.Events)
+local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
@@ -641,12 +639,12 @@ return function(plr: Player)
 		CAS:UnbindAction("UseESkill")
 		CAS:UnbindAction("UseFSkill")
 
-		Events.EquipItems:Disconnect()
-		Events.ItemCD:Disconnect()
-		Events.RefreshBackpack:Disconnect()
-		Events.GiveDrop:Disconnect()
-		Events.LevelUp:Disconnect()
-		Events.CastClassSkill:Disconnect()
+		Events.EquipItems:DisconnectAll()
+		Events.ItemCD:DisconnectAll()
+		Events.RefreshBackpack:DisconnectAll()
+		Events.GiveDrop:DisconnectAll()
+		Events.LevelUp:DisconnectAll()
+		Events.CastClassSkill:DisconnectAll()
 
 		self.Empty()
 	end

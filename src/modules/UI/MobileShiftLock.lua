@@ -5,7 +5,7 @@ local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
-local Fusion = require(RepS.Modules.HarukaFrameworkClient).Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local MobileShiftLock = {}
 MobileShiftLock.__index = MobileShiftLock

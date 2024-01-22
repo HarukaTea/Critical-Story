@@ -2,9 +2,9 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local FastNet2 = require(RepS.Modules.Packages.imezx_fastnet2.fastnet2)
+local Warp = require(RepS.Modules.Packages.Warp)
 
-local Net = FastNet2.new
+local Net = Warp.Server
 
 local Events = {
 	AddPoints = Net("AddSkillPoints"),
@@ -26,5 +26,4 @@ local Events = {
 	UseItem = Net("UseItem"),
 	UpdatePinnedItems = Net("UpdatePinnedItems"),
 }
-
 return Events

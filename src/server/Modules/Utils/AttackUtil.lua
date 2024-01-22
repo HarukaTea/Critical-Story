@@ -4,20 +4,18 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local FastSpawn = HarukaFrameworkClient.FastSpawn
-local HarukaLib = HarukaFrameworkClient.HarukaLib
-local LootPlan = require(RepS.Modules.Packages.colbert2677_lootplan.lootplan)
+local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 
 local AttackUtil = {}
 
 local wait, delay = task.wait, task.delay
-local clear, insert = table.clear, table.insert
+local insert = table.insert
 local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
 local cfNew, v3New = CFrame.new, Vector3.new

@@ -5,11 +5,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
 local Events = require(SSS.Modules.Data.ServerEvents)
-local FastSpawn = HarukaFrameworkClient.FastSpawn
-local LootPlan = require(RepS.Modules.Packages.colbert2677_lootplan.lootplan)
+local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 

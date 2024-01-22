@@ -3,7 +3,7 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
-local HarukaLib = require(RepS.Modules.HarukaFrameworkClient).HarukaLib
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local plr = Players.LocalPlayer
 local char = script.Parent

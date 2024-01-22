@@ -2,10 +2,8 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local Events = HarukaFrameworkClient.Events
-local Signals = HarukaFrameworkClient.Signals
+local Events = require(RepS.Modules.Data.Events)
+local Signals = require(RepS.Modules.Data.Signals)
 
 return function (plr: Player)
 	local char = plr.Character or plr.CharacterAdded:Wait()
@@ -49,7 +47,7 @@ return function (plr: Player)
 	Signals.PlayAnimation:Connect(_playAnim)
 
 	local function _onDead()
-		Events.PlayAnimation:Disconnect()
+		Events.PlayAnimation:DisconnectAll()
 	end
 	humanoid.Died:Once(_onDead)
 end

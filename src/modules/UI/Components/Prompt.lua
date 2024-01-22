@@ -4,9 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local Fusion = HarukaFrameworkClient.Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale

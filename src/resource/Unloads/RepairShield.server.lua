@@ -1,6 +1,6 @@
 --!nocheck
 
-local HarukaLib = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer).HarukaLib
+local HarukaLib = require(game:GetService("ReplicatedStorage").Modules.Packages.HarukaLib)
 
 local char = script.Parent
 

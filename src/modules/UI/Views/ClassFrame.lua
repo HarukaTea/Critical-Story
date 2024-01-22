@@ -3,7 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
-local Fusion = require(RepS.Modules.HarukaFrameworkClient).Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local ActiveSlot = require(RepS.Modules.UI.Components.ActiveSlot)
 local ClassSlot = require(RepS.Modules.UI.Components.ClassSlot)

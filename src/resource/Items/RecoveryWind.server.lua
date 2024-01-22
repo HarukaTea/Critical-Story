@@ -2,11 +2,11 @@
 
 local Players = game:GetService("Players")
 
-local HarukaFrameworkServer = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer)
+local SSS = game:GetService("ServerScriptService")
 
-local Events = HarukaFrameworkServer.Events
-local ServerUtil = HarukaFrameworkServer.ServerUtil
-local SkillUtil = HarukaFrameworkServer.SkillUtil
+local Events = require(SSS.Modules.Data.ServerEvents)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 
 local char = script.Parent.Parent.Parent
 local plr = Players:GetPlayerFromCharacter(char)

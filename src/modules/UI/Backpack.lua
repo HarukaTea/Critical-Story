@@ -4,11 +4,9 @@ local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Fusion = HarukaFrameworkClient.Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)

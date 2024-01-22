@@ -2,10 +2,8 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
 local Components = require(RepS.Modules.UI.Vanilla)
-local Fusion = HarukaFrameworkClient.Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local Children = Fusion.Children
 

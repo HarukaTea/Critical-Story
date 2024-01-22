@@ -1,6 +1,6 @@
 --!nocheck
 
-local AssetBook = require(game:GetService("ReplicatedStorage").Modules.HarukaFrameworkClient).AssetBook
+local AssetBook = require(game:GetService("ReplicatedStorage").Modules.Data.AssetBook)
 
 local model = script.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(model.Parent.Parent)

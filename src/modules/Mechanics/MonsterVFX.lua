@@ -3,9 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 
 local MonsterVFX = {}
 MonsterVFX.__index = MonsterVFX

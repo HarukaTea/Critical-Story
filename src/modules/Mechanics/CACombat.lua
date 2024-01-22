@@ -4,14 +4,12 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
-local Clock = HarukaFrameworkClient.Clock
-local Collection = HarukaFrameworkClient.Collection
-local Events = HarukaFrameworkClient.Events
-local Fusion = HarukaFrameworkClient.Fusion
-local Signals = HarukaFrameworkClient.Signals
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Clock = require(RepS.Modules.Packages.Clock)
+local Collection = require(RepS.Modules.Packages.Collection)
+local Events = require(RepS.Modules.Data.Events)
+local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local CACombat = {}
 CACombat.__index = CACombat
@@ -223,7 +221,7 @@ end
 ]]
 function CACombat:Setup()
 	local monsterLocations = self.monsterLocations
-	local char = self.char
+	local char, plr = self.char, self.plr
 
 	for _, folder in self.mapComponents.CombatFolders:GetChildren() do
 		if folder:GetAttribute("PublicCombat") then
@@ -343,7 +341,7 @@ end
     The clear actions, and ready for next require
 ]]
 function CACombat:Destroy()
-	Events.MagicCasted:Disconnect()
+	Events.MagicCasted:DisconnectAll()
 
 	self.stopSimulating()
 	self.stopDetecting()

@@ -1,8 +1,8 @@
 --!nocheck
 
-local SSS = game:GetService("ServerScriptService")
+local RepS = game:GetService("ReplicatedStorage")
 
-local Guard = require(SSS.Modules.HarukaFrameworkServer).Guard
+local Guard = require(RepS.Modules.Packages.Guard)
 
 local numberCheck = Guard.Check(Guard.NumberMinMax(1, 950))
 

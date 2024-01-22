@@ -1,11 +1,10 @@
 --!nocheck
 
+local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local HarukaFrameworkServer = require(SSS.Modules.HarukaFrameworkServer)
-
-local Guard = HarukaFrameworkServer.Guard
-local ServerUtil = HarukaFrameworkServer.ServerUtil
+local Guard = require(RepS.Modules.Packages.Guard)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local cfNew = CFrame.new
 

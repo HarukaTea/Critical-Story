@@ -1,6 +1,8 @@
 --!nocheck
 
-local Guard = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer).Guard
+local RepS = game:GetService("ReplicatedStorage")
+
+local Guard = require(RepS.Modules.Packages.Guard)
 
 local stringCheck = Guard.Check(Guard.String)
 

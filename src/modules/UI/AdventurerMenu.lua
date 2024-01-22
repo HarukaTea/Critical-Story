@@ -5,7 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
-local Fusion = require(RepS.Modules.HarukaFrameworkClient).Fusion
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)

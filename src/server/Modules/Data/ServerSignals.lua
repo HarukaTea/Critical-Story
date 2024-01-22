@@ -2,14 +2,16 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local Signal = require(RepS.Modules.Packages["red-blox_signal"].signal)
+local Signal = require(RepS.Modules.Packages.Signal)
+
+local NewSignal = Signal.new
 
 local Signals = {
-	CombatEnd = Signal(),
-	ItemsAdded = Signal(),
-	ItemsEquipped = Signal(),
-	ItemsPinned = Signal(),
-	LevelUp = Signal(),
+	CombatEnd = NewSignal(),
+	ItemsAdded = NewSignal(),
+	ItemsEquipped = NewSignal(),
+	ItemsPinned = NewSignal(),
+	LevelUp = NewSignal(),
 }
 
 return Signals

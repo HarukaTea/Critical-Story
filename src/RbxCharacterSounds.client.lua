@@ -4,10 +4,8 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
-local HarukaFrameworkClient = require(RepS.Modules.HarukaFrameworkClient)
-
-local AssetBook = HarukaFrameworkClient.AssetBook
-local Events = HarukaFrameworkClient.Events
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Events = require(RepS.Modules.Data.Events)
 
 local plr = Players.LocalPlayer
 

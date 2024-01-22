@@ -1,11 +1,10 @@
 --!nocheck
 
 local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 
-local HarukaFrameworkServer = require(game:GetService("ServerScriptService").Modules.HarukaFrameworkServer)
-
-local HarukaLib = HarukaFrameworkServer.HarukaLib
-local ServerUtil = HarukaFrameworkServer.ServerUtil
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent.Parent
 local color = script:GetAttribute("Color")
