@@ -6,7 +6,7 @@ export type rateLimitArg = {
 }
 
 export type Client = {
-	Fire: (self: Client, reliable: boolean, any) -> (),
+	Fire: (self: Client, any) -> (),
 	Invoke: (self: Client, timeout: number, any) -> any,
 	Connect: (self: Client, callback: (args: any) -> ()) -> string,
 	Once: (self: Client, callback: (player: Player, args: any) -> ()) -> string,
@@ -17,8 +17,8 @@ export type Client = {
 }
 
 export type Server = {
-	Fire: (self: Server, reliable: boolean, player: Player, any) -> (),
-	Fires: (self: Server, reliable: boolean, any) -> (),
+	Fire: (self: Server, player: Player, any) -> (),
+	Fires: (self: Server, any) -> (),
 	Invoke: (self: Server, timeout: number, player: Player, any) -> any,
 	Connect: (self: Server, callback: (player: Player, args: any) -> ()) -> string,
 	Once: (self: Server, callback: (player: Player, args: any) -> ()) -> string,

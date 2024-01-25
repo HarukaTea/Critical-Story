@@ -1,15 +1,4 @@
 {
-  "files.exclude": {
-    "**/.git": true,
-
-    "src/modules/Packages": true,
-
-    "src/Animate.client.lua": true,
-    "src/modules/UI/PostStroke.lua": true,
-    "src/Health.server.lua": true,
-    "src/modules/UI/Hints.lua": true,
-    "src/modules/UI/MobileShiftLock.lua": true
-  },
   "robloxLsp.workspace.ignoreDir": [
     ".vscode",
     "**/_Index/**",

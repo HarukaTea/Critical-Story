@@ -8,7 +8,6 @@ export type Connection = {
 
 export type Signal<T...> = {
 	Fire: (self: Signal<T...>, T...) -> (),
-	FireDeferred: (self: Signal<T...>, T...) -> (),
 	Connect: (self: Signal<T...>, fn: (T...) -> ()) -> Connection,
 	Once: (self: Signal<T...>, fn: (T...) -> ()) -> Connection,
 	DisconnectAll: (self: Signal<T...>) -> (),
@@ -109,7 +108,7 @@ Signal.__index = Signal
 --[=[
 	Constructs a new Signal
 ]=]
-function Signal.new<T...>(identifier: string): Signal<T...>
+function Signal.new<T...>(): Signal<T...>
 	local self = setmetatable({
 		_handlerListHead = false,
 		_proxyHandler = nil,

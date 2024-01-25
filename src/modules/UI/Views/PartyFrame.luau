@@ -1,0 +1,138 @@
+--!nocheck
+
+local Players = game:GetService("Players")
+local RepS = game:GetService("ReplicatedStorage")
+
+local Components = require(RepS.Modules.UI.Vanilla)
+local Fusion = require(RepS.Modules.Packages.Fusion)
+
+local PartyInviteSlot = require(RepS.Modules.UI.Components.PartyInviteSlot)
+
+local Children, New, Computed, OnChange = Fusion.Children, Fusion.New, Fusion.Computed, Fusion.OnChange
+
+local v2New = Vector2.new
+local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
+local insert = table.insert
+local udNew = UDim.new
+
+local function Title(index: number, text: string) : TextLabel
+	return Components.TextLabel({
+		Name = "Title"..index,
+		Position = if index == 1 then fromScale(0, 0) else fromScale(0.416, 0),
+		Size = fromScale(0.355, 0.1),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Text = text
+	})
+end
+
+local function PartyFrame(self: table): Frame
+
+	self.players = Fusion.Value({})
+
+	local function _setNewPlayers()
+		local reqPlayers = {}
+		for _, player in Players:GetPlayers() do
+			if player == self.plr then continue end
+
+			insert(reqPlayers, player)
+		end
+
+		self.players:set(reqPlayers)
+	end
+	_setNewPlayers()
+	Players.PlayerAdded:Connect(_setNewPlayers)
+	Players.PlayerRemoving:Connect(_setNewPlayers)
+
+	return Components.Frame({
+		Name = "Party",
+		Position = fromScale(0.496, 0.567),
+		Size = fromScale(0.944, 0.627),
+		Visible = false,
+
+		[Children] = {
+			New("UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+
+			Title(1, "Players"),
+			Title(2, "Your Party"),
+
+			Components.ScrollingFrame({
+				Name = "InviteList",
+				AnchorPoint = v2New(),
+				ScrollingDirection = Enum.ScrollingDirection.Y,
+				Position = fromScale(0, 0.133),
+				Size = fromScale(0.363, 0.883),
+				ClipsDescendants = true,
+				CanvasSize = Computed(function(use)
+					if use(self.absContentSize[1]) > use(self.absSize[1]) then
+						return fromOffset(0, use(self.absContentSize[1]))
+					else
+						return fromOffset(0, 0)
+					end
+				end),
+				ScrollingEnabled = Computed(function(use)
+					return if use(self.absContentSize[1]) > use(self.absSize[1]) then true else false
+				end),
+
+				[Fusion.Ref] = self.partyInvList,
+				[OnChange("AbsoluteSize")] = function(newSize: UDim)
+					self.absSize[1]:set(newSize.Y)
+				end,
+
+				[Children] = {
+					New("UIListLayout")({
+						Padding = udNew(0, 6),
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+
+						[OnChange("AbsoluteContentSize")] = function(newSize: UDim)
+							self.absContentSize[1]:set(newSize.Y)
+						end
+					}),
+					Fusion.ForValues(self.players, function(use, player: Player)
+						return PartyInviteSlot(player, "Invite", self)
+					end, Fusion.cleanup)
+				}
+			}),
+			Components.ScrollingFrame({
+				Name = "MembersList",
+				AnchorPoint = v2New(),
+				ScrollingDirection = Enum.ScrollingDirection.Y,
+				Position = fromScale(0.416, 0.133),
+				Size = fromScale(0.579, 0.883),
+				ClipsDescendants = true,
+				CanvasSize = Computed(function(use)
+					if use(self.absContentSize[2]) > use(self.absSize[2]) then
+						return fromOffset(0, use(self.absContentSize[2]))
+					else
+						return fromOffset(0, 0)
+					end
+				end),
+				ScrollingEnabled = Computed(function(use)
+					return if use(self.absContentSize[2]) > use(self.absSize[2]) then true else false
+				end),
+
+				[Fusion.Ref] = self.partyMembersList,
+				[OnChange("AbsoluteSize")] = function(newSize: UDim)
+					self.absSize[2]:set(newSize.Y)
+				end,
+
+				[Children] = {
+					New("UIGridLayout")({
+						CellPadding = fromOffset(8, 8),
+						CellSize = Computed(function(use)
+							return fromOffset(use(self.absCellSize)[1], use(self.absCellSize)[2])
+						end),
+
+						[OnChange("AbsoluteContentSize")] = function(newSize: UDim)
+							self.absContentSize[2]:set(newSize.Y)
+						end
+					}),
+					Fusion.ForValues(self.partyMembers, function(use, objVal: ObjectValue)
+						return PartyInviteSlot(objVal.Value, "Member", self)
+					end, Fusion.cleanup)
+				}
+			}),
+		},
+	})
+end
+
+return PartyFrame
