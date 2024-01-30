@@ -5,7 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Guard = require(RepS.Modules.Packages.Guard)
 
-local numberCheck = Guard.Check(Guard.NumberMinMax(1, 99999999))
+local numberCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
 
 return function (_, plr, gold)
     local goldPass, goldWant = numberCheck(gold)

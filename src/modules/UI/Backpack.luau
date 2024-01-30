@@ -11,7 +11,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
-local FilterButton = require(RepS.Modules.UI.Components.FilterButton)
+local FilterButton = require(RepS.Modules.UI.Components.FilterButtonBackpack)
 
 local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
 

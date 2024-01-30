@@ -6,7 +6,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local New = Fusion.New
+local New, peek = Fusion.New, Fusion.peek
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
@@ -14,10 +14,12 @@ local fromRGB = Color3.fromRGB
 local sFind, format, match = string.find, string.format, string.match
 
 local function PlayerSlot(self: table, player: Player): Frame
-
-	--- sometimes there are issues with this, so tricky way to fix
-	local class = player:GetAttribute("Class") :: string
-	if not class then class = "Warrior" end
+	local class = Fusion.Value("Warrior")
+	Fusion.Hydrate(player)({
+		[Fusion.AttributeChange("Class")] = function(newClass)
+			class:set(newClass)
+		end
+	})
 
 	return Components.Frame({
 		BackgroundTransparency = 0,
@@ -33,7 +35,9 @@ local function PlayerSlot(self: table, player: Player): Frame
 				BackgroundColor3 = Color3.new(),
 				Position = fromScale(0.055, 0.5),
 				Size = fromScale(0.14, 0.665),
-				Image = AssetBook.ClassInfo[class].Image,
+				Image = Fusion.Computed(function(use)
+					return AssetBook.ClassInfo[use(class)].Image
+				end),
 
 				[Fusion.Children] = { Components.RoundUICorner() },
 			}),
@@ -54,7 +58,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 					local list, desc = Fusion.peek(self.list) :: Frame, Fusion.peek(self.desc) :: Frame
 
 					for _, element in list:GetChildren() do
-						if element:IsA("Frame") and element.BackgroundColor3 == color3New(1, 1, 1) then
+						if element:IsA("Frame") then
 							element.BackgroundColor3 = fromRGB(30, 30, 30)
 							element.PlayerName.TextColor3 = if player:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
 						end
@@ -68,9 +72,10 @@ local function PlayerSlot(self: table, player: Player): Frame
 					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
 					list[player.Name].PlayerName.TextColor3 = color3New()
 
+					desc.Role.Text = ""
 					desc.DisplayName.Text = player.DisplayName
 					desc.UserName.Text = "@" .. player.Name
-					desc.Class.Image = AssetBook.ClassInfo[class].Image
+					desc.Class.Image = AssetBook.ClassInfo[peek(class)].Image
 					desc.Level.Text = "Lv."
 						.. player:GetAttribute("Levels")
 						.. " - "
@@ -91,8 +96,8 @@ local function PlayerSlot(self: table, player: Player): Frame
 							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
 						end
 					end
-					desc.Slot4.Image = AssetBook.ClassInfo[class].SkillImage
-					desc.Slot4.ImageColor3 = if AssetBook.ClassInfo[class].CAIcon then color3New(1, 1, 1) else AssetBook.ClassInfo[class].Color
+					desc.Slot4.Image = AssetBook.ClassInfo[peek(class)].SkillImage
+					desc.Slot4.ImageColor3 = if AssetBook.ClassInfo[peek(class)].CAIcon then color3New(1, 1, 1) else AssetBook.ClassInfo[peek(class)].Color
 					for _, item in items:GetChildren() do
 						if AssetBook.Items.ItemType[item.Name] == "Active" and item:GetAttribute("Equipped") then
 							local index = match(item:GetAttribute("Slot"), "%d") + 4

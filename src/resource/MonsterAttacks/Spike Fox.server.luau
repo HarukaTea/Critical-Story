@@ -38,6 +38,7 @@ local function spikeShot(target: Model)
 	local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolf1:Clone() :: Model
 	blast.Owner.Value = char
 	blast:PivotTo(char.PrimaryPart.CFrame)
+	blast:AddTag("MonsterAttack")
 	blast.Parent = char.Holder.Value
 
 	if char.Head:FindFirstChild("Encountered") then return end
@@ -61,6 +62,7 @@ local function spikeRain(target: Model)
 	rangeTip.Owner.Value = char
 	rangeTip:AddTag("MonsterAttack")
 	rangeTip.Parent = char.Holder.Value
+
 	Debris:AddItem(rangeTip, 1)
 
 	for _ = 1, random(5, 6) do
@@ -75,8 +77,6 @@ local function spikeRain(target: Model)
 		blast.Owner.Value = char
 		blast:AddTag("MonsterAttack")
 		blast.Parent = char.Holder.Value
-
-		blast.Spike:Play()
 
 		Debris:AddItem(blast, 10)
 	end

@@ -15,27 +15,24 @@ local PPS = game:GetService("ProximityPromptService")
 
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local FastSpawn = require(RepS.Modules.Packages.Spawn)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local package = RepS.Package
 local resources = RepS.Resources
 
-local ServerSetups = {}
-ServerSetups.__index = ServerSetups
-
 local instanceNew = Instance.new
 local wait = task.wait
 local sub, upper = string.sub, string.upper
+local insert = table.insert
 
---[[
-    Setups when server starts
-]]
-function ServerSetups:MainSetup()
+local function mainSetup()
 	--- clear extra events
 	for _, mapPart in workspace:GetDescendants() do
-		if mapPart:IsA("BasePart") then mapPart.CanTouch = false end
+		if mapPart:IsA("BasePart") and not mapPart:IsDescendantOf(workspace.MapComponents.Waters) then
+			mapPart.CanTouch = false
+		end
 	end
 	for _, link in RepS:GetDescendants() do
 		if link:IsA("PackageLink") then link:Destroy() end
@@ -148,7 +145,7 @@ function ServerSetups:MainSetup()
 	end)
 
 	--- private server setup
-	FastSpawn(function()
+	Spawn(function()
 		local privateId, code = game.PrivateServerId, nil
 
 		if privateId ~= "" then
@@ -171,10 +168,10 @@ function ServerSetups:MainSetup()
 	end)
 
 	--- server location info
-	FastSpawn(function()
+	Spawn(function()
 		if RS:IsStudio() then return end
 
-		local serverInfo = HttpService:GetAsync("https://ip.useragentinfo.com/json", true)
+		local serverInfo = HttpService:GetAsync("https://ipapi.co/json", true)
 
 		if serverInfo then
 			local realInfo = HttpService:JSONDecode(serverInfo)
@@ -184,6 +181,8 @@ function ServerSetups:MainSetup()
 				RepS.Package.ServerLocation.Value = serverLocation
 
 				print("Server Location: "..serverLocation)
+			else
+				warn("Fetched IP data, but is empty")
 			end
 		else
 			warn("Failed to fetch IP data")
@@ -191,10 +190,7 @@ function ServerSetups:MainSetup()
 	end)
 end
 
---[[
-	Create the collision groups, which are players, npcs and combat border
-]]
-function ServerSetups:CollisionRegister()
+local function collisionRegister()
 	PS:RegisterCollisionGroup("Player")
 	PS:RegisterCollisionGroup("NPC")
 	PS:RegisterCollisionGroup("Barrier")
@@ -211,19 +207,13 @@ function ServerSetups:CollisionRegister()
 	ServerUtil:SetCollisionGroup(RepS.Package.Unloads["CombatBorder"], "Barrier")
 end
 
---[[
-	Register Cmdr module
-]]
-function ServerSetups:CmdrRegister()
+local function cmdrRegister()
 	Cmdr:RegisterDefaultCommands({"Help", "DefaultAdmin"})
 	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
 	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
 end
 
---[[
-	Handle all the prompts requests
-]]
-function ServerSetups:PromptsHandler(prompt: ProximityPrompt, plr: Player)
+local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 	if prompt.Name == "Class" then
 		local class = prompt.Parent.Parent.Name
 
@@ -247,44 +237,55 @@ function ServerSetups:PromptsHandler(prompt: ProximityPrompt, plr: Player)
 
 		Events.RejoinCombat:Fire(plr)
 
+		local hinted = false
+		local monsters = {}
 		for _, monster in locator:GetDescendants() do
 			if monster:GetAttribute("IsMonster") then
-				ServerUtil:AddTargetForMonster(plr, monster)
+				if not monster:GetAttribute("SubMonster") then
+					insert(monsters, 1, monster)
+				else
+					insert(monsters, monster)
+				end
 
-				local hp = monster:GetAttribute("MaxHealth")
+				if not monster:GetAttribute("OriMaxHealth") then
+					monster:SetAttribute("OriMaxHealth", monster:GetAttribute("MaxHealth"))
+				end
+
+				local hp = monster:GetAttribute("OriMaxHealth")
 				HarukaLib:Add(monster, "MaxHealth", hp)
 				HarukaLib:Add(monster, "Health", hp)
 
 				if monster.Holder.Value then
 					monster.Holder.Value:SetAttribute(plr.Name, true)
 				end
+
+				if hinted then continue end
+				hinted = true
+
+				local combatPlrs = {}
+				for _, target in monster.TargetingList:GetChildren() do
+					local tempPlr = Players:GetPlayerFromCharacter(target.Value)
+
+					if tempPlr then insert(combatPlrs, tempPlr) end
+				end
+
+				for _, player in combatPlrs do
+					Events.CreateHint:Fire(player, plr.DisplayName.." has joined the combat!", "Hint")
+				end
 			end
+		end
+		for _, monster in ipairs(monsters) do
+			ServerUtil:AddTargetForMonster(plr, monster)
 		end
 	end
 end
 
-return function ()
-    local self = setmetatable({}, ServerSetups)
+local function returnFunc()
 
-	self.ATTRIBUTES = {
-		CriChance = 1,
-		InCombat = false,
-		Magic = 20,
-		Mana = 100,
-		Damage = 15,
-		MaxMana = 100,
-		MaxShield = 20,
-		OrbLifeTime = 15,
-		Shield = 20,
-
-		HealthBuff = 0,
-		JumpBuff = 0,
-		MagicBuff = 0,
-		ManaBuff = 0,
-		DamageBuff = 0,
-		ShieldBuff = 0,
-		SpeedBuff = 0,
-	}
+	--// Setups
+	collisionRegister()
+	cmdrRegister()
+    mainSetup()
 
 	--// Connections
 	Players.PlayerAdded:Connect(function(plr)
@@ -294,14 +295,9 @@ return function ()
 			end)
 		end
 	end)
-	PPS.PromptTriggered:Connect(function(prompt: ProximityPrompt, plr: Player)
-		self:PromptsHandler(prompt, plr)
-	end)
-
-	--// Setups
-	self:CollisionRegister()
-	self:CmdrRegister()
-    self:MainSetup()
+	PPS.PromptTriggered:Connect(promptsHandler)
 
 	require(script.Parent.PlayerSetups)()
 end
+
+return returnFunc

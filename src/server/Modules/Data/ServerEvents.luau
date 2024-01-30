@@ -16,6 +16,7 @@ local Events = {
 	ChestUnlocked = Net("ChestUnlocked", false),
 	EquipItems = Net("EquipItems"),
 	ErrorDataStore = Net("ErrorDataStore"),
+	ForceReset = Net("ForceReset", false),
 	GiveDrop = Net("GiveDrop"),
 	ItemCD = Net("ItemCD", false),
 	LevelUp = Net("LevelUpVFX", false),

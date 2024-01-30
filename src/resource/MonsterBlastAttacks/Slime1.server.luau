@@ -18,5 +18,4 @@ for _, child in blast:GetDescendants() do
     end
 end
 
-blast.SlimeAttack:Play()
 model:Destroy()

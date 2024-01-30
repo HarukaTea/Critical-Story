@@ -25,6 +25,7 @@ local function slimeShot(target: Model)
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
+	blast:AddTag("MonsterAttack")
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
 	blast.Parent = char.Holder.Value
 end

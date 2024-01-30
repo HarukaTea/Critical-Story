@@ -6,20 +6,20 @@ local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local FastSpawn = require(RepS.Modules.Packages.Spawn)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local AttackUtil = {}
 
-local wait, delay = task.wait, task.delay
+local wait = task.wait
 local insert = table.insert
 local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
 local cfNew, v3New = CFrame.new, Vector3.new
-local cfLookAt, cfAngles = CFrame.lookAt, CFrame.Angles
+local cfAngles = CFrame.Angles
 local rad = math.rad
 
 --[[
@@ -42,7 +42,8 @@ function AttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, for
 		local criEff = RepS.Package.Effects.CriticalHitEffect:Clone() :: ParticleEmitter
 		criEff.Parent = monster.PrimaryPart
 
-		ServerUtil:ShowText(plr.Character, "CRITICAL!", fromRGB(230, 241, 3))
+        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Critical)
+		ServerUtil:ShowText(monster, "CRITICAL!", fromRGB(230, 241, 3))
 
 		wait(0.3)
 		criEff.Enabled = false
@@ -75,10 +76,12 @@ function AttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 
 		local comboEff = RepS.Package.Effects.ComboEffect:Clone() :: ParticleEmitter
 		comboEff.Parent = monster.PrimaryPart
-		delay(0.4, function()
+		Debris:AddItem(comboEff, 1)
+
+        Spawn(function()
+            wait(0.4)
 			comboEff.Enabled = false
 		end)
-		Debris:AddItem(comboEff, 1)
 
         AttackUtil:DealDMG(plr, monster, finalDamage)
 	else
@@ -141,8 +144,6 @@ function AttackUtil.Wizard(plr: Player, monster: Model)
         Events.MagicCasted:Fire(plr)
         RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
     end
-
-    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
@@ -173,18 +174,19 @@ function AttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
 end
 
 function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
-    if not orb:GetAttribute("IsSpawnedOneForRepeater") then
+    if not orb:GetAttribute("RepeaterSpawned") then
         local pos = ServerUtil:GenerateOrbPos(monster)
         local repeaterOrb = RepS.Package.PlayerAttacks.RepeaterOrb:Clone() :: Model
 
         repeaterOrb.Owner.Value = plr.Character
         repeaterOrb:PivotTo(pos)
-        repeaterOrb.Parent = workspace.MapComponents.OrbFolders[plr.Name]
-        repeaterOrb:SetAttribute("IsSpawnedOneForRepeater", true)
+        repeaterOrb:SetAttribute("RepeaterSpawned", true)
         repeaterOrb:SetAttribute("OrbLifeTime", 5)
+        repeaterOrb.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+
         Debris:AddItem(repeaterOrb, 5)
 
-        FastSpawn(function()
+        Spawn(function()
             local laser = instanceNew("Part")
             laser.Material = Enum.Material.Neon
             laser.CanCollide = false
@@ -196,6 +198,7 @@ function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, or
             laser.Size = v3New(0.5, 0.5, (orb.Base.CFrame.Position - repeaterOrb.Base.CFrame.Position).Magnitude)
             laser.CFrame = cfNew((orb.Base.CFrame.Position + repeaterOrb.Base.CFrame.Position) / 2, orb.Base.CFrame.Position)
             laser.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+
             Debris:AddItem(laser, 1)
 
             Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
@@ -205,124 +208,77 @@ function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, or
     AttackUtil:DealDMG(plr, monster, baseDamage)
 end
 
-function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number, originOrb: Model)
-    local char = plr.Character
-    local orbs = workspace.MapComponents.OrbFolders[plr.Name]:GetChildren()
-    local strikerOrbs = {}
+function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
+    Spawn(function()
+        local char = plr.Character
+        local orbs = workspace.MapComponents.OrbFolders[plr.Name]:GetChildren()
+        local strikerOrbs = {}
 
-    for _, strikerOrb in orbs do
-        if strikerOrb.Name == "StrikerOrb" then
-            insert(strikerOrbs, strikerOrb)
-        end
-    end
+        for _, strikerOrb in orbs do
+            if strikerOrb.Name == "StrikerOrb" and not strikerOrb:GetAttribute("Obtained") then
+                insert(strikerOrbs, strikerOrb)
 
-    AttackUtil:DealDMG(plr, monster, baseDamage)
-
-    wait(0.2)
-    local function _findNearestOrb()
-        local foundOrb = nil
-        local distance = 200
-
-        for _, orb in strikerOrbs do
-            if orb ~= originOrb and orb:FindFirstChild("Base") then
-                local realMagnitude = (orb.Base.Position - char.PrimaryPart.Position).Magnitude
-
-                if realMagnitude < distance then
-                    foundOrb = orb.Base
-                    distance = realMagnitude
-                end
+                strikerOrb:SetAttribute("Obtained", true)
             end
         end
 
-        if foundOrb then return foundOrb.Parent end
-    end
-    local nearestOrb = _findNearestOrb()
+        wait(0.2)
+        HarukaLib:Add(char, "SpeedBuff", -999)
+        HarukaLib:Add(char, "JumpBuff", -999)
 
-    if nearestOrb then
-        local vel = instanceNew("BodyVelocity")
-        vel.MaxForce = Vector3.one * math.huge
-        vel.Name = "StrikerDashVel"
-        vel.Velocity = char.PrimaryPart.CFrame.LookVector * 0
-        vel.Parent = char.PrimaryPart
-        Debris:AddItem(vel, 0.8)
+        Spawn(function()
+            for _ = 1, #strikerOrbs do
+                AttackUtil:DealDMG(plr, monster, baseDamage)
+                wait(0.3)
+            end
+        end)
 
-        char.Humanoid.AutoRotate = false
-        char.PrimaryPart.CFrame = cfLookAt(char.PrimaryPart.Position, nearestOrb.Base.Position)
+        for _, orb in strikerOrbs do
+            if orb:FindFirstChild("Base") then
+                char.Humanoid.AutoRotate = false
 
-        local originHRPCFrame = char.PrimaryPart.CFrame
-        local shockwave = RepS.Package.MagicAssets.Shockwave:Clone()
-        shockwave.Transparency = 0.6
-        shockwave.CFrame = char.PrimaryPart.CFrame * cfNew(0,0,-2) * cfAngles(0, rad(90), rad(90))
-        shockwave.Parent = char
-        Debris:AddItem(shockwave, 1)
-        Events.ClientTween:Fires({ shockwave }, { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
+                local shockwave = RepS.Package.MagicAssets.Shockwave:Clone()
+                shockwave.Transparency = 0.6
+                shockwave.CFrame = char.PrimaryPart.CFrame * cfNew(0,0,-2) * cfAngles(0, rad(90), rad(90))
+                shockwave.Parent = char
+                Debris:AddItem(shockwave, 1)
 
-        char.PrimaryPart.CFrame = nearestOrb.Base.CFrame
+                Events.ClientTween:Fires({ shockwave }, { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
 
-        for i = 1,3 do
-            FastSpawn(function()
-                local strikerDash = RepS.Package.MagicAssets.StrikerDash:Clone()
-                strikerDash:PivotTo(originHRPCFrame)
-                strikerDash.Parent = char
-                Debris:AddItem(strikerDash, 1)
+                local bp = instanceNew("BodyPosition")
+                bp.Name = "DashVel"
+                bp.D = 500
+                bp.MaxForce = v3New(1, 1, 1) * 100000
+                bp.Position = orb.Base.Position
+                bp.Parent = char.PrimaryPart
 
-                local tweenObjs = {}
-                for _, child in strikerDash:GetChildren() do
-                    if child:IsA("Part") and child.Name ~= "HumanoidRootPart" then
-                        child.Transparency = 0.6
-                        insert(tweenObjs, child)
-                    end
-                end
-                Events.ClientTween:Fires(tweenObjs, { Transparency = 1 }, "one")
-
-                local newHRPCFrame = char.PrimaryPart.CFrame
-                Events.ClientTween:Fires({ strikerDash.PrimaryPart }, { Position = newHRPCFrame.Position }, "one")
-            end)
-            wait(0.1)
+                wait(0.3)
+                char.Humanoid.AutoRotate = true
+                bp:Destroy()
+            end
         end
-    end
 
-    wait(0.3)
-    for _, child in char.PrimaryPart:GetChildren() do
-        if child.Name == "StrikerDashVel" then child:Destroy() end
-    end
-
-    local shockwave2 = RepS.Package.MagicAssets.Shockwave:Clone()
-    shockwave2.Transparency = 0.7
-    shockwave2.CFrame = char.PrimaryPart.CFrame * cfNew(0,0,-2) * cfAngles(0, rad(90), rad(90))
-    shockwave2.Parent = char
-    Debris:AddItem(shockwave2, 1)
-    Events.ClientTween:Fires({ shockwave2 }, { Size = shockwave2.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
-
-    local bv = instanceNew("BodyVelocity")
-    bv.MaxForce = Vector3.one * math.huge
-    bv.Velocity = char.PrimaryPart.CFrame.UpVector * 50
-    bv.Parent = char.PrimaryPart
-    Debris:AddItem(bv, 0.05)
+        HarukaLib:Add(char, "SpeedBuff", 999)
+        HarukaLib:Add(char, "JumpBuff", 999)
+    end)
 end
 
 function AttackUtil.AlchemistRed(plr: Player, monster: Model)
-    SkillUtil:RestoreManaByOrb(plr)
-
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
+
+    
 end
 function AttackUtil.AlchemistBlue(plr: Player, monster: Model)
-    SkillUtil:RestoreManaByOrb(plr)
-
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 end
 function AttackUtil.AlchemistGreen(plr: Player, monster: Model)
-    SkillUtil:RestoreManaByOrb(plr)
-
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 end
 
 function AttackUtil.Illusionist(plr: Player, monster: Model)
-    SkillUtil:RestoreManaByOrb(plr)
-
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 end

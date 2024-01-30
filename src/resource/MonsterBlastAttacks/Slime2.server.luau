@@ -16,8 +16,6 @@ for i = 1, 5 do
 			if (child.Position - char.Parent.Position).Magnitude >= 46 then
 				child:Destroy()
 
-				model.SlimeAttack:Play()
-
 				wait(0.5)
 				model:Destroy()
 				return
@@ -29,6 +27,7 @@ for i = 1, 5 do
 			blast.Owner.Value = model.Owner.Value
 			blast:PivotTo(cfNew(post, post + child.CFrame.LookVector))
 			blast:AddTag("MonsterAttack")
+			blast:SetAttribute("SlimeWaveProjectile", true)
 			blast.Parent = char.Holder.Value
 			for _, descendant in blast:GetDescendants() do
 				if descendant:IsA("BasePart") then
@@ -42,8 +41,6 @@ for i = 1, 5 do
 	end
 	wait(0.01)
 end
-
-model.SlimeAttack:Play()
 
 wait(1)
 model:Destroy()

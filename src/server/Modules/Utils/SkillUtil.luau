@@ -6,8 +6,9 @@ local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local delay = task.delay
+local wait = task.wait
 local ceil, floor = math.ceil, math.floor
 local fromRGB = Color3.fromRGB
 
@@ -30,7 +31,8 @@ function SkillUtil:RestoreManaByOrb(plr: Player)
 	restoreEff.Parent = char.PrimaryPart
 	Debris:AddItem(restoreEff, 1)
 
-	delay(0.4, function()
+	Spawn(function()
+		wait(0.4)
 		restoreEff.Enabled = false
 	end)
 end
@@ -49,7 +51,8 @@ function SkillUtil:RestoreMana(plr: Player, healPower: number)
 	restoreEff.Parent = char.PrimaryPart
 	Debris:AddItem(restoreEff, 1)
 
-	delay(0.4, function()
+	Spawn(function()
+		wait(0.4)
 		restoreEff.Enabled = false
 	end)
 end
@@ -68,7 +71,8 @@ function SkillUtil:Heal(plr: Player, healPower: number)
 	healEff.Parent = char.PrimaryPart
 	Debris:AddItem(healEff, 1)
 
-	delay(0.4, function()
+	Spawn(function()
+		wait(0.4)
 		healEff.Enabled = false
 	end)
 end

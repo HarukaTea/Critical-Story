@@ -9,7 +9,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
-local FilterButton = require(RepS.Modules.UI.Components.FilterButton)
+local FilterButton = require(RepS.Modules.UI.Components.FilterButtonMenu)
 
 local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
 local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
@@ -93,8 +93,9 @@ return function(plr: Player)
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
 						FilterButton("Party", self)
-						-- FilterButton("Donation", self),
-						-- FilterButton("Guild", self),
+					}, self),
+					BottomBtns("Right", {
+						FilterButton("Disband", self)
 					}, self),
 
 					CharacterFrame(self),
@@ -191,6 +192,10 @@ return function(plr: Player)
 			playerData.Gold:set(gold)
 		end,
 
+		[AttributeChange("CombatMode")] = function(style)
+			playerSettings.PartyCombat:set(style == "Party")
+			playerSettings.PublicCombat:set(style == "Public")
+		end,
 		[AttributeChange("Musics")] = function(state)
 			playerSettings.Musics:set(state)
 

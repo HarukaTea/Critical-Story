@@ -14,14 +14,34 @@ local v2New = Vector2.new
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local insert = table.insert
 local udNew = UDim.new
+local fromRGB = Color3.fromRGB
 
 local function Title(index: number, text: string) : TextLabel
 	return Components.TextLabel({
 		Name = "Title"..index,
 		Position = if index == 1 then fromScale(0, 0) else fromScale(0.416, 0),
 		Size = fromScale(0.355, 0.1),
+		TextColor3 = fromRGB(255, 170, 127),
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Text = text
+		Text = "<u>"..text.."</u>",
+		RichText = true
+	})
+end
+local function Tip(index: number, text: string, self: table) : TextLabel
+	return Components.TextLabel({
+		Name = "Tip"..index,
+		Position = if index == 1 then fromScale(0.027, 0.438) else fromScale(0.536, 0.438),
+		Size = fromScale(0.298, 0.107),
+		Text = text,
+		TextTransparency = 0.5,
+
+		Visible = Computed(function(use)
+			if index == 1 then
+				if not use(self.players)[1] then return true else return false end
+			elseif index == 2 then
+				if not use(self.partyMembers)[1] then return true else return false end
+			end
+		end)
 	})
 end
 
@@ -54,6 +74,9 @@ local function PartyFrame(self: table): Frame
 
 			Title(1, "Players"),
 			Title(2, "Your Party"),
+
+			Tip(1, "NO PLAYERS IN SERVER", self),
+			Tip(2, "NO PARTY CREATED", self),
 
 			Components.ScrollingFrame({
 				Name = "InviteList",

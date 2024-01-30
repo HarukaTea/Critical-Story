@@ -4,7 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Guard = require(RepS.Modules.Packages.Guard)
 
-local numberCheck = Guard.Check(Guard.NumberMinMax(1, 950))
+local numberCheck = Guard.Check(Guard.NumberMinMax(0, 950))
 
 return function (_, plr, level)
     local levelPass, levelWant = numberCheck(level)

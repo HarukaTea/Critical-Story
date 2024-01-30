@@ -6,6 +6,9 @@ local PassiveUtil = {}
 
 local find, sub = string.find, string.sub
 
+--[[
+    Equip a new passive, and apply its buffs
+]]
 function PassiveUtil:EquipPassive(item: string, char: Model)
     if item == "HuntingDagger" then
         HarukaLib:Add(char, "DamageBuff", 5)
@@ -21,6 +24,9 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", true)
 end
 
+--[[
+    Unequip a passive by clear all passive, and re-equip the rest
+]]
 function PassiveUtil:ClearAllPassives(char: Model)
     for attribute, _ in char:GetAttributes() do
         if find(attribute, "Buff") then

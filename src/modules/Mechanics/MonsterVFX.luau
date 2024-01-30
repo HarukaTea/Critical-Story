@@ -6,26 +6,29 @@ local TS = game:GetService("TweenService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Collection = require(RepS.Modules.Packages.Collection)
 
-local MonsterVFX = {}
-MonsterVFX.__index = MonsterVFX
-
 local wait = task.wait
 local sinh, random = math.sinh, math.random
 local v3New = Vector3.new
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
 
 ---// Foxes
-function MonsterVFX:Spike1(blast: Model)
+local function spikeShot(blast: Model)
+	wait(0.5)
+	blast.Spike:Play()
+end
+
+local function spike1(blast: Model)
 	blast.Base.CFrame *= cfNew(0, 0, -80)
 
 	TS:Create(blast.Part, AssetBook.TweenInfos.one, { Position = blast.Base.Position }):Play()
 end
 
-function MonsterVFX:Spike2Range(blast: BasePart)
+local function spike2Range(blast: BasePart)
 	TS:Create(blast, AssetBook.TweenInfos.one, { Transparency = 1 }):Play()
 end
 
-function MonsterVFX:SpikeRain(blast: Model)
+local function spikeRain(blast: Model)
+	blast.Spike:Play()
 	blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, 30, 0))
 
 	for _ = 1, 30 do
@@ -36,7 +39,9 @@ function MonsterVFX:SpikeRain(blast: Model)
 	end
 end
 
-function MonsterVFX:WolfBite(blast: Model)
+local function wolfBite(blast: Model)
+	blast.WolfSound:Play()
+
 	TS:Create(blast.Fang1.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 	TS:Create(blast.Fang2.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 
@@ -50,9 +55,8 @@ function MonsterVFX:WolfBite(blast: Model)
 end
 
 
-
 --// Slimes
-function MonsterVFX:SlimeShot(blast: Model, char: Model)
+local function slimeShot(blast: Model, char: Model)
 	if not blast:FindFirstChild("Shot") then return end
 
 	blast.Shot.Part.Color = blast:GetAttribute("SlimeColor")
@@ -67,7 +71,7 @@ function MonsterVFX:SlimeShot(blast: Model, char: Model)
 	blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(angle,0,0))
 
 	local rotatingangle = angle * 2 /10
-	for i = 1,10 do
+	for _ = 1, 10 do
 		wait(0.01)
 		if not blast:FindFirstChild("Shot") then return end
 
@@ -76,7 +80,9 @@ function MonsterVFX:SlimeShot(blast: Model, char: Model)
 	blast.Shot:Destroy()
 end
 
-function MonsterVFX:SlimeWave(blast: Model)
+local function slimeWave(blast: Model)
+	blast.SlimeAttack:Play()
+
 	for i = 1, 5 do
 		if not blast:FindFirstChild("Position"..i) then continue end
 
@@ -84,7 +90,7 @@ function MonsterVFX:SlimeWave(blast: Model)
 	end
 end
 
-function MonsterVFX:SlimeBlast(blast: Model)
+local function slimeBlast(blast: Model, noSound: boolean?)
 	local centerCFrame = blast.BlastCenter.CFrame :: CFrame
 	local cframe1, cframe2, cframe3, cframe4 =
 		blast.Blast1.CFrame :: CFrame,
@@ -93,7 +99,8 @@ function MonsterVFX:SlimeBlast(blast: Model)
 		blast.Blast4.CFrame :: CFrame
 	local cframeArray = { [1] = cframe1, [2] = cframe2, [3] = cframe3, [4] = cframe4 }
 
-	for i = 1, 4 do
+	if not noSound then blast.SlimeAttack:Play() end
+	for _ = 1, 4 do
 		wait(0.01)
 		if not blast:FindFirstChild("BlastCenter") then return end
 
@@ -107,7 +114,7 @@ function MonsterVFX:SlimeBlast(blast: Model)
 			blast["Blast" .. j].Transparency += 0.05
 		end
 	end
-	for i = 1, 4 do
+	for _ = 1, 4 do
 		wait(0.01)
 		if not blast:FindFirstChild("BlastCenter") then return end
 
@@ -123,7 +130,7 @@ function MonsterVFX:SlimeBlast(blast: Model)
 	end
 end
 
-function MonsterVFX:SlimeBlastFade(blast: Model)
+local function slimeBlastFade(blast: Model)
 	for _, child in blast:GetChildren() do
 		if child:IsA("BasePart") then
 			TS:Create(child, AssetBook.TweenInfos.one, { Size = v3New() }):Play()
@@ -131,7 +138,7 @@ function MonsterVFX:SlimeBlastFade(blast: Model)
 	end
 end
 
-function MonsterVFX:SlimeDive(blast: Model)
+local function slimeDive(blast: Model)
 	for i = 1, 2 do
 		local size = if i == 1 then v3New(20, 1, 20) else v3New(4, 1, 4)
 
@@ -139,56 +146,60 @@ function MonsterVFX:SlimeDive(blast: Model)
 	end
 end
 
-function MonsterVFX:SlimeBomb(blast: Model)
+local function slimeBomb(blast: Model)
 	TS:Create(blast.Bomb1, AssetBook.TweenInfos.twiceHalf, { Size = v3New(16, 16, 16) }):Play()
 	TS:Create(blast.Bomb2, AssetBook.TweenInfos.twiceHalf, { Size = v3New(22, 26, 26) }):Play()
 	TS:Create(blast.Bomb1, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 	TS:Create(blast.Bomb2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
-function MonsterVFX:SlimeSpin(blast: Model)
+local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast1, AssetBook.TweenInfos.twiceHalf, { Size = v3New(16, 16, 16) }):Play()
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Size = v3New(22, 26, 26) }):Play()
 	TS:Create(blast.Blast1, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
-return function()
-	local self = setmetatable({}, MonsterVFX)
-
+local function returnFunc()
 	local function _vfxHandler(blast: Model | BasePart)
 		wait()
 		local style = blast.Name
+		if not blast:IsDescendantOf(workspace) then return end
 
 		blast:WaitForChild("Owner")
 
-		if style == "SpikeWolfSpike1" then
-			self:Spike1(blast)
+		if style == "SpikeWolf1" then
+			spikeShot(blast)
+
+		elseif style == "SpikeWolfSpike1" then
+			spike1(blast)
 
 		elseif style == "SpikeWolfSpike2" then
-			self:SpikeRain(blast)
+			spikeRain(blast)
 
 		elseif style == "SpikeWolf2Range" then
-			self:Spike2Range(blast)
+			spike2Range(blast)
 
 		elseif style == "SpikeWolf4" then
-			self:WolfBite(blast)
+			wolfBite(blast)
 
 		elseif style == "Slime1" then
 			wait(0.3)
-			self:SlimeShot(blast, blast.Owner.Value)
+			slimeShot(blast, blast.Owner.Value)
 
 		elseif style == "Slime2" then
 			wait(0.5)
-			self:SlimeWave(blast)
+			slimeWave(blast)
 
 		elseif style == "SlimeBlast" then
-			self:SlimeBlast(blast)
+			slimeBlast(blast, blast:GetAttribute("SlimeWaveProjectile"))
 
 			wait(8)
-			self:SlimeBlastFade(blast)
+			slimeBlastFade(blast)
 		end
 	end
 
 	Collection("MonsterAttack", _vfxHandler)
 end
+
+return returnFunc

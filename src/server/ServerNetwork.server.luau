@@ -7,15 +7,15 @@ local TeleS = game:GetService("TeleportService")
 
 local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local FastSpawn = require(RepS.Modules.Packages.Spawn)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 local PassiveUtil = require(SSS.Modules.Utils.PassiveUtil)
 
 local floor = math.floor
 local fromRGB = Color3.fromRGB
-local delay = task.delay
+local wait = task.wait
 local insert = table.insert
 local instanceNew = Instance.new
 
@@ -55,11 +55,10 @@ local function combatEndSetup(monster: Model)
 
 	local attackFolder = monster.Holder.Value
 	local continueCombatCheck = false
-	local result = if monster:GetAttribute("Health") <= 0 then "Success" else "Failed"
 
-	delay(1, function()
-		attackFolder:Destroy()
-	end)
+	--- another issue, don't change this else it will bug
+	local result = "Failed"
+	if monster:GetAttribute("Health") <= 0 then result = "Success" end
 
 	if result == "Failed" then
 		ServerUtil:MonsterDefeated(monster, monster.PrimaryPart.Position, true)
@@ -152,7 +151,7 @@ end
 Events.CombatStart:Connect(combatStartSetup)
 Signals.CombatEnd:Connect(function(monster: Model)
 	--- I have no idea why this can be broken without task.spawn
-	FastSpawn(combatEndSetup, monster)
+	Spawn(combatEndSetup, monster)
 end)
 
 --[[
@@ -193,6 +192,13 @@ local function levelUp(plr: Player)
 
 		ServerUtil:ShowText(plr.Character, "LEVEL UP!", fromRGB(255, 255, 0))
 
+		--- make character full state
+		local char = plr.Character :: Model
+
+		char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
+		char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
+		char.Humanoid.Health = char.Humanoid.MaxHealth
+
 	elseif not check and plr:GetAttribute("Levels") < LEVEL_CAP then
 		plr:SetAttribute("Levels", LEVEL_CAP)
 		plr:SetAttribute("EXP", 0)
@@ -211,10 +217,11 @@ Signals.LevelUp:Connect(levelUp)
 ]]
 local function addPoint(plr: Player, option: string, times: number)
 	if option == "Reset" then
-		local cost = ((plr:GetAttribute("Levels") - 1) * LEVEL_POINT - plr:GetAttribute("LvPoints")) * 20
+		local level = plr:GetAttribute("Levels") - 1
+		local cost = (level * LEVEL_POINT - plr:GetAttribute("LvPoints")) * 20
 
 		if plr:GetAttribute("Gold") < cost then
-			Events.CreateHint:Fire(plr, "You don't have enough Gold to reset!")
+			Events.CreateHint:Fire(plr, "You don't have enough Gold to reset!", "Error")
 			return
 		end
 
@@ -224,12 +231,12 @@ local function addPoint(plr: Player, option: string, times: number)
 		plr:SetAttribute("ManaPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
 		plr:SetAttribute("ShieldPoints", 0)
-		plr:SetAttribute("LvPoints", (plr:GetAttribute("Levels") - 1) * LEVEL_POINT)
+		plr:SetAttribute("LvPoints", level * LEVEL_POINT)
 		return
 	end
 
 	if plr:GetAttribute("LvPoints") > 0 then
-		for i = 1, times do
+		for _ = 1, times do
 			if plr:GetAttribute("LvPoints") > 0 then
 				HarukaLib:Add(plr, option, 1)
 				HarukaLib:Add(plr, "LvPoints", -1)
@@ -322,8 +329,7 @@ Events.EquipItems:Connect(equipItem)
 	Handle the request from player to use items
 ]]
 local function essentialCheck(plr: Player, item: string) : string
-	if
-		plr.Inventory:FindFirstChild(item)
+	if plr.Inventory:FindFirstChild(item)
 		and plr.Inventory[item].Value > 0
 		and plr.Inventory[item]:GetAttribute("Equipped")
 	then
@@ -365,31 +371,58 @@ Events.UpdatePinnedItems:Connect(pinItem)
 local function makeParty(plr: Player, method: string, target: Player | string)
 	local parties = workspace.MapComponents.Parties
 
+	local function _disbandParty()
+		for _, player in parties[plr.Name]:GetChildren() do
+			if player.Value then player.Value:SetAttribute("InParty", false) end
+
+			Events.CreateHint:Fire(player.Value, "The party has been disbanded by party owner!", "Hint")
+		end
+
+		parties[plr.Name]:Destroy()
+	end
 	if method == "Invite" then
+		if not target then return end
+
 		if target:GetAttribute("InviteTicket") then
-			Events.CreateHint:Fire(plr, "Player is busying handling with the requests from other players!")
+			Events.CreateHint:Fire(plr, "Player is busying handling with the requests from other players!", "Error")
             return
 		end
 
 		Events.PartyInvite:Fire(target, plr)
 
 		target:SetAttribute("InviteTicket", true)
-		delay(12, function()
+		Spawn(function()
+			wait(12)
 			target:SetAttribute("InviteTicket", nil)
 		end)
 
 	elseif method == "Kick" then
+		if not target then return end
 		if not parties:FindFirstChild(plr.Name) then return end
 		if not parties[plr.Name]:FindFirstChild(target.Name) then return end
 
-		parties[plr.Name][target.Name]:Destroy()
+		local party = parties[plr.Name]
+
+		party[target.Name]:Destroy()
 		target:SetAttribute("InParty", false)
 
-		if not parties[plr.Name]:FindFirstChildOfClass("ObjectValue") or #parties[plr.Name]:GetChildren() == 1 then
-			parties[plr.Name]:Destroy()
+		if target.Name == plr.Name then
+			_disbandParty()
+			return
+		end
+
+		for _, player in party:GetChildren() do
+			Events.CreateHint:Fire(player.Value, target.Name.." has left the party...", "Hint")
+		end
+
+		if #party:GetChildren() <= 1 then
+			party:Destroy()
 
 			plr:SetAttribute("InParty", false)
+			Events.CreateHint:Fire(target, "The party has been disbanded due to the lack of people...", "Hint")
 		end
+
+		Events.CreateHint:Fire(target, "You have been kicked from the party...", "Hint")
 
 	elseif method == "Accept" then
 		if not parties:FindFirstChild(target) and Players:FindFirstChild(target) then
@@ -403,6 +436,8 @@ local function makeParty(plr: Player, method: string, target: Player | string)
 			leader.Parent = owner
 
 			Players[target]:SetAttribute("InParty", true)
+
+			Events.CreateHint:Fire(Players[target], "Party created!", "Hint")
 		end
 
 		if parties:FindFirstChild(target) then
@@ -412,6 +447,38 @@ local function makeParty(plr: Player, method: string, target: Player | string)
 			member.Parent = parties[target]
 
 			plr:SetAttribute("InParty", true)
+		end
+
+		for _, player in parties[target]:GetChildren() do
+			Events.CreateHint:Fire(player.Value, target.." has joined the party...", "Hint")
+		end
+
+	elseif method == "Leave" then
+		local check = parties:FindFirstChild(plr.Name, true)
+		if not check then return end
+
+		if check:IsA("Folder") then
+			_disbandParty()
+
+		elseif check:IsA("ObjectValue") then
+			local folder = check.Parent
+
+			check:Destroy()
+			plr:SetAttribute("InParty", false)
+
+			for _, player in folder:GetChildren() do
+				Events.CreateHint:Fire(player.Value, plr.Name.." has left the party...", "Hint")
+			end
+
+			if #folder:GetChildren() <= 1 then
+				local player = folder:FindFirstChildOfClass("ObjectValue")
+
+				player.Value:SetAttribute("InParty", false)
+				Events.CreateHint:Fire(player.Value, "The party has been disbanded due to the lack of people...", "Hint")
+
+				folder:Destroy()
+				return
+			end
 		end
 	end
 end
@@ -440,6 +507,14 @@ local function rejoinRequest(plr: Player)
 	TeleS:Teleport(game.PlaceId, plr)
 end
 Events.RejoinRequest:Connect(rejoinRequest)
+
+--[[
+	Fix the reset button issue
+]]
+local function forceReset(plr: Player)
+	plr.Character.Humanoid.Health = 0
+end
+Events.ForceReset:Connect(forceReset)
 
 --- Start the server after net listening are all done
 require(script.Parent.Modules.ServerSetups)()

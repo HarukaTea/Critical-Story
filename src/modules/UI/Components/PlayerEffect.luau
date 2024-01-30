@@ -13,7 +13,7 @@ local clamp = math.clamp
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
 local IMAGES = {
-    AttackBuff = "rbxassetid://2970818097"
+    AttackBuff = "rbxassetid://2965862892"
 }
 
 local function mapValue(val: number, duration: number) : number

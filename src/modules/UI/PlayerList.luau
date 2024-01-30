@@ -25,21 +25,17 @@ local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local fromRGB = Color3.fromRGB
 local min = math.min
 
-function PlayerList:ChangePlayerSlotClass(player: Player)
-	if not player:IsDescendantOf(Players) then return end --- cuz plr left also triggers this
-
-	peek(self.list)[player.Name].Class.Image = AssetBook.ClassInfo[player:GetAttribute("Class")].Image
-end
-
 return function(plr: Player)
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 
 	local self = setmetatable({}, PlayerList)
 	self.plrGui = plr.PlayerGui
 
+	local char = plr.Character or plr.CharacterAdded:Wait()
+
 	self.UI, self.list, self.desc = Value(), Value(), Value()
 	self.absSize, self.absContentSize = Value(90), Value(30)
-	self.players = Value(Players:GetPlayers())
+	self.players = Value({})
 
 	self.isOpen = Value(true)
 	self.invProgressSize, self.invPerson, self.invPersonT = Value(fromScale(1, 1)), Value(""), Value("")
@@ -107,7 +103,7 @@ return function(plr: Player)
 
 				[Fusion.OnEvent("MouseLeave")] = function()
 					for _, element in peek(self.list):GetChildren() do
-						if element:IsA("Frame") and element.BackgroundColor3 == color3New(1, 1, 1) then
+						if element:IsA("Frame") then
 							element.BackgroundColor3 = fromRGB(30, 30, 30)
 							element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
 						end
@@ -144,21 +140,14 @@ return function(plr: Player)
 	self.absContentSize:set(peek(self.list).UIListLayout.AbsoluteContentSize.Y)
 	for _, player in Players:GetPlayers() do
 		repeat wait() until player:GetAttribute("PlayerDataLoaded")
-
-		player:GetAttributeChangedSignal("Class"):Connect(function()
-			self:ChangePlayerSlotClass(player)
-		end)
 	end
+	self.players:set(Players:GetPlayers())
 
 	---// Listening events
 	Players.PlayerAdded:Connect(function(player)
 		repeat wait() until player:GetAttribute("PlayerDataLoaded")
 
 		self.players:set(Players:GetPlayers())
-
-		player:GetAttributeChangedSignal("Class"):Connect(function()
-			self:ChangePlayerSlotClass(player)
-		end)
 	end)
 	Players.PlayerRemoving:Connect(function()
 		self.players:set(Players:GetPlayers())
@@ -182,4 +171,14 @@ return function(plr: Player)
 		self.invProgressSize:set(fromScale(1, 1))
 	end
 	Events.PartyInvite:Connect(_partyInvite)
+
+	--// Clear
+	local function _clearGarbadge()
+		Events.PartyInvite:DisconnectAll()
+
+		CAS:UnbindAction("TogglePlayerList")
+
+		peek(self.UI):Destroy()
+	end
+	char.Humanoid.Died:Once(_clearGarbadge)
 end

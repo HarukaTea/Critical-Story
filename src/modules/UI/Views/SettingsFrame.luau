@@ -58,8 +58,6 @@ local function OptionFrame(id: string, self: table) : Frame
 							plr:SetAttribute("CombatMode", "Public")
 						end
 
-						playerSettings[id]:set(not peek(playerSettings[id]))
-						playerSettings.PartyCombat:set(false)
 						return
 
 					elseif id == "PartyCombat" then
@@ -69,8 +67,6 @@ local function OptionFrame(id: string, self: table) : Frame
 							plr:SetAttribute("CombatMode", "Party")
 						end
 
-						playerSettings[id]:set(not peek(playerSettings[id]))
-						playerSettings.PublicCombat:set(false)
 						return
 
 					elseif id == "PotatoMode" then

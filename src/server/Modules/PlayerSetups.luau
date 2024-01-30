@@ -5,9 +5,10 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local FastSpawn = require(RepS.Modules.Packages.Spawn)
+local Events = require(SSS.Modules.Data.ServerEvents)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local Signals = require(SSS.Modules.Data.ServerSignals)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local newInstance = Instance.new
 local wait = task.wait
@@ -165,10 +166,38 @@ function PlayerSetups:Clear(plr: Player)
 			end
 		end
 	end
+
+	--- check if player is in party
+	local check = workspace.MapComponents.Parties:FindFirstChild(plr.Name, true)
+
+	local function _leaveParty(wholeParty: Folder, member: ObjectValue)
+		member:Destroy()
+
+		for _, player in wholeParty:GetChildren() do
+			Events.CreateHint:Fire(player.Value, plr.Name.." has left the party...", "Hint")
+		end
+
+		if #wholeParty:GetChildren() <= 1 then
+			local player = wholeParty:FindFirstChildOfClass("ObjectValue")
+
+			player.Value:SetAttribute("InParty", false)
+			Events.CreateHint:Fire(player.Value, "The party has been disbanded due to the lack of people...", "Hint")
+
+			wholeParty:Destroy()
+		end
+	end
+	if check then
+		if check:IsA("ObjectValue") then
+			_leaveParty(check.Parent, check)
+
+		elseif check:IsA("Folder") then
+			_leaveParty(check, check[plr.Name])
+		end
+	end
 end
 
-return function ()
-    local self = setmetatable({}, PlayerSetups)
+local function returnFunc()
+	local self = setmetatable({}, PlayerSetups)
 
     self.TEMPLATE = {
 		Stats = {
@@ -196,6 +225,13 @@ return function ()
 	}
 	self.DS1, self.DS2, self.DS3 = "CSTORY_BETA_1599", "CSTORY_BETA_1599_S2", "CSTORY_BETA_1599_S3"
 
+	--- in case player joined before server starts
+	for _, plr in Players:GetPlayers() do
+		Spawn(function()
+			self:Setup(plr)
+		end)
+	end
+
 	--// Connections
 	local function _playerAdded(plr: Player)
 		if plr:IsDescendantOf(Players) then --- in case player joins and left very quickly
@@ -207,11 +243,6 @@ return function ()
 	end
 	Players.PlayerAdded:Connect(_playerAdded)
 	Players.PlayerRemoving:Connect(_playerLeft)
-
-	--- in case player joined before server starts
-	for _, plr in Players:GetPlayers() do
-		FastSpawn(function()
-			self:Setup(plr)
-		end)
-	end
 end
+
+return returnFunc

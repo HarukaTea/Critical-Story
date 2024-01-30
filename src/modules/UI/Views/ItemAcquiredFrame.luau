@@ -26,13 +26,11 @@ local function ItemAcquiredFrame(self: table): Frame
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
 			}),
 			Fusion.ForValues(self.newAddedItems, function(use, item: string)
-				workspace.Sounds.SFXs.ItemAcquired:Play()
-
 				local info = {
 					Icon = AssetBook.Items.ItemImages[item],
 					Name = AssetBook.Items.ItemName[item],
 					TierColor = AssetBook.TierColor[AssetBook.Items.ItemTier[item]],
-					Position = Value(fromScale(-0.25, 0))
+					Position = Value(fromScale(-0.45, 0))
 				}
 
 				return ItemBar(info)

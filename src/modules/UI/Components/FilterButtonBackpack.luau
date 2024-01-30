@@ -12,16 +12,12 @@ local peek = Fusion.peek
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local tFind = table.find
 
 local COLORS = {
-	Character = fromRGB(172, 113, 86),
-	Party = fromRGB(52, 104, 156),
-	Settings = fromRGB(53, 107, 79),
-
 	Passive = fromRGB(40, 98, 3),
 	Active = fromRGB(167, 111, 83),
 	Others = fromRGB(0, 130, 139),
+
 	Equip = fromRGB(85, 85, 85),
 	Pin = fromRGB(93, 47, 140),
 }
@@ -37,16 +33,6 @@ local function _findItem(itemFrame: Frame) : string
 	if not item then return "None" end
 
 	return item
-end
-local function _closeOther(self: table, id: string)
-	local mainFrames = { "BottomLeft", "Top" }
-	for _, frame in peek(self.UI).BG:GetChildren() do
-		if frame:IsA("Frame") and not tFind(mainFrames, frame.Name) then
-			frame.Visible = false
-		end
-	end
-
-	peek(self.UI).BG[id].Visible = true
 end
 local function _onClick(id: string, self: table)
 	if peek(self.chosenFilter) == id then
@@ -84,9 +70,6 @@ local function _onClick(id: string, self: table)
 			btnsRightFrame.Pin.Text = "Pin"
 			peek(self.itemFrame)[item].Pinned.Visible = false
 		end
-
-	elseif id == "Character" or id == "Settings" or id == "Party" then
-		_closeOther(self, id)
 
 	else
 		self.chosenFilter:set(id)

@@ -11,6 +11,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
@@ -28,7 +29,7 @@ local Children, New, Value, Hydrate, AttributeChange, OnEvent, peek =
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
 
-local wait, cancel, spawn, delay = task.wait, task.cancel, task.spawn, task.delay
+local wait, cancel = task.wait, task.cancel
 local insert, remove, tFind = table.insert, table.remove, table.find
 local floor, clamp = math.floor, math.clamp
 local sFind, format, match = string.find, string.format, string.match
@@ -531,7 +532,8 @@ return function(plr: Player)
 		insert(nowAdded, item)
 		self.newAddedItems:set(nowAdded)
 
-		delay(4, function()
+		Spawn(function()
+			wait(4)
 			local afterAdded = peek(self.newAddedItems)
 
 			remove(afterAdded, tFind(afterAdded, item))

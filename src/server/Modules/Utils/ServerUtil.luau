@@ -5,18 +5,19 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local FastSpawn = require(RepS.Modules.Packages.Spawn)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local wait, delay = task.wait, task.delay
+local wait = task.wait
 local floor, random, rad = math.floor, math.random, math.rad
 local cfNew, instanceNew, rayNew, v3New = CFrame.new, Instance.new, Ray.new, Vector3.new
 local cfAngles = CFrame.Angles
 local fromRGB = Color3.fromRGB
-local insert, clear = table.insert, table.clear
+local insert = table.insert
 local yAxis = Vector3.yAxis
 local sFind = string.find
 
@@ -134,9 +135,9 @@ end
 
 --[[
 	Spawn a monster, with the given locator part, you can pass level in to force
-	spawn strong monsters
+	Spawn strong monsters
 ]]
-function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
+function ServerUtil:SetupMonster(locator: Part, forceLevel: number?)
 	local level = forceLevel or locator:GetAttribute("Levels")
 
 	local monster = RepS.Package.MonsterModels[locator.Name]:Clone() :: Model
@@ -151,23 +152,23 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", level ^ 2 + 59)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2.2) + 99)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
 	monster:SetAttribute("EXP", floor(level ^ 1.25) + 25)
 	monster:SetAttribute("Damage", 5 * level)
 	monster:SetAttribute("InCombat", false)
 	monster:SetAttribute("IsMonster", true)
-	monster.Parent = locator
 
 	for _, child in monster:GetChildren() do
 		if child:IsA("Part") and monster:FindFirstChild(child.Name .. "Model") then
 			ServerUtil:WeldPart(child, monster[child.Name .. "Model"])
 		end
 	end
-
 	local monsterHPScript = RepS.Resources.Unloads.MonsterHP:Clone() :: Script
 	monsterHPScript.Disabled = true
 	monsterHPScript.Parent = monster
+
+	monster.Parent = locator
 
 	locator.Transparency = 1
 end
@@ -214,61 +215,69 @@ function ServerUtil:MonsterActivateCombat(monster: Model, mode: string?, plr: Pl
 		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
 		joinPrompt.CFrame = cfNew(locator.Position) * cfNew(0, 4, 0)
 		prompt:SetAttribute("Owner", plr.Name)
-		prompt:AddTag("CombatJoinPrompt")
 		prompt.Name = "PartyJoin"
+		prompt:AddTag("CombatJoinPrompt")
 		joinPrompt.Parent = locator
 	end
 end
 
 --[[
-	Monster defeated visual effects, and ready to spawn another one
+	Monster defeated visual effects, and ready to Spawn another one
 
 	You can make it not respawn after defeated, like story monsters
 ]]
 function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespawn: boolean?)
-	local respawnLocatorTip = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
-	local locator = monster.Parent
+	--- there will be issues without task.Spawn, what's the problem with that???
+	Spawn(function()
+		local respawnLocatorTip = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+		local locator = monster.Parent
 
-	wait(1)
-	local defeatedEffect = RepS.Package.Effects.DefeatedEffect:Clone() :: Part
-	defeatedEffect.Position = deadPos
-	defeatedEffect.Parent = workspace
-	delay(0.3, function()
-		defeatedEffect.Particle.Enabled = false
-	end)
-	Debris:AddItem(defeatedEffect, 5)
+		wait(1)
+		if monster.Holder.Value then monster.Holder.Value:Destroy() end
 
-	if not allowRespawn or locator:GetAttribute("CantRespawn") then
+		local defeatedEffect = RepS.Package.Effects.DefeatedEffect:Clone() :: Part
+		defeatedEffect.Position = deadPos
+		defeatedEffect.Parent = workspace
+
+		Debris:AddItem(defeatedEffect, 1)
+
+		Spawn(function()
+			wait(0.3)
+			defeatedEffect.Particle.Enabled = false
+		end)
+
+		if not allowRespawn or locator:GetAttribute("CantRespawn") then
+			monster:Destroy()
+			return
+		end
+
+		--- multi-combat mechanic
+		local waitingLocators = {}
+		if monster.WaitingList:FindFirstChildOfClass("ObjectValue") then
+			for _, waitingMonster in monster.WaitingList:GetChildren() do
+				insert(waitingLocators, waitingMonster.Value)
+			end
+		end
+		local respawnTimer = RepS.Package.Unloads.RespawnTimer:Clone() :: Part
+		respawnTimer.Parent = workspace
+		respawnTimer.Position = respawnLocatorTip.Position
+		Debris:AddItem(respawnTimer, 13)
+		Spawn(function()
+			for i = 12, 0, -1 do
+				respawnTimer.Timer.Text.Text = i
+				wait(1)
+			end
+		end)
+
 		monster:Destroy()
-		return
-	end
+		if respawnLocatorTip:FindFirstChild("PublicJoinPrompt") then respawnLocatorTip.PublicJoinPrompt:Destroy() end
 
-	--- multi-combat mechanic
-	local waitingLocators = {}
-	if monster.WaitingList:FindFirstChildOfClass("ObjectValue") then
-		for _, waitingMonster in monster.WaitingList:GetChildren() do
-			insert(waitingLocators, waitingMonster.Value)
-		end
-	end
-	local respawnTimer = RepS.Package.Unloads.RespawnTimer:Clone() :: Part
-	respawnTimer.Parent = workspace
-	respawnTimer.Position = respawnLocatorTip.Position
-	Debris:AddItem(respawnTimer, 13)
-	FastSpawn(function()
-		for i = 12, 0, -1 do
-			respawnTimer.Timer.Text.Text = i
-			wait(1)
+		wait(13)
+		ServerUtil:SetupMonster(locator)
+		for _, waitingLocator in waitingLocators do
+			ServerUtil:SetupMonster(waitingLocator)
 		end
 	end)
-
-	monster:Destroy()
-	if respawnLocatorTip:FindFirstChild("PublicJoinPrompt") then respawnLocatorTip.PublicJoinPrompt:Destroy() end
-
-	wait(13)
-	ServerUtil:SetupMonster(locator)
-	for _, waitingLocator in waitingLocators do
-		ServerUtil:SetupMonster(waitingLocator)
-	end
 end
 
 --[[
@@ -325,7 +334,8 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 		encounterHighlight.Adornee = char
 		Debris:AddItem(encounterHighlight, 2)
 
-		delay(1, function()
+		Spawn(function()
+			wait(1)
 			Events.ClientTween:Fires({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
 		end)
 	end
@@ -389,10 +399,22 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 		inventoryFolder[item].Value += amount
 
 	else
-		local intValue = instanceNew("IntValue")
-		intValue.Name = item
-		intValue.Value = amount
-		intValue.Parent = inventoryFolder
+		local itemType = AssetBook.Items.ItemType[item]
+
+		if not AssetBook.Items.IsSkill[item] and (itemType == "Active" or itemType == "Material") then
+			local intValue = instanceNew("IntConstrainedValue")
+			intValue.Name = item
+			intValue.MaxValue = 9999
+			intValue.Value = amount
+			intValue.Parent = inventoryFolder
+
+		else
+			local intValue = instanceNew("IntConstrainedValue")
+			intValue.Name = item
+			intValue.MaxValue = 1
+			intValue.Value = amount
+			intValue.Parent = inventoryFolder
+		end
 	end
 
 	Events.GiveDrop:Fire(plr, item)
@@ -426,7 +448,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 
 	if attributes.COMBAT_REQ then
 		if not char:GetAttribute("InCombat") or not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then
-			Events.CreateHint:Fire(plr, "You can only use this during combat!")
+			Events.CreateHint:Fire(plr, "You can only use this during combat!", "Error")
 
 			wait()
 			script:Destroy()
@@ -435,7 +457,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	end
 	if attributes.MANA_REQ then
 		if SkillUtil:ManaCheck(plr, attributes.MANA_REQ) == false then
-			Events.CreateHint:Fire(plr, "You don't have enough MP!")
+			Events.CreateHint:Fire(plr, "You don't have enough Mana!", "Error")
 
 			wait()
 			script:Destroy()
@@ -450,7 +472,8 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 		end
 	end
 
-	delay(attributes.CD, function()
+	Spawn(function()
+		wait(attributes.CD)
 		script:Destroy()
 	end)
 

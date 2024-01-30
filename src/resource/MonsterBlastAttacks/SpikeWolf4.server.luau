@@ -4,8 +4,6 @@ local model = script.Parent
 
 local wait = task.wait
 
-model.WolfSound:Play()
-
 wait(0.5)
 model.Fang1:SetAttribute("IsDamage", true)
 model.Fang2:SetAttribute("IsDamage", true)

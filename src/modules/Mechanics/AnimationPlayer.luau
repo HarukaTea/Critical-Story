@@ -35,7 +35,8 @@ return function (plr: Player)
 
         ArcherCharge = animator:LoadAnimation(animations.ArcherCharge),
 		KnightParry = animator:LoadAnimation(animations.KnightParry),
-		RogueSlash = animator:LoadAnimation(animations.RogueSlash)
+		RogueSlash = animator:LoadAnimation(animations.RogueSlash),
+		RepeaterFire = animator:LoadAnimation(animations.RepeaterFire)
     }
 
 	local function _playAnim(anim: string)
@@ -48,6 +49,7 @@ return function (plr: Player)
 
 	local function _onDead()
 		Events.PlayAnimation:DisconnectAll()
+		Signals.PlayAnimation:DisconnectAll()
 	end
 	humanoid.Died:Once(_onDead)
 end

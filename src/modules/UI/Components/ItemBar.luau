@@ -5,19 +5,24 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children = Fusion.Children
 
 local fromScale = UDim2.fromScale
 local v2New = Vector2.new
-local delay = task.delay
+local wait = task.wait
 local fromRGB = Color3.fromRGB
 
 local function ItemBar(info: table): Frame
-	delay(0.1, function()
+	workspace.Sounds.SFXs.ItemAcquired:Play()
+	
+	Spawn(function()
+		wait(0.75)
 		info.Position:set(fromScale(-0.04, 0))
 	end)
-	delay(3.2, function()
+	Spawn(function()
+		wait(3.2)
 		info.Position:set(fromScale(-0.25, 0))
 	end)
 

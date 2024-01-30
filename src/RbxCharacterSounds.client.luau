@@ -63,7 +63,10 @@ Events.ChestUnlocked:Connect(vfxChestUnlock)
 local function rejoinCombat()
 	for _, monsterSymbol in plr.Character.CharStats.TargetMonsters:GetChildren() do
 		if monsterSymbol.Value and monsterSymbol.Value.Holder.Value then
-			monsterSymbol.Value.Holder.Value.Parent = workspace.MapComponents.CombatFolders
+			local folder = monsterSymbol.Value.Holder.Value
+			if not folder.Parent then return end
+
+			folder.Parent = workspace.MapComponents.CombatFolders
 		end
 	end
 end

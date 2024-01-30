@@ -64,30 +64,31 @@ local function PartyInviteSlot(player: Player, envir: string, self: table) : Fra
                     then Font.fromName("GothamSSm", Enum.FontWeight.Bold)
                     else Font.fromName("SourceSansPro", Enum.FontWeight.Bold),
                 Text = if envir == "Invite" then "?" else "X",
+                Visible = if player.Name == self.plr.Name then false else true,
 
                 [Children] = { Components.RoundUICorner() },
 
                 [Fusion.OnEvent("MouseButton1Click")] = function()
                     if envir == "Invite" then
                         if not Fusion.peek(state) then
-                            Signals.CreateHint:Fire("You can't invite that player due to privacy settings!")
+                            Signals.CreateHint:Fire("You can't invite that player due to privacy settings!", "Error")
                             return
                         end
 
                         if player:GetAttribute("InviteTicket") then
-                            Signals.CreateHint:Fire("Player is busying handling with the requests from other players!")
+                            Signals.CreateHint:Fire("Player is busying handling with the requests from other players!", "Error")
                             return
                         end
 
                         if player:GetAttribute("InParty") then
-                            Signals.CreateHint:Fire("Player already have a party!")
+                            Signals.CreateHint:Fire("Player already have a party!", "Error")
                             return
                         end
 
                         local plr = self.plr :: Player
                         if plr:GetAttribute("InParty") then
                             if not workspace.MapComponents.Parties:FindFirstChild(plr.Name) then
-                                Signals.CreateHint:Fire("You can't invite others if you are not party owner!")
+                                Signals.CreateHint:Fire("You can't invite others if you are not party owner!", "Error")
                                 return
                             end
                         end
@@ -95,13 +96,15 @@ local function PartyInviteSlot(player: Player, envir: string, self: table) : Fra
                         Events.PartyInvite:Fire("Invite", player)
 
                     elseif envir == "Member" then
-                        if not workspace.MapComponents.Parties:FindFirstChild(self.plr.Name) then
-                            Signals.CreateHint:Fire("You can't kick others if you are not party owner!")
+                        local plr = self.plr :: Player
+
+                        if not workspace.MapComponents.Parties:FindFirstChild(plr.Name) then
+                            Signals.CreateHint:Fire("You can't kick others if you are not party owner!", "Error")
                             return
                         end
 
-                        if player.Name == self.plr.Name then
-                            Signals.CreateHint:Fire("Are you sure you wanna kick yourself?")
+                        if player.Name == plr.Name then
+                            Events.PartyInvite:Fire("Leave", player)
                             return
                         end
 

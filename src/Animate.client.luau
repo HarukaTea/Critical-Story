@@ -14,10 +14,12 @@ local requireList = {
 	UIModules.AdventurerStats,
 	UIModules.AdventurerMenu,
 	UIModules.Backpack,
+	UIModules.PlayerList,
 	UIModules.ShiftLock,
 	mechanicModules.CharacterSetups,
 	mechanicModules.CACombat,
 	mechanicModules.AnimationPlayer,
+	mechanicModules.MonsterVFX,
 	mechanicModules.WaterSwim,
 }
 HarukaLib:Require(requireList, plr)

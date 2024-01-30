@@ -66,14 +66,20 @@ return function(plr: Player)
 		},
 	})
 
-	local function _createHint(text: string)
+	local function _createHint(text: string, envir: string)
 		local past = Fusion.peek(self.hintsList)
 		insert(past, text)
 
 		self.hintsList:set(past)
-		workspace.Sounds.SFXs.Error:Play()
 
-		wait(2)
+		if envir == "Error" then
+			workspace.Sounds.SFXs.Error:Play()
+
+		elseif envir == "Hint" then
+			workspace.Sounds.SFXs.NewInfo:Play()
+		end
+
+		wait(5)
 		local now = Fusion.peek(self.hintsList)
 		remove(now, tFind(now, text))
 

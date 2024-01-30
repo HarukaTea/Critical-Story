@@ -44,12 +44,12 @@ assets.ClassInfo = {
 		CAIcon = true,
 	},
 	Archer = {
-		Desc = "Hit orb to spawn arrow orb, each arrow can deal extra damage significantly.",
+		Desc = "Hit orb to generate an arrow orb, which can increase the amount of arrows. Arrows can deal additional damage to monsters, which is calculated separately.",
 		Image = "rbxassetid://2965863905",
 		Color = fromRGB(100, 255, 100),
 		SkillImage = "rbxassetid://2044402746",
 		SkillName = "Sky Assault",
-		SkillDesc = "Retrieve extra one arrow from your pocket, and spawn extra orb which applies poison."
+		SkillDesc = "Retrieve extra one arrow from your pocket, and spawn an extra orb which applies poison."
 	},
 	Wizard = {
 		Desc = "Hit orb to charge, the magic ball will be casted when it's done.",
@@ -70,7 +70,7 @@ assets.ClassInfo = {
 		CAIcon = true
 	},
 	Rogue = {
-		Desc = "Hit orb to increase your critical chance, the critical hit is calculated significantly.",
+		Desc = "Hit orb to increase critical chance. Each critical hit is independently calculated as an additional chance.",
 		Image = "rbxassetid://12284961892",
 		Color = fromRGB(255, 170, 255),
 		SkillImage = "rbxassetid://2050931825",
@@ -78,36 +78,36 @@ assets.ClassInfo = {
 		SkillDesc = "Make your next hit 100% Critical, and give 2x attack buff temporarily."
 	},
 	Repeater = {
-		Desc = "Hit the orb to spawn another orb in the area, spawned orb cannot spawn orb again.",
+		Desc = "Hit orb to generate another orb within the combat area. However, this orb cannot generate orbs any more.",
 		Image = "rbxassetid://12190533959",
 		Color = fromRGB(65, 179, 255),
 		SkillImage = "rbxassetid://2093502347",
 		SkillName = "Armor Shredder",
-		SkillDesc = "Step backwards and shoot out 6 bullets rapidly that deal neutral damage. (Abandoned, TBA)"
+		SkillDesc = "Spawn 3 extra orbs, which, however, cannot generate orbs, in the area, and give 2x attack buff temporarily."
 	},
 	Striker = {
-		Desc = "Hit the orb to strike to the nearest orb, and strike back instantly.",
+		Desc = "Hit orb to dash to the nearest orb, you can only dash when there is more than 1 orb.",
 		Image = "rbxassetid://12190535870",
 		Color = fromRGB(253, 148, 44),
-		SkillImage = "rbxassetid://4395267764",
-		SkillName = "Harpoon Strike",
-		SkillDesc = "Throw a spear forward, disable you for a while, fling you to the spear's position once hits. (Abandoned, TBA)"
+		SkillImage = "rbxassetid://4395268516",
+		SkillName = "Lightning Strike",
+		SkillDesc = "Instantly dash to the nearest orb in the area, if there is no orb, then spawn one."
 	},
 	Alchemist = {
-		Desc = "Hit the orb to get different ingredients, use different combinations to receive different effects.",
+		Desc = "Hit orbs of various colors to reach different research stages. Each stage will provide different effects. Red adds 1, Blue adds 2, and Green adds 3.",
 		Image = "rbxassetid://12236618949",
 		Color = fromRGB(0, 255, 22),
 		SkillImage = "rbxassetid://2228031365",
 		SkillName = "Potions Clash",
-		SkillDesc = "Create an AoE that deals damage, deals more damage and apply effect depend on your research stage. (Abandoned, TBA)"
+		SkillDesc = "Receive the effects of all stages, and apply effects for your allies depend on your research stage.",
 	},
 	Illusionist = {
-		Desc = "Hit the orb to create a clone, which will explode after 3 seconds, dealing magical damage to monsters within range.",
+		Desc = "Hit orb to create your clone, which will cast all your actives equipped if you have enough Mana.",
 		Image = "rbxassetid://15875390788",
 		Color = fromRGB(0, 255, 252),
-		SkillImage = "rbxassetid://4570577354",
+		SkillImage = "rbxassetid://4570577929",
 		SkillName = "Replica",
-		SkillDesc = "Give yourself Alternate for a while and recast the lastest active used."
+		SkillDesc = "Make yourself Alternate for a while, leave a clone and move back to where you stand 3 seconds ago."
 	}
 }
 assets.MonsterAvatars = {

@@ -12,151 +12,23 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
+local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local AttributeChange = Fusion.AttributeChange
 
 local CharacterSetups = {}
 CharacterSetups.__index = CharacterSetups
 
-local wait, delay = task.wait, task.delay
+local wait = task.wait
 local floor, random = math.floor, math.random
-local cfNew = CFrame.new
 local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
 local sFind = string.find
 
---[[
-    Actions when character spawns, apply attributes for UIs to use
-]]
-function CharacterSetups:Setup()
-    local char, plr = self.char, self.plr
-
-    repeat wait() until plr:GetAttribute("PlayerDataLoaded")
-
-    local function _createFolder(name: string, parent: Folder) : Folder
-        local folder = instanceNew("Folder")
-        folder.Name = name
-        folder.Parent = parent
-
-        return folder
-    end
-    local function _createStats()
-        local charStats = _createFolder("CharStats", char)
-
-        for i, v in self.ATTRIBUTES do
-            char:SetAttribute(i, v)
-        end
-        local objValue = instanceNew("ObjectValue")
-        objValue.Name = "TargetMonster"
-        objValue.Parent = charStats
-
-        _createFolder("Items", charStats)
-        _createFolder("ExtraOrbs", charStats)
-        _createFolder("TargetMonsters", charStats)
-        _createFolder("EffectsList", charStats)
-
-        return charStats
-    end
-    self.charStats = _createStats()
-    self.humanoid.BreakJointsOnDeath = false
-    char:SetAttribute("HitCD", 0)
-
-    self.timeCalStop = Clock(1, function()
-		HarukaLib:Add(plr, "PlayTime", 1)
-	end)
-    self.hitCDStop = Clock(1, function()
-        HarukaLib:Add(char, "HitCD", -1)
-    end)
-
-    ServerUtil:EquipWeapon(char)
-
-    if plr:GetAttribute("PlayerSpawnPos") ~= Vector3.zero then
-		char:WaitForChild("HumanoidRootPart", 999)
-
-		char:PivotTo(cfNew(plr:GetAttribute("PlayerSpawnPos")))
-	end
-end
-
---[[
-    Clear actions when character is dead or fall into eternal void
-]]
-function CharacterSetups:Clear(char: Model)
-    char:SetAttribute("InCombat", false)
-
-	for _, monster in self.charStats.TargetMonsters:GetChildren() do
-		monster.Value.TargetingList[char.Name]:Destroy()
-	end
-    for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
-        if orbFolder.Name == char.Name then wait() orbFolder:Destroy() end
-    end
-
-	self.timeCalStop()
-    self.hitCDStop()
-
-	ServerUtil:RagdollNPC(char)
-end
-
---[[
-    Repair the shield, can be cancelled at any time
-]]
-function CharacterSetups:RepairShield()
-    RepS.Resources.Unloads.RepairShield:Clone().Parent = self.char
-end
-
---[[
-    Heals the player, can be cancelled at any time
-]]
-function CharacterSetups:Heal()
-    RepS.Resources.Unloads.HealHP:Clone().Parent = self.char
-end
-
---[[
-    Check the shield everytime they changed, repair it if needed
-]]
-function CharacterSetups:ShieldCheck()
-    local char, isBroken = self.char, self.isBroken
-    local shield, maxShield = char:GetAttribute("Shield"), char:GetAttribute("MaxShield")
-
-	if shield < 0 then char:SetAttribute("Shield", 0) end
-	if shield >= maxShield then
-		char:SetAttribute("Shield", maxShield)
-
-		isBroken = false
-		return
-	end
-	if shield == 0 and not isBroken then
-		isBroken = true
-
-		Events.PlaySound:Fire(self.plr, workspace.Sounds.SFXs.ShieldBroken)
-	end
-end
-
---[[
-    Cancel the heal or repair threads cuz player is unsafe rn
-]]
-function CharacterSetups:CancelHealing()
-    local char = self.char
-
-    if char:GetAttribute("HitCD") < 0 then char:SetAttribute("HitCD", 1) end
-    HarukaLib:Add(char, "HitCD", 15)
-    if char:GetAttribute("HitCD") > 15 then char:SetAttribute("HitCD", 15) end
-
-    if char:FindFirstChild("HealHP") then char.HealHP:Destroy() end
-    if char:FindFirstChild("RepairShield") then char.RepairShield:Destroy() end
-    char:SetAttribute("Repairing", false)
-    char:SetAttribute("Healing", false)
-
-    self:RepairShield()
-    self:Heal()
-end
-
---[[
-    The actions after character is actually hit by attacks
-]]
-function CharacterSetups:CharTakeDMG(plr: Player, monster: Model, dmgType: boolean?)
+local function charTakeDMG(char: Model, monster: Model, dmgType: boolean?)
 	if not monster then return end
 
-	local char = plr.Character
 	local humanoid = char.Humanoid
 	local shield = char:GetAttribute("Shield")
 	local dmg, finalDmg = monster:GetAttribute("Damage"), monster:GetAttribute("Damage")
@@ -166,11 +38,29 @@ function CharacterSetups:CharTakeDMG(plr: Player, monster: Model, dmgType: boole
 		return
 	end
 
-    self:CancelHealing()
+    local function _cancelHealing()
+        if char:GetAttribute("HitCD") < 0 then char:SetAttribute("HitCD", 1) end
+        HarukaLib:Add(char, "HitCD", 15)
+        if char:GetAttribute("HitCD") > 15 then char:SetAttribute("HitCD", 15) end
+
+        if char:FindFirstChild("HealHP") then char.HealHP:Destroy() end
+        if char:FindFirstChild("RepairShield") then char.RepairShield:Destroy() end
+        char:SetAttribute("Repairing", false)
+        char:SetAttribute("Healing", false)
+
+        if char:GetAttribute("Shield") < char:GetAttribute("MaxShield") then
+            RepS.Resources.Unloads.RepairShield:Clone().Parent = char
+        end
+        if humanoid.Health < humanoid.MaxHealth then
+            RepS.Resources.Unloads.HealHP:Clone().Parent = char
+        end
+    end
+    _cancelHealing()
 
 	--- Knight class skills
 	if char:GetAttribute("Guard") > 0 then
 		finalDmg = floor(dmg - (dmg * char:GetAttribute("Guard")) / 100)
+
 		char:SetAttribute("Guard", 0)
 	end
 
@@ -199,69 +89,10 @@ function CharacterSetups:CharTakeDMG(plr: Player, monster: Model, dmgType: boole
 	ServerUtil:ShowNumber(char, finalDmg)
 end
 
---[[
-    Character hit monsters' attacks
-]]
-function CharacterSetups:OnHit(hit: BasePart)
-    if hit.Parent:GetAttribute("IsOrb") then
-		local orb, char = hit.Parent :: Model, self.char :: Model
-        local plr = Players:GetPlayerFromCharacter(char)
-		local HRP = char.PrimaryPart
-
-		--- pre checks
-		if self.orbTouchCD then return end
-        if not orb:FindFirstChild("Owner") then return end
-        if orb.Owner.Value ~= char then return end
-        if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
-        if not char.CharStats.TargetMonster.Value then return end
-        if not HRP then return end
-        if not orb.Parent then return end
-        if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then return end
-
-		self.orbTouchCD = true
-        delay(0.2, function()
-            self.orbTouchCD = false
-        end)
-
-        local monster = char.CharStats.TargetMonster.Value
-        local baseDamage = char:GetAttribute("Damage")
-
-        orb.Owner:Destroy()
-
-        --- final check
-        if not monster.PrimaryPart then return end
-
-        local subStyle = orb:GetAttribute("SubStyle")
-        local style = if subStyle then subStyle else orb:GetAttribute("Style")
-        if AttackUtil[style] then
-            AttackUtil[style](plr, monster, baseDamage, orb)
-        end
-
-        orb:Destroy()
-
-    elseif hit.Parent:GetAttribute("IsDamage") then
-		local damagePart, char = hit.Parent :: Model, self.char :: Model
-
-		--- checks
-		if self.dmgTouchCD then return end
-		if not damagePart:FindFirstChild("Owner") then return end
-		if not char.PrimaryPart then return end
-
-		self.dmgTouchCD = true
-		delay(0.55, function()
-            self.dmgTouchCD = false
-        end)
-
-        self:CharTakeDMG(self.plr, damagePart.Owner.Value, damagePart:GetAttribute("Pierce"))
-	end
-end
-
---[[
-    Spawn orbs automatically when character is in combat
-]]
-function CharacterSetups:OrbSpawnHandler()
-    local char, orbFolders = self.char, workspace.MapComponents.OrbFolders
+local function orbSpawnHandler(char: Model, state: boolean)
+    local orbFolders = workspace.MapComponents.OrbFolders
     local monster, orbAttack = char.CharStats.TargetMonster, RepS.Package.PlayerAttacks
+    local plr = Players:GetPlayerFromCharacter(char)
 
     local function _placeOrb(orb: Model, pos: CFrame, lifeTime: number)
         orb.Owner.Value = char
@@ -273,7 +104,7 @@ function CharacterSetups:OrbSpawnHandler()
     end
     local function _spawnOrb(isSpawned: boolean?)
         local isInCombat, class, lifeTime =
-            char:GetAttribute("InCombat"), self.plr:GetAttribute("Class"), char:GetAttribute("OrbLifeTime")
+            char:GetAttribute("InCombat"), plr:GetAttribute("Class"), char:GetAttribute("OrbLifeTime")
 
         if monster.Value and isInCombat and orbFolders:FindFirstChild(char.Name) and char.Humanoid.Health > 0 then
             local orb
@@ -293,32 +124,28 @@ function CharacterSetups:OrbSpawnHandler()
         end
     end
 
-    if char:GetAttribute("InCombat") then
+    local stopSpawn
+    if state then
 		if char:GetAttribute("SpawnMultiOrb") then
-			for i = 1, 3 do _spawnOrb(true) end
+			for _ = 1, 3 do _spawnOrb(true) end
 		end
 
-		self.stopSpawn = Clock(3, function()
+		stopSpawn = Clock(3, function()
 			if char:GetAttribute("InCombat") then _spawnOrb() end
 		end)
 	else
-		if self.stopSpawn then self.stopSpawn() end
-
-		self.stopSpawn = nil
+		if stopSpawn then stopSpawn() end
 	end
 end
 
---[[
-    Weapon handler when combat state changes
-]]
-function CharacterSetups:WeaponHandler(state)
-    local char = self.char :: Model
+local function weaponHandler(char: Model, state: boolean)
+    local plr = Players:GetPlayerFromCharacter(char)
 
     for _, child in char:GetChildren() do
 		if sFind(child.Name, "Weapon") then child:Destroy() end
 	end
 
-	local class = self.plr:GetAttribute("Class")
+	local class = plr:GetAttribute("Class")
     if state then
         local weapon = RepS.Package.StyleWeapons[class].WeaponEquipped:Clone() :: Model
 
@@ -336,73 +163,24 @@ function CharacterSetups:WeaponHandler(state)
     end
 end
 
---[[
-    Handle the class-related attributes
-]]
-function CharacterSetups:ClassAttributesHandler()
-    local char = self.char
+local function returnFunc(char: Model)
+    local plr = Players:GetPlayerFromCharacter(char)
+    local humanoid = char.Humanoid
 
-    --- warrior
-    char.Humanoid.StateChanged:Connect(function(state)
-        if state == Enum.HumanoidStateType.Landed
-            or state ~= Enum.HumanoidStateType.Jumping
-            or state ~= Enum.HumanoidStateType.Freefall
-        then
-            self.char:SetAttribute("Combo", 0)
-        end
-    end)
+    local charStats = nil
+    local isBroken = false
+    local lvUpCD, dmgTouchCD, orbTouchCD = false, false, false
 
-    --- wizard
-    char:GetAttributeChangedSignal("InCombat"):Connect(function()
-        if not char:GetAttribute("InCombat") then
-            char:SetAttribute("WizardCasted", 0)
-            char:SetAttribute("Guard", 0)
-            char:SetAttribute("RogueCritical", 0)
-        end
-    end)
-
-    --- knight
-    Clock(1.1, function()
-        HarukaLib:Add(char, "Guard", -1)
-
-        if char:GetAttribute("Guard") < 0 then
-            char:SetAttribute("Guard", 0)
-        end
-    end)
-
-    --- rogue
-    Clock(0.7, function()
-        HarukaLib:Add(char, "RogueCritical", -1)
-
-        if char:GetAttribute("RogueCritical") < 0 then
-            char:SetAttribute("RogueCritical", 0)
-        end
-    end)
-end
-
-return function (char: Model)
-    local self = setmetatable({}, CharacterSetups)
-
-    self.char = char
-    self.plr = Players:GetPlayerFromCharacter(char)
-    self.humanoid = char:WaitForChild("Humanoid") :: Humanoid
-    self.charStats = nil
-    self.timeCalStop, self.hitCDStop = nil, nil
-    self.isBroken, self.isDamaged = false, false
-    self.repairing, self.healing = nil, nil
-    self.stopSpawn = nil
-    self.lvUpCD, self.dmgTouchCD, self.orbTouchCD = false, false, false
-
-    self.ATTRIBUTES = {
+    local ATTRIBUTES = {
 		CriChance = 1,
 		InCombat = false,
-		Magic = 20,
-		Mana = 100,
-		Damage = 15,
-		MaxMana = 100,
-		MaxShield = 20,
+		Magic = 0,
+		Mana = 0,
+		Damage = 0,
+		MaxMana = 0,
+		MaxShield = 0,
 		OrbLifeTime = 10,
-		Shield = 20,
+		Shield = 0,
         Repairing = false,
         Healing = false,
 
@@ -422,31 +200,177 @@ return function (char: Model)
         RogueCritical = 0
 	}
 
-    repeat wait() until self.plr:GetAttribute("PlayerDataLoaded")
-    self:Setup()
+    repeat wait() until plr:GetAttribute("PlayerDataLoaded")
+    local function _setup()
+        char.PrimaryPart = char.Humanoid.RootPart
+
+        local function __createFolder(name: string, parent: Folder) : Folder
+            local folder = instanceNew("Folder")
+            folder.Name = name
+            folder.Parent = parent
+
+            return folder
+        end
+        local function __createStats()
+            charStats = __createFolder("CharStats", char)
+
+            for i, v in ATTRIBUTES do
+                char:SetAttribute(i, v)
+            end
+            local objValue = instanceNew("ObjectValue")
+            objValue.Name = "TargetMonster"
+            objValue.Parent = charStats
+
+            __createFolder("Items", charStats)
+            __createFolder("ExtraOrbs", charStats)
+            __createFolder("TargetMonsters", charStats)
+            __createFolder("EffectsList", charStats)
+        end
+        __createStats()
+
+        humanoid.BreakJointsOnDeath = false
+        char:SetAttribute("HitCD", 0)
+
+        Clock(1, function()
+            HarukaLib:Add(plr, "PlayTime", 1)
+
+            if char:GetAttribute("HitCD") > 0 then
+                HarukaLib:Add(char, "HitCD", -1)
+            end
+        end)
+
+        ServerUtil:EquipWeapon(char)
+    end
+    local function _classAttributesSetup()
+        --- warrior
+        char.Humanoid.StateChanged:Connect(function(state)
+            if state == Enum.HumanoidStateType.Landed
+                or state ~= Enum.HumanoidStateType.Jumping
+                or state ~= Enum.HumanoidStateType.Freefall
+            then
+                char:SetAttribute("Combo", 0)
+            end
+        end)
+
+        --- wizard
+        char:GetAttributeChangedSignal("InCombat"):Connect(function()
+            if not char:GetAttribute("InCombat") then
+                char:SetAttribute("WizardCasted", 0)
+                char:SetAttribute("Guard", 0)
+                char:SetAttribute("RogueCritical", 0)
+                char:SetAttribute("ResearchStage", 0)
+            end
+        end)
+
+        --- knight
+        Clock(1.1, function()
+            if char:GetAttribute("Guard") <= 0 then return end
+
+            HarukaLib:Add(char, "Guard", -1)
+        end)
+
+        --- rogue
+        Clock(0.7, function()
+            if char:GetAttribute("RogueCritical") <= 0 then return end
+
+            HarukaLib:Add(char, "RogueCritical", -1)
+        end)
+    end
+    _setup()
+    _classAttributesSetup()
 
     --// Connections
-    self.humanoid.Died:Once(function()
-        self:Clear(char)
-    end)
-    self.humanoid.Touched:Connect(function(hit: BasePart)
-        self:OnHit(hit)
-    end)
+    local function _onDead()
+        char:SetAttribute("InCombat", false)
 
-    local plr, humanoid = self.plr, self.humanoid
-    local function _manaCheck()
-        local mana, maxMana = self.char:GetAttribute("Mana"), self.char:GetAttribute("MaxMana")
+        for _, monster in char.CharStats.TargetMonsters:GetChildren() do
+            wait()
+            monster.Value.TargetingList[char.Name]:Destroy()
+        end
+        for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
+            if orbFolder.Name == char.Name then orbFolder:Destroy() end
+        end
 
-        if mana > maxMana then self.char:SetAttribute("Mana", maxMana) end
+        ServerUtil:RagdollNPC(char)
+    end
+    local function _onTouch(hit: BasePart)
+        if not hit or not hit.Parent then return end
+
+        if hit.Parent:GetAttribute("IsOrb") then
+            local orb = hit.Parent :: Model
+            local HRP = char.PrimaryPart
+
+            --- pre checks
+            if orbTouchCD then return end
+            if not orb:FindFirstChild("Owner") then return end
+            if orb.Owner.Value ~= char then return end
+            if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
+            if not char.CharStats.TargetMonster.Value then return end
+            if not HRP then return end
+            if not orb.Parent then return end
+            if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then return end
+
+            orbTouchCD = true
+            char.Humanoid.AutoRotate = false
+            Spawn(function()
+                wait(0.1)
+                orbTouchCD = false
+                char.Humanoid.AutoRotate = true
+            end)
+
+            local monster = char.CharStats.TargetMonster.Value
+            local baseDamage = char:GetAttribute("Damage")
+
+            orb.Owner:Destroy()
+
+            --- final check
+            if not monster.PrimaryPart then return end
+
+            local subStyle = orb:GetAttribute("SubStyle")
+            local style = if subStyle then subStyle else orb:GetAttribute("Style")
+            if AttackUtil[style] then
+                AttackUtil[style](plr, monster, baseDamage, orb)
+            end
+
+            SkillUtil:RestoreManaByOrb(plr)
+
+            orb:Destroy()
+
+        elseif hit.Parent:GetAttribute("IsDamage") then
+            local damagePart = hit.Parent :: Model
+
+            --- checks
+            if dmgTouchCD then return end
+            if not damagePart:FindFirstChild("Owner") then return end
+            if not char.PrimaryPart then return end
+            if not damagePart.Owner.Value then return end
+            if not damagePart.Owner.Value.TargetingList:FindFirstChild(char.Name) then return end
+
+            dmgTouchCD = true
+            Spawn(function()
+                wait(0.55)
+                dmgTouchCD = false
+            end)
+
+            charTakeDMG(char, damagePart.Owner.Value, damagePart:GetAttribute("Pierce"))
+        end
+    end
+    humanoid.Died:Once(_onDead)
+    humanoid.Touched:Connect(_onTouch)
+
+    local function _manaCheck(mana)
+        local maxMana = char:GetAttribute("MaxMana")
+
+        if mana > maxMana then char:SetAttribute("Mana", maxMana) end
     end
     local function _updateDMG()
-        char:SetAttribute("Damage", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 15 + char:GetAttribute("DamageBuff"))
+        char:SetAttribute("Damage", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 10 + char:GetAttribute("DamageBuff"))
     end
     local function _updateMagic()
-        char:SetAttribute("Magic", floor(plr:GetAttribute("MagicPoints") ^ 1.42) + 12 + char:GetAttribute("MagicBuff"))
+        char:SetAttribute("Magic", floor(plr:GetAttribute("MagicPoints") ^ 1.42) + 20 + char:GetAttribute("MagicBuff"))
     end
     local function _updateMana()
-        char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") ^ 1.9) + 60 + char:GetAttribute("ManaBuff"))
+        char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") ^ 1.9) + 100 + char:GetAttribute("ManaBuff"))
         char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
     end
     local function _updateShield()
@@ -454,26 +378,26 @@ return function (char: Model)
         char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
     end
     local function _updateHP()
-        humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") ^ 1.5) + 100 + char:GetAttribute("HealthBuff")
+        humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") ^ 1.7) + 100 + char:GetAttribute("HealthBuff")
         humanoid.Health = humanoid.MaxHealth
     end
-    local function _updateSpeed()
-        humanoid.WalkSpeed = 30 + char:GetAttribute("SpeedBuff")
+    local function _updateSpeed(speed)
+        humanoid.WalkSpeed = 30 + speed
     end
-    local function _updateJump()
-        humanoid.JumpPower = 50 + char:GetAttribute("JumpBuff")
+    local function _updateJump(jump)
+        humanoid.JumpPower = 50 + jump
     end
     local function _levelReqCheck()
         local level = plr:GetAttribute("Levels")
 
         if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 60 then
-            if self.lvUpCD then return end
+            if lvUpCD then return end
 
-            self.lvUpCD = true
+            lvUpCD = true
             Signals.LevelUp:Fire(plr)
 
             wait(1)
-            self.lvUpCD = false
+            lvUpCD = false
         end
     end
     _updateDMG()
@@ -481,10 +405,9 @@ return function (char: Model)
     _updateMana()
     _updateShield()
     _updateHP()
-    _updateSpeed()
-    _updateJump()
+    _updateSpeed(0)
+    _updateJump(0)
     _levelReqCheck()
-    self:ClassAttributesHandler()
 
     Fusion.Hydrate(plr)({
         [AttributeChange("DmgPoints")] = _updateDMG,
@@ -497,6 +420,20 @@ return function (char: Model)
             ServerUtil:EquipWeapon(char)
         end
     })
+
+    local function _shieldCheck(shield)
+        local maxShield = char:GetAttribute("MaxShield")
+
+        if shield < 0 then char:SetAttribute("Shield", 0) end
+        if shield > 0 and isBroken then isBroken = false end
+        if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
+
+        if shield == 0 and not isBroken then
+            isBroken = true
+
+            Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
+        end
+    end
     Fusion.Hydrate(char)({
         [AttributeChange("DamageBuff")] = _updateDMG,
         [AttributeChange("MagicBuff")] = _updateMagic,
@@ -506,14 +443,14 @@ return function (char: Model)
         [AttributeChange("HealthBuff")] = _updateHP,
         [AttributeChange("SpeedBuff")] = _updateSpeed,
         [AttributeChange("JumpBuff")] = _updateJump,
-        [AttributeChange("Shield")] = function()
-            self:ShieldCheck()
-        end,
+        [AttributeChange("Shield")] = _shieldCheck,
         [AttributeChange("InCombat")] = function(state)
-            self:OrbSpawnHandler()
-            self:WeaponHandler(state)
+            orbSpawnHandler(char, state)
+            weaponHandler(char, state)
         end
     })
 
     char:SetAttribute("CharDataLoaded", true)
 end
+
+return returnFunc

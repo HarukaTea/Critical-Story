@@ -8,8 +8,8 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local cfNew = CFrame.new
 
-local levelCheck = Guard.Check(Guard.NumberMinMax(1, 99999999))
-local amountCheck = Guard.Check(Guard.NumberMinMax(1, 99999999))
+local levelCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
+local amountCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
 
 return function (context, level, amount)
     local levelPass, levelWant = levelCheck(level)

@@ -6,44 +6,37 @@ local UIS = game:GetService("UserInputService")
 local UGS = UserSettings():GetService("UserGameSettings")
 
 local Cmdr = require(RepS:WaitForChild("CmdrClient"))
-local Collection = require(RepS.Modules.Packages.Collection)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
-local FastSpawn = require(RepS.Modules.Packages.Spawn)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local maps = workspace:WaitForChild("Maps")
 local mapComponents = workspace:WaitForChild("MapComponents")
-
-local ClientSetups = {}
-ClientSetups.__index = ClientSetups
 
 local wait = task.wait
 local cfAngles = CFrame.Angles
 local rad = math.rad
 local yAxis = Vector3.yAxis
 
---[[
-    Start the animate models, such as Windmill and Sky galleons
-]]
-function ClientSetups:EnableWorldAnims()
+local function enableWorldAnims()
     for _, child in maps:GetDescendants() do
         if child.Name == "Wings" and child.Parent.Name == "Windmill" then
-            FastSpawn(function()
+            Spawn(function()
                 Clock(0.01, function()
                     child:PivotTo(child.PrimaryPart.CFrame * cfAngles(rad(-1), 0, 0))
                 end)
             end)
 
         elseif child.Name == "Sky Galleon" then
-            FastSpawn(function()
+            Spawn(function()
                 while true do
                     for _ = 1, 100 do
-                        child:PivotTo(child.PrimaryPart.CFrame + yAxis * 0.01)
+                        child:PivotTo(child.PrimaryPart.CFrame + yAxis * 0.03)
                         wait(0.01)
                     end
                     for _ = 1, 100 do
-                        child:PivotTo(child.PrimaryPart.CFrame - yAxis * 0.01)
+                        child:PivotTo(child.PrimaryPart.CFrame - yAxis * 0.03)
                         wait(0.01)
                     end
                 end
@@ -52,11 +45,8 @@ function ClientSetups:EnableWorldAnims()
     end
 end
 
---[[
-    Enable day-night cycle mechanic, day night cycles every 12 minutes
-]]
-function ClientSetups:DayNightCycle()
-    local cycleTime, minutesInADay = self.CYCLE_TIME, self.MINUTES_IN_A_DAY
+local function dayNightCycle()
+    local cycleTime, minutesInADay = 12 * 60, 24 * 60
     local startTime = tick() - (Lighting:GetMinutesAfterMidnight() / minutesInADay) * cycleTime
     local endTime = startTime + cycleTime
     local timeRatio, currentTime = minutesInADay / cycleTime, nil
@@ -73,10 +63,7 @@ function ClientSetups:DayNightCycle()
     end)
 end
 
---[[
-    Detect if the chest is opened, when player joins
-]]
-function ClientSetups:OpenAcquiredChests(plr: Player)
+local function openAcquiredChests(plr: Player)
     local chests = mapComponents.Chests
     local inventory = plr:WaitForChild("Inventory", 999)
 
@@ -85,7 +72,7 @@ function ClientSetups:OpenAcquiredChests(plr: Player)
             chest:SetAttribute("Opened", true)
             chest.Giver.Chest.Enabled = false
 
-            FastSpawn(function()
+            Spawn(function()
                 for _ = 1, 5 do
                     wait(0.01)
                     chest.Top:PivotTo(chest.Top.Base.CFrame * cfAngles(rad(10), 0, 0))
@@ -95,11 +82,8 @@ function ClientSetups:OpenAcquiredChests(plr: Player)
     end
 end
 
---[[
-    Register cmdr in client, and along with chat detections
-]]
-function ClientSetups:CmdrRegister(plr: Player)
-    Cmdr:SetActivationKeys({ Enum.KeyCode.P })
+local function cmdrRegister(plr: Player)
+    Cmdr:SetActivationKeys({ Enum.KeyCode.Quote })
     Cmdr:SetPlaceName("CS-Test-0.7")
 
     plr.Chatted:Connect(function(msg)
@@ -108,34 +92,27 @@ function ClientSetups:CmdrRegister(plr: Player)
     end)
 end
 
---[[
-    Default camera sensitivity is a little higher, and we wanna change that
-]]
-function ClientSetups:CameraSensitivityChange()
-    UIS.MouseDeltaSensitivity = 0.8 / UGS.MouseSensitivity
+local function cameraSensitivityChange()
+    UIS.MouseDeltaSensitivity = 0.74 / UGS.MouseSensitivity
 
     UGS:GetPropertyChangedSignal("MouseSensitivity"):Connect(function()
-        UIS.MouseDeltaSensitivity = 0.8 / UGS.MouseSensitivity
+        UIS.MouseDeltaSensitivity = 0.74 / UGS.MouseSensitivity
     end)
 end
 
-return function (plr: Player)
-    local self = setmetatable({}, ClientSetups)
-
-    self.CYCLE_TIME, self.MINUTES_IN_A_DAY = 12 * 60, 24 * 60
-
+local function returnFunc(plr: Player)
     local UIModules = RepS.Modules.UI
     local requireList = {
         UIModules.Hints,
-        UIModules.PostStroke,
-        UIModules.PlayerList,
-        RepS.Modules.Mechanics.MonsterVFX
+        UIModules.PostStroke
     }
     HarukaLib:Require(requireList, plr)
 
-    self:EnableWorldAnims()
-    self:DayNightCycle()
-    self:OpenAcquiredChests(plr)
-    self:CmdrRegister(plr)
-    self:CameraSensitivityChange()
+    enableWorldAnims()
+    dayNightCycle()
+    openAcquiredChests(plr)
+    cmdrRegister(plr)
+    cameraSensitivityChange()
 end
+
+return returnFunc
