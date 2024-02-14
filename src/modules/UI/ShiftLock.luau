@@ -14,9 +14,7 @@ local cfNew, cfAngle = CFrame.new, CFrame.Angles
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 
---[[
-	Set the state of Lock with the given boolean
-]]
+
 function MobileShiftLock:SetLockState(state: string)
 	if state == "On" then
 		self.enabled = true
@@ -27,9 +25,6 @@ function MobileShiftLock:SetLockState(state: string)
 	end
 end
 
---[[
-	The action of enable shiftlock thread, enable it again to disable it
-]]
 function MobileShiftLock:EnableShiftLock()
 	if self.enabled then
 		--- store variables to reduce index time spent in RenderStepped
@@ -72,10 +67,9 @@ return function(plr: Player)
 
 		[Fusion.Children] = {
 			Components.Frame({
-
 				AnchorPoint = v2New(1, 0.5),
 				ZIndex = 999,
-				Position = fromScale(0.985, 0.87),
+				Position = fromScale(0.984, 0.6),
 				Size = fromScale(0.035, 0.085),
 
 				[Fusion.Children] = {

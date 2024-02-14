@@ -1,11 +1,11 @@
 --!nocheck
 
 local Players = game:GetService("Players")
+local PPS = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local TeleS = game:GetService("TeleportService")
 
-local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(SSS.Modules.Data.ServerSignals)
@@ -18,6 +18,77 @@ local fromRGB = Color3.fromRGB
 local wait = task.wait
 local insert = table.insert
 local instanceNew = Instance.new
+
+--[[
+	Handle the prompts that triggered
+]]
+local function promptsHandler(prompt: ProximityPrompt, plr: Player)
+	if prompt.Name == "Class" then
+		local class = prompt.Parent.Parent.Name
+
+		if not plr:GetAttribute("Class") == class then
+			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Equip)
+		end
+
+		plr:SetAttribute("Class", class)
+
+	elseif prompt.Name == "Chest" then
+		local chest = prompt.Parent.Parent
+
+		if not plr.Inventory:FindFirstChild(chest.Name) then
+			Events.ChestUnlocked:Fire(plr, chest)
+		end
+
+		ServerUtil:GiveItem(plr, chest.Name, 1)
+
+	elseif prompt.Name == "PublicJoin" or prompt.Name == "PartyJoin" then
+		local locator = prompt.Parent.Parent
+
+		Events.RejoinCombat:Fire(plr)
+
+		local hinted = false
+		local monsters = {}
+		for _, monster in locator:GetDescendants() do
+			if monster:GetAttribute("IsMonster") then
+				if not monster:GetAttribute("SubMonster") then
+					insert(monsters, 1, monster)
+				else
+					insert(monsters, monster)
+				end
+
+				if not monster:GetAttribute("OriMaxHealth") then
+					monster:SetAttribute("OriMaxHealth", monster:GetAttribute("MaxHealth"))
+				end
+
+				local hp = monster:GetAttribute("OriMaxHealth")
+				HarukaLib:Add(monster, "MaxHealth", hp)
+				HarukaLib:Add(monster, "Health", hp)
+
+				if monster.Holder.Value then
+					monster.Holder.Value:SetAttribute(plr.Name, true)
+				end
+
+				if hinted then continue end
+				hinted = true
+
+				local combatPlrs = {}
+				for _, target in monster.TargetingList:GetChildren() do
+					local tempPlr = Players:GetPlayerFromCharacter(target.Value)
+
+					if tempPlr then insert(combatPlrs, tempPlr) end
+				end
+
+				for _, player in combatPlrs do
+					Events.CreateHint:Fire(player, plr.DisplayName.." has joined the combat!", "Hint")
+				end
+			end
+		end
+		for _, monster in ipairs(monsters) do
+			ServerUtil:AddTargetForMonster(plr, monster)
+		end
+	end
+end
+PPS.PromptTriggered:Connect(promptsHandler)
 
 --[[
 	Combat starts! Good luck players
@@ -153,17 +224,6 @@ Signals.CombatEnd:Connect(function(monster: Model)
 	--- I have no idea why this can be broken without task.spawn
 	Spawn(combatEndSetup, monster)
 end)
-
---[[
-	Player send request to cast unique skills of their classes
-]]
-local function castCSSkills(plr: Player)
-	local class = plr:GetAttribute("Class")
-	local char = plr.Character
-
-	if CSAttackUtil[class] then CSAttackUtil[class](char) end
-end
-Events.CastClassSkill:Connect(castCSSkills)
 
 --[[
 	Player finally reach the requirement and level up!
@@ -515,6 +575,3 @@ local function forceReset(plr: Player)
 	plr.Character.Humanoid.Health = 0
 end
 Events.ForceReset:Connect(forceReset)
-
---- Start the server after net listening are all done
-require(script.Parent.Modules.ServerSetups)()

@@ -60,17 +60,7 @@ local function _onClick(id: string, self: table)
 		local item = _findItem(peek(self.itemFrame))
 		if item == "None" then return end
 
-		local btnsRightFrame = peek(self.btnsFrame.Right) :: Frame
 		Events.UpdatePinnedItems:Fire(item)
-
-		if btnsRightFrame.Pin.Text == "Pin" then
-			btnsRightFrame.Pin.Text = "Unpin"
-			peek(self.itemFrame)[item].Pinned.Visible = if self.inventory[item]:GetAttribute("Equipped") then false else true
-		else
-			btnsRightFrame.Pin.Text = "Pin"
-			peek(self.itemFrame)[item].Pinned.Visible = false
-		end
-
 	else
 		self.chosenFilter:set(id)
 		self.items:set(self.inventory:GetChildren())
@@ -80,6 +70,8 @@ local function _onClick(id: string, self: table)
 end
 
 local function FilterButton(id: string, self: table): TextButton
+	self.chosenFilter = Fusion.Value("All")
+
 	return Components.TextButton({
 		Name = id,
 		BackgroundColor3 = COLORS[id],

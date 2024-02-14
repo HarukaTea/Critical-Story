@@ -10,7 +10,8 @@ local Signals = require(RepS.Modules.Data.Signals)
 
 local PointsButton = require(RepS.Modules.UI.Components.PointsButton)
 
-local Children, New, peek = Fusion.Children, Fusion.New, Fusion.peek
+local Children, New, Value, AttributeChange, Hydrate, peek =
+	Fusion.Children, Fusion.New, Fusion.Value, Fusion.AttributeChange, Fusion.Hydrate, Fusion.peek
 
 local udNew =  UDim.new
 local fromScale = UDim2.fromScale
@@ -43,6 +44,72 @@ local function LinePart(pos: UDim2, direction: string, color: Color3, face: stri
 end
 
 local function CharacterFrame(self: table): Frame
+	local plr, char = self.plr :: Player, self.char :: Model
+	self.playerData = {
+		Levels = Value(plr:GetAttribute("Levels")),
+		LvPoints = Value(plr:GetAttribute("LvPoints")),
+		DMG = Value(plr:GetAttribute("DmgPoints")),
+		Health = Value(plr:GetAttribute("HealthPoints")),
+		Mana = Value(plr:GetAttribute("ManaPoints")),
+		Shield = Value(plr:GetAttribute("ShieldPoints")),
+		Magic = Value(plr:GetAttribute("MagicPoints")),
+		Gold = Value(plr:GetAttribute("Gold"))
+	}
+	self.charData = {
+		DMG = Value(char:GetAttribute("Damage")),
+		Magic = Value(char:GetAttribute("Magic")),
+		Mana = Value(char:GetAttribute("MaxMana")),
+		Shield = Value(char:GetAttribute("MaxShield")),
+		Health = Value(char.Humanoid.MaxHealth)
+	}
+	local playerData, charData = self.playerData, self.charData
+
+	Hydrate(plr)({
+		[AttributeChange("Levels")] = function(level)
+			playerData.Levels:set(level)
+		end,
+		[AttributeChange("LvPoints")] = function(point)
+			playerData.LvPoints:set(point)
+		end,
+		[AttributeChange("DmgPoints")] = function(point)
+			playerData.DMG:set(point)
+		end,
+		[AttributeChange("HealthPoints")] = function(point)
+			playerData.Health:set(point)
+		end,
+		[AttributeChange("ManaPoints")] = function(point)
+			playerData.Mana:set(point)
+		end,
+		[AttributeChange("ShieldPoints")] = function(point)
+			playerData.Shield:set(point)
+		end,
+		[AttributeChange("MagicPoints")] = function(point)
+			playerData.Magic:set(point)
+		end,
+		[AttributeChange("Gold")] = function(gold)
+			playerData.Gold:set(gold)
+		end
+	})
+	Hydrate(char)({
+		[AttributeChange("Damage")] = function(dmg)
+			charData.DMG:set(dmg)
+		end,
+		[AttributeChange("Magic")] = function(magic)
+			charData.Magic:set(magic)
+		end,
+		[AttributeChange("MaxMana")] = function(mana)
+			charData.Mana:set(mana)
+		end,
+		[AttributeChange("MaxShield")] = function(shield)
+			charData.Shield:set(shield)
+		end
+	})
+	Hydrate(char.Humanoid)({
+		[Fusion.OnChange("MaxHealth")] = function(hp)
+			charData.Health:set(hp)
+		end
+	})
+
 	return Components.Frame({
 		Name = "Character",
 		Position = fromScale(0.496, 0.567),

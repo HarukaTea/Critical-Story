@@ -15,15 +15,15 @@ local wait = task.wait
 local fromRGB = Color3.fromRGB
 
 local function ItemBar(info: table): Frame
-	workspace.Sounds.SFXs.ItemAcquired:Play()
-	
 	Spawn(function()
 		wait(0.75)
-		info.Position:set(fromScale(-0.04, 0))
+		workspace.Sounds.SFXs.ItemAcquired:Play()
+
+		info.Position:set(fromScale(0.84, 0))
 	end)
 	Spawn(function()
 		wait(3.2)
-		info.Position:set(fromScale(-0.25, 0))
+		info.Position:set(fromScale(1.2, 0))
 	end)
 
 	return Components.Frame({
@@ -43,7 +43,6 @@ local function ItemBar(info: table): Frame
 					Components.RoundUICorner(),
 					Components.ImageLabel({
 						Name = "Icon",
-						Position = fromScale(0.8, 0),
 						Size = fromScale(0.196, 1),
 						Image = info.Icon,
 						BackgroundTransparency = 0,
@@ -52,19 +51,19 @@ local function ItemBar(info: table): Frame
 					}),
 					Components.TextLabel({
 						Name = "Title",
-						Position = fromScale(0, 0.03),
-						Size = fromScale(0.771, 0.4),
+						Position = fromScale(0.23, 0.03),
+						Size = fromScale(0.529, 0.4),
 						Text = "Acquired",
 						TextColor3 = fromRGB(156, 156, 156),
-						TextXAlignment = Enum.TextXAlignment.Right,
+						TextXAlignment = Enum.TextXAlignment.Left,
 					}),
 					Components.TextLabel({
 						Name = "ItemName",
-						Position = fromScale(0, 0.44),
-						Size = fromScale(0.771, 0.45),
+						Position = fromScale(0.23, 0.44),
+						Size = fromScale(0.529, 0.45),
 						Text = info.Name,
 						TextColor3 = info.TierColor,
-						TextXAlignment = Enum.TextXAlignment.Right
+						TextXAlignment = Enum.TextXAlignment.Left
 					}),
 				},
 			}),

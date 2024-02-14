@@ -43,7 +43,7 @@ local function StatText(direction: "Left" | "Right", id: string, self: table): F
 				Position = if direction == "Left" then fromScale(0.3, 0) else fromScale(0, 0),
 				TextXAlignment = if direction == "Right" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				Text = Fusion.Computed(function(use)
-					return use(self.charStatsDict.PlayerData[id])
+					return use(self.playerData[id])
 				end),
 
 				[Children] = {

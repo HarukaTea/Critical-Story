@@ -1,6 +1,5 @@
 --!nocheck
 
-local BS = game:GetService("BadgeService")
 local GS = game:GetService("GroupService")
 local HttpService = game:GetService("HttpService")
 local MS = game:GetService("MessagingService")
@@ -9,13 +8,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local SSS = game:GetService("ServerScriptService")
-local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
-local PPS = game:GetService("ProximityPromptService")
 
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
-local Events = require(SSS.Modules.Data.ServerEvents)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
@@ -25,7 +20,31 @@ local resources = RepS.Resources
 local instanceNew = Instance.new
 local wait = task.wait
 local sub, upper = string.sub, string.upper
-local insert = table.insert
+
+local function collisionRegister()
+	PS:RegisterCollisionGroup("Player")
+	PS:RegisterCollisionGroup("NPC")
+	PS:RegisterCollisionGroup("Barrier")
+
+	PS:CollisionGroupSetCollidable("Player", "Player", false)
+	PS:CollisionGroupSetCollidable("Player", "NPC", false)
+	PS:CollisionGroupSetCollidable("Player", "Barrier", true)
+	PS:CollisionGroupSetCollidable("NPC", "NPC", false)
+	PS:CollisionGroupSetCollidable("NPC", "Barrier", false)
+
+	ServerUtil:SetCollisionGroup(RepS.Package.MonsterModels, "NPC")
+	ServerUtil:SetCollisionGroup(workspace.Monsters, "NPC")
+	ServerUtil:SetCollisionGroup(workspace.MapComponents.NPCs, "NPC")
+	ServerUtil:SetCollisionGroup(RepS.Package.Unloads["CombatBorder"], "Barrier")
+end
+collisionRegister()
+
+local function cmdrRegister()
+	Cmdr:RegisterDefaultCommands({"Help", "DefaultAdmin"})
+	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
+	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
+end
+cmdrRegister()
 
 local function mainSetup()
 	--- clear extra events
@@ -46,25 +65,20 @@ local function mainSetup()
 	--- sound setups
 	RepS.Package.Unloads.Musics.Parent = SoundService
 	RepS.Package.Unloads.SFXs.Parent = SoundService
-
-	local sounds = instanceNew("Folder")
-	sounds.Name = "Sounds"
-	sounds.Parent = workspace
 	for _, sound in package.Sounds:GetChildren() do
 		if sound.Name == "SFXs" then
 			for _, sfx in sound:GetChildren() do sfx.SoundGroup = SoundService.SFXs end
 		else
 			sound.SoundGroup = SoundService.Musics
 		end
-
-		sound:Clone().Parent = sounds
 	end
+	package.Sounds.Parent = workspace
 	for _, child in package.MonsterAttacks:GetDescendants() do
 		if child:IsA("Sound") then child.SoundGroup = SoundService.SFXs end
 	end
 
 	--- zone setups
-	for _, zone in SS.Zones:GetChildren() do
+	for _, zone in package.Zones:GetChildren() do
 		zone.Transparency = 1
 		zone.Parent = workspace.MapComponents.Zones
 	end
@@ -112,8 +126,6 @@ local function mainSetup()
 	--- player extra info setup
 	local joinData
 	Players.PlayerAdded:Connect(function(plr)
-		BS:AwardBadge(plr.UserId, 2129794618)
-
 		local groups = GS:GetGroupsAsync(plr.UserId)
 		local rank = 0
 		for _, group in groups do
@@ -189,115 +201,4 @@ local function mainSetup()
 		end
 	end)
 end
-
-local function collisionRegister()
-	PS:RegisterCollisionGroup("Player")
-	PS:RegisterCollisionGroup("NPC")
-	PS:RegisterCollisionGroup("Barrier")
-
-	PS:CollisionGroupSetCollidable("Player", "Player", false)
-	PS:CollisionGroupSetCollidable("Player", "NPC", false)
-	PS:CollisionGroupSetCollidable("Player", "Barrier", true)
-	PS:CollisionGroupSetCollidable("NPC", "NPC", false)
-	PS:CollisionGroupSetCollidable("NPC", "Barrier", false)
-
-	ServerUtil:SetCollisionGroup(RepS.Package.MonsterModels, "NPC")
-	ServerUtil:SetCollisionGroup(workspace.Monsters, "NPC")
-	ServerUtil:SetCollisionGroup(workspace.MapComponents.NPCs, "NPC")
-	ServerUtil:SetCollisionGroup(RepS.Package.Unloads["CombatBorder"], "Barrier")
-end
-
-local function cmdrRegister()
-	Cmdr:RegisterDefaultCommands({"Help", "DefaultAdmin"})
-	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
-	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
-end
-
-local function promptsHandler(prompt: ProximityPrompt, plr: Player)
-	if prompt.Name == "Class" then
-		local class = prompt.Parent.Parent.Name
-
-		if not plr:GetAttribute("Class") == class then
-			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Equip)
-		end
-
-		plr:SetAttribute("Class", class)
-
-	elseif prompt.Name == "Chest" then
-		local chest = prompt.Parent.Parent
-
-		if not plr.Inventory:FindFirstChild(chest.Name) then
-			Events.ChestUnlocked:Fire(plr, chest)
-		end
-
-		ServerUtil:GiveItem(plr, chest.Name, 1)
-
-	elseif prompt.Name == "PublicJoin" or prompt.Name == "PartyJoin" then
-		local locator = prompt.Parent.Parent
-
-		Events.RejoinCombat:Fire(plr)
-
-		local hinted = false
-		local monsters = {}
-		for _, monster in locator:GetDescendants() do
-			if monster:GetAttribute("IsMonster") then
-				if not monster:GetAttribute("SubMonster") then
-					insert(monsters, 1, monster)
-				else
-					insert(monsters, monster)
-				end
-
-				if not monster:GetAttribute("OriMaxHealth") then
-					monster:SetAttribute("OriMaxHealth", monster:GetAttribute("MaxHealth"))
-				end
-
-				local hp = monster:GetAttribute("OriMaxHealth")
-				HarukaLib:Add(monster, "MaxHealth", hp)
-				HarukaLib:Add(monster, "Health", hp)
-
-				if monster.Holder.Value then
-					monster.Holder.Value:SetAttribute(plr.Name, true)
-				end
-
-				if hinted then continue end
-				hinted = true
-
-				local combatPlrs = {}
-				for _, target in monster.TargetingList:GetChildren() do
-					local tempPlr = Players:GetPlayerFromCharacter(target.Value)
-
-					if tempPlr then insert(combatPlrs, tempPlr) end
-				end
-
-				for _, player in combatPlrs do
-					Events.CreateHint:Fire(player, plr.DisplayName.." has joined the combat!", "Hint")
-				end
-			end
-		end
-		for _, monster in ipairs(monsters) do
-			ServerUtil:AddTargetForMonster(plr, monster)
-		end
-	end
-end
-
-local function returnFunc()
-
-	--// Setups
-	collisionRegister()
-	cmdrRegister()
-    mainSetup()
-
-	--// Connections
-	Players.PlayerAdded:Connect(function(plr)
-		if plr:IsDescendantOf(Players) then --- in case player joins and left very quickly
-			plr.CharacterAdded:Connect(function(char)
-				ServerUtil:SetCollisionGroup(char, "Player")
-			end)
-		end
-	end)
-	PPS.PromptTriggered:Connect(promptsHandler)
-
-	require(script.Parent.PlayerSetups)()
-end
-
-return returnFunc
+mainSetup()

@@ -6,6 +6,8 @@ local udNew = UDim.new
 local fromScale = UDim2.fromScale
 
 local function FilterBG(direction: "Left" | "Right", btns: table, self: table): Frame
+	self.btnsFrame = { Left = Fusion.Value(), Right = Fusion.Value() }
+
 	return Fusion.New("Frame")({
 		Name = "Bottom" .. direction,
 		BackgroundTransparency = 1,

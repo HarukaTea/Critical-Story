@@ -10,36 +10,54 @@ local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
+local TEMPLATE = {
+	Stats = {
+		Levels = 1,
+		EXP = 0,
+		Gold = 0,
+		RP = 0,
+		PlayTime = 0,
+		StoryId = 0,
+		Class = "Warrior",
+		ChestOpened = 0,
+		LastSeen = "MainWorld",
+		Cosmetic = "None",
+		Companion = "None",
+		LvPoints = 0,
+		DmgPoints = 0,
+		MagicPoints = 0,
+		ManaPoints = 0,
+		HealthPoints = 0,
+		ShieldPoints = 0,
+	},
+	Inventory = {},
+	EquippedItems = {},
+	PinnedItems = {}
+}
+local DS1, DS2, DS3 = "CSTORY_DEV20", "CSTORY_DEV20_S2", "CSTORY_DEV20_S3"
+
 local newInstance = Instance.new
 local wait = task.wait
 
-local PlayerSetups = {}
-PlayerSetups.__index = PlayerSetups
 
---[[
-	Finds the datastore with the given `player` object
-]]
-function PlayerSetups:FindDataStore(plr: Player) : DataStore?
-	local joinData = plr:GetJoinData().TeleportData
+local function findDataStore(plr: Player) : DataStore?
+	local joinData = plr:GetJoinData().TeleportData :: table?
 	local slotChosen = if joinData then joinData[1] else "Slot1"
 
-	local ds
+	local ds: DataStore
 	if slotChosen == "Slot2" then
-		ds = SuphiDataStore.find(self.DS2, plr.UserId)
+		ds = SuphiDataStore.find(DS2, plr.UserId)
 	elseif slotChosen == "Slot3" then
-		ds = SuphiDataStore.find(self.DS3, plr.UserId)
+		ds = SuphiDataStore.find(DS3, plr.UserId)
 	else
-		ds = SuphiDataStore.find(self.DS1, plr.UserId)
+		ds = SuphiDataStore.find(DS1, plr.UserId)
 	end
 
 	return ds
 end
 
---[[
-	Cache the backpack data to datastore, and wait autosave
-]]
-function PlayerSetups:SaveBackpackData(plr: Player, ds: any)
-	local data = ds.Value
+local function _saveBackpackData(plr: Player, ds: any)
+	local data = ds.Value :: table
 	if not data then return end
 
 	local inventory = {}
@@ -60,32 +78,29 @@ function PlayerSetups:SaveBackpackData(plr: Player, ds: any)
 	data.PinnedItems = pinned
 end
 
---[[
-	Load the data from DataStore and apply attributes to player
-]]
-function PlayerSetups:Setup(plr: Player)
-	local joinData = plr:GetJoinData().TeleportData
+local function setup(plr: Player)
+	local joinData = plr:GetJoinData().TeleportData :: table?
 	local slotChosen = if joinData then joinData[1] else "Slot1"
 
-	local ds
+	local ds: DataStore
 	if slotChosen == "Slot2" then
-		ds = SuphiDataStore.new(self.DS2, plr.UserId)
+		ds = SuphiDataStore.new(DS2, plr.UserId)
 	elseif slotChosen == "Slot3" then
-		ds = SuphiDataStore.new(self.DS3, plr.UserId)
+		ds = SuphiDataStore.new(DS3, plr.UserId)
 	else
-		ds = SuphiDataStore.new(self.DS1, plr.UserId)
+		ds = SuphiDataStore.new(DS1, plr.UserId)
 	end
 
 	local function stateChanged(state: boolean, datastore: any)
 		while datastore.State == false do
-			if datastore:Open(self.TEMPLATE) ~= "Success" then wait(6) end
+			if datastore:Open(TEMPLATE) ~= "Success" then wait(6) end
 		end
 	end
 	ds.StateChanged:Connect(stateChanged)
 	stateChanged(ds.State, ds)
 
 	--- once everything is fine, we load data
-	local data = ds.Value
+	local data = ds.Value :: table
 
 	local backpackData = newInstance("Folder")
 	backpackData.Name = "Inventory"
@@ -131,28 +146,24 @@ function PlayerSetups:Setup(plr: Player)
 		end
 	end
 
-	plr:SetAttribute("PlayerSpawnPos", Vector3.zero)
 	plr:SetAttribute("PlayerDataLoaded", true)
 	plr:SetAttribute("InviteAccess", true)
 
-	local function saveData(player: Player)
+	local function _saveData(player: Player)
 		if player ~= plr then return end
 
-		self:SaveBackpackData(plr, ds)
+		_saveBackpackData(plr, ds)
 	end
-	Signals.ItemsAdded:Connect(saveData)
-	Signals.ItemsEquipped:Connect(saveData)
-	Signals.ItemsPinned:Connect(saveData)
+	Signals.ItemsAdded:Connect(_saveData)
+	Signals.ItemsEquipped:Connect(_saveData)
+	Signals.ItemsPinned:Connect(_saveData)
 end
 
---[[
-	Actions when player left, save the data, and clear the existence of world
-]]
-function PlayerSetups:Clear(plr: Player)
-	local ds = self:FindDataStore(plr)
+local function clear(plr: Player)
+	local ds = findDataStore(plr)
 
 	if ds then
-		self:SaveBackpackData(plr, ds)
+		_saveBackpackData(plr, ds)
 		ds:Destroy()
 	end
 
@@ -196,53 +207,18 @@ function PlayerSetups:Clear(plr: Player)
 	end
 end
 
-local function returnFunc()
-	local self = setmetatable({}, PlayerSetups)
-
-    self.TEMPLATE = {
-		Stats = {
-			Levels = 1,
-			EXP = 0,
-			Gold = 0,
-			RP = 0,
-			PlayTime = 0,
-			StoryId = 0,
-			Class = "Warrior",
-			ChestOpened = 0,
-			LastSeen = "MainWorld",
-			Cosmetic = "None",
-			Companion = "None",
-			LvPoints = 0,
-			DmgPoints = 0,
-			MagicPoints = 0,
-			ManaPoints = 0,
-			HealthPoints = 0,
-			ShieldPoints = 0,
-		},
-		Inventory = {},
-		EquippedItems = {},
-		PinnedItems = {}
-	}
-	self.DS1, self.DS2, self.DS3 = "CSTORY_BETA_1599", "CSTORY_BETA_1599_S2", "CSTORY_BETA_1599_S3"
-
-	--- in case player joined before server starts
-	for _, plr in Players:GetPlayers() do
-		Spawn(function()
-			self:Setup(plr)
-		end)
-	end
-
-	--// Connections
-	local function _playerAdded(plr: Player)
-		if plr:IsDescendantOf(Players) then --- in case player joins and left very quickly
-			self:Setup(plr)
-		end
-	end
-	local function _playerLeft(plr: Player)
-		self:Clear(plr)
-	end
-	Players.PlayerAdded:Connect(_playerAdded)
-	Players.PlayerRemoving:Connect(_playerLeft)
+--- in case player joined before server starts
+for _, plr in Players:GetPlayers() do
+	Spawn(function()
+		setup(plr)
+	end)
 end
 
-return returnFunc
+--// Connections
+local function _playerAdded(plr: Player)
+	if plr:IsDescendantOf(Players) then --- in case player joins and left very quickly
+		setup(plr)
+	end
+end
+Players.PlayerAdded:Connect(_playerAdded)
+Players.PlayerRemoving:Connect(clear)

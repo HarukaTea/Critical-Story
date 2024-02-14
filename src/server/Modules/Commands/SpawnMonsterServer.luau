@@ -19,9 +19,9 @@ return function (context, level, amount)
         return "I guess you typed incorrectly..."
     end
 
-    if amountWant > 10 then
-        return "Bruh you are trying to explode the server!!!"
-    end
+    -- if amountWant > 10 then
+    --     return "Bruh you are trying to explode the server!!!"
+    -- end
     if levelWant > 950 then
         return "Nah are you sure you can beat monsters that above level 950?"
     end

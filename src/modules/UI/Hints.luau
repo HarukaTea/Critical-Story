@@ -79,7 +79,7 @@ return function(plr: Player)
 			workspace.Sounds.SFXs.NewInfo:Play()
 		end
 
-		wait(5)
+		wait(3)
 		local now = Fusion.peek(self.hintsList)
 		remove(now, tFind(now, text))
 

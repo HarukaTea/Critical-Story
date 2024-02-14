@@ -4,20 +4,40 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local ItemBar = require(RepS.Modules.UI.Components.ItemBar)
 
 local Children, New, Value = Fusion.Children, Fusion.New, Fusion.Value
 
-local v2New, udNew = Vector2.new, UDim.new
+local udNew = UDim.new
 local fromScale = UDim2.fromScale
+local insert, tFind, remove = table.insert, table.find, table.remove
+local wait = task.wait
 
 local function ItemAcquiredFrame(self: table): Frame
+	self.newAddedItems = Value({})
+
+	local function _giveDrop(item: string)
+		local nowAdded = Fusion.peek(self.newAddedItems)
+
+		insert(nowAdded, item)
+		self.newAddedItems:set(nowAdded)
+
+		Spawn(function()
+			wait(4)
+			local afterAdded = Fusion.peek(self.newAddedItems)
+
+			remove(afterAdded, tFind(afterAdded, item))
+			self.newAddedItems:set(afterAdded)
+		end)
+	end
+	Events.GiveDrop:Connect(_giveDrop)
+
 	return Components.Frame({
 		Name = "ItemAcquiredFrame",
-		AnchorPoint = v2New(0.5, 0),
-		Position = fromScale(0.5, -1.15),
 
 		[Children] = {
 			New("UIListLayout")({
@@ -30,7 +50,7 @@ local function ItemAcquiredFrame(self: table): Frame
 					Icon = AssetBook.Items.ItemImages[item],
 					Name = AssetBook.Items.ItemName[item],
 					TierColor = AssetBook.TierColor[AssetBook.Items.ItemTier[item]],
-					Position = Value(fromScale(-0.45, 0))
+					Position = Value(fromScale(1.2, 0))
 				}
 
 				return ItemBar(info)

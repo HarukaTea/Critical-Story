@@ -37,77 +37,47 @@ assets.ClassInfo = {
 	Warrior = {
 		Desc = "Hit orb to gain combo, the more combos you get, the more damage you deal with.",
 		Image = "rbxassetid://2965862892",
-		Color = fromRGB(255, 100, 100),
-		SkillImage = "rbxassetid://4821548100",
-		SkillName = "Warrior Jump",
-		SkillDesc = "Immediately give you an extra jump, so that you can reach further orbs.",
-		CAIcon = true,
+		Color = fromRGB(255, 100, 100)
 	},
 	Archer = {
 		Desc = "Hit orb to generate an arrow orb, which can increase the amount of arrows. Arrows can deal additional damage to monsters, which is calculated separately.",
 		Image = "rbxassetid://2965863905",
-		Color = fromRGB(100, 255, 100),
-		SkillImage = "rbxassetid://2044402746",
-		SkillName = "Sky Assault",
-		SkillDesc = "Retrieve extra one arrow from your pocket, and spawn an extra orb which applies poison."
+		Color = fromRGB(100, 255, 100)
 	},
 	Wizard = {
 		Desc = "Hit orb to charge, the magic ball will be casted when it's done.",
 		Image = "rbxassetid://2965863231",
-		Color = fromRGB(100, 100, 254),
-		SkillImage = "rbxassetid://12027128349",
-		SkillName = "Fireball",
-		SkillDesc = "Shoot a fireball towards the monster, deals 2x magic damage and apply burn effect if hits.",
-		CAIcon = true,
+		Color = fromRGB(100, 100, 254)
 	},
 	Knight = {
 		Desc = "Hit orb to gain defense, which can be used to mitigate the damage you receive.",
 		Image = "rbxassetid://2965863677",
-		Color = fromRGB(255, 255, 50),
-		SkillImage = "rbxassetid://12027131895",
-		SkillName = "Revitalizing Gale",
-		SkillDesc = "Heal half of your max health for your teammates around you within a decent range.",
-		CAIcon = true
+		Color = fromRGB(255, 255, 50)
 	},
 	Rogue = {
 		Desc = "Hit orb to increase critical chance. Each critical hit is independently calculated as an additional chance.",
 		Image = "rbxassetid://12284961892",
-		Color = fromRGB(255, 170, 255),
-		SkillImage = "rbxassetid://2050931825",
-		SkillName = "Shadow Walker",
-		SkillDesc = "Make your next hit 100% Critical, and give 2x attack buff temporarily."
+		Color = fromRGB(255, 170, 255)
 	},
 	Repeater = {
 		Desc = "Hit orb to generate another orb within the combat area. However, this orb cannot generate orbs any more.",
 		Image = "rbxassetid://12190533959",
-		Color = fromRGB(65, 179, 255),
-		SkillImage = "rbxassetid://2093502347",
-		SkillName = "Armor Shredder",
-		SkillDesc = "Spawn 3 extra orbs, which, however, cannot generate orbs, in the area, and give 2x attack buff temporarily."
+		Color = fromRGB(65, 179, 255)
 	},
 	Striker = {
 		Desc = "Hit orb to dash to the nearest orb, you can only dash when there is more than 1 orb.",
 		Image = "rbxassetid://12190535870",
-		Color = fromRGB(253, 148, 44),
-		SkillImage = "rbxassetid://4395268516",
-		SkillName = "Lightning Strike",
-		SkillDesc = "Instantly dash to the nearest orb in the area, if there is no orb, then spawn one."
+		Color = fromRGB(253, 148, 44)
 	},
 	Alchemist = {
 		Desc = "Hit orbs of various colors to reach different research stages. Each stage will provide different effects. Red adds 1, Blue adds 2, and Green adds 3.",
 		Image = "rbxassetid://12236618949",
-		Color = fromRGB(0, 255, 22),
-		SkillImage = "rbxassetid://2228031365",
-		SkillName = "Potions Clash",
-		SkillDesc = "Receive the effects of all stages, and apply effects for your allies depend on your research stage.",
+		Color = fromRGB(0, 255, 22)
 	},
 	Illusionist = {
 		Desc = "Hit orb to create your clone, which will cast all your actives equipped if you have enough Mana.",
 		Image = "rbxassetid://15875390788",
-		Color = fromRGB(0, 255, 252),
-		SkillImage = "rbxassetid://4570577929",
-		SkillName = "Replica",
-		SkillDesc = "Make yourself Alternate for a while, leave a clone and move back to where you stand 3 seconds ago."
+		Color = fromRGB(0, 255, 252)
 	}
 }
 assets.MonsterAvatars = {

@@ -138,8 +138,9 @@ end
 	Spawn strong monsters
 ]]
 function ServerUtil:SetupMonster(locator: Part, forceLevel: number?)
-	local level = forceLevel or locator:GetAttribute("Levels")
+	if not RepS.Package.MonsterModels:FindFirstChild(locator.Name) then return end
 
+	local level = forceLevel or locator:GetAttribute("Levels")
 	local monster = RepS.Package.MonsterModels[locator.Name]:Clone() :: Model
 	monster:PivotTo(cfNew(locator.Position) * cfAngles(0, rad(random(1, 360)), 0))
 	monster:SetAttribute("Levels", level)
@@ -284,6 +285,11 @@ end
 	Return a randomly generate a position in the combat area
 ]]
 function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
+	--- checks
+	if not monster then return end
+	if not monster.Parent then return end
+	if not monster.Parent.Parent then return end
+
 	local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
 	local ray = rayNew(
 		position,
@@ -321,6 +327,11 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 		folder.Name = plr.Name
 		folder:AddTag("OrbHolder")
 		folder.Parent = workspace.MapComponents.OrbFolders
+
+		local owner = instanceNew("ObjectValue")
+		owner.Name = "Owner"
+		owner.Value = char
+		owner.Parent = folder
 	end
 
 	ServerUtil:AddSingleTarget(plr, monster)
@@ -345,6 +356,10 @@ end
 	Pop up the damage you or monster you did in workspace
 ]]
 function ServerUtil:ShowNumber(target: Model, number: number, color: Color3?, size: number?)
+	--- checks
+	if not target then return end
+	if not target.PrimaryPart then return end
+
 	local eff = RepS.Package.Effects.Number:Clone() :: Part
 	eff.Display.Text.TextColor3 = if color then color else fromRGB(255, 106, 106)
 	if size then

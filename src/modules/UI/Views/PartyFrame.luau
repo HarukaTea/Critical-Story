@@ -8,13 +8,15 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local PartyInviteSlot = require(RepS.Modules.UI.Components.PartyInviteSlot)
 
-local Children, New, Computed, OnChange = Fusion.Children, Fusion.New, Fusion.Computed, Fusion.OnChange
+local Children, New, Computed, OnChange, Value, peek =
+	Fusion.Children, Fusion.New, Fusion.Computed, Fusion.OnChange, Fusion.Value, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
-local insert = table.insert
+local insert, tFind, remove = table.insert, table.find, table.remove
 local udNew = UDim.new
 local fromRGB = Color3.fromRGB
+local wait = task.wait
 
 local function Title(index: number, text: string) : TextLabel
 	return Components.TextLabel({
@@ -46,8 +48,13 @@ local function Tip(index: number, text: string, self: table) : TextLabel
 end
 
 local function PartyFrame(self: table): Frame
-
-	self.players = Fusion.Value({})
+	local camera = workspace.CurrentCamera
+	self.absCamSize = Value({ camera.ViewportSize.X * 0.944 * 0.579, camera.ViewportSize.Y * 0.627 * 0.883 })
+	self.absCellSize = Value({ peek(self.absCamSize)[1] * 0.48, peek(self.absCamSize)[2] * 0.15 })
+	self.absSize = { Value(0), Value(0) }
+	self.absContentSize = { Value(0), Value(0) }
+	self.players = Value({})
+	self.partyMembers = Value({})
 
 	local function _setNewPlayers()
 		local reqPlayers = {}
@@ -62,6 +69,57 @@ local function PartyFrame(self: table): Frame
 	_setNewPlayers()
 	Players.PlayerAdded:Connect(_setNewPlayers)
 	Players.PlayerRemoving:Connect(_setNewPlayers)
+
+	local function _setPartyMembers(added: Folder | ObjectValue, method: string)
+		wait()
+		local plr = self.plr :: Player
+
+		if method == "Add" then
+			if workspace.MapComponents.Parties:FindFirstChild(plr.Name, true) then
+				if added:IsA("ObjectValue") and added.Parent:FindFirstChild(plr.Name) then
+					self.partyMembers:set(added.Parent:GetChildren())
+				end
+			end
+		end
+		if method == "Remove" then
+			if added.Name == plr.Name and added:IsA("ObjectValue") then self.partyMembers:set({}) end
+			if added:IsA("ObjectValue") then
+				local members = peek(self.partyMembers)
+				if tFind(members, added) then
+					remove(members, tFind(members, added))
+				end
+
+				self.partyMembers:set(members)
+			end
+		end
+		if method == "Refresh" then
+			local check = workspace.MapComponents.Parties:FindFirstChild(plr.Name, true)
+
+			if not check then return end
+
+			if check:IsA("Folder") then
+				self.partyMembers:set(check:GetChildren())
+
+			elseif check:IsA("ObjectValue") then
+				self.partyMembers:set(check.Parent:GetChildren())
+			end
+		end
+	end
+	_setPartyMembers(nil, "Refresh")
+	Fusion.Hydrate(workspace:WaitForChild("MapComponents").Parties)({
+		[Fusion.OnEvent("DescendantAdded")] = function(added)
+			_setPartyMembers(added, "Add")
+		end,
+		[Fusion.OnEvent("DescendantRemoving")] = function(added)
+			_setPartyMembers(added, "Remove")
+		end
+	})
+	Fusion.Hydrate(camera)({
+		[Fusion.OnChange("ViewportSize")] = function(newSize)
+			self.absCamSize:set({ newSize.X * 0.944 * 0.579, newSize.Y * 0.627 * 0.883 })
+			self.absCellSize:set({ peek(self.absCamSize)[1] * 0.48, peek(self.absCamSize)[2] * 0.15 })
+		end,
+	})
 
 	return Components.Frame({
 		Name = "Party",

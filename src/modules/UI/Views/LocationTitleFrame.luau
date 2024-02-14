@@ -6,11 +6,12 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
+local Children, Tween, Computed, Value = Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
+local wait, cancel, spawn = task.wait, task.cancel, task.spawn
 
 local function TextStroke(self: table)
     return Components.TextUIStroke({
@@ -22,6 +23,49 @@ local function TextStroke(self: table)
 end
 
 local function LocationTitleFrame(self: table) : Frame
+    self.locationInfo = {
+		Thread = nil,
+		Name = Value(""),
+		Desc = Value(""),
+		Shown = Value(false),
+		OverallTrans = Value(1),
+		OverallStrokeTrans = Value(1),
+		HorizonLineSize = Value(fromScale(0.25, 0.07))
+	}
+    local function _showCurrentLocation(location: string)
+        if not location or location == "" then return end
+		local locationInfo = self.locationInfo
+
+		if locationInfo.Thread then cancel(locationInfo.Thread) end
+
+		wait()
+		locationInfo.Thread = spawn(function()
+			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
+			locationInfo.Shown:set(true)
+
+			wait(0.3)
+			locationInfo.OverallStrokeTrans:set(0.3)
+			locationInfo.OverallTrans:set(0)
+
+			locationInfo.Name:set(AssetBook.LocationInfo.Name[location])
+			locationInfo.Desc:set(AssetBook.LocationInfo.Desc[location])
+
+			wait(0.1)
+			locationInfo.HorizonLineSize:set(fromScale(0, 0.07))
+
+			wait(2)
+			locationInfo.OverallStrokeTrans:set(1)
+			locationInfo.OverallTrans:set(1)
+
+			wait(1)
+			locationInfo.Shown:set(false)
+			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
+		end)
+	end
+    Fusion.Hydrate(self.char)({
+        [Fusion.AttributeChange("CurrentRegion")] = _showCurrentLocation
+    })
+
     return Components.Frame({
         Name = "LocationTitle",
         Visible = Computed(function(use)

@@ -6,13 +6,35 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, OnEvent, peek = Fusion.Children, Fusion.OnEvent, Fusion.peek
+local Children, OnEvent, Value, Computed, peek =
+	Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Computed, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local function BackpackItemSlot(item: string, self: table): ImageButton
+local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageButton
+	local amount = Value(item.Value)
+	local equipped = Value(item:GetAttribute("Equipped"))
+	local pinned = Value(item:GetAttribute("Pinned"))
+
+	Fusion.Hydrate(item)({
+		[Fusion.OnChange("Value")] = function(newAmount)
+			amount:set(newAmount)
+		end,
+		[Fusion.AttributeChange("Equipped")] = function(state)
+			equipped:set(state)
+
+			peek(self.btnsFrame.Right).Equip.Text = if state then "Unequip" else "Equip"
+		end,
+		[Fusion.AttributeChange("Pinned")] = function(state)
+			pinned:set(state)
+
+			peek(self.btnsFrame.Right).Pin.Text = if state then "Unpin" else "Pin"
+		end
+	})
+
+	item = item.Name
 	return Components.HoverImageButton({
 		Name = item,
 		BackgroundTransparency = 0,
@@ -30,7 +52,9 @@ local function BackpackItemSlot(item: string, self: table): ImageButton
 				Size = fromScale(0.5, 0.5),
 				ZIndex = 2,
 				Text = "E",
-				Visible = if self.inventory[item]:GetAttribute("Equipped") then true else false,
+				Visible = Computed(function(use)
+					return use(equipped)
+				end),
 
 				[Children] = {
 					Components.RoundUICorner(),
@@ -46,10 +70,11 @@ local function BackpackItemSlot(item: string, self: table): ImageButton
 				Size = fromScale(0.5, 0.5),
 				ZIndex = 3,
 				Text = "P",
-				Visible = if self.inventory[item]:GetAttribute("Pinned")
-						and not self.inventory[item]:GetAttribute("Equipped")
-					then true
-					else false,
+				Visible = Computed(function(use)
+					if not use(equipped) then
+						return use(pinned)
+					end
+				end),
 
 				[Children] = {
 					Components.RoundUICorner(),
@@ -62,7 +87,15 @@ local function BackpackItemSlot(item: string, self: table): ImageButton
 				Size = fromScale(1, 0.35),
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
-				Text = self.inventory[item].Value > 1 and "x" .. self.inventory[item].Value or "",
+				Text = Computed(function(use)
+					local itemAmount = use(amount) :: number
+
+					if itemAmount == 1 or itemAmount == 0 then
+						return ""
+					else
+						return "x"..itemAmount
+					end
+				end),
 			}),
 		},
 		[OnEvent("MouseEnter")] = function()
@@ -82,7 +115,7 @@ local function BackpackItemSlot(item: string, self: table): ImageButton
 				return
 			end
 
-			self:DeselectAll()
+			self:DeselectAll(self)
 
 			itemFrame[item]:SetAttribute("Selected", true)
 			itemFrame[item].UIStroke.Enabled = true
@@ -100,8 +133,9 @@ local function BackpackItemSlot(item: string, self: table): ImageButton
 			itemDescFrame.ItemTier.TextColor3 = AssetBook.TierColor[AssetBook.Items.ItemTier[item]]
 
 			btnsFrame.Equip.Visible = if itemType ~= "Material" then true else false
+			btnsFrame.Equip.Text = if peek(equipped) then "Unequip" else "Equip"
 			btnsFrame.Pin.Visible = true
-			btnsFrame.Pin.Text = if self.inventory[item]:GetAttribute("Pinned") then "Unpin" else "Pin"
+			btnsFrame.Pin.Text = if peek(pinned) then "Unpin" else "Pin"
 			btnsFrame.Pin.Size = if btnsFrame.Equip.Visible
 				then fromScale(0.116, 1)
 				else fromScale(0.237, 1)

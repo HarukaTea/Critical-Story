@@ -1,13 +1,15 @@
 --!nocheck
 
 local RepS = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, New, peek = Fusion.Children, Fusion.New, Fusion.peek
+local Children, New, Value, AttributeChange, peek =
+	Fusion.Children, Fusion.New, Fusion.Value, Fusion.AttributeChange, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -43,7 +45,7 @@ local function OptionFrame(id: string, self: table) : Frame
 				Size = fromScale(0.2, 1),
 
 				[Fusion.OnEvent("MouseButton1Click")] = function()
-					local plr, playerSettings = self.plr :: Player, self.playerSettings :: table
+					local plr = self.plr :: Player
 
 					if peek(self.playerSettings[id]) then
 						workspace.Sounds.SFXs.SwitchOff:Play()
@@ -116,6 +118,44 @@ local function OptionFrame(id: string, self: table) : Frame
 end
 
 local function SettingsFrame(self: table): Frame
+	self.playerSettings = {
+		Musics = Value(true),
+		SFXs = Value(true),
+		PublicCombat = Value(false),
+		PartyCombat = Value(false),
+		PotatoMode = Value(false),
+		PlayerList = Value(true),
+		InviteAccess = Value(true)
+	}
+	self.potatoStoreParts = {}
+
+	local playerSettings = self.playerSettings
+	Fusion.Hydrate(self.plr)({
+		[AttributeChange("CombatMode")] = function(style)
+			playerSettings.PartyCombat:set(style == "Party")
+			playerSettings.PublicCombat:set(style == "Public")
+		end,
+		[AttributeChange("Musics")] = function(state)
+			playerSettings.Musics:set(state)
+
+			SoundService.Musics.Volume = if state then 1 else 0
+		end,
+		[AttributeChange("SFXs")] = function(state)
+			playerSettings.SFXs:set(state)
+
+			SoundService.SFXs.Volume = if state then 1 else 0
+		end,
+		[AttributeChange("PotatoMode")] = function(state)
+			playerSettings.PotatoMode:set(state)
+		end,
+		[AttributeChange("PlayerList")] = function(state)
+			playerSettings.PlayerList:set(state)
+		end,
+		[AttributeChange("InviteAccess")] = function(state)
+			playerSettings.InviteAccess:set(state)
+		end
+	})
+
 	return Components.Frame({
 		Name = "Settings",
 		Position = fromScale(0.496, 0.567),

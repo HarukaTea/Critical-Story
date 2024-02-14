@@ -1,5 +1,6 @@
 --!nocheck
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
@@ -60,7 +61,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 					for _, element in list:GetChildren() do
 						if element:IsA("Frame") then
 							element.BackgroundColor3 = fromRGB(30, 30, 30)
-							element.PlayerName.TextColor3 = if player:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+							element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
 						end
 					end
 					for _, element in desc:GetChildren() do
@@ -96,11 +97,9 @@ local function PlayerSlot(self: table, player: Player): Frame
 							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
 						end
 					end
-					desc.Slot4.Image = AssetBook.ClassInfo[peek(class)].SkillImage
-					desc.Slot4.ImageColor3 = if AssetBook.ClassInfo[peek(class)].CAIcon then color3New(1, 1, 1) else AssetBook.ClassInfo[peek(class)].Color
 					for _, item in items:GetChildren() do
 						if AssetBook.Items.ItemType[item.Name] == "Active" and item:GetAttribute("Equipped") then
-							local index = match(item:GetAttribute("Slot"), "%d") + 4
+							local index = match(item:GetAttribute("Slot"), "%d") + 3
 
 							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
 						end

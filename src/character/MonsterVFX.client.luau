@@ -1,10 +1,11 @@
 --!nocheck
 
+local CS = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Collection = require(RepS.Modules.Packages.Collection)
+--local HyperTween = require(RepS.Modules.Packages.HyperTween)
 
 local wait = task.wait
 local sinh, random = math.sinh, math.random
@@ -14,6 +15,9 @@ local cfNew, cfAngles = CFrame.new, CFrame.Angles
 ---// Foxes
 local function spikeShot(blast: Model)
 	wait(0.5)
+	if not blast then return end
+	if not blast:FindFirstChild("Spike") then return end
+
 	blast.Spike:Play()
 end
 
@@ -28,6 +32,10 @@ local function spike2Range(blast: BasePart)
 end
 
 local function spikeRain(blast: Model)
+	--- most issues come from here in public test
+	if not blast then return end
+	if not blast:FindFirstChild("Spike") then return end
+
 	blast.Spike:Play()
 	blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, 30, 0))
 
@@ -160,46 +168,40 @@ local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
-local function returnFunc()
-	local function _vfxHandler(blast: Model | BasePart)
-		wait()
-		local style = blast.Name
-		if not blast:IsDescendantOf(workspace) then return end
+local function vfxHandler(blast: Model | BasePart)
+	local style = blast.Name
 
-		blast:WaitForChild("Owner")
+	if not blast:IsDescendantOf(workspace) then return end
+	blast:WaitForChild("Owner")
 
-		if style == "SpikeWolf1" then
-			spikeShot(blast)
+	if style == "SpikeWolf1" then
+		spikeShot(blast)
 
-		elseif style == "SpikeWolfSpike1" then
-			spike1(blast)
+	elseif style == "SpikeWolfSpike1" then
+		spike1(blast)
 
-		elseif style == "SpikeWolfSpike2" then
-			spikeRain(blast)
+	elseif style == "SpikeWolfSpike2" then
+		spikeRain(blast)
 
-		elseif style == "SpikeWolf2Range" then
-			spike2Range(blast)
+	elseif style == "SpikeWolf2Range" then
+		spike2Range(blast)
 
-		elseif style == "SpikeWolf4" then
-			wolfBite(blast)
+	elseif style == "SpikeWolf4" then
+		wolfBite(blast)
 
-		elseif style == "Slime1" then
-			wait(0.3)
-			slimeShot(blast, blast.Owner.Value)
+	elseif style == "Slime1" then
+		wait(0.3)
+		slimeShot(blast, blast.Owner.Value)
 
-		elseif style == "Slime2" then
-			wait(0.5)
-			slimeWave(blast)
+	elseif style == "Slime2" then
+		wait(0.5)
+		slimeWave(blast)
 
-		elseif style == "SlimeBlast" then
-			slimeBlast(blast, blast:GetAttribute("SlimeWaveProjectile"))
+	elseif style == "SlimeBlast" then
+		slimeBlast(blast, blast:GetAttribute("SlimeWaveProjectile"))
 
-			wait(8)
-			slimeBlastFade(blast)
-		end
+		wait(8)
+		slimeBlastFade(blast)
 	end
-
-	Collection("MonsterAttack", _vfxHandler)
 end
-
-return returnFunc
+CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)

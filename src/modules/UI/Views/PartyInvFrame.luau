@@ -7,12 +7,13 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
+local Children, New, Computed, Value = Fusion.Children, Fusion.New, Fusion.Computed, Fusion.Value
 
 local udNew, ud2New = UDim.new, UDim2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local v2New = Vector2.new
+local wait = task.wait
 
 local function OptionButton(option: boolean, self: table) : TextButton
     return Components.TextButton({
@@ -39,6 +40,23 @@ local function OptionButton(option: boolean, self: table) : TextButton
 end
 
 local function PartyInvFrame(self: table) : Frame
+    self.invProgressSize, self.invPerson, self.invPersonT = Value(fromScale(1, 1)), Value(""), Value("")
+
+    local function _partyInvite(inviter: Player)
+		workspace.Sounds.SFXs.Notification:Play()
+
+		self.invPerson:set(inviter.DisplayName)
+		self.invPersonT:set(inviter.Name)
+		self.invProgressSize:set(fromScale(0, 1))
+
+		wait(6)
+		self.invPerson:set("")
+		self.invPersonT:set("")
+		self.invProgressSize:set(fromScale(1, 1))
+	end
+	Events.PartyInvite:Connect(_partyInvite)
+
+
     return Components.Frame({
         Name = "PartyInvFrame",
         BackgroundTransparency = 0,

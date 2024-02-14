@@ -54,9 +54,9 @@ end
 	Check if the slot is equipped, and return free slot if has
 ]]
 function Backpack:CheckSlot(type: string) : string
-	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame.Frame
+	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
 
-	for _, element in classFrame:GetChildren() do
+	for _, element in classFrame:GetDescendants() do
 		if sFind(element.Name, type) then
 			if not element:GetAttribute("Equipped") then
 				return element.Name
@@ -71,10 +71,10 @@ end
 	Check if it's already equipped, more like a sanity check
 ]]
 function Backpack:CheckSameItem(item: string, type: string) : (string, string?)
-	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame.Frame
+	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
 
 	local check, sameSlot = false, nil
-	for _, element in classFrame:GetChildren() do
+	for _, element in classFrame:GetDescendants() do
 		if sFind(element.Name, type) and element:GetAttribute("ItemEquipped") == item then
 			check = true
 			sameSlot = element.Name
@@ -93,18 +93,16 @@ return function(plr: Player)
 	self.plr = plr
 	self.plrGui = plr.PlayerGui
 	local char = plr.Character or plr.CharacterAdded:Wait()
+	local camVPSize = workspace.CurrentCamera.ViewportSize
 
 	self.inventory = plr:WaitForChild("Inventory", 999)
-
-	self.absSize = Value({ workspace.CurrentCamera.ViewportSize.X * 0.71, workspace.CurrentCamera.ViewportSize.Y * 0.662 })
+	self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })
 	self.absCellPadding = Value({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
 	self.absCellSize, self.absTextSize = Value(peek(self.absSize)[1] / 15.58), Value(peek(self.absSize)[2] * 0.345 / 4.66)
 	self.absScrollSize, self.absContentSize = Value(90), Value(30)
 
 	self.UI, self.itemFrame, self.itemDescFrame = Value(), Value(), Value()
-	self.btnsFrame = { Left = Value(), Right = Value() }
-
-	self.items, self.chosenFilter, self.noItemsShow = Value({}), Value("All"), Value(false)
+	self.items, self.noItemsShow = Value({}), Value(false)
 
 	Components.ScreenGui({
 		Name = "Backpack",
@@ -186,16 +184,16 @@ return function(plr: Player)
 									}),
 									Fusion.ForValues(self.items, function(use, item: IntValue)
 										if use(self.chosenFilter) == "All" then
-											return BackpackItemSlot(item.Name, self)
+											return BackpackItemSlot(item, self)
 
 										elseif use(self.chosenFilter) == "Others" then
 											local filter = { "Material", "Cosmetic", "Companion" }
 											if tFind(filter, AssetBook.Items.ItemType[item.Name]) then
-												return BackpackItemSlot(item.Name, self)
+												return BackpackItemSlot(item, self)
 											end
 										else
 											if AssetBook.Items.ItemType[item.Name] == use(self.chosenFilter) then
-												return BackpackItemSlot(item.Name, self)
+												return BackpackItemSlot(item, self)
 											end
 										end
 									end, Fusion.cleanup),
@@ -274,7 +272,7 @@ return function(plr: Player)
 			_setExVisibleState(menuFrame, false)
 		end
 	end
-	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.C)
+	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
 
 	--// Setup
 	self.items:set(self.inventory:GetChildren())

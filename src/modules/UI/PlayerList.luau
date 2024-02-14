@@ -6,7 +6,6 @@ local Players = game:GetService("Players")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
@@ -31,19 +30,14 @@ return function(plr: Player)
 	local self = setmetatable({}, PlayerList)
 	self.plrGui = plr.PlayerGui
 
-	local char = plr.Character or plr.CharacterAdded:Wait()
-
 	self.UI, self.list, self.desc = Value(), Value(), Value()
 	self.absSize, self.absContentSize = Value(90), Value(30)
 	self.players = Value({})
-
 	self.isOpen = Value(true)
-	self.invProgressSize, self.invPerson, self.invPersonT = Value(fromScale(1, 1)), Value(""), Value("")
 
 	Components.ScreenGui({
 		Name = "PlayerList",
 		Parent = self.plrGui,
-		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		[Fusion.Ref] = self.UI,
 
 		[Children] = {
@@ -136,8 +130,6 @@ return function(plr: Player)
 	CAS:BindAction("TogglePlayerList", _togglePlayerList, false, Enum.KeyCode.Tab)
 
 	---// Setup
-	self.absSize:set(peek(self.list).AbsoluteSize.Y)
-	self.absContentSize:set(peek(self.list).UIListLayout.AbsoluteContentSize.Y)
 	for _, player in Players:GetPlayers() do
 		repeat wait() until player:GetAttribute("PlayerDataLoaded")
 	end
@@ -157,28 +149,4 @@ return function(plr: Player)
 			self.isOpen:set(state)
 		end
 	})
-
-	local function _partyInvite(inviter: Player)
-		workspace.Sounds.SFXs.Notification:Play()
-
-		self.invPerson:set(inviter.DisplayName)
-		self.invPersonT:set(inviter.Name)
-		self.invProgressSize:set(fromScale(0, 1))
-
-		wait(6)
-		self.invPerson:set("")
-		self.invPersonT:set("")
-		self.invProgressSize:set(fromScale(1, 1))
-	end
-	Events.PartyInvite:Connect(_partyInvite)
-
-	--// Clear
-	local function _clearGarbadge()
-		Events.PartyInvite:DisconnectAll()
-
-		CAS:UnbindAction("TogglePlayerList")
-
-		peek(self.UI):Destroy()
-	end
-	char.Humanoid.Died:Once(_clearGarbadge)
 end

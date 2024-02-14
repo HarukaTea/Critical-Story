@@ -65,6 +65,7 @@ return function(plr: Player)
 
 	CS:GetInstanceAddedSignal("ScreenStroke"):Connect(function(added: Instance)
 		self.uiStrokes[added] = added.Thickness
+
 		added.Thickness *= _calScreenRatio()
 	end)
 

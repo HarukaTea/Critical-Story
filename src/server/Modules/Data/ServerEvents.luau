@@ -11,11 +11,10 @@ local Events = {
 	CombatStart = Net("CombatStart"),
 	CreateHint = Net("CreateHint", false),
 	ClientTween = Net("ClientTween", false),
-	CastClassSkill = Net("CastClassSkill"),
 	ChangeInviteAccess = Net("ChangeInviteAccess", false),
 	ChestUnlocked = Net("ChestUnlocked", false),
 	EquipItems = Net("EquipItems"),
-	ErrorDataStore = Net("ErrorDataStore"),
+	ErrorDataStore = Net("ErrorDataStore", false),
 	ForceReset = Net("ForceReset", false),
 	GiveDrop = Net("GiveDrop"),
 	ItemCD = Net("ItemCD", false),
@@ -28,7 +27,7 @@ local Events = {
 	RejoinCombat = Net("RejoinCombat"),
 	RejoinRequest = Net("RejoinRequest", false),
 	UseItem = Net("UseItem"),
-	UpdatePinnedItems = Net("UpdatePinnedItems"),
+	UpdatePinnedItems = Net("UpdatePinnedItems", false),
 }
 
 return Events

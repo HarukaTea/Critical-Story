@@ -3,28 +3,30 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local plr = Players.LocalPlayer
-local char = script.Parent
+local char = script.Parent :: Model
 
-local UIModules = RepS.Modules.UI
-local mechanicModules = RepS.Modules.Mechanics
+local wait = task.wait
+local instanceNew = Instance.new
+local random, sin = math.random, math.sin
+local sub = string.sub
+
+local UIModules = RepS.Modules.UI :: Folder
 local requireList = {
 	UIModules.AdventurerStats,
 	UIModules.AdventurerMenu,
 	UIModules.Backpack,
-	UIModules.PlayerList,
-	UIModules.ShiftLock,
-	mechanicModules.CharacterSetups,
-	mechanicModules.CACombat,
-	mechanicModules.AnimationPlayer,
-	mechanicModules.MonsterVFX,
-	mechanicModules.WaterSwim,
+	UIModules.ShiftLock
 }
-HarukaLib:Require(requireList, plr)
+for _, module in requireList do
+	Spawn(function()
+		require(module)(plr)
+	end)
+end
 
---- Now for the trash animate part
+--- I optimized the animate script so it should be pretty good right now
 local torso = char:WaitForChild("Torso")
 local rightShoulder = torso:WaitForChild("Right Shoulder")
 local leftShoulder = torso:WaitForChild("Left Shoulder")
@@ -41,8 +43,7 @@ local currentAnimSpeed = 1.0
 local animTable = {}
 local animNames = {
 	idle = {
-		{ id = "rbxassetid://12405336225", weight = 9 },
-		{ id = "rbxassetid://12405336225", weight = 1 },
+		{ id = "rbxassetid://12405336225", weight = 10 }
 	},
 	walk = {
 		{ id = "rbxassetid://12405387090", weight = 10 },
@@ -96,10 +97,10 @@ local dances = { "dance1", "dance2", "dance3" }
 local emoteNames =
 	{ wave = false, point = false, dance1 = true, dance2 = true, dance3 = true, laugh = false, cheer = false }
 
-local function configureAnimationSet(name, fileList)
-	if animTable[name] ~= nil then
+local function configureAnimationSet(name: string, fileList: table)
+	if animTable[name] then
 		for _, connection in animTable[name].connections do
-			connection:disconnect()
+			connection:Disconnect()
 		end
 	end
 	animTable[name] = {}
@@ -111,7 +112,7 @@ local function configureAnimationSet(name, fileList)
 	if animTable[name].count <= 0 then
 		for idx, anim in fileList do
 			animTable[name][idx] = {}
-			animTable[name][idx].anim = Instance.new("Animation")
+			animTable[name][idx].anim = instanceNew("Animation")
 			animTable[name][idx].anim.Name = name
 			animTable[name][idx].anim.AnimationId = anim.id
 			animTable[name][idx].weight = anim.weight
@@ -123,10 +124,10 @@ end
 
 -- Clear any existing animation tracks
 -- Fixes issue with characters that are moved in and out of the Workspace accumulating tracks
-local animator = if humanoid then humanoid:FindFirstChildOfClass("Animator") else nil
+local animator = if humanoid then humanoid.Animator else nil
 if animator then
 	local animTracks = animator:GetPlayingAnimationTracks()
-	for i, track in ipairs(animTracks) do
+	for _, track in ipairs(animTracks) do
 		track:Stop(0)
 		track:Destroy()
 	end
@@ -136,11 +137,9 @@ for name, fileList in animNames do
 end
 
 -- ANIMATION
-
 -- declarations
 local jumpAnimTime = 0
 local jumpAnimDuration = 0.3
-
 local fallTransitionTime = 0.3
 
 -- functions
@@ -148,17 +147,15 @@ local function stopAllAnimations()
 	local oldAnim = currentAnim
 
 	-- return to idle if finishing an emote
-	if emoteNames[oldAnim] ~= nil and emoteNames[oldAnim] == false then
+	if emoteNames[oldAnim] and emoteNames[oldAnim] == false then
 		oldAnim = "idle"
 	end
 
 	currentAnim = ""
 	currentAnimInstance = nil
-	if currentAnimKeyframeHandler ~= nil then
-		currentAnimKeyframeHandler:disconnect()
-	end
+	if currentAnimKeyframeHandler then currentAnimKeyframeHandler:Disconnect() end
 
-	if currentAnimTrack ~= nil then
+	if currentAnimTrack then
 		currentAnimTrack:Stop()
 		currentAnimTrack:Destroy()
 		currentAnimTrack = nil
@@ -166,7 +163,7 @@ local function stopAllAnimations()
 	return oldAnim
 end
 
-local function setAnimationSpeed(speed)
+local function setAnimationSpeed(speed: number)
 	if speed ~= currentAnimSpeed then
 		currentAnimSpeed = speed
 		currentAnimTrack:AdjustSpeed(currentAnimSpeed)
@@ -174,19 +171,18 @@ local function setAnimationSpeed(speed)
 end
 
 -- Preload animations
-local function playAnimation(animName, transitionTime, humanoid)
-	local roll = math.random(1, animTable[animName].totalWeight)
+local function playAnimation(animName: string, transitionTime: number)
+	local roll = random(1, animTable[animName].totalWeight)
 	local idx = 1
 	while roll > animTable[animName][idx].weight do
 		roll = roll - animTable[animName][idx].weight
-		idx = idx + 1
+		idx += 1
 	end
 
 	local anim = animTable[animName][idx].anim
-
 	-- switch animation
 	if anim ~= currentAnimInstance then
-		if currentAnimTrack ~= nil then
+		if currentAnimTrack then
 			currentAnimTrack:Stop(transitionTime)
 			currentAnimTrack:Destroy()
 		end
@@ -203,20 +199,16 @@ local function playAnimation(animName, transitionTime, humanoid)
 		currentAnimInstance = anim
 
 		-- set up keyframe name triggers
-		if currentAnimKeyframeHandler ~= nil then
-			currentAnimKeyframeHandler:disconnect()
-		end
+		if currentAnimKeyframeHandler then currentAnimKeyframeHandler:Disconnect() end
 
-        local function keyFrameReachedFunc(frameName)
+        local function keyFrameReachedFunc(frameName: string)
             if frameName == "End" then
                 local repeatAnim = currentAnim
                 -- return to idle if finishing an emote
-                if emoteNames[repeatAnim] ~= nil and emoteNames[repeatAnim] == false then
-                    repeatAnim = "idle"
-                end
+                if emoteNames[repeatAnim] and not emoteNames[repeatAnim] then repeatAnim = "idle" end
 
                 local animSpeed = currentAnimSpeed
-                playAnimation(repeatAnim, 0.0, humanoid)
+                playAnimation(repeatAnim, 0)
 
                 setAnimationSpeed(animSpeed)
             end
@@ -226,92 +218,73 @@ local function playAnimation(animName, transitionTime, humanoid)
 end
 
 
-local function onRunning(speed)
+local function onRunning()
 	if humanoid.MoveDirection.Magnitude > 0 then
-		playAnimation("walk", 0.1, humanoid)
-		if currentAnimInstance and currentAnimInstance.AnimationId == "http://www.roblox.com/asset/?id=180426354" then
-			setAnimationSpeed(speed / 14.5)
-		end
+		playAnimation("walk", 0.1)
+
 		pose = "Running"
 	else
 		if emoteNames[currentAnim] == nil then
-			playAnimation("idle", 0.1, humanoid)
+			playAnimation("idle", 0.1)
 			pose = "Standing"
 		end
 	end
 end
-
 local function onDied()
 	pose = "Dead"
 end
-
 local function onJumping()
-	playAnimation("jump", 0.1, humanoid)
+	playAnimation("jump", 0.1)
+
 	jumpAnimTime = jumpAnimDuration
 	pose = "Jumping"
 end
+local function onClimbing(speed: number)
+	playAnimation("climb", 0.1)
 
-local function onClimbing(speed)
-	playAnimation("climb", 0.1, humanoid)
-	setAnimationSpeed(speed / 12.0)
+	setAnimationSpeed(speed / 12)
 	pose = "Climbing"
 end
-
 local function onGettingUp()
 	pose = "GettingUp"
 end
-
 local function onFreeFall()
 	if jumpAnimTime <= 0 then
-		playAnimation("fall", fallTransitionTime, humanoid)
+		playAnimation("fall", fallTransitionTime)
 	end
 	pose = "FreeFall"
 end
-
 local function onFallingDown()
 	pose = "FallingDown"
 end
-
 local function onSeated()
 	pose = "Seated"
 end
-
 local function onPlatformStanding()
 	pose = "PlatformStanding"
 end
 
-local function onSwimming(speed)
-	if speed > 0 then
-		pose = "Running"
-	else
-		pose = "Standing"
-	end
-end
-
-local lastTick = 0
-
-local function move(time)
+local lastTick = tick()
+local function move()
 	local amplitude = 1
 	local frequency = 1
-	local deltaTime = time - lastTick
-	lastTick = time
+	local deltaTime = tick() - lastTick
+	lastTick = tick()
 
 	local climbFudge = 0
 	local setAngles = false
 
-	if jumpAnimTime > 0 then
-		jumpAnimTime = jumpAnimTime - deltaTime
-	end
+	if jumpAnimTime > 0 then jumpAnimTime = jumpAnimTime - deltaTime end
 
 	if pose == "FreeFall" and jumpAnimTime <= 0 then
-		playAnimation("fall", fallTransitionTime, humanoid)
+		playAnimation("fall", fallTransitionTime)
 
 	elseif pose == "Seated" then
-		playAnimation("sit", 0.5, humanoid)
-		return
+		playAnimation("sit", 0.5)
 
+		return
 	elseif pose == "Running" then
-		playAnimation("walk", 0.1, humanoid)
+		playAnimation("walk", 0.1)
 
 	elseif
 		pose == "Dead"
@@ -327,7 +300,7 @@ local function move(time)
 	end
 
 	if setAngles then
-		local desiredAngle = amplitude * math.sin(time * frequency)
+		local desiredAngle = amplitude * sin(tick() * frequency)
 
 		rightShoulder:SetDesiredAngle(desiredAngle + climbFudge)
 		leftShoulder:SetDesiredAngle(desiredAngle - climbFudge)
@@ -347,29 +320,28 @@ humanoid.FreeFalling:Connect(onFreeFall)
 humanoid.FallingDown:Connect(onFallingDown)
 humanoid.Seated:Connect(onSeated)
 humanoid.PlatformStanding:Connect(onPlatformStanding)
-humanoid.Swimming:Connect(onSwimming)
 
 ---- setup emote chat hook
 Players.LocalPlayer.Chatted:Connect(function(msg)
 	local emote = ""
 	if msg == "/e dance" then
-		emote = dances[math.random(1, #dances)]
-	elseif string.sub(msg, 1, 3) == "/e " then
-		emote = string.sub(msg, 4)
-	elseif string.sub(msg, 1, 7) == "/emote " then
-		emote = string.sub(msg, 8)
+		emote = dances[random(1, #dances)]
+	elseif sub(msg, 1, 3) == "/e " then
+		emote = sub(msg, 4)
+	elseif sub(msg, 1, 7) == "/emote " then
+		emote = sub(msg, 8)
 	end
 
-	if pose == "Standing" and emoteNames[emote] ~= nil then
-		playAnimation(emote, 0.1, humanoid)
+	if pose == "Standing" and emoteNames[emote] then
+		playAnimation(emote, 0.1)
 	end
 end)
 
 -- initialize to idle
-playAnimation("idle", 0.1, humanoid)
+playAnimation("idle", 0.1)
 pose = "Standing"
 
 while char.Parent do
-	local _, time = wait(0.1)
-	move(time)
+	wait(0.1)
+	move()
 end

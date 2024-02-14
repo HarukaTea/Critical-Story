@@ -1,7 +1,5 @@
 --!nocheck
 
-local FastSpawn = require(script.Parent.Spawn)
-
 local HarukaLib = {}
 
 local floor, log10, abs = math.floor, math.log10, math.abs
@@ -38,17 +36,6 @@ end
 function HarukaLib:ClearAllAttributes(obj: Instance)
 	for attribute, _ in obj:GetAttributes() do
 		obj:SetAttribute(attribute, nil)
-	end
-end
-
---[[
-	To prevent require issues
-]]
-function HarukaLib:Require(list: table, plr: Player)
-	for _, module in list do
-		FastSpawn(function()
-			require(module)(plr)
-		end)
 	end
 end
 

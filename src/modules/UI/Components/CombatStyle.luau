@@ -1,22 +1,63 @@
 --!nocheck
 
 local RepS = game:GetService("ReplicatedStorage")
+local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, Computed = Fusion.Children, Fusion.Computed
+local Children, Computed, Value, AttributeChange =
+    Fusion.Children, Fusion.Computed, Fusion.Value, Fusion.AttributeChange
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local clamp = math.clamp
+local wait = task.wait
 
 local function CombatStyle(self: table, class: string) : Frame
+    self.charClassInfo = {
+		Warrior = { Val = Value(0), UI = Value() },
+		Archer = { Val = Value(0), UI = Value() },
+		Wizard = { Val = Value(0), UI = Value() },
+		Knight = { Val = Value(0), UI = Value() },
+		Rogue = { Val = Value(0), UI = Value() }
+	}
+
+    local charClassInfo = self.charClassInfo
+    Fusion.Hydrate(self.char)({
+		[AttributeChange("Combo")] = function(combo)
+			if combo <= 0 then
+				charClassInfo.Warrior.Val:set(combo)
+				return
+			end
+
+			local tagUI = Fusion.peek(charClassInfo.Warrior.UI)
+
+			charClassInfo.Warrior.Val:set(combo)
+
+			TS:Create(tagUI.BarBG.Bar, AssetBook.TweenInfos.twiceHalf, { Size = fromScale(1, 1) }):Play()
+			wait(0.2)
+			TS:Create(tagUI.BarBG.Bar, AssetBook.TweenInfos.threeHalfOne, { Size = fromScale(0, 1) }):Play()
+		end,
+		[AttributeChange("Arrows")] = function(arrows)
+			charClassInfo.Archer.Val:set(arrows)
+		end,
+		[AttributeChange("WizardCasted")] = function(casted)
+			charClassInfo.Wizard.Val:set(casted)
+		end,
+		[AttributeChange("Guard")] = function(guarded)
+			charClassInfo.Knight.Val:set(guarded)
+		end,
+		[AttributeChange("RogueCritical")] = function(criChance)
+			charClassInfo.Rogue.Val:set(criChance)
+		end
+	})
+
     return Components.Frame({
         Name = class.."Style",
         Visible = Computed(function(use)
-            local neededClass = use(self.charStatsDict.PlayerData.Class) :: string
+            local neededClass = use(self.playerData.Class) :: string
             local inCombat = use(self.charStatsDict.IsInCombat) :: boolean
 
             --- in combat condition
@@ -44,7 +85,7 @@ local function CombatStyle(self: table, class: string) : Frame
                         Size = fromScale(1, 1),
                         BackgroundTransparency = 0,
                         Visible = Computed(function(use)
-                            local neededClass = use(self.charStatsDict.PlayerData.Class) :: string
+                            local neededClass = use(self.playerData.Class) :: string
 
                             return if neededClass == "Warrior" and class == "Warrior" then true else false
                         end),
@@ -80,7 +121,7 @@ local function CombatStyle(self: table, class: string) : Frame
                         end), AssetBook.TweenInfos.half),
                         BackgroundTransparency = 0,
                         Visible = Computed(function(use)
-                            local neededClass = use(self.charStatsDict.PlayerData.Class) :: string
+                            local neededClass = use(self.playerData.Class) :: string
 
                             return if neededClass == "Warrior" and class == "Warrior" then false else true
                         end),

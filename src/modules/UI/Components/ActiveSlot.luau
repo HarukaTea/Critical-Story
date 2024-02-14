@@ -13,18 +13,16 @@ local OnEvent, Computed, Children, Value = Fusion.OnEvent, Fusion.Computed, Fusi
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 
-local POSITIONS = { 0, 0.2, 0.666, 0.866 }
+local POSITIONS = { 0, 0.355, 0.71, 0.866 }
 local STROKES_ENABLE = { Value(false), Value(false), Value(false), Value(false) }
 
 local function ActiveSlot(id: string, self: table): Frame
 	return Fusion.New("Frame")({
-		Name = if id == 1 then "ClassSkill" else "Active"..tostring(id - 1),
+		Name = "Active"..id,
 		BackgroundColor3 = color3New(),
 		Position = fromScale(POSITIONS[id], 0),
-		Size = fromScale(0.135, 1),
+		Size = fromScale(0.281, 0.658),
 		[Fusion.Ref] = self.activeList[id],
-
-		[Fusion.Attribute("Equipped")] = if id == 1 then true else false,
 
 		[Children] = {
 			Components.RoundUICorner(),
@@ -45,36 +43,38 @@ local function ActiveSlot(id: string, self: table): Frame
 					STROKES_ENABLE[id]:set(false)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					self:UseItem(id - 1)
+					self:UseItem(id)
 				end,
 			}),
 			Components.ImageLabel({
 				Name = "Icon",
 				Size = fromScale(1, 1),
 				Image = Computed(function(use)
-					if id == 1 then
-						return AssetBook.ClassInfo[use(self.charStatsDict.PlayerData.Class)].SkillImage
-					else
-						return AssetBook.Items.ItemImages.Null
-					end
-				end),
-				ImageColor3 = Computed(function(use)
-					local class = use(self.charStatsDict.PlayerData.Class) :: string
+					local item = use(self.activeIconList[id]) :: string
 
-					if AssetBook.ClassInfo[class].CAIcon then
-						return color3New(1, 1, 1)
+					if AssetBook.Items.ItemImages[item] then
+						return AssetBook.Items.ItemImages[item]
 					else
-						return if id == 1 then AssetBook.ClassInfo[class].Color else color3New(1, 1, 1)
+						return AssetBook.Items.ItemImages.Unknown
 					end
 				end)
 			}),
 			Components.TextLabel({
 				Name = "Amount",
-				Position = fromScale(-0.02, 0.617),
+				Position = fromScale(-0.02, 0.72),
 				Size = fromScale(1.25, 0.365),
 				ZIndex = 4,
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
+				Text = Computed(function(use)
+					local amount = use(self.activeAmountList[id]) :: number
+
+					if amount == 1 or amount == 0 then
+						return ""
+					else
+						return "x"..amount
+					end
+				end),
 
 				[Children] = {
 					Components.TextUIStroke({ Thickness = 2.5 }),
@@ -106,13 +106,15 @@ local function ActiveSlot(id: string, self: table): Frame
 			}),
 			Components.TextLabel({
 				Name = "Key",
-				Position = fromScale(-0.25, -0.17),
-				Size = fromScale(0.6, 0.6),
+				BackgroundColor3 = color3New(),
+				BackgroundTransparency = 0,
+				Position = fromScale(0.316, 1.109),
+				Size = fromScale(0.361, 0.362),
 				ZIndex = 4,
 				TextStrokeTransparency = 0,
-				Text = if id == 1 then "F" else (id - 1),
+				Text = id,
 
-				[Children] = { Components.TextUIStroke({ Thickness = 2.5 }) },
+				[Children] = { Fusion.New("UICorner")({ CornerRadius = udNew(0.3, 0) })},
 			}),
 
 			ProgressCircle("Left", self, id),
