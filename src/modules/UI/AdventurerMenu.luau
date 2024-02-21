@@ -74,7 +74,7 @@ return function(plr: Player)
 		ui.Shadow.Visible = state
 	end
 	local function _setOthersVisibleState(state: boolean)
-		self.plrGui.AdventurerStats.BG.Visible = state
+		self.plrGui.AdventurerStats.Enabled = state
 		self.plrGui.PlayerList.Enabled = state
 
 		workspace.CurrentCamera.UIBlur.Enabled = not state

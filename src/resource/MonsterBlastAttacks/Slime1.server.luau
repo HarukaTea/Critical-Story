@@ -9,7 +9,6 @@ wait(0.5)
 local blast = model.Projectile.Value:Clone() :: Model
 blast.Owner.Value = model.Owner.Value
 blast:PivotTo(model.Base.CFrame)
-blast:AddTag("MonsterAttack")
 blast.Parent = char.Holder.Value
 
 for _, child in blast:GetDescendants() do

@@ -5,7 +5,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
---local HyperTween = require(RepS.Modules.Packages.HyperTween)
 
 local wait = task.wait
 local sinh, random = math.sinh, math.random
@@ -25,10 +24,13 @@ local function spike1(blast: Model)
 	blast.Base.CFrame *= cfNew(0, 0, -80)
 
 	TS:Create(blast.Part, AssetBook.TweenInfos.one, { Position = blast.Base.Position }):Play()
+	--HyprTween:Create(blast.Part, AssetBook.TweenInfos.one, { Position = blast.Base.Position }):Play()
 end
 
 local function spike2Range(blast: BasePart)
 	TS:Create(blast, AssetBook.TweenInfos.one, { Transparency = 1 }):Play()
+
+	--HyprTween:Create(blast, AssetBook.TweenInfos.one, { Transparency = 1 }):Play()
 end
 
 local function spikeRain(blast: Model)
@@ -147,7 +149,11 @@ local function slimeBlastFade(blast: Model)
 end
 
 local function slimeDive(blast: Model)
+	blast.SlimeAttack:Play()
+
 	for i = 1, 2 do
+		if not blast:FindFirstChild("Position"..i) then continue end
+
 		local size = if i == 1 then v3New(20, 1, 20) else v3New(4, 1, 4)
 
 		TS:Create(blast["Position" .. i], AssetBook.TweenInfos.twiceHalf, { Size = size }):Play()
@@ -155,6 +161,8 @@ local function slimeDive(blast: Model)
 end
 
 local function slimeBomb(blast: Model)
+	blast.Explosion:Play()
+
 	TS:Create(blast.Bomb1, AssetBook.TweenInfos.twiceHalf, { Size = v3New(16, 16, 16) }):Play()
 	TS:Create(blast.Bomb2, AssetBook.TweenInfos.twiceHalf, { Size = v3New(22, 26, 26) }):Play()
 	TS:Create(blast.Bomb1, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
@@ -189,6 +197,8 @@ local function vfxHandler(blast: Model | BasePart)
 	elseif style == "SpikeWolf4" then
 		wolfBite(blast)
 
+
+
 	elseif style == "Slime1" then
 		wait(0.3)
 		slimeShot(blast, blast.Owner.Value)
@@ -196,6 +206,21 @@ local function vfxHandler(blast: Model | BasePart)
 	elseif style == "Slime2" then
 		wait(0.5)
 		slimeWave(blast)
+
+	elseif style == "Slime3" then
+		wait(0.5)
+		slimeDive(blast)
+
+	elseif style == "Slime4" then
+		wait(0.3)
+		slimeShot(blast, blast.Owner.Value)
+
+	elseif style == "SlimeBomb" then
+		wait(1)
+		slimeBomb(blast)
+
+	elseif style == "SlimeSpin" then
+		slimeSpin(blast)
 
 	elseif style == "SlimeBlast" then
 		slimeBlast(blast, blast:GetAttribute("SlimeWaveProjectile"))

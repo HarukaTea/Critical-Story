@@ -15,3 +15,11 @@ for _, child in workspace.Maps:GetDescendants() do
         child:Destroy()
     end
 end
+
+for _, child in workspace.MapComponents.Statues:GetChildren() do
+    child.Prompt.Class.ActionText = child.Prompt.Class:GetAttribute("Class")
+end
+
+for _, child in workspace.MapComponents.Chests:GetChildren() do
+    child.Giver:SetAttribute("IsChest", nil)
+end

@@ -12,11 +12,13 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
+local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
 local MonsterHPFrame = require(RepS.Modules.UI.Views.MonsterHPFrame)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
+local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 
 local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
@@ -82,12 +84,19 @@ return function(plr: Player)
 		Gold = Value(HarukaLib:NumberConvert(plr:GetAttribute("Gold"), "%.1f")),
 		RP = Value(HarukaLib:NumberConvert(plr:GetAttribute("RP"), "%.1f")),
 	}
+	self.charClassInfo = {
+		Warrior = { Val = Value(0), UI = Value() },
+		Archer = { Val = Value(0), UI = Value() },
+		Wizard = { Val = Value(0), UI = Value() },
+		Knight = { Val = Value(0), UI = Value() },
+		Rogue = { Val = Value(0), UI = Value() }
+	}
 	self.shadowTrans = Value(1)
-
 	self.Add, self.Empty = Bin()
 
 	Components.ScreenGui({
 		Name = "AdventurerStats",
+		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		Parent = self.plrGui,
 		[Fusion.Ref] = self.UI,
 
@@ -156,6 +165,7 @@ return function(plr: Player)
 					}),
 
 					ClassFrame(self),
+					ChatFrame(self)
 				},
 			}),
 			Components.Frame({
@@ -183,6 +193,7 @@ return function(plr: Player)
 					PromptsFrame(self),
 					MonsterHPFrame(self),
 					ItemAcquiredFrame(self),
+					QuestFrame(self),
 
 					CombatStyle(self, "Warrior"),
 					CombatStyle(self, "Archer"),
@@ -278,12 +289,15 @@ return function(plr: Player)
 		CAS:UnbindAction("UseQSkill")
 		CAS:UnbindAction("UseWSkill")
 		CAS:UnbindAction("UseESkill")
+		CAS:UnbindAction("NextDialogue")
+		CAS:UnbindAction("FreezeControl")
 
 		Events.EquipItems:DisconnectAll()
 		Events.ItemCD:DisconnectAll()
 		Events.RefreshBackpack:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()
 		Events.LevelUp:DisconnectAll()
+		Events.NPCChat:DisconnectAll()
 
 		self.Empty()
 	end

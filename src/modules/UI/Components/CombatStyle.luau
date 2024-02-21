@@ -16,15 +16,8 @@ local clamp = math.clamp
 local wait = task.wait
 
 local function CombatStyle(self: table, class: string) : Frame
-    self.charClassInfo = {
-		Warrior = { Val = Value(0), UI = Value() },
-		Archer = { Val = Value(0), UI = Value() },
-		Wizard = { Val = Value(0), UI = Value() },
-		Knight = { Val = Value(0), UI = Value() },
-		Rogue = { Val = Value(0), UI = Value() }
-	}
-
     local charClassInfo = self.charClassInfo
+
     Fusion.Hydrate(self.char)({
 		[AttributeChange("Combo")] = function(combo)
 			if combo <= 0 then
@@ -56,6 +49,7 @@ local function CombatStyle(self: table, class: string) : Frame
 
     return Components.Frame({
         Name = class.."Style",
+        Position = fromScale(0.5, 1.85),
         Visible = Computed(function(use)
             local neededClass = use(self.playerData.Class) :: string
             local inCombat = use(self.charStatsDict.IsInCombat) :: boolean
@@ -67,7 +61,7 @@ local function CombatStyle(self: table, class: string) : Frame
 
             return false
         end),
-        [Fusion.Ref] = self.charClassInfo[class].UI,
+        [Fusion.Ref] = charClassInfo[class].UI,
 
         [Children] = {
             Components.Frame({
@@ -82,7 +76,7 @@ local function CombatStyle(self: table, class: string) : Frame
                     Components.Frame({
                         Name = "Bar",
                         BackgroundColor3 = AssetBook.ClassInfo[class].Color,
-                        Size = fromScale(1, 1),
+                        Size = fromScale(0, 0),
                         BackgroundTransparency = 0,
                         Visible = Computed(function(use)
                             local neededClass = use(self.playerData.Class) :: string

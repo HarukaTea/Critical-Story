@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local Signals = require(SSS.Modules.Data.ServerSignals)
+local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local TEMPLATE = {
@@ -32,12 +33,17 @@ local TEMPLATE = {
 	},
 	Inventory = {},
 	EquippedItems = {},
-	PinnedItems = {}
+	PinnedItems = {},
+	Quests = {
+		Main = 1,
+		Town = {}
+	}
 }
 local DS1, DS2, DS3 = "CSTORY_DEV20", "CSTORY_DEV20_S2", "CSTORY_DEV20_S3"
 
 local newInstance = Instance.new
 local wait = task.wait
+local insert = table.insert
 
 
 local function findDataStore(plr: Player) : DataStore?
@@ -63,6 +69,7 @@ local function _saveBackpackData(plr: Player, ds: any)
 	local inventory = {}
 	local equipped = {}
 	local pinned = {}
+	local quests, townQuests = {}, {}
 
 	for index, item in plr.Inventory:GetChildren() do
 		if item.Value <= 0 then continue end
@@ -72,10 +79,20 @@ local function _saveBackpackData(plr: Player, ds: any)
 		if item:GetAttribute("Pinned") then pinned[index] = item.Name end
 		if item:GetAttribute("Equipped") then equipped[item.Name] = item:GetAttribute("Slot") end
 	end
+	for _, quest in plr.Quests:GetChildren() do
+		if quest.Name == "Town" then
+			insert(townQuests, quest.Value)
+			continue
+		end
+
+		quests[quest.Name] = quest.Value
+	end
+	quests.Town = townQuests
 
 	data.Inventory = inventory
 	data.EquippedItems = equipped
 	data.PinnedItems = pinned
+	data.Quests = quests
 end
 
 local function setup(plr: Player)
@@ -105,6 +122,9 @@ local function setup(plr: Player)
 	local backpackData = newInstance("Folder")
 	backpackData.Name = "Inventory"
 	backpackData.Parent = plr
+	local questsData = newInstance("Folder")
+	questsData.Name = "Quests"
+	questsData.Parent = plr
 
 	for i, v in data.Stats do
 		plr:SetAttribute(i, v)
@@ -112,6 +132,28 @@ local function setup(plr: Player)
 		plr:GetAttributeChangedSignal(i):Connect(function()
 			data.Stats[i] = plr:GetAttribute(i)
 		end)
+	end
+
+	for questType, questId in data.Quests do
+		if questType == "Town" then
+			for _, townQuest in questId do
+				local intValue = newInstance("IntConstrainedValue")
+				intValue.Name = "Town"
+				intValue.MinValue = 1
+				intValue.MaxValue = #StoryBook[questType]
+				intValue.Value = townQuest
+				intValue.Parent = questsData
+			end
+
+			continue
+		end
+
+		local intValue = newInstance("IntConstrainedValue")
+		intValue.Name = questType
+		intValue.MinValue = 1
+		intValue.MaxValue = #StoryBook[questType]
+		intValue.Value = questId
+		intValue.Parent = questsData
 	end
 
 	for index, amount in data.Inventory do

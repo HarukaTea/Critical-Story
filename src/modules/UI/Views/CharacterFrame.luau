@@ -56,7 +56,8 @@ local function CharacterFrame(self: table): Frame
 		Gold = Value(plr:GetAttribute("Gold"))
 	}
 	self.charData = {
-		DMG = Value(char:GetAttribute("Damage")),
+		MinDMG = Value(char:GetAttribute("MinDMG")),
+		MaxDMG = Value(char:GetAttribute("MaxDMG")),
 		Magic = Value(char:GetAttribute("Magic")),
 		Mana = Value(char:GetAttribute("MaxMana")),
 		Shield = Value(char:GetAttribute("MaxShield")),
@@ -91,8 +92,11 @@ local function CharacterFrame(self: table): Frame
 		end
 	})
 	Hydrate(char)({
-		[AttributeChange("Damage")] = function(dmg)
-			charData.DMG:set(dmg)
+		[AttributeChange("MinDMG")] = function(dmg)
+			charData.MinDMG:set(dmg)
+		end,
+		[AttributeChange("MaxDMG")] = function(dmg)
+			charData.MaxDMG:set(dmg)
 		end,
 		[AttributeChange("Magic")] = function(magic)
 			charData.Magic:set(magic)

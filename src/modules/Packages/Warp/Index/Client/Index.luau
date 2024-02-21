@@ -1,8 +1,8 @@
---!nocheck
-
+--!strict
 local Client = {}
 Client.__index = Client
 
+local Players = game:GetService("Players")
 local Util = script.Parent.Parent.Util
 
 local ClientProcess = require(script.Parent.ClientProcess)
@@ -10,11 +10,11 @@ local Assert = require(Util.Assert)
 local Key = require(Util.Key)
 local Serdes = require(Util.Serdes)
 
-function Client.new(Identifier: string, isReliable: boolean?)
+function Client.new(Identifier: string)
 	local self = setmetatable({}, Client)
 	self.id = Serdes(Identifier)
 	self.fn = {}
-	self.isReliable = isReliable or true
+	self.isReliable = true
 
 	ClientProcess.add(self.id, Identifier)
 
@@ -22,7 +22,7 @@ function Client.new(Identifier: string, isReliable: boolean?)
 end
 
 function Client:Fire(...: any)
-	ClientProcess.insertQueue(self.id, self.isReliable, ...)
+	ClientProcess.insertQueue(self.id, self.reliable, ...)
 end
 
 function Client:Invoke(timeout: number, ...: any): any
@@ -49,7 +49,7 @@ end
 function Client:Wait()
 	local thread: thread, t = coroutine.running(), os.clock()
 	self:Once(function()
-		task.spawn(thread, os.clock() - t)
+		task.spawn(thread, os.clock()-t)
 	end)
 	return coroutine.yield()
 end
@@ -63,13 +63,11 @@ end
 
 function Client:Disconnect(key: string)
 	Assert(typeof(key) == "string", "Key must be a string type.")
-
 	ClientProcess.removeCallback(self.id, key)
 end
 
 function Client:Destroy()
 	self:DisconnectAll()
-
 	setmetatable(self, nil)
 end
 

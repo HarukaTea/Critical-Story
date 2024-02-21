@@ -5,12 +5,16 @@ local PPS = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local TeleS = game:GetService("TeleportService")
+local TestS = game:GetService("TestService")
 
+local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local StoryBook = require(RepS.Modules.Data.StoryBook)
 local PassiveUtil = require(SSS.Modules.Utils.PassiveUtil)
 
 local floor = math.floor
@@ -26,7 +30,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 	if prompt.Name == "Class" then
 		local class = prompt.Parent.Parent.Name
 
-		if not plr:GetAttribute("Class") == class then
+		if plr:GetAttribute("Class") ~= class then
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Equip)
 		end
 
@@ -40,6 +44,51 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		end
 
 		ServerUtil:GiveItem(plr, chest.Name, 1)
+
+	elseif prompt.Name == "Chat" then
+		local npc = prompt.Parent.Parent :: Model
+		Events.NPCChat:Fire(plr, npc, prompt)
+
+	elseif prompt.Name == "Material" then
+		local hasTool = false
+		if prompt.Parent:GetAttribute("Special") then
+			local essential = prompt.Parent:GetAttribute("Special")
+
+			if plr.Character:GetAttribute(essential) then hasTool = true end
+		else
+			hasTool = true
+		end
+
+		if not hasTool then return end
+		if plr:GetAttribute("MaterialCD") then return end
+
+		plr:SetAttribute("MaterialCD", true)
+		Spawn(function()
+			wait(1)
+			plr:SetAttribute("MaterialCD", nil)
+		end)
+
+		prompt.Enabled = false
+
+		local material = prompt.Parent.Parent
+		local finalMaterial = material.Name
+		if prompt.Parent:GetAttribute("Rare") then
+			local rareChance = LootPlan.new()
+			local rareMaterial = prompt.Parent:GetAttribute("Rare")
+			rareChance:Add(material.Name, 80)
+			rareChance:Add(rareMaterial, 20)
+
+			finalMaterial = rareChance:Roll()
+			rareChance:Destroy()
+		end
+
+		material.Parent = TestS
+
+		ServerUtil:GiveItem(plr, finalMaterial, #material.Items:GetChildren())
+
+		wait(60)
+		material.Parent = workspace.MapComponents.Materials
+		prompt.Enabled = true
 
 	elseif prompt.Name == "PublicJoin" or prompt.Name == "PartyJoin" then
 		local locator = prompt.Parent.Parent
@@ -192,27 +241,25 @@ local function combatEndSetup(monster: Model)
 			charStats.TargetMonster.Value = charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue").Value
 		end
 
-		--- tricky this time, may think a better choice in the future
-		for _, child in workspace.Monsters:GetDescendants() do
+		local locator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+		for _, child in locator:GetDescendants() do
 			if child:GetAttribute("IsMonster")
 				and child ~= monster
-				and child:GetAttribute("InCombat")
+				and child:GetAttribute("InCombat") == true
 				and child:GetAttribute("Health") > 0 then
 
-				if (monster.PrimaryPart.Position - child.PrimaryPart.Position).Magnitude <= 128 then
-					continueCombatCheck = true
+				continueCombatCheck = true
 
-					local locator = instanceNew("ObjectValue")
-					locator.Name = monster.Name
-					locator.Value = monster.Parent
-					locator:SetAttribute("EXP", monster:GetAttribute("EXP"))
-					locator.Parent = child.WaitingList
+				local locatorSymbol = instanceNew("ObjectValue")
+				locatorSymbol.Name = monster.Name
+				locatorSymbol.Value = monster.Parent
+				locatorSymbol:SetAttribute("EXP", monster:GetAttribute("EXP"))
+				locatorSymbol.Parent = child.WaitingList
 
-					for _, pastWaiting in monster.WaitingList:GetChildren() do
-						pastWaiting.Parent = child.WaitingList
-					end
-					break
+				for _, pastWaiting in monster.WaitingList:GetChildren() do
+					pastWaiting.Parent = child.WaitingList
 				end
+				break
 			end
 		end
 
@@ -543,6 +590,58 @@ local function makeParty(plr: Player, method: string, target: Player | string)
 	end
 end
 Events.PartyInvite:Connect(makeParty)
+
+--[[
+	Finished chatting with NPCs, and award quest rewards if have
+]]
+local function npcChatEnded(plr: Player, npc: Model, series: string)
+	-- checks
+	if not npc then return end
+	if not StoryBook[series] then return end
+	if not plr.Quests:FindFirstChild(series) then return end
+
+	if series ~= "Town" then
+		local currentId = plr.Quests[series].Value :: number
+		if StoryBook[series][currentId].NPC ~= npc.Name then return end
+
+		if DialogueBook[npc.Name].Extra[series..currentId] then
+			Signals[DialogueBook[npc.Name].Extra[series..currentId]]:Fire(plr)
+			return
+		end
+
+		for reward, val in StoryBook[series][currentId].Rewards do
+			HarukaLib:Add(plr, reward, val)
+		end
+
+		plr.Quests[series]:Destroy()
+
+		local quest = instanceNew("IntConstrainedValue")
+		quest.Name = series
+		quest.MinValue = 1
+		quest.MaxValue = #StoryBook[series]
+		quest.Value = currentId + 1
+		quest.Parent = plr.Quests
+
+		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.QuestComplete)
+
+	elseif series == "Town" then
+		local currentId: number = nil
+
+		for _, quest in plr.Quests:GetChildren() do
+			if quest.Name ~= "Town" then continue end
+			if StoryBook[series][quest.Value].NPC == npc.Name then currentId = quest.Value end
+		end
+		for reward, val in StoryBook[series][currentId].Rewards do
+			HarukaLib:Add(plr, reward, val)
+		end
+		for _, quest in plr.Quests:GetChildren() do
+			if quest.Name == "Town" and quest.Value == currentId then quest:Destroy() end
+		end
+
+		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.QuestComplete)
+	end
+end
+Events.NPCChatEnded:Connect(npcChatEnded)
 
 --[[
 	Handle the request to disable invite access for player

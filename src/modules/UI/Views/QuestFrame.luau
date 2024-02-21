@@ -3,16 +3,24 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Signals = require(RepS.Modules.Data.Signals)
+
+local QuestBar = require(RepS.Modules.UI.Components.QuestBar)
 
 local fromScale = UDim2.fromScale
 local udNew = UDim.new
+local wait = task.wait
 
 local function QuestFrame(self: table) : Frame
-    self.quests = Fusion.Value({})
+    local quests = self.plr:WaitForChild("Quests") :: Folder
+
+    self.quests = Fusion.Value(quests:GetChildren())
+    local function _changeQuests()
+        wait()
+        self.quests:set(quests:GetChildren())
+    end
+    quests.ChildAdded:Connect(_changeQuests)
+    quests.ChildRemoved:Connect(_changeQuests)
 
     return Components.Frame({
         Name = "QuestsFrame",
@@ -24,9 +32,9 @@ local function QuestFrame(self: table) : Frame
                 Padding = udNew(0.5, 0),
                 VerticalAlignment = Enum.VerticalAlignment.Bottom
             }),
-            Fusion.ForValues(self.quests, function(use, quest)
-                
-            end)
+            Fusion.ForValues(self.quests, function(use, quest: IntValue)
+                return QuestBar(quest)
+            end, Fusion.cleanup)
         }
     })
 end

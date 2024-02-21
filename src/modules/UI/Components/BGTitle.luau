@@ -57,7 +57,7 @@ local function TitleFrame(id: string, self: table): Frame
 					Fusion.peek(self.UI).Shadow.Visible = false
 
 					self.plr:SetAttribute("CurrentMenu", "None")
-					plrGui.AdventurerStats.BG.Visible = true
+					plrGui.AdventurerStats.Enabled = true
 					plrGui.PlayerList.Enabled = true
 					workspace.CurrentCamera.UIBlur.Enabled = false
 				end,

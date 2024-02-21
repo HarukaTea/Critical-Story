@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Manages batch updating of tween objects.

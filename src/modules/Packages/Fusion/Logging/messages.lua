@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Stores templates for different kinds of logging messages.
@@ -12,6 +12,7 @@ return {
 	cannotConnectEvent = "The %s class doesn't have an event called '%s'.",
 	cannotCreateClass = "Can't create a new instance of class '%s'.",
 	computedCallbackError = "Computed callback error: ERROR_MESSAGE",
+	contextualCallbackError = "Contextual callback error: ERROR_MESSAGE",
 	destructorNeededValue = "To save instances into Values, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
 	destructorNeededComputed = "To return instances from Computeds, provide a destructor function. This will be an error soon - see discussion #183 on GitHub.",
 	multiReturnComputed = "Returning multiple values from Computeds is discouraged, as behaviour will change soon - see discussion #189 on GitHub.",
@@ -41,6 +42,7 @@ return {
 	mistypedSpringSpeed = "The speed of a spring must be a number. (got a %s)",
 	mistypedTweenInfo = "The tween info of a tween must be a TweenInfo. (got a %s)",
 	noTaskScheduler = "Fusion is not connected to an external task scheduler.",
+	propertySetError = "Error setting property: ERROR_MESSAGE",
 	springTypeMismatch = "The type '%s' doesn't match the spring's type '%s'.",
 	stateGetWasRemoved = "`StateObject:get()` has been replaced by `use()` and `peek()` - see discussion #217 on GitHub.",
 	strictReadError = "'%s' is not a valid member of '%s'.",

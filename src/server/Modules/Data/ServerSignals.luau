@@ -2,16 +2,19 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local Signal = require(RepS.Modules.Packages.Signal)
+local Warp = require(RepS.Modules.Packages.Warp)
 
-local NewSignal = Signal.new
+local Signal = Warp.Signal
 
 local Signals = {
-	CombatEnd = NewSignal(),
-	ItemsAdded = NewSignal(),
-	ItemsEquipped = NewSignal(),
-	ItemsPinned = NewSignal(),
-	LevelUp = NewSignal(),
+	CombatEnd = Signal("CombatEnd"),
+	ItemsAdded = Signal("ItemsAdded"),
+	ItemsEquipped = Signal("ItemsEquipped"),
+	ItemsPinned = Signal("ItemsPinned"),
+	LevelUp = Signal("LevelUp"),
+
+	--- story
+	FirstStepTutorial = Signal("FirstStepStory")
 }
 
 return Signals

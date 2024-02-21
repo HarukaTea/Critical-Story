@@ -25,7 +25,6 @@ local function slimeShot(target: Model)
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
-	blast:AddTag("MonsterAttack")
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
 	blast.Parent = char.Holder.Value
 end
@@ -38,7 +37,6 @@ local function slimeWave(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + char.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast:AddTag("MonsterAttack")
 	blast.Parent = char.Holder.Value
 end
 

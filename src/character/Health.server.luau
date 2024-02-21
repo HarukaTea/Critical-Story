@@ -12,7 +12,6 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
@@ -24,11 +23,12 @@ local isBroken = false
 local lvUpCD, dmgTouchCD, orbTouchCD = false, false, false
 
 local ATTRIBUTES = {
-    CriChance = 1,
     InCombat = false,
+
     Magic = 0,
     Mana = 0,
-    Damage = 0,
+    MinDMG = 5,
+    MaxDMG = 15,
     MaxMana = 0,
     MaxShield = 0,
     OrbLifeTime = 10,
@@ -42,10 +42,16 @@ local ATTRIBUTES = {
     JumpBuff = 0,
     MagicBuff = 0,
     ManaBuff = 0,
-    DamageBuff = 0,
+    MinDMGBuff = 0,
+    MaxDMGBuff = 0,
     ShieldBuff = 0,
     SpeedBuff = 0,
     RestoreBuff = 15,
+    HealBuff = 10,
+
+    BurnChance = 0,
+    DodgeChance = 0,
+    CriChance = 1,
 
     Combo = 0,
     Arrows = 0,
@@ -63,7 +69,6 @@ local wait = task.wait
 local floor, random = math.floor, math.random
 local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
-local sFind = string.find
 
 local function charTakeDMG(monster: Model, dmgType: boolean?)
 	if not monster then return end
@@ -156,15 +161,17 @@ local function orbSpawnHandler(state: boolean)
 
             --- extra orbs from items
             if not isSpawned then
-                for _, exOrb in char.CharStats.ExtraOrbs:GetChildren() do
-                    _placeOrb(orbAttack[exOrb.Value]:Clone(), ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
+                for attr, val in char.CharStats.ExtraOrbs:GetAttributes() do
+                    if not val then continue end
+
+                    _placeOrb(orbAttack[attr.Name]:Clone(), ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
                 end
             end
         end
     end
 
     if state then
-		if char:GetAttribute("SpawnMultiOrb") then
+		if char:GetAttribute("CanSpawnMultiOrb") then
 			for _ = 1, 3 do _spawnOrb(true) end
 		end
 
@@ -176,29 +183,6 @@ local function orbSpawnHandler(state: boolean)
 
         stopSpawn = nil
 	end
-end
-
-local function weaponHandler(state: boolean)
-    for _, child in char:GetChildren() do
-		if sFind(child.Name, "Weapon") then child:Destroy() end
-	end
-
-	local class = plr:GetAttribute("Class") :: string
-    if state then
-        local weapon = RepS.Package.StyleWeapons[class].WeaponEquipped:Clone() :: Model
-
-        ServerUtil:WeldPart(char["Right Arm"], weapon)
-        weapon.Parent = char
-
-        if class == "Repeater" or class == "Alchemist" then
-            local weapon2 = RepS.Package.StyleWeapons[class].WeaponEquipped2:Clone() :: Model
-            ServerUtil:WeldPart(char["Left Arm"], weapon2)
-
-            weapon2.Parent = char
-        end
-    else
-        ServerUtil:EquipWeapon(char)
-    end
 end
 
 repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -238,6 +222,8 @@ local function setup()
         if char:GetAttribute("HitCD") >= 0 then HarukaLib:Add(char, "HitCD", -1) end
     end)
 end
+setup()
+
 local function classAttributesSetup()
     --- warrior
     char.Humanoid.StateChanged:Connect(function(state)
@@ -273,7 +259,6 @@ local function classAttributesSetup()
         HarukaLib:Add(char, "RogueCritical", -1)
     end)
 end
-setup()
 classAttributesSetup()
 
 --// Connections
@@ -315,20 +300,20 @@ local function onTouch(hit: BasePart)
         end)
 
         local monster = char.CharStats.TargetMonster.Value :: Model
-        local baseDamage = char:GetAttribute("Damage") :: number
+        local minDMG, maxDMG = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")
+        local baseDamage = if minDMG >= maxDMG then maxDMG else random(minDMG, maxDMG)
 
         orb.Owner:Destroy()
 
         --- final check
         if not monster.PrimaryPart then return end
+        if monster:GetAttribute("CantAttack") then baseDamage = 0 end
 
         local subStyle = orb:GetAttribute("SubStyle") :: string?
         local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
         if AttackUtil[style] then
             AttackUtil[style](plr, monster, baseDamage, orb)
         end
-
-        SkillUtil:RestoreManaByOrb(plr)
 
         orb:Destroy()
 
@@ -359,8 +344,11 @@ local function manaCheck(mana)
 
     if mana > maxMana then char:SetAttribute("Mana", maxMana) end
 end
-local function updateDMG()
-    char:SetAttribute("Damage", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 10 + char:GetAttribute("DamageBuff"))
+local function updateMinDMG()
+    char:SetAttribute("MinDMG", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 5 + char:GetAttribute("MinDMGBuff"))
+end
+local function updateMaxDMG()
+    char:SetAttribute("MaxDMG", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 15 + char:GetAttribute("MaxDMGBuff"))
 end
 local function updateMagic()
     char:SetAttribute("Magic", floor(plr:GetAttribute("MagicPoints") ^ 1.42) + 20 + char:GetAttribute("MagicBuff"))
@@ -396,7 +384,8 @@ local function levelReqCheck()
         lvUpCD = false
     end
 end
-updateDMG()
+updateMinDMG()
+updateMaxDMG()
 updateMagic()
 updateMana()
 updateShield()
@@ -406,7 +395,10 @@ updateJump(0)
 levelReqCheck()
 
 Fusion.Hydrate(plr)({
-    [AttributeChange("DmgPoints")] = updateDMG,
+    [AttributeChange("DmgPoints")] = function()
+        updateMinDMG()
+        updateMaxDMG()
+    end,
     [AttributeChange("MagicPoints")] = updateMagic,
     [AttributeChange("ManaPoints")] = updateMana,
     [AttributeChange("ShieldPoints")] = updateShield,
@@ -430,7 +422,8 @@ local function _shieldCheck(shield)
     end
 end
 Fusion.Hydrate(char)({
-    [AttributeChange("DamageBuff")] = updateDMG,
+    [AttributeChange("MinDMGBuff")] = updateMinDMG,
+    [AttributeChange("MaxDMGBuff")] = updateMaxDMG,
     [AttributeChange("MagicBuff")] = updateMagic,
     [AttributeChange("ManaBuff")] = updateMana,
     [AttributeChange("Mana")] = manaCheck,
@@ -441,7 +434,8 @@ Fusion.Hydrate(char)({
     [AttributeChange("Shield")] = _shieldCheck,
     [AttributeChange("InCombat")] = function(state)
         orbSpawnHandler(state)
-        weaponHandler(state)
+
+        ServerUtil:EquipWeapon(char)
     end
 })
 

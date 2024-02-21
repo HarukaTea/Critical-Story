@@ -13,7 +13,7 @@ for _, child in model:GetChildren() do
 		local blast = model.Projectile.Value:Clone() :: Model
 		blast.Owner.Value = target
 		blast:PivotTo(child.CFrame)
-		blast:AddTag("MonsterAttack")
+
 		blast.Parent = target.Holder.Value
 
 		Debris:AddItem(blast, 1)

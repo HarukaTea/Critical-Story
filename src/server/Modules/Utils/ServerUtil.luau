@@ -65,21 +65,36 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 		if sFind(child.Name, "Weapon") then child:Destroy() end
 	end
 
-	if class == "Alchemist" then
-		local model = RepS.Package.StyleWeapons.Alchemist.WeaponEquipped:Clone() :: Model
-		local model2 = RepS.Package.StyleWeapons.Alchemist.WeaponEquipped2:Clone() :: Model
+	if char:GetAttribute("InCombat") == false then
+		if class == "Alchemist" then
+			local model = RepS.Package.StyleWeapons.Alchemist.WeaponEquipped:Clone() :: Model
+			local model2 = RepS.Package.StyleWeapons.Alchemist.WeaponEquipped2:Clone() :: Model
 
-		ServerUtil:WeldPart(char["Right Arm"], model)
-		ServerUtil:WeldPart(char["Left Arm"], model2)
+			ServerUtil:WeldPart(char["Right Arm"], model)
+			ServerUtil:WeldPart(char["Left Arm"], model2)
 
-		model.Parent = char
-		model2.Parent = char
-	else
-		local model = RepS.Package.StyleWeapons[class].WeaponUnequip:Clone() :: Model
+			model.Parent = char
+			model2.Parent = char
+		else
+			local model = RepS.Package.StyleWeapons[class].WeaponUnequip:Clone() :: Model
 
-		ServerUtil:WeldPart(char.Torso, model)
+			ServerUtil:WeldPart(char.Torso, model)
 
-		model.Parent = char
+			model.Parent = char
+		end
+
+	elseif char:GetAttribute("InCombat") then
+		local weapon = RepS.Package.StyleWeapons[class].WeaponEquipped:Clone() :: Model
+
+        ServerUtil:WeldPart(char["Right Arm"], weapon)
+        weapon.Parent = char
+
+        if class == "Repeater" or class == "Alchemist" then
+            local weapon2 = RepS.Package.StyleWeapons[class].WeaponEquipped2:Clone() :: Model
+            ServerUtil:WeldPart(char["Left Arm"], weapon2)
+
+            weapon2.Parent = char
+        end
 	end
 end
 
@@ -137,7 +152,7 @@ end
 	Spawn a monster, with the given locator part, you can pass level in to force
 	Spawn strong monsters
 ]]
-function ServerUtil:SetupMonster(locator: Part, forceLevel: number?)
+function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	if not RepS.Package.MonsterModels:FindFirstChild(locator.Name) then return end
 
 	local level = forceLevel or locator:GetAttribute("Levels")
@@ -172,6 +187,8 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?)
 	monster.Parent = locator
 
 	locator.Transparency = 1
+
+	return monster
 end
 
 --[[
@@ -188,6 +205,7 @@ function ServerUtil:MonsterActivateCombat(monster: Model, mode: string?, plr: Pl
 	if mode then folder:SetAttribute(mode.."Combat", true) end
 	folder:AddTag("CombatHolder")
 	folder.Parent = workspace.MapComponents.CombatFolders
+
 	local owner = instanceNew("ObjectValue")
 	owner.Name = "Owner"
 	owner.Value = monster
@@ -203,21 +221,25 @@ function ServerUtil:MonsterActivateCombat(monster: Model, mode: string?, plr: Pl
 		local locator = monster.Parent
 
 		local joinPrompt = RepS.Package.Unloads.PublicJoinPrompt:Clone() :: Part
-		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
 		joinPrompt.CFrame = cfNew(locator.Position) * cfNew(0, 4, 0)
+
+		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
 		prompt:SetAttribute("Owner", plr.Name)
 		prompt:AddTag("CombatJoinPrompt")
+
 		joinPrompt.Parent = locator
 
 	elseif mode == "Party" then
 		local locator = monster.Parent
 
 		local joinPrompt = RepS.Package.Unloads.PublicJoinPrompt:Clone() :: Part
-		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
 		joinPrompt.CFrame = cfNew(locator.Position) * cfNew(0, 4, 0)
+
+		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
 		prompt:SetAttribute("Owner", plr.Name)
 		prompt.Name = "PartyJoin"
 		prompt:AddTag("CombatJoinPrompt")
+
 		joinPrompt.Parent = locator
 	end
 end

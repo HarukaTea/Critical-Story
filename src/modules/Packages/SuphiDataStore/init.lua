@@ -6,7 +6,7 @@ local HttpService = game:GetService("HttpService")
 
 local Proxy = require(script.Proxy)
 local Signal = require(script.Signal)
-local SynchronousTaskManager = require(script.SynchronousTaskManager)
+local SynchronousTaskManager = require(script.TaskManager)
 
 local Constructor, DataStore = {}, {}
 local OpenTask, ReadTask, LockTask, SaveTask, CloseTask, DestroyTask, Lock, Unlock, Load, Save, StartSaveTimer, StopSaveTimer, SaveTimerEnded, StartLockTimer, StopLockTimer, LockTimerEnded, ProcessQueue, SignalConnected, Clone, Reconcile, Compress, Decompress, Encode, Decode, BindToClose

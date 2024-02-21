@@ -38,7 +38,7 @@ local function spikeShot(target: Model)
 	local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolf1:Clone() :: Model
 	blast.Owner.Value = char
 	blast:PivotTo(char.PrimaryPart.CFrame)
-	blast:AddTag("MonsterAttack")
+
 	blast.Parent = char.Holder.Value
 
 	if char.Head:FindFirstChild("Encountered") then return end
@@ -75,7 +75,7 @@ local function spikeRain(target: Model)
 		blast:PivotTo(cfNew(post, post + blast.Base.CFrame.LookVector))
 		blast:PivotTo(cfNew(post) * cfAngles(0, rad(random(1, 360)), 0))
 		blast.Owner.Value = char
-		blast:AddTag("MonsterAttack")
+
 		blast.Parent = char.Holder.Value
 
 		Debris:AddItem(blast, 10)

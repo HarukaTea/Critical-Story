@@ -26,7 +26,6 @@ for i = 1, 5 do
 			local blast = model.Projectile.Value:Clone() :: Model
 			blast.Owner.Value = model.Owner.Value
 			blast:PivotTo(cfNew(post, post + child.CFrame.LookVector))
-			blast:AddTag("MonsterAttack")
 			blast:SetAttribute("SlimeWaveProjectile", true)
 			blast.Parent = char.Holder.Value
 			for _, descendant in blast:GetDescendants() do

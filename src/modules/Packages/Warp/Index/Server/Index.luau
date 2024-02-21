@@ -1,5 +1,4 @@
---!nocheck
-
+--!strict
 local Server = {}
 Server.__index = Server
 
@@ -12,11 +11,11 @@ local Assert = require(Util.Assert)
 local Key = require(Util.Key)
 local Serdes = require(Util.Serdes)
 
-function Server.new(Identifier: string, isReliable: boolean, rateLimit: Type.rateLimitArg?)
+function Server.new(Identifier: string, rateLimit: Type.rateLimitArg?)
 	local self = setmetatable({}, Server)
 	self.id = Serdes(Identifier)
 	self.fn = {}
-	self.isReliable = isReliable or true
+	self.isReliable = true
 
 	ServerProcess.add(self.id, Identifier, rateLimit or { maxEntrance = 200, interval = 2 })
 
@@ -24,12 +23,12 @@ function Server.new(Identifier: string, isReliable: boolean, rateLimit: Type.rat
 end
 
 function Server:Fire(player: Player, ...: any)
-	ServerProcess.insertQueue(self.id, self.isReliable, player, ...)
+	ServerProcess.insertQueue(self.id, self.reliable, player, ...)
 end
 
 function Server:Fires(...: any)
 	for _, player: Player in ipairs(Players:GetPlayers()) do
-		ServerProcess.insertQueue(self.id, self.isReliable, player, ...)
+		ServerProcess.insertQueue(self.id, self.reliable, player, ...)
 	end
 end
 

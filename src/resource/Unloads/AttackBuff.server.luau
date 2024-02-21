@@ -17,14 +17,16 @@ local floor = math.floor
 
 ServerUtil:ShowText(char, text, color)
 
-local nowDMG = char:GetAttribute("Damage") :: number
-local theoryDMG = floor(nowDMG * power - nowDMG)
-HarukaLib:Add(char, "DamageBuff", theoryDMG)
+local nowMinDMG, nowMaxDMG = char:GetAttribute("MinDMG"):: number, char:GetAttribute("MaxDMG") :: number
+local theoryMinDMG, theoryMaxDMG = floor(nowMinDMG * power - nowMinDMG), floor(nowMaxDMG * power - nowMaxDMG)
+HarukaLib:Add(char, "MinDMGBuff", theoryMinDMG)
+HarukaLib:Add(char, "MaxDMGBuff", theoryMaxDMG)
 
-for i = duration, 0, -0.1 do
+for _ = duration, 0, -0.1 do
     HarukaLib:Add(script, "Duration", -0.1)
     wait(0.1)
 end
 
-HarukaLib:Add(char, "DamageBuff", -theoryDMG)
+HarukaLib:Add(char, "MinDMGBuff", -theoryMinDMG)
+HarukaLib:Add(char, "MaxDMGBuff", -theoryMaxDMG)
 script:Destroy()

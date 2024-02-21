@@ -24,6 +24,7 @@ local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
 local monsterLocations = workspace:WaitForChild("Monsters") :: Folder
 
 local isInCombat, isPlaying = false, ""
+local isInReadyCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
 local encounterCD = false
@@ -117,7 +118,10 @@ local function setup()
 
 	local function _rotateSimulate()
         for _, monster in monsterLocations:GetDescendants() do
-            if monster:GetAttribute("IsMonster") and monster.PrimaryPart and not monster:GetAttribute("InCombat") then
+            if monster:GetAttribute("IsMonster")
+				and monster.PrimaryPart
+				and not monster:GetAttribute("InCombat") then
+
                 if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 256 then
                     local rotating = random(5, 20)
                     local direction = random(-2, 2)
@@ -140,7 +144,7 @@ local function setup()
 				and monster:GetAttribute("InCombat") == false
 				and not monster:GetAttribute("SubMonster") then
 
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 20 then
+                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 30 then
 					encounterCD = true
 
                     Events.CombatStart:Fire(monster, plr:GetAttribute("CombatMode"))
@@ -192,7 +196,7 @@ local function startCombat(monster: Model)
 	border:PivotTo(cfNew(locator.Position))
 	border.Parent = char
 end
-local function _endCombat()
+local function endCombat()
 	--- checks
 	if not isInCombat then return end
 
@@ -224,7 +228,7 @@ Fusion.Hydrate(char)({
 			startCombat(char.CharStats.TargetMonster.Value)
 
 		elseif state == false then --- in case nil
-			_endCombat()
+			endCombat()
 		end
 	end
 })
@@ -289,7 +293,7 @@ local function onTouched(hit: BasePart)
 			local variant = format("%sAnim%s", orb:GetAttribute("Style"), tostring(animStep))
 			Signals.PlayAnimation:Fire(variant)
 
-			_hitVFX(char.CharStats.TargetMonster.Value, char)
+			_hitVFX(char.CharStats.TargetMonster.Value)
 		end
 
 		orb:Destroy()

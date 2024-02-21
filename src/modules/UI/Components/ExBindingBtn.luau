@@ -55,7 +55,7 @@ local function ExCharButton(id: string, self: table): Frame
 				[OnEvent("MouseButton1Click")] = function()
 					local plrGui = self.plrGui :: PlayerGui
 
-					peek(self.UI).BG.Visible = false
+					peek(self.UI).Enabled = false
 					self.plr:SetAttribute("CurrentMenu", id)
 					plrGui[OPENS[id]].Shadow.Visible = true
 					plrGui[OPENS[id]].BG.Visible = true

@@ -18,8 +18,8 @@ local peek = require(Package.State.peek)
 
 local class = {}
 
-local CLASS_METATABLE = { __index = class }
-local WEAK_KEYS_METATABLE = { __mode = "k" }
+local CLASS_METATABLE = {__index = class}
+local WEAK_KEYS_METATABLE = {__mode = "k"}
 
 --[[
 	Sets the position of the internal springs, meaning the value of this
@@ -140,6 +140,7 @@ function class:update(): boolean
 			-- if the type isn't animatable, snap to the new value
 			self._currentValue = self._goalValue
 			return true
+
 		else
 			-- if it's animatable, let it animate to the goal
 			SpringScheduler.add(self)
@@ -172,7 +173,7 @@ local function Spring<T>(
 		damping = 1
 	end
 
-	local dependencySet = { [goalState] = true }
+	local dependencySet = {[goalState] = true}
 	if xtypeof(speed) == "State" then
 		dependencySet[speed] = true
 	end
@@ -200,7 +201,7 @@ local function Spring<T>(
 
 		_springPositions = nil,
 		_springGoals = nil,
-		_springVelocities = nil,
+		_springVelocities = nil
 	}, CLASS_METATABLE)
 
 	-- add this object to the goal state's dependent set

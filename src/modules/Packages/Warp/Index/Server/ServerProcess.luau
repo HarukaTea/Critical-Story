@@ -1,5 +1,5 @@
---!nocheck
-
+--!native
+--!strict
 local ServerProcess = {}
 
 local RunService = game:GetService("RunService")
@@ -8,7 +8,7 @@ local Util = script.Parent.Parent.Util
 
 local Type = require(script.Parent.Parent.Type)
 local Event = require(script.Parent.Parent.Event)
-local Spawn = require(script.Parent.Parent.Parent.Parent.Spawn)
+local Spawn = require(script.Parent.Parent.Util.Spawn)
 local Key = require(Util.Key)
 local RateLimit = require(Util.RateLimit)
 
@@ -16,6 +16,7 @@ local serverQueue: Type.QueueMap = {}
 local unreliableServerQueue: Type.QueueMap = {}
 local serverCallback: Type.CallbackMap = {}
 local serverRequestQueue: Type.QueueMap = {}
+
 local queueOut: {
 	[Player]: {
 		[string]: {any},
@@ -154,7 +155,7 @@ function ServerProcess.start()
 		end
 		for Identifier: string, players in serverQueue do
 			for player: Player, data in players do
-				if #data > 0 then
+				if #data > 0 and queueOut[player] then
 					queueOut[player][Identifier] = table.clone(data)
 					table.clear(data)
 				end
@@ -165,7 +166,7 @@ function ServerProcess.start()
 						table.remove(requestData, #requestData)
 					end
 				end
-				if serverCallback[Identifier] ~= nil then
+				if serverCallback[Identifier] then
 					if #queueIn[Identifier][player] > 0 then
 						for _, packedDatas: any in queueIn[Identifier][player] do
 							if #packedDatas == 0 then continue end

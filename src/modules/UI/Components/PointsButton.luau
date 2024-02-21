@@ -62,7 +62,11 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 				TextXAlignment = if direction == "Left" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				TextColor3 = COLORS[id],
                 Text = Computed(function(use)
-					return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
+					if id ~= "DMG" then
+						return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
+					else
+						return "DMG: "..use(self.playerData[id]).." ("..use(self.charData.MinDMG).."-"..use(self.charData.MaxDMG)..")"
+					end
 				end)
 			}),
 			Components.TextButton({

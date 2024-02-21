@@ -21,9 +21,15 @@ return function (_, plr, item, amount)
         return "Wrong amount!"
     end
 
-    if not AssetBook.Items.ItemName[itemName] then
+    if not AssetBook.Items.ItemName[itemName] and itemName ~= "all" then
         return "There is no item named "..itemName..", are you sure you typed correctly?"
 
+    elseif itemName == "all" then
+        for everyItem, _ in AssetBook.Items.ItemName do
+            ServerUtil:GiveItem(plr, everyItem, 1)
+        end
+
+        return "Gived all items to "..plr.DisplayName
     else
         ServerUtil:GiveItem(plr, itemName, amountWanted)
 

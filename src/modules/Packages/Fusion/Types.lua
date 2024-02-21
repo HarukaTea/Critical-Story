@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Stores common type information used internally.
@@ -28,6 +28,12 @@ export type Error = {
 	raw: string,
 	message: string,
 	trace: string
+}
+
+-- An object which stores a value scoped in time.
+export type Contextual<T> = PubTypes.Contextual<T> & {
+	_valuesNow: {[thread]: {value: T}},
+	_defaultValue: T
 }
 
 --[[

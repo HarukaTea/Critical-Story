@@ -31,11 +31,6 @@ local anims = {
 	IllusionistAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
 	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2),
-
-	ArcherCharge = animator:LoadAnimation(animations.ArcherCharge),
-	KnightParry = animator:LoadAnimation(animations.KnightParry),
-	RogueSlash = animator:LoadAnimation(animations.RogueSlash),
-	RepeaterFire = animator:LoadAnimation(animations.RepeaterFire)
 }
 
 local function playAnim(anim: string)

@@ -1,11 +1,14 @@
 --!nocheck
 
+local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 
-local Signal = require(script.Parent.Signal)
+local Warp = require(RepS.Modules.Packages.Warp)
 
 local TypeWriter = {}
 TypeWriter.__index = TypeWriter
+TypeWriter.onTextUpdated = Warp.Signal("OnTextUpdated")
+TypeWriter.onTyperFinished = Warp.Signal("OnTyperFinished")
 
 local sFind, sub, match = string.find, string.sub, string.match
 local wait = task.wait
@@ -38,9 +41,6 @@ local RichTextTags = {
 ]]
 function TypeWriter.new()
 	local self = setmetatable({}, TypeWriter)
-
-	self.onTextUpdated = Signal()
-	self.onTyperFinished = Signal()
 
 	self.stopped = false
 	self.paused = false
@@ -165,7 +165,7 @@ function TypeWriter:TypeText(text: string)
 
 	--- End Typing
 	self.running = false
-	self.onTyperFinished:Fire()
+	self.onTyperFinished:Fire(text)
 end
 
 --[[
@@ -192,7 +192,7 @@ end
 ]]
 function TypeWriter:Pause()
 	self.paused = true
-	
+
 	while self.running do
 		RS.Heartbeat:Wait()
 	end

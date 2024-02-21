@@ -2,14 +2,15 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local Signal = require(RepS.Modules.Packages.Signal)
+local Warp = require(RepS.Modules.Packages.Warp)
 
-local NewSignal = Signal.new
+local Signal = Warp.Signal
 
 local Signals = {
-	CreateHint = NewSignal(),
-	ClientTween = NewSignal(),
-	PlayAnimation = NewSignal()
+	CreateHint = Signal("CreateHint"),
+	ClientTween = Signal("ClientTween"),
+	NPCChat = Signal("NPCChat"),
+	PlayAnimation = Signal("PlayAnimation")
 }
 
 return Signals

@@ -119,7 +119,7 @@ function SkillUtil:Poison(plr: Player, monster: Model, duration: number)
 
 	local poison = RepS.Resources.Unloads.BurnDMG:Clone() :: Script
 	poison:SetAttribute("Duration", duration)
-	poison:SetAttribute("Damage", floor(plr.Character:GetAttribute("Damage") / 2))
+	poison:SetAttribute("Damage", floor(plr.Character:GetAttribute("MaxDMG") / 2))
 	poison:SetAttribute("Color", fromRGB(255, 0, 191))
 	poison:SetAttribute("Text", "POISON!")
 	poison.Name = "Poison"

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Constructs special keys for property tables which connect property change

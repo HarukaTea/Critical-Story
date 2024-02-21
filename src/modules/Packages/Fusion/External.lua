@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 --[[
     Abstraction layer between Fusion internals and external environments,
     allowing for flexible integration with schedulers and test mocks.
@@ -73,7 +73,7 @@ end
     Returns a function that can be used to disconnect later.
 
     Callbacks are given the current number of seconds since an arbitrary epoch.
-
+    
     TODO: This epoch may change between schedulers. We could investigate ways
     of allowing schedulers to co-operate to keep the epoch the same, so that
     monotonicity can be better preserved.

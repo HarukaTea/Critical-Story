@@ -18,7 +18,7 @@ local insert, tFind, remove = table.insert, table.find, table.remove
 ]]
 local function PromptsFrame(self: table) : Frame
     self.promptsList = Fusion.Value({})
-    
+
     local function _addPrompt(prompt: ProximityPrompt)
 		local nowPrompts = Fusion.peek(self.promptsList)
 
@@ -36,7 +36,7 @@ local function PromptsFrame(self: table) : Frame
 
 		prompt.Enabled = false
 		wait(1)
-		local blacklist = { "Chest", "PublicJoin", "PartyJoin" }
+		local blacklist = { "Chest", "PublicJoin", "PartyJoin", "Chat" }
 		if not tFind(blacklist, prompt.Name) then prompt.Enabled = true end
 	end
 	self.Add(PPS.PromptShown:Connect(_addPrompt))

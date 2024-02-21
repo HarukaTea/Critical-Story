@@ -1,5 +1,4 @@
---!nocheck
-
+--!strict
 local RunService = game:GetService("RunService")
 local SerInt = 0
 

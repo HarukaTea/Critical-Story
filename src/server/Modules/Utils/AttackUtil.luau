@@ -87,6 +87,8 @@ function AttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 	else
 		AttackUtil:DealDMG(plr, monster, baseDamage)
 	end
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
@@ -115,6 +117,8 @@ function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
     else
         AttackUtil:DealDMG(plr, monster, baseDamage)
     end
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 function AttackUtil.PoisonArcher(plr: Player, monster: Model, baseDamage: number)
     AttackUtil:DealDMG(plr, monster, baseDamage)
@@ -144,6 +148,8 @@ function AttackUtil.Wizard(plr: Player, monster: Model)
         Events.MagicCasted:Fire(plr)
         RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
     end
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
@@ -155,6 +161,8 @@ function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
     if char:GetAttribute("Guard") > 100 then
         char:SetAttribute("Guard", 100)
     end
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
@@ -171,6 +179,8 @@ function AttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
     local result = AttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCritical"))
 
     if result == "CriticalHit" then char:SetAttribute("RogueCritical", 0) end
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
@@ -206,9 +216,12 @@ function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, or
     end
 
     AttackUtil:DealDMG(plr, monster, baseDamage)
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
+    SkillUtil:RestoreManaByOrb(plr)
+
     Spawn(function()
         local char = plr.Character
         local orbs = workspace.MapComponents.OrbFolders[plr.Name]:GetChildren()
@@ -267,20 +280,26 @@ function AttackUtil.AlchemistRed(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 
-    
+    SkillUtil:RestoreManaByOrb(plr)
 end
 function AttackUtil.AlchemistBlue(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 function AttackUtil.AlchemistGreen(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function AttackUtil.Illusionist(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 return AttackUtil
