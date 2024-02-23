@@ -1,10 +1,12 @@
 --!nocheck
 
 local RepS = game:GetService("ReplicatedStorage")
+local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children, Tween, Computed, Value = Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value
 
@@ -40,6 +42,19 @@ local function LocationTitleFrame(self: table) : Frame
 
 		wait()
 		locationInfo.Thread = spawn(function()
+            Spawn(function()
+                local overworldMusic = workspace.Sounds.Overworld :: Sound
+                if overworldMusic.SoundId ~= AssetBook.LocationInfo.Music[location] then
+                    TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = 0 }):Play()
+
+                    wait(0.6)
+                    overworldMusic.SoundId = AssetBook.LocationInfo.Music[location]
+                    overworldMusic:Play()
+
+                    TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = 0.5 }):Play()
+                end
+            end)
+
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
 

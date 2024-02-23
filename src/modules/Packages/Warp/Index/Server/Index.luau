@@ -15,7 +15,6 @@ function Server.new(Identifier: string, rateLimit: Type.rateLimitArg?)
 	local self = setmetatable({}, Server)
 	self.id = Serdes(Identifier)
 	self.fn = {}
-	self.isReliable = true
 
 	ServerProcess.add(self.id, Identifier, rateLimit or { maxEntrance = 200, interval = 2 })
 
@@ -23,12 +22,12 @@ function Server.new(Identifier: string, rateLimit: Type.rateLimitArg?)
 end
 
 function Server:Fire(player: Player, ...: any)
-	ServerProcess.insertQueue(self.id, self.reliable, player, ...)
+	ServerProcess.insertQueue(self.id, true, player, ...)
 end
 
 function Server:Fires(...: any)
 	for _, player: Player in ipairs(Players:GetPlayers()) do
-		ServerProcess.insertQueue(self.id, self.reliable, player, ...)
+		ServerProcess.insertQueue(self.id, true, player, ...)
 	end
 end
 

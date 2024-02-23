@@ -31,6 +31,7 @@ local function ChatFrame(self: table) : Frame
     self.triangleVisible = Value(true)
     self.isChatting = Value(false)
 
+    local originDialoguesChatting = nil
     local dialoguesChatting = nil
     local dialogueIndexChatting = 1
     local dialogueChoiceIndex = 0
@@ -84,11 +85,11 @@ local function ChatFrame(self: table) : Frame
         workspace.Sounds.SFXs.Next:Play()
 
         --- enter choices
-        if match(dialoguesChatting[dialogueIndexChatting], "CHOICE") then
+        if sFind(dialoguesChatting[dialogueIndexChatting], "CHOICE") then
             canContinueChat = false
 
             local series = match(dialoguesChatting[dialogueIndexChatting], "%d+")
-            local choices = dialoguesChatting["Choice"..series]
+            local choices = originDialoguesChatting["Choice"..series]
             local realChoices = {}
 
             dialogueChoiceIndex = series
@@ -100,11 +101,20 @@ local function ChatFrame(self: table) : Frame
             self.chatChoices:set(realChoices)
             return
         end
+        --- enter quests
+        if sFind(dialoguesChatting[dialogueIndexChatting], "QUEST") then
+            local series = if sFind(dialoguesChatting[dialogueIndexChatting], "TOWN") then "Town" else "Side"
+            local questWillDo = match(dialoguesChatting[dialogueIndexChatting], "%d+")
+
+            Events.NewQuest:Fire(npcChatting, series, tonumber(questWillDo))
+
+            __endChatting()
+            return
+        end
 
         Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
     end
-    local function _nextDialogue(_, inputState: Enum.UserInputState)
-        if inputState ~= Enum.UserInputState.Begin then return end
+    local function _nextDialogue()
         if not canContinueChat then return end
 
         __nextText(if Typer:IsTyping() then "Skip" else "Continue")
@@ -124,7 +134,6 @@ local function ChatFrame(self: table) : Frame
         CAS:BindActionAtPriority("FreezeControl", function()
             return Enum.ContextActionResult.Sink
         end, false, Enum.ContextActionPriority.High.Value, unpack(Enum.PlayerActions:GetEnumItems()))
-        CAS:BindAction("NextDialogue", _nextDialogue, false, Enum.KeyCode.Space)
 
         local quests = self.plr.Quests:GetChildren() :: Folder
 
@@ -133,9 +142,12 @@ local function ChatFrame(self: table) : Frame
 
         local function __priorityChoose(series: string)
             local found = false
-            for _, quest in quests do
+            for _, quest: IntConstrainedValue in quests do
                 if quest.Name == series and DialogueBook[speaker][series..quest.Value] then
+
+                    originDialoguesChatting = DialogueBook[speaker][series..quest.Value]
                     dialoguesChatting = DialogueBook[speaker][series..quest.Value]
+
                     Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
 
                     found = true
@@ -151,13 +163,15 @@ local function ChatFrame(self: table) : Frame
         if __priorityChoose("Town") then return end
 
         --- all of above don't match
+        originDialoguesChatting = DialogueBook[speaker].Else
         dialoguesChatting = DialogueBook[speaker].Else
+
         Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
     end
     Events.NPCChat:Connect(_startChatting)
 
     local function _chooseOption(series: number)
-        dialoguesChatting = dialoguesChatting["Choice"..dialogueChoiceIndex]["Option"..series]
+        dialoguesChatting = originDialoguesChatting["Choice"..dialogueChoiceIndex]["Option"..series]
         dialogueIndexChatting = 1
 
         Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
@@ -187,9 +201,7 @@ local function ChatFrame(self: table) : Frame
                 Name = "Hover",
                 ZIndex = 2,
 
-                [Fusion.OnEvent("MouseButton1Click")] = function()
-                    _nextDialogue("NextDialogue", Enum.UserInputState.Begin)
-                end
+                [Fusion.OnEvent("MouseButton1Click")] = _nextDialogue
             }),
             Components.ImageLabel({
                 Name = "Triangle",
@@ -254,8 +266,9 @@ local function ChatFrame(self: table) : Frame
                     Fusion.ForValues(self.chatChoices, function(use, option)
                         local way = "Chat"
                         if sFind(option, "EXIT") then way = "Exit" end
-                        if sFind(option, "BUY") then way = "Exit" end
-                        if sFind(option, "CRAFT") then way = "Exit" end
+                        if sFind(option, "BUY") then way = "Buy" end
+                        if sFind(option, "CRAFT") then way = "Craft" end
+                        if sFind(option, "QUEST") then way = "Quest" end
                         local index = tFind(Fusion.peek(self.chatChoices), option)
 
                         return OptionFrame(option, way, self, index)

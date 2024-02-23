@@ -306,7 +306,7 @@ end
 --[[
 	Return a randomly generate a position in the combat area
 ]]
-function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
+function ServerUtil:GenerateOrbPos(monster: Model, char: Model) : CFrame
 	--- checks
 	if not monster then return end
 	if not monster.Parent then return end
@@ -316,7 +316,7 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	local ray = rayNew(
 		position,
 		cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
-	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, { monster })
+	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, { monster, char })
 
 	return cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
 end
@@ -532,7 +532,10 @@ function ServerUtil:FindPartOnRay(givenPos: Vector3, ignores: table?)
 	while wait() do
 		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
 		if hit then
-			if not hit.Parent:GetAttribute("Terrain") or not hit.CanCollide or hit.Transparency >= 0.5 then
+			if not (hit.Parent:GetAttribute("Terrain") or hit.Parent.Name == "Terrain")
+				or not hit.CanCollide
+				or hit.Transparency >= 0.5 then
+
 				insert(ignoreList, hit)
 			else
 				return pos

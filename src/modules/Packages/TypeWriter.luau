@@ -3,12 +3,12 @@
 local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 
-local Warp = require(RepS.Modules.Packages.Warp)
+local Signal = require(RepS.Modules.Packages.Signal)
 
 local TypeWriter = {}
 TypeWriter.__index = TypeWriter
-TypeWriter.onTextUpdated = Warp.Signal("OnTextUpdated")
-TypeWriter.onTyperFinished = Warp.Signal("OnTyperFinished")
+TypeWriter.onTextUpdated = Signal.new()
+TypeWriter.onTyperFinished = Signal.new()
 
 local sFind, sub, match = string.find, string.sub, string.match
 local wait = task.wait

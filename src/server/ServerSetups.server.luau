@@ -8,6 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local SSS = game:GetService("ServerScriptService")
+local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
 
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
@@ -78,7 +79,7 @@ local function mainSetup()
 	end
 
 	--- zone setups
-	for _, zone in package.Zones:GetChildren() do
+	for _, zone in SS.Zones:GetChildren() do
 		zone.Transparency = 1
 		zone.Parent = workspace.MapComponents.Zones
 	end

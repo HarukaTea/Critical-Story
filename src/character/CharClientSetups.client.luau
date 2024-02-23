@@ -6,6 +6,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Bin = require(RepS.Modules.Packages.Bin)
 local Events = require(RepS.Modules.Data.Events)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
@@ -16,10 +17,12 @@ local musics = workspace:WaitForChild("Sounds") :: Folder
 local effects = RepS.Package.Effects :: Folder
 local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
 
+local Add, Empty = Bin()
+
 local fromRGB = Color3.fromRGB
 local v3Zero = Vector3.zero
 local cfNew = CFrame.new
-local insert = table.insert
+local insert, clear = table.insert, table.clear
 local floor = math.floor
 local wait = task.wait
 
@@ -62,20 +65,31 @@ local function onDied()
 
 	Lighting.ColorShift_Bottom = fromRGB(255, 0, 0)
 	Lighting.ColorShift_Top = fromRGB(255, 0, 0)
+
+	Empty()
 end
 char.Humanoid.Died:Once(onDied)
 
 
 local markers = {}
 local quests = plr:WaitForChild("Quests", 999) :: Folder
+
+local function __distanceCheck()
+	for _, marker: Part in markers do
+		local magnitude = floor((marker:GetAttribute("Location") - char.PrimaryPart.Position).Magnitude)
+
+		marker.TargetUI.Distance.Text = magnitude.."M"
+	end
+end
 local function targetCurrentQuest()
 	wait()
 	for _, child in camera:GetChildren() do
 		if child.Name == "QuestMarker" then child:Destroy() end
 	end
 	for _, child in mapComponents.NPCs:GetDescendants() do
-		if child.Name == "MissionIndicator" then child:Destory() end
+		if child.Name == "QuestIndicator" then child:Destroy() end
 	end
+	clear(markers)
 
     for _, quest: IntConstrainedValue in quests:GetChildren() do
         local realQuest = StoryBook[quest.Name][quest.Value]
@@ -97,16 +111,8 @@ local function targetCurrentQuest()
 			indicator.Parent = mapComponents.NPCs[StoryBook[quest.Name][quest.Value].NPC]
 		end
     end
-
-	local function __distanceCheck()
-		for _, marker: Part in markers do
-			local magnitude = floor((marker:GetAttribute("Location") - char.PrimaryPart.Position).Magnitude)
-
-			marker.TargetUI.Distance.Text = magnitude.."M"
-		end
-	end
-	RS.Heartbeat:Connect(__distanceCheck)
 end
 targetCurrentQuest()
-quests.ChildAdded:Connect(targetCurrentQuest)
-quests.ChildRemoved:Connect(targetCurrentQuest)
+Add(quests.ChildAdded:Connect(targetCurrentQuest))
+Add(quests.ChildRemoved:Connect(targetCurrentQuest))
+Add(RS.Heartbeat:Connect(__distanceCheck))

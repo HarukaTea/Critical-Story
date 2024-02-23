@@ -144,7 +144,7 @@ local function setup()
 				and monster:GetAttribute("InCombat") == false
 				and not monster:GetAttribute("SubMonster") then
 
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 30 then
+                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 18 then
 					encounterCD = true
 
                     Events.CombatStart:Fire(monster, plr:GetAttribute("CombatMode"))

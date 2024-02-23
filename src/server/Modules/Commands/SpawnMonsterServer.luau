@@ -26,7 +26,7 @@ return function (context, level, amount)
         return "Nah are you sure you can beat monsters that above level 950?"
     end
 
-    local locator = workspace.Monsters["Primis Field"]["Spike Fox"]:Clone()
+    local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone()
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
     locator:SetAttribute("CantRespawn", true)
@@ -36,7 +36,7 @@ return function (context, level, amount)
     ServerUtil:SetupMonster(locator, levelWant)
 
     for _ = 1, amount do
-        local subLocator = workspace.Monsters["Primis Field"]["Spike Fox"]:Clone()
+        local subLocator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone()
 
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)

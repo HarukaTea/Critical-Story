@@ -42,51 +42,48 @@ assets.ChatIcons = {
     Chat = "rbxassetid://13124035950",
     Exit = "rbxassetid://16458254833",
     Buy = "rbxassetid://16458319981",
-    Craft = "rbxassetid://16458320089"
+    Craft = "rbxassetid://16458320089",
+    Quest = "rbxassetid://16468992982"
+}
+assets.PromptIcons = {
+    Chat = "rbxassetid://13124035950",
+    Quest = "rbxassetid://16468992982",
+    Travel = "rbxassetid://16458254833"
 }
 assets.ClassInfo = {
 	Warrior = {
-		Desc = "Hit orb to gain combo, the more combos you get, the more damage you deal with.",
 		Image = "rbxassetid://2965862892",
 		Color = fromRGB(255, 100, 100)
 	},
 	Archer = {
-		Desc = "Hit orb to generate an arrow orb, which can increase the amount of arrows. Arrows can deal additional damage to monsters, which is calculated separately.",
 		Image = "rbxassetid://2965863905",
 		Color = fromRGB(100, 255, 100)
 	},
 	Wizard = {
-		Desc = "Hit orb to charge, the magic ball will be casted when it's done.",
 		Image = "rbxassetid://2965863231",
 		Color = fromRGB(100, 100, 254)
 	},
 	Knight = {
-		Desc = "Hit orb to gain defense, which can be used to mitigate the damage you receive.",
 		Image = "rbxassetid://2965863677",
 		Color = fromRGB(255, 255, 50)
 	},
 	Rogue = {
-		Desc = "Hit orb to increase critical chance. Each critical hit is independently calculated as an additional chance.",
 		Image = "rbxassetid://12284961892",
 		Color = fromRGB(255, 170, 255)
 	},
 	Repeater = {
-		Desc = "Hit orb to generate another orb within the combat area. However, this orb cannot generate orbs any more.",
 		Image = "rbxassetid://12190533959",
 		Color = fromRGB(65, 179, 255)
 	},
 	Striker = {
-		Desc = "Hit orb to dash to the nearest orb, you can only dash when there is more than 1 orb.",
 		Image = "rbxassetid://12190535870",
 		Color = fromRGB(253, 148, 44)
 	},
 	Alchemist = {
-		Desc = "Hit orbs of various colors to reach different research stages. Each stage will provide different effects. Red adds 1, Blue adds 2, and Green adds 3.",
 		Image = "rbxassetid://12236618949",
 		Color = fromRGB(0, 255, 22)
 	},
 	Illusionist = {
-		Desc = "Hit orb to create your clone, which will cast all your actives equipped if you have enough Mana.",
 		Image = "rbxassetid://15875390788",
 		Color = fromRGB(0, 255, 252)
 	}
@@ -96,29 +93,42 @@ assets.MonsterAvatars = {
 	["Spike Wolf"] = "rbxassetid://15688333529",
     ["Thorn Wolf"] = "rbxassetid://15688333529",
     ["Needle Wolf"] = "rbxassetid://15688333529",
+    ["Hardmode Wolf"] = "rbxassetid://2985521957",
 
 	["Green Slime"] = "rbxassetid://15951815518",
-    ["Blue Slime"] = "rbxassetid://15951815518",
-    ["Lapis Slime"] = "rbxassetid://15951815518",
-    ["Purple Slime"] = "rbxassetid://15951815518"
+    ["Blue Slime"] = "rbxassetid://2985521957",
+    ["Lapis Slime"] = "rbxassetid://2985521957",
+    ["Purple Slime"] = "rbxassetid://2985521957"
 }
 
 assets.LocationInfo = {
 	Name = {
+        InitusVillage = "Initus Village",
+        MonolithGrove = "Monolith Grove",
 		InitusBay = "Initus Bay",
-		FoxForest = "The Whispering Forest",
-		SecretCave = "A Secret Cave",
 		PrimisField = "Primis Field",
-		SonusCave = "Sonus Cave"
+		SonusCave = "Sonus Cave",
+        MisniPort = "Misni Port",
+        Highland = "High Lands"
 	},
-
 	Desc = {
-		InitusBay = "The start of every adventure...",
-		FoxForest = "A quiet forest, full of foxes...",
-		SecretCave = "An unknown cave, usually used for testing...",
-		PrimisField = "Familiar field, with the memory of Slimes...",
-		SonusCave = "A pretty safe cave without bats..."
-	}
+		InitusVillage = "The start of every adventure...",
+        MonolithGrove = "Other than the sound of foxes, you can hardly hear any other noises.",
+        InitusBay = "You feel like you've come here multiple times...",
+		PrimisField = "The old memories with Slimes...",
+		SonusCave = "Bats make you crazy.",
+        MisniPort = "Another port, larger than Initus Bay",
+        Highland = "I don't know why it's called High Lands..."
+	},
+    Music = {
+        InitusVillage = "rbxassetid://11130054413",
+        MonolithGrove = "rbxassetid://11130054413",
+        InitusBay = "rbxassetid://10717248822",
+		PrimisField = "rbxassetid://10717248822",
+		SonusCave = "rbxassetid://10717248822",
+        MisniPort = "rbxassetid://16471110687",
+        Highland = "rbxassetid://15842496353"
+    }
 }
 
 assets.Items = {

@@ -27,19 +27,6 @@ export type Server = {
 	Wait: (self: Server) -> number,
 }
 
-export type Signal = {
-	Fire: (self: Signal, ...any) -> (),
-	FireTo: (self: Signal, Identifier: string, ...any) -> (),
-	Invoke: (self: Signal, ...any) -> (...any?),
-	InvokeTo: (self: Signal, Identifier: string, ...any) -> (...any?),
-	Connect: (self: Signal, callback: (...any) -> ()) -> string,
-	Once: (self: Signal, callback: (...any) -> ()) -> string,
-	Disconnect: (self: Signal, key: string) -> (),
-	DisconnectAll: (self: Signal) -> (),
-	Wait: (self: Signal) -> number,
-	Destroy: (self: Signal) -> (),
-}
-
 export type Event = {
 	Reliable: RemoteEvent,
 	Unreliable: UnreliableRemoteEvent,
@@ -58,18 +45,6 @@ export type CallbackMap = {
 
 export type StoredRatelimit = {
 	[string]: any
-}
-
-export type fromServerArray = {
-	[string]: Server
-}
-
-export type fromClientArray = {
-	[string]: Client
-}
-
-export type fromSignalArray = {
-	[string]: Signal
 }
 
 return nil

@@ -2,7 +2,6 @@
 local Client = {}
 Client.__index = Client
 
-local Players = game:GetService("Players")
 local Util = script.Parent.Parent.Util
 
 local ClientProcess = require(script.Parent.ClientProcess)
@@ -14,7 +13,6 @@ function Client.new(Identifier: string)
 	local self = setmetatable({}, Client)
 	self.id = Serdes(Identifier)
 	self.fn = {}
-	self.isReliable = true
 
 	ClientProcess.add(self.id, Identifier)
 
@@ -22,7 +20,7 @@ function Client.new(Identifier: string)
 end
 
 function Client:Fire(...: any)
-	ClientProcess.insertQueue(self.id, self.reliable, ...)
+	ClientProcess.insertQueue(self.id, true, ...)
 end
 
 function Client:Invoke(timeout: number, ...: any): any

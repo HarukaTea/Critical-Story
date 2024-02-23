@@ -88,21 +88,21 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         RepS.Resources.Items.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "MountainKingClown" then
-        HarukaLib:Add("MaxDMGBuff", 125)
+        HarukaLib:Add(char, "MaxDMGBuff", 125)
 
     elseif item == "MilkPillow" then
-        HarukaLib:Add("MaxDMGBuff", 9999)
+        HarukaLib:Add(char, "MaxDMGBuff", 9999)
 
     elseif item == "NorthernHalberd" then
-        HarukaLib:Add("MaxDMGBuff", 125)
-        HarukaLib:Add("MinDMGBuff", 100)
+        HarukaLib:Add(char, "MaxDMGBuff", 125)
+        HarukaLib:Add(char, "MinDMGBuff", 100)
 
     elseif item == "NorthernerAxe" then
-        HarukaLib:Add("MaxDMGBuff", 70)
+        HarukaLib:Add(char, "MaxDMGBuff", 70)
 
     elseif item == "RabbitFoot" then
-        HarukaLib:Add("SpeedBuff", 5)
-        HarukaLib:Add("JumpBuff", 40)
+        HarukaLib:Add(char, "SpeedBuff", 5)
+        HarukaLib:Add(char, "JumpBuff", 40)
 
     elseif item == "RegenerationGem" then
         RepS.Resources.Items.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs

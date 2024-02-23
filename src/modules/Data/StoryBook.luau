@@ -2,7 +2,9 @@
 
 local story = {}
 
+local maps = workspace:WaitForChild("Maps") :: Folder
 local npcs = workspace:WaitForChild("MapComponents").NPCs :: Folder
+local statues = workspace.MapComponents.Statues :: Folder
 
 local v3New = Vector3.new
 
@@ -57,16 +59,40 @@ story.Main = {
     },
     {
         Name = "Monolith Grove",
-        Target = "See what happened there",
+        Target = "Start your adventure!",
         Desc = "",
-        NPC = "None",
-        Hint = v3New(),
+        NPC = "Firefly",
+        Hint = maps["Monolith Grove"].StoryLocator1.Position,
 
         Rewards = {
             EXP = 20,
             Gold = 100
         }
-    }
+    },
+    {
+        Name = "To the Sky",
+        Target = "Go to Initus Bay",
+        Desc = "",
+        NPC = "Hehe",
+        Hint = maps["Initus Bay"].StoryLocator1.Position,
+
+        Rewards = {
+            EXP = 20,
+            Gold = 100
+        }
+    },
+    {
+        Name = "The Secret",
+        Target = "Go back to Monolith Grove",
+        Desc = "",
+        NPC = "None",
+        Hint = maps["Monolith Grove"].StoryLocator1.Position,
+
+        Rewards = {
+            EXP = 20,
+            Gold = 100
+        }
+    },
 }
 
 story.Side = {
@@ -75,7 +101,9 @@ story.Side = {
         Target = "Get Archer power from its statue",
         Desc = "",
         NPC = "None",
-        Hint = v3New(5, 5, 5),
+        Hint = if statues:FindFirstChild("Archer") then statues.Archer.PrimaryPart.Position else v3New(),
+
+        Script = true,
 
         Rewards = {
             EXP = 20,
@@ -86,16 +114,36 @@ story.Side = {
 
 story.Town = {
     {
-        Name = "Slime Troubles",
-        Target = "Defeat 5 slimes",
+        Name = "Fox Hunt",
+        Target = "Get 6 Spiky Fur",
         Desc = "",
-        Hint = v3New()
+        NPC = "None",
+        Hint = v3New(),
+
+        Script = true,
+
+        Rewards = {}
+    },
+    {
+        Name = "Fox Hunt",
+        Target = "Return to FChenP",
+        Desc = "",
+        NPC = "FChenP",
+        Hint = if npcs:FindFirstChild("FChenP") then npcs.FChenP.PrimaryPart.Position else v3New(),
+
+        Rewards = {
+            EXP = 20,
+            Gold = 100
+        }
     }
 }
 
 story.NPCs = {
     Cyalm = "Cyalm",
-    Milk = "Milk"
+    Milk = "Milk",
+    FChenP = "FChenP",
+    Firefly = "Firefly",
+    Hehe = "Hehe"
 }
 
 return story

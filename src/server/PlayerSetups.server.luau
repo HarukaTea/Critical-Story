@@ -39,7 +39,7 @@ local TEMPLATE = {
 		Town = {}
 	}
 }
-local DS1, DS2, DS3 = "CSTORY_DEV20", "CSTORY_DEV20_S2", "CSTORY_DEV20_S3"
+local DS1, DS2, DS3 = "CSTORY_BETA1599", "CSTORY_BETA1599_S2", "CSTORY_BETA1599_S3"
 
 local newInstance = Instance.new
 local wait = task.wait

@@ -13,6 +13,7 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
@@ -69,6 +70,7 @@ local wait = task.wait
 local floor, random = math.floor, math.random
 local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
+local sFind = string.find
 
 local function charTakeDMG(monster: Model, dmgType: boolean?)
 	if not monster then return end
@@ -91,12 +93,8 @@ local function charTakeDMG(monster: Model, dmgType: boolean?)
     char:SetAttribute("Repairing", false)
     char:SetAttribute("Healing", false)
 
-    if shield < char:GetAttribute("MaxShield") then
-        RepS.Resources.Unloads.RepairShield:Clone().Parent = char
-    end
-    if humanoid.Health < humanoid.MaxHealth then
-        RepS.Resources.Unloads.HealHP:Clone().Parent = char
-    end
+    RepS.Resources.Unloads.RepairShield:Clone().Parent = char
+    RepS.Resources.Unloads.HealHP:Clone().Parent = char
 
 	--- Knight class skills
 	if char:GetAttribute("Guard") > 0 then
@@ -157,14 +155,14 @@ local function orbSpawnHandler(state: boolean)
             else
                 orb = orbAttack[class .. "Orb"]:Clone() :: Model
             end
-            _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
+            _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value, char), lifeTime)
 
             --- extra orbs from items
             if not isSpawned then
                 for attr, val in char.CharStats.ExtraOrbs:GetAttributes() do
                     if not val then continue end
 
-                    _placeOrb(orbAttack[attr.Name]:Clone(), ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
+                    _placeOrb(orbAttack[attr.Name]:Clone(), ServerUtil:GenerateOrbPos(monster.Value, char), lifeTime)
                 end
             end
         end
@@ -210,6 +208,7 @@ local function setup()
         _createFolder("ExtraOrbs", charStats)
         _createFolder("TargetMonsters", charStats)
         _createFolder("EffectsList", charStats)
+        _createFolder("Quests", charStats)
     end
     _createStats()
 
@@ -260,6 +259,35 @@ local function classAttributesSetup()
     end)
 end
 classAttributesSetup()
+
+local function questDataSetup()
+    local quests = plr:WaitForChild("Quests", 999) :: Folder
+
+    for _, quest: IntConstrainedValue in quests:GetChildren() do
+        if StoryBook[quest.Name][quest.Value]["Script"] then
+            RepS.Resources.Quests[quest.Name..quest.Value]:Clone().Parent = char.CharStats.Quests
+        end
+    end
+
+    local function setQuestsScriptsAdded(quest: IntConstrainedValue)
+        local questName = quest.Name..quest.Value
+
+        if StoryBook[quest.Name][quest.Value]["Script"] and not char.CharStats.Quests:FindFirstChild(questName) then
+            RepS.Resources.Quests[questName]:Clone().Parent = char.CharStats.Quests
+        end
+    end
+    local function setQuestsScriptsRemoved(quest: IntConstrainedValue)
+        wait()
+        local questName = quest.Name..quest.Value
+
+        for _, child in char.CharStats.Quests:GetChildren() do
+            if sFind(child.Name, questName) then child:Destroy() end
+        end
+    end
+    quests.ChildAdded:Connect(setQuestsScriptsAdded)
+    quests.ChildRemoved:Connect(setQuestsScriptsRemoved)
+end
+questDataSetup()
 
 --// Connections
 local function onDead()

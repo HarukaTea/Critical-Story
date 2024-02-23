@@ -20,7 +20,7 @@ local function openAcquiredChests()
     local inventory = plr:WaitForChild("Inventory", 999) :: Folder
 
     for _, chest: Model in chests:GetChildren() do
-        if inventory:FindFirstChild(chest.Name) then
+        if inventory:FindFirstChild(chest.Name) and not chest:GetAttribute("Active") then
             chest:SetAttribute("Opened", true)
             chest.Giver.Chest.Enabled = false
 
@@ -60,7 +60,8 @@ local function setupUI()
     local requireList = {
         UIModules.Hints,
         UIModules.PostStroke,
-        UIModules.PlayerList
+        UIModules.PlayerList,
+        UIModules.SwitchScene
     }
     for _, module in requireList do
         Spawn(function()

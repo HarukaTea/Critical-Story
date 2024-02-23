@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -27,7 +28,7 @@ local function Prompt(prompt: ProximityPrompt, index: number) : Frame
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.05, 0.5),
                 Size = fromScale(0.12, 0.7),
-                Image = "rbxassetid://13124035950"
+                Image = if AssetBook.PromptIcons[prompt.Name] then AssetBook.PromptIcons[prompt.Name] else AssetBook.PromptIcons.Chat
             }),
             Components.CenterTextLabel({
                 Name = "PromptText",

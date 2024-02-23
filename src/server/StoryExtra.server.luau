@@ -13,7 +13,7 @@ local wait = task.wait
 local instanceNew = Instance.new
 
 local function firstCombat(plr: Player)
-    local locator = workspace.Monsters["Primis Field"]["Spike Fox"]:Clone() :: Part
+    local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: Part
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", 1)
     locator:SetAttribute("CantRespawn", true)

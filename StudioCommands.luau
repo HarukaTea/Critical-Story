@@ -23,3 +23,11 @@ end
 for _, child in workspace.MapComponents.Chests:GetChildren() do
     child.Giver:SetAttribute("IsChest", nil)
 end
+
+for _, child in workspace:GetDescendants() do
+    if child.Name == "Tree" then
+        for _, descendant in child:GetDescendants() do
+            if descendant:IsA("BasePart") then descendant.Transparency = 0 end
+        end
+    end
+end

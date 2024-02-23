@@ -43,7 +43,7 @@ function AttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, for
 		criEff.Parent = monster.PrimaryPart
 
         Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Critical)
-		ServerUtil:ShowText(monster, "CRITICAL!", fromRGB(230, 241, 3))
+		ServerUtil:ShowText(char, "CRITICAL!", fromRGB(230, 241, 3))
 
 		wait(0.3)
 		criEff.Enabled = false
@@ -96,7 +96,7 @@ function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
 
     local arrow = RepS.Package.PlayerAttacks.ArrowOrb:Clone() :: Model
     arrow.Owner.Value = char
-    arrow:PivotTo(ServerUtil:GenerateOrbPos(monster))
+    arrow:PivotTo(ServerUtil:GenerateOrbPos(monster, plr.Character))
     arrow:SetAttribute("OrbLifeTime", 8)
     arrow.Parent = workspace.MapComponents.OrbFolders[plr.Name]
     Debris:AddItem(arrow, 8)
@@ -185,7 +185,7 @@ end
 
 function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
     if not orb:GetAttribute("RepeaterSpawned") then
-        local pos = ServerUtil:GenerateOrbPos(monster)
+        local pos = ServerUtil:GenerateOrbPos(monster, plr.Character)
         local repeaterOrb = RepS.Package.PlayerAttacks.RepeaterOrb:Clone() :: Model
 
         repeaterOrb.Owner.Value = plr.Character
