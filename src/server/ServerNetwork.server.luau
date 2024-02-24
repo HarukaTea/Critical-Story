@@ -39,12 +39,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 	elseif prompt.Name == "Chest" then
 		local chest = prompt.Parent.Parent :: Model
 
-		if not plr.Inventory:FindFirstChild(chest.Name) and not chest:GetAttribute("Active") then
-			Events.ChestUnlocked:Fire(plr, chest)
-
-		elseif chest:GetAttribute("Active") then
-			Events.ChestUnlocked:Fire(plr, chest)
-		end
+		Events.ChestUnlocked:Fire(plr, chest)
 
 		ServerUtil:GiveItem(plr, chest.Name, chest:GetAttribute("Amount") or 1)
 
@@ -265,18 +260,22 @@ local function combatEndSetup(monster: Model)
 				and child:GetAttribute("InCombat") == true
 				and child:GetAttribute("Health") > 0 then
 
-				continueCombatCheck = true
+				if child:FindFirstChild("TargetingList") and
+					child.TargetingList:FindFirstChildOfClass("ObjectValue") then
 
-				local locatorSymbol = instanceNew("ObjectValue")
-				locatorSymbol.Name = monster.Name
-				locatorSymbol.Value = monster.Parent
-				locatorSymbol:SetAttribute("EXP", monster:GetAttribute("EXP"))
-				locatorSymbol.Parent = child.WaitingList
+					continueCombatCheck = true
 
-				for _, pastWaiting in monster.WaitingList:GetChildren() do
-					pastWaiting.Parent = child.WaitingList
+					local locatorSymbol = instanceNew("ObjectValue")
+					locatorSymbol.Name = monster.Name
+					locatorSymbol.Value = monster.Parent
+					locatorSymbol:SetAttribute("EXP", monster:GetAttribute("EXP"))
+					locatorSymbol.Parent = child.WaitingList
+
+					for _, pastWaiting in monster.WaitingList:GetChildren() do
+						pastWaiting.Parent = child.WaitingList
+					end
+					break
 				end
-				break
 			end
 		end
 
@@ -284,10 +283,7 @@ local function combatEndSetup(monster: Model)
 	end
 end
 Events.CombatStart:Connect(combatStartSetup)
-Signals.CombatEnd:Connect(function(monster: Model)
-	--- I have no idea why this can be broken without task.spawn
-	Spawn(combatEndSetup, monster)
-end)
+Signals.CombatEnd:Connect(combatEndSetup)
 
 --[[
 	Player finally reach the requirement and level up!
@@ -626,9 +622,7 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 			return
 		end
 
-		for reward, val in StoryBook[series][currentId].Rewards do
-			HarukaLib:Add(plr, reward, val)
-		end
+		ServerUtil:GiveQuestRewards(series, currentId, plr)
 
 		plr.Quests[series]:Destroy()
 
@@ -648,9 +642,9 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 			if quest.Name ~= "Town" then continue end
 			if StoryBook[series][quest.Value].NPC == npc.Name then currentId = quest.Value end
 		end
-		for reward, val in StoryBook[series][currentId].Rewards do
-			HarukaLib:Add(plr, reward, val)
-		end
+
+		ServerUtil:GiveQuestRewards(series, currentId, plr)
+
 		for _, quest in plr.Quests:GetChildren() do
 			if quest.Name == "Town" and quest.Value == currentId then quest:Destroy() end
 		end
@@ -674,9 +668,7 @@ end
 local function questCompleted(series: string, questId: number, plr: Player, needNewQuest: boolean)
 	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.QuestComplete)
 
-	for reward, val in StoryBook[series][questId].Rewards do
-		HarukaLib:Add(plr, reward, val)
-	end
+	ServerUtil:GiveQuestRewards(series, questId, plr)
 
 	for _, quest: IntConstrainedValue in plr.Quests:GetChildren() do
 		if quest.Name == series and quest.Value == questId then

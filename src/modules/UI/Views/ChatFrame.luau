@@ -34,7 +34,7 @@ local function ChatFrame(self: table) : Frame
     local originDialoguesChatting = nil
     local dialoguesChatting = nil
     local dialogueIndexChatting = 1
-    local dialogueChoiceIndex = 0
+    local dialogueChoiceIndex = 1
     local canContinueChat = true
     local promptChatting: ProximityPrompt = nil
     local npcChatting: Model = nil
@@ -58,6 +58,13 @@ local function ChatFrame(self: table) : Frame
     local function __endChatting()
         self.isChatting:set(false)
 
+        ---// revert back to initial state
+        originDialoguesChatting = nil
+        dialoguesChatting = nil
+        dialogueIndexChatting = 1
+        dialogueChoiceIndex = 1
+        canContinueChat = true
+
         CAS:UnbindAction("NextDialogue")
         CAS:UnbindAction("FreezeControl")
         UIS.ModalEnabled = false
@@ -65,6 +72,10 @@ local function ChatFrame(self: table) : Frame
         promptChatting.Enabled = true
 
         Events.NPCChatEnded:Fire(npcChatting, seriesDoing)
+
+        promptChatting = nil
+        npcChatting = nil
+        seriesDoing = nil
     end
     local function __nextText(method: string)
         if method == "Skip" then
@@ -92,7 +103,7 @@ local function ChatFrame(self: table) : Frame
             local choices = originDialoguesChatting["Choice"..series]
             local realChoices = {}
 
-            dialogueChoiceIndex = series
+            dialogueChoiceIndex = tonumber(series)
 
             for i = 1, #choices do
                 insert(realChoices, choices[i])
@@ -174,9 +185,9 @@ local function ChatFrame(self: table) : Frame
         dialoguesChatting = originDialoguesChatting["Choice"..dialogueChoiceIndex]["Option"..series]
         dialogueIndexChatting = 1
 
-        Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
-
         canContinueChat = true
+
+        Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
     end
     Signals.NPCChat:Connect(_chooseOption)
 

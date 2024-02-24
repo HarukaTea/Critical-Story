@@ -8,8 +8,15 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, New, Value, AttributeChange, peek =
-	Fusion.Children, Fusion.New, Fusion.Value, Fusion.AttributeChange, Fusion.peek
+local Children, New, Value, AttributeChange, Tween, Computed, OnEvent, peek =
+	Fusion.Children,
+	Fusion.New,
+	Fusion.Value,
+	Fusion.AttributeChange,
+	Fusion.Tween,
+	Fusion.Computed,
+	Fusion.OnEvent,
+	Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -27,6 +34,8 @@ local TEXTS = {
 }
 
 local function OptionFrame(id: string, self: table) : Frame
+	local stroke_trans = Fusion.Value(1)
+
 	return Components.Frame {
 		Name = id,
 
@@ -44,7 +53,13 @@ local function OptionFrame(id: string, self: table) : Frame
 				Position = fromScale(0.7, 0),
 				Size = fromScale(0.2, 1),
 
-				[Fusion.OnEvent("MouseButton1Click")] = function()
+				[OnEvent("MouseEnter")] = function()
+					stroke_trans:set(0)
+				end,
+				[OnEvent("MouseLeave")] = function()
+					stroke_trans:set(1)
+				end,
+				[OnEvent("MouseButton1Click")] = function()
 					local plr = self.plr :: Player
 
 					if peek(self.playerSettings[id]) then
@@ -97,17 +112,27 @@ local function OptionFrame(id: string, self: table) : Frame
 					self.plr:SetAttribute(id, not self.plr:GetAttribute(id))
 				end,
 
-				[Children] = { Components.RoundUICorner() }
+				[Children] = {
+					Components.RoundUICorner(),
+					Components.UIStroke({
+						Thickness = 3,
+						Enabled = true,
+						Transparency = Tween(Computed(function(use)
+							return use(stroke_trans)
+						end), AssetBook.TweenInfos.twiceHalf)
+					})
+				}
 			}),
 			Components.Frame({
 				Name = "Switch",
 				BackgroundTransparency = 0,
 				AnchorPoint = v2New(),
 				Size = fromScale(0.1, 1),
-				BackgroundColor3 = Fusion.Tween(Fusion.Computed(function(use)
+
+				BackgroundColor3 = Tween(Computed(function(use)
 					return if use(self.playerSettings[id]) then fromRGB(80, 161, 118) else fromRGB(214, 71, 107)
 				end), AssetBook.TweenInfos.threeHalf),
-				Position = Fusion.Tween(Fusion.Computed(function(use)
+				Position = Tween(Computed(function(use)
 					return if use(self.playerSettings[id]) then fromScale(0.8, 0) else fromScale(0.7, 0)
 				end), AssetBook.TweenInfos.twiceHalf),
 

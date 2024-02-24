@@ -2,6 +2,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -12,10 +13,6 @@ local fromScale = UDim2.fromScale
 local clamp = math.clamp
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local IMAGES = {
-    AttackBuff = "rbxassetid://2965862892"
-}
-
 local function mapValue(val: number, duration: number) : number
     --- you may be confused about this math problem, well, I'm confused too lol
     local from = (val - 0) / (duration - 0)
@@ -24,7 +21,7 @@ local function mapValue(val: number, duration: number) : number
     return to
 end
 
-local function ProgressCircle(direction: string, info: table) : Frame
+local function ProgressCircle(direction: string, effect: string, info: table) : Frame
     local maxDuration = 0
 
     Fusion.Hydrate(info.Script)({
@@ -49,6 +46,7 @@ local function ProgressCircle(direction: string, info: table) : Frame
 				Position = if direction == "Right" then fromScale(-1, 0) else fromScale(0, 0),
 				Size = fromScale(2, 1),
 				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+                ImageColor3 = AssetBook.BuffColors[effect],
 
 				[Children] = {
 					Fusion.New("UIGradient")({
@@ -74,8 +72,9 @@ local function PlayerEffect(effect: string, info: table) : ImageLabel
     return Components.ImageLabel({
         Name = effect,
         BackgroundTransparency = 0,
-        Size = fromScale(0.199, 1),
-        Image = IMAGES[effect],
+        Size = fromScale(1, 1),
+        SizeConstraint = Enum.SizeConstraint.RelativeYY,
+        Image = AssetBook.BuffImages[effect],
 
         [Children] = {
             Components.RoundUICorner(),
@@ -85,9 +84,20 @@ local function PlayerEffect(effect: string, info: table) : ImageLabel
 
                 [Children] = { Components.RoundUICorner() }
             }),
+            Components.TextLabel({
+                Name = "BuffPower",
+                Position = fromScale(0, 0.6),
+                Size = fromScale(1, 0.5),
+                ZIndex = 3,
+                Text = info.Power.."x",
 
-            ProgressCircle("Left", info),
-            ProgressCircle("Right", info)
+                [Children] = {
+                    Components.TextUIStroke({ Thickness = 3 })
+                }
+            }),
+
+            ProgressCircle("Left", effect, info),
+            ProgressCircle("Right", effect, info)
         }
     })
 end

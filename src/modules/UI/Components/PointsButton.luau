@@ -2,12 +2,14 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local Children, New, Computed, peek = Fusion.Children, Fusion.New, Fusion.Computed, Fusion.peek
+local Children, New, Computed, Tween, OnEvent, Value, peek =
+	Fusion.Children, Fusion.New, Fusion.Computed, Fusion.Tween, Fusion.OnEvent, Fusion.Value, Fusion.peek
 
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
@@ -36,18 +38,10 @@ local POINTS = {
 	Magic = "MagicPoints"
 }
 
-local function AddButtonChildren(id: string) : table
-	return {
-		New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-		Components.UIStroke({
-			Transparency = 0.2,
-			Color = COLORS[id],
-			Thickness = 2.5,
-			Enabled = true,
-		}),
-	}
-end
 local function PointsButton(id: string, direction: string, self: table): Frame
+	local bgColors = { Value(fromRGB(30, 30, 30)), Value(fromRGB(30, 30, 30)) }
+	local contentColors = { Value(fromRGB(255, 255, 255)), Value(fromRGB(255, 255, 255)) }
+
 	return New("Frame")({
         Name = id,
 		BackgroundTransparency = 1,
@@ -78,7 +72,22 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 					return if use(self.playerData.LvPoints) > 0 then true else false
 				end),
 
-				[Fusion.OnEvent("MouseButton1Click")] = function()
+				BackgroundColor3 = Tween(Computed(function(use)
+					return use(bgColors[1])
+				end), AssetBook.TweenInfos.twiceHalf),
+				TextColor3 = Tween(Computed(function(use)
+					return use(contentColors[1])
+				end), AssetBook.TweenInfos.twiceHalf),
+
+				[OnEvent("MouseEnter")] = function()
+					bgColors[1]:set(fromRGB(255, 255, 255))
+					contentColors[1]:set(fromRGB())
+				end,
+				[OnEvent("MouseLeave")] = function()
+					bgColors[1]:set(fromRGB(30, 30, 30))
+					contentColors[1]:set(fromRGB(255, 255, 255))
+				end,
+				[OnEvent("MouseButton1Click")] = function()
 					if peek(self.playerData.LvPoints) > 0 then
 						workspace.Sounds.SFXs.Ding:Play()
 
@@ -88,7 +97,18 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 					end
 				end,
 
-				[Children] = AddButtonChildren(id)
+				[Children] = {
+					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke({
+						Transparency = 0.2,
+						Thickness = 2.5,
+						Enabled = true,
+
+						Color = Tween(Computed(function(use)
+							return if use(bgColors[1]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
+						end))
+					})
+				}
 			}),
 			Components.TextButton({
 				Name = "Add10",
@@ -99,7 +119,22 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 					return if use(self.playerData.LvPoints) >= 10 then true else false
 				end),
 
-				[Fusion.OnEvent("MouseButton1Click")] = function()
+				BackgroundColor3 = Tween(Computed(function(use)
+					return use(bgColors[2])
+				end), AssetBook.TweenInfos.twiceHalf),
+				TextColor3 = Tween(Computed(function(use)
+					return use(contentColors[2])
+				end), AssetBook.TweenInfos.twiceHalf),
+
+				[OnEvent("MouseEnter")] = function()
+					bgColors[2]:set(fromRGB(255, 255, 255))
+					contentColors[2]:set(fromRGB())
+				end,
+				[OnEvent("MouseLeave")] = function()
+					bgColors[2]:set(fromRGB(30, 30, 30))
+					contentColors[2]:set(fromRGB(255, 255, 255))
+				end,
+				[OnEvent("MouseButton1Click")] = function()
 					if peek(self.playerData.LvPoints) >= 10 then
 						workspace.Sounds.SFXs.Ding:Play()
 
@@ -109,7 +144,18 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 					end
 				end,
 
-				[Children] = AddButtonChildren(id)
+				[Children] = {
+					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke({
+						Transparency = 0.2,
+						Thickness = 2.5,
+						Enabled = true,
+
+						Color = Tween(Computed(function(use)
+							return if use(bgColors[2]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
+						end))
+					})
+				}
 			})
 		},
 	})

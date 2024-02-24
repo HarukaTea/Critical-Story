@@ -2,6 +2,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -10,8 +11,16 @@ local Signals = require(RepS.Modules.Data.Signals)
 
 local PointsButton = require(RepS.Modules.UI.Components.PointsButton)
 
-local Children, New, Value, AttributeChange, Hydrate, peek =
-	Fusion.Children, Fusion.New, Fusion.Value, Fusion.AttributeChange, Fusion.Hydrate, Fusion.peek
+local Children, New, Value, AttributeChange, Hydrate, Tween, Computed, OnEvent, peek =
+	Fusion.Children,
+	Fusion.New,
+	Fusion.Value,
+	Fusion.AttributeChange,
+	Fusion.Hydrate,
+	Fusion.Tween,
+	Fusion.Computed,
+	Fusion.OnEvent,
+	Fusion.peek
 
 local udNew =  UDim.new
 local fromScale = UDim2.fromScale
@@ -114,6 +123,9 @@ local function CharacterFrame(self: table): Frame
 		end
 	})
 
+	local bgColor = Value(fromRGB(30, 30, 30))
+	local contentColor = Value(fromRGB(255, 255, 255))
+
 	return Components.Frame({
 		Name = "Character",
 		Position = fromScale(0.496, 0.567),
@@ -170,8 +182,8 @@ local function CharacterFrame(self: table): Frame
 				Position = fromScale(0.61, 1.013),
 				Size = fromScale(0.374, 0.08),
 				TextXAlignment = Enum.TextXAlignment.Right,
-				Text = Fusion.Computed(function(use)
-					return "SKILL POINTS LEFT: "..use(self.playerData.LvPoints)
+				Text = Computed(function(use)
+					return "SKILL POINTS LEFT: "..use(playerData.LvPoints)
 				end)
 			}),
 			Components.TextButton({
@@ -179,9 +191,22 @@ local function CharacterFrame(self: table): Frame
 				Position = fromScale(0.647, -0.094),
 				Size = fromScale(0.09, 0.078),
 				Text = "RESET",
+				TextColor3 = Tween(Computed(function(use)
+					return use(contentColor)
+				end), AssetBook.TweenInfos.twiceHalf),
+				BackgroundColor3 = Tween(Computed(function(use)
+					return use(bgColor)
+				end), AssetBook.TweenInfos.twiceHalf),
 
-				[Fusion.OnEvent("MouseButton1Click")] = function()
-					local playerData = self.playerData :: table
+				[OnEvent("MouseEnter")] = function()
+					bgColor:set(fromRGB(255, 255, 255))
+					contentColor:set(fromRGB())
+				end,
+				[OnEvent("MouseLeave")] = function()
+					bgColor:set(fromRGB(30, 30, 30))
+					contentColor:set(fromRGB(255, 255, 255))
+				end,
+				[OnEvent("MouseButton1Click")] = function()
 					local cost = ((peek(playerData.Levels) - 1) * 2 - peek(playerData.LvPoints)) * 20
 
 					if peek(playerData.Gold) >= cost and cost ~= 0 then
@@ -195,9 +220,12 @@ local function CharacterFrame(self: table): Frame
 					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
 					Components.UIStroke({
 						Transparency = 0.2,
-						Color = fromRGB(255, 85, 0),
 						Thickness = 2.5,
 						Enabled = true,
+
+						Color = Tween(Computed(function(use)
+							return if use(bgColor) == fromRGB(30, 30, 30) then fromRGB(255, 85, 0) else fromRGB()
+						end), AssetBook.TweenInfos.twiceHalf),
 					}),
 					New("UIPadding")({ PaddingBottom = udNew(0, 1) })
 				}
@@ -209,8 +237,7 @@ local function CharacterFrame(self: table): Frame
 				FontFace = Font.fromName("TitilliumWeb", Enum.FontWeight.Bold),
 				TextColor3 = fromRGB(255, 255, 0),
 				TextXAlignment = Enum.TextXAlignment.Left,
-				Text = Fusion.Computed(function(use)
-					local playerData = self.playerData :: table
+				Text = Computed(function(use)
 					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 
 					return "COST: "..HarukaLib:NumberConvert(cost, "%.1f").." GOLD"

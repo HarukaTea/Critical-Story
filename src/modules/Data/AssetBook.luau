@@ -53,52 +53,72 @@ assets.PromptIcons = {
 assets.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
-		Color = fromRGB(255, 100, 100)
+		Color = fromRGB(255, 100, 100),
+        Type = "DMG"
 	},
 	Archer = {
 		Image = "rbxassetid://2965863905",
-		Color = fromRGB(100, 255, 100)
+		Color = fromRGB(100, 255, 100),
+        Type = "DMG"
 	},
 	Wizard = {
 		Image = "rbxassetid://2965863231",
-		Color = fromRGB(100, 100, 254)
+		Color = fromRGB(100, 100, 254),
+        Type = "Magic"
 	},
 	Knight = {
 		Image = "rbxassetid://2965863677",
-		Color = fromRGB(255, 255, 50)
+		Color = fromRGB(255, 255, 50),
+        Type = "DMG"
 	},
 	Rogue = {
 		Image = "rbxassetid://12284961892",
-		Color = fromRGB(255, 170, 255)
+		Color = fromRGB(255, 170, 255),
+        Type = "DMG"
 	},
 	Repeater = {
 		Image = "rbxassetid://12190533959",
-		Color = fromRGB(65, 179, 255)
+		Color = fromRGB(65, 179, 255),
+        Type = "DMG"
 	},
 	Striker = {
 		Image = "rbxassetid://12190535870",
-		Color = fromRGB(253, 148, 44)
+		Color = fromRGB(253, 148, 44),
+        Type = "DMG"
 	},
 	Alchemist = {
 		Image = "rbxassetid://12236618949",
-		Color = fromRGB(0, 255, 22)
+		Color = fromRGB(0, 255, 22),
+        Type = "Magic"
 	},
 	Illusionist = {
 		Image = "rbxassetid://15875390788",
-		Color = fromRGB(0, 255, 252)
+		Color = fromRGB(0, 255, 252),
+        Type = "Magic"
 	}
 }
 assets.MonsterAvatars = {
 	["Spike Fox"] = "rbxassetid://13886503379",
-	["Spike Wolf"] = "rbxassetid://15688333529",
+	["Spike Wolf"] = "rbxassetid://16483664838",
     ["Thorn Wolf"] = "rbxassetid://15688333529",
     ["Needle Wolf"] = "rbxassetid://15688333529",
-    ["Hardmode Wolf"] = "rbxassetid://2985521957",
+    ["Lava Wolf"] = "rbxassetid://16483654080",
 
 	["Green Slime"] = "rbxassetid://15951815518",
-    ["Blue Slime"] = "rbxassetid://2985521957",
-    ["Lapis Slime"] = "rbxassetid://2985521957",
-    ["Purple Slime"] = "rbxassetid://2985521957"
+    ["Blue Slime"] = "rbxassetid://16483649460",
+    ["Lapis Slime"] = "rbxassetid://16483649287",
+    ["Purple Slime"] = "rbxassetid://16483649160",
+    ["Rock Slime"] = "rbxassetid://16483665012",
+}
+assets.BuffImages = {
+    AttackBuff = "rbxassetid://2965862892",
+    Burn = "rbxassetid://12218488404",
+    Poison = "rbxassetid://12371171272"
+}
+assets.BuffColors = {
+    AttackBuff = fromRGB(255, 255, 255),
+    Burn = fromRGB(255, 0, 0),
+    Poison = fromRGB(170, 85, 255)
 }
 
 assets.LocationInfo = {
@@ -109,7 +129,8 @@ assets.LocationInfo = {
 		PrimisField = "Primis Field",
 		SonusCave = "Sonus Cave",
         MisniPort = "Misni Port",
-        Highland = "High Lands"
+        Highland = "High Lands",
+        Tundra = "Tundra"
 	},
 	Desc = {
 		InitusVillage = "The start of every adventure...",
@@ -118,16 +139,26 @@ assets.LocationInfo = {
 		PrimisField = "The old memories with Slimes...",
 		SonusCave = "Bats make you crazy.",
         MisniPort = "Another port, larger than Initus Bay",
-        Highland = "I don't know why it's called High Lands..."
+        Highland = "I don't know why it's called High Lands...",
+        Tundra = "Tempature start to drop..."
 	},
     Music = {
         InitusVillage = "rbxassetid://11130054413",
         MonolithGrove = "rbxassetid://11130054413",
         InitusBay = "rbxassetid://10717248822",
 		PrimisField = "rbxassetid://10717248822",
-		SonusCave = "rbxassetid://10717248822",
+		SonusCave = "rbxassetid://12076218714",
         MisniPort = "rbxassetid://16471110687",
-        Highland = "rbxassetid://15842496353"
+        Highland = "rbxassetid://15842496353",
+        Tundra = "rbxassetid://12294493784"
+    },
+    MusicVolumes = {
+        ["rbxassetid://11130054413"] = 0.5, --- initus village
+        ["rbxassetid://10717248822"] = 0.5, --- initus bay
+        ["rbxassetid://15842496353"] = 1, --- highland
+        ["rbxassetid://16471110687"] = 0.3, --- misni port
+        ["rbxassetid://12076218714"] = 0.5, --- sonus cave
+        ["rbxassetid://12294493784"] = 0.5 --- tundra
     }
 }
 
@@ -504,14 +535,14 @@ assets.Items = {
         TravellerBoots = "rbxassetid://2965728606",
         BurningTorch = "rbxassetid://2965771738",
         CampfireWood = "rbxassetid://2970559088",
-        HuntingDagger = "rbxassetid://1723200131",
+        HuntingDagger = "rbxassetid://16483882733",
         MiningPickaxe = "rbxassetid://12118509077",
         CopperSword = "rbxassetid://12192841092",
         AncientHammer = "rbxassetid://12119868315",
         ManaCrystal = "rbxassetid://12119869276",
         AdventurersKit = "rbxassetid://12370527641",
         RabbitFoot = "rbxassetid://4820619821",
-        ArcaneSpellbook = "rbxassetid://4820515430",
+        ArcaneSpellbook = "rbxassetid://16483876342",
         EnchantedBlade = "rbxassetid://4820519895",
         MagicianHat = "rbxassetid://14429547149",
         StalkerCape = "rbxassetid://12284033809",

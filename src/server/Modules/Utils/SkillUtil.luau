@@ -102,38 +102,62 @@ function SkillUtil:ManaCheck(plr: Player, req: number) : boolean
 	return true
 end
 
-function SkillUtil:Burn(plr: Player, monster: Model, duration: number)
+function SkillUtil:Burn(plr: Player, monster: Model, duration: number, isPlayer: boolean?)
 	if not monster:FindFirstChild("EffectsList") then return end
 
-	local burn = RepS.Resources.Unloads.BurnDMG:Clone() :: Script
-	burn:SetAttribute("Duration", duration)
-	burn:SetAttribute("Damage", floor(plr.Character:GetAttribute("Magic") / 2))
-	burn:SetAttribute("Color", fromRGB(255, 176, 0))
-	burn:SetAttribute("Text", "BURN!")
-	burn.Name = "Burn"
-	burn.Parent = monster.EffectsList
+	local debuff: Script
+	if isPlayer then
+		debuff = RepS.Resources.Unloads.BurnDMGPlayer:Clone()
+		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+	else
+		debuff = RepS.Resources.Unloads.BurnDMG:Clone()
+		debuff:SetAttribute("Damage", floor(plr.Character:GetAttribute("Magic") / 2))
+	end
+	debuff:SetAttribute("Duration", duration)
+	debuff:SetAttribute("Color", fromRGB(255, 85, 0))
+	debuff:SetAttribute("Text", "BURN!")
+	debuff.Name = "Burn"
+	debuff.Parent = if isPlayer then plr.Character.CharStats.EffectsList else monster.EffectsList
 end
 
-function SkillUtil:Poison(plr: Player, monster: Model, duration: number)
+function SkillUtil:Poison(plr: Player, monster: Model, duration: number, isPlayer: boolean?)
 	if not monster:FindFirstChild("EffectsList") then return end
 
-	local poison = RepS.Resources.Unloads.BurnDMG:Clone() :: Script
-	poison:SetAttribute("Duration", duration)
-	poison:SetAttribute("Damage", floor(plr.Character:GetAttribute("MaxDMG") / 2))
-	poison:SetAttribute("Color", fromRGB(255, 0, 191))
-	poison:SetAttribute("Text", "POISON!")
-	poison.Name = "Poison"
-	poison.Parent = monster.EffectsList
+	local debuff: Script
+	if isPlayer then
+		debuff = RepS.Resources.Unloads.BurnDMGPlayer:Clone()
+		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+	else
+		debuff = RepS.Resources.Unloads.BurnDMG:Clone()
+		debuff:SetAttribute("Damage", floor(plr.Character:GetAttribute("MaxDMG") / 2))
+	end
+	debuff:SetAttribute("Duration", duration)
+	debuff:SetAttribute("Color", fromRGB(55, 66, 250))
+	debuff:SetAttribute("Text", "POISON!")
+	debuff.Name = "Poison"
+	debuff.Parent = if isPlayer then plr.Character.CharStats.EffectsList else monster.EffectsList
 end
 
 function SkillUtil:AttackBuff(plr: Player, attackPower: number, duration: number)
-	local attackBuff = RepS.Resources.Unloads.AttackBuff:Clone() :: Script
-	attackBuff:SetAttribute("Duration", duration)
-	attackBuff:SetAttribute("Power", attackPower)
-	attackBuff:SetAttribute("Color", fromRGB(255, 255, 0))
-	attackBuff:SetAttribute("Text", "ATTACK UP!")
-	attackBuff.Name = "AttackBuff"
-	attackBuff.Parent = plr.Character.CharStats.EffectsList
+	local buff = RepS.Resources.Unloads.AttackBuff:Clone() :: Script
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("Power", attackPower)
+	buff:SetAttribute("Color", fromRGB(255, 255, 0))
+	buff:SetAttribute("Text", "ATTACK UP!")
+	buff.Name = "AttackBuff"
+	buff.Parent = plr.Character.CharStats.EffectsList
+
+	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
+end
+
+function SkillUtil:SpeedBuff(plr: Player, exSpeed: number, duration: number)
+	local buff = RepS.Resources.Unloads.SpeedBuff:Clone() :: Script
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("Power", exSpeed)
+	buff:SetAttribute("Color", fromRGB(255, 255, 0))
+	buff:SetAttribute("Text", "SPEED UP!")
+	buff.Name = "SpeedBuff"
+	buff.Parent = plr.Character.CharStats.EffectsList
 
 	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
 end

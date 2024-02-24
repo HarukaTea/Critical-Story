@@ -22,7 +22,9 @@ return function(plr: Player)
 
 	self.hintsList = Fusion.Value({})
 
-	Components.ScreenGui({
+	local char = plr.Character or plr.CharacterAdded:Wait()
+
+	local UI = Components.ScreenGui({
 		Name = "Hints",
 		DisplayOrder = 5,
 		Parent = plr.PlayerGui,
@@ -87,4 +89,12 @@ return function(plr: Player)
 	end
 	Events.CreateHint:Connect(_createHint)
 	Signals.CreateHint:Connect(_createHint)
+
+	local function _onDead()
+		Events.CreateHint:DisconnectAll()
+		Signals.CreateHint:DisconnectAll()
+
+		UI:Destroy()
+	end
+	char.Humanoid.Died:Once(_onDead)
 end

@@ -19,6 +19,8 @@ return function (plr: Player)
     local bgPos = Value(fromScale(1.7, 1.7))
 	local isSwitching = Value(false)
 
+	local char = plr.Character or plr.CharacterAdded:Wait()
+
 	local function createBackendFrame(props: table)
 		local defaultProps = {
 			BackgroundColor3 = Color3.fromRGB(),
@@ -28,7 +30,7 @@ return function (plr: Player)
 
 		return Fusion.New("Frame")(defaultProps)
 	end
-	Components.ScreenGui({
+	local UI = Components.ScreenGui({
 		Name = "SwitchScene",
 		DisplayOrder = 100,
 		Parent = plr.PlayerGui,
@@ -102,4 +104,12 @@ return function (plr: Player)
     end
     Events.SwitchScene:Connect(switching)
     Signals.SwitchScene:Connect(switching)
+
+	local function _onDead()
+		Events.SwitchScene:DisconnectAll()
+		Signals.SwitchScene:DisconnectAll()
+
+		UI:Destroy()
+	end
+	char.Humanoid.Died:Once(_onDead)
 end

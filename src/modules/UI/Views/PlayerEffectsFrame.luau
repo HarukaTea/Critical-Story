@@ -10,33 +10,29 @@ local PlayerEffect = require(RepS.Modules.UI.Components.PlayerEffect)
 local v2New = Vector2.new
 local udNew =  UDim.new
 local fromScale = UDim2.fromScale
-local sFind = string.find
 
-local function PlayerEffectsFrame(direction: string, self: table) : Frame
+local function PlayerEffectsFrame(self: table) : Frame
     return Components.Frame({
-        Name = "Effects"..direction,
-        AnchorPoint = v2New(),
-        Position = if direction == "Left" then fromScale(-0.234, -0.957) else fromScale(0.72, -0.957),
-        Size = fromScale(0.5, 0.78),
+        Name = "EffectsFrame",
+        AnchorPoint = v2New(0.5, 0),
+        Position = fromScale(0.5, -1.5),
+        Size = fromScale(1, 0.78),
 
         [Fusion.Children] = {
             Fusion.New("UIListLayout")({
-                Padding = udNew(0.03, 0),
+                Padding = udNew(0.01, 0),
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                HorizontalAlignment = if direction == "Left" then Enum.HorizontalAlignment.Right else Enum.HorizontalAlignment.Left,
+                HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                FillDirection = Enum.FillDirection.Horizontal
             }),
             Fusion.ForValues(self.charStatsDict.EffectsList, function(use, effect: Script)
                 local effectInfo = {
                     Script = effect,
                     Duration = Fusion.Value(effect:GetAttribute("Duration")),
+                    Power = effect:GetAttribute("Power")
                 }
 
-                if direction == "Left" and sFind(effect.Name, "Buff") then
-                    return PlayerEffect(effect.Name, effectInfo)
-
-                elseif direction == "Right" and sFind(effect.Name, "Debuff") then
-                    return PlayerEffect(effect.Name, effectInfo)
-                end
+                return PlayerEffect(effect.Name, effectInfo)
             end, Fusion.cleanup)
         }
     })

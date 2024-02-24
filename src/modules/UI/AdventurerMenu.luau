@@ -94,6 +94,8 @@ return function(plr: Player)
 		if plr:GetAttribute("CurrentMenu") == "None" then
 			_setVisible("Menu", menuFrame)
 
+			workspace.Sounds.SFXs.MapOpen:Play()
+
 		elseif plr:GetAttribute("CurrentMenu") == "Menu" then
 			_setVisible("None", menuFrame)
 

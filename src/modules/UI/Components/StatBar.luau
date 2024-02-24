@@ -24,10 +24,10 @@ local COLORS = {
 	DEF = fromRGB(167, 115, 56),
 	DEFRepairing = fromRGB(72, 166, 176),
 }
-local STROKES_ENABLE = {
-	HP = Value(false),
-	MP = Value(false),
-	DEF = Value(false)
+local STROKES_TRANS = {
+	HP = Value(1),
+	MP = Value(1),
+	DEF = Value(1)
 }
 
 local function StatBar(id: string, self: table): Frame
@@ -114,9 +114,10 @@ local function StatBar(id: string, self: table): Frame
 			New("UICorner")({ CornerRadius = udNew(0.5, 0) }),
 			Components.UIStroke({
 				Thickness = 2.5,
-				Enabled = Computed(function(use)
-					return use(STROKES_ENABLE[id])
-				end)
+				Enabled = true,
+				Transparency = Fusion.Tween(Computed(function(use)
+					return use(STROKES_TRANS[id])
+				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			New("Frame")({
 				Name = "Bar",
@@ -158,10 +159,10 @@ local function StatBar(id: string, self: table): Frame
 				ZIndex = 2,
 
 				[OnEvent("MouseEnter")] = function()
-					STROKES_ENABLE[id]:set(true)
+					STROKES_TRANS[id]:set(0)
 				end,
 				[OnEvent("MouseLeave")] = function()
-					STROKES_ENABLE[id]:set(false)
+					STROKES_TRANS[id]:set(1)
 				end,
 			}),
 			Components.TextLabel({

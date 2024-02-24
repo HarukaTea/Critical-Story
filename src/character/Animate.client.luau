@@ -13,12 +13,16 @@ local instanceNew = Instance.new
 local random, sin = math.random, math.sin
 local sub = string.sub
 
-local UIModules = RepS.Modules.UI :: Folder
+local UIModules = RepS.Modules.UI
 local requireList = {
 	UIModules.AdventurerStats,
 	UIModules.AdventurerMenu,
 	UIModules.Backpack,
-	UIModules.ShiftLock
+	UIModules.ShiftLock,
+	UIModules.PlayerList,
+	UIModules.Hints,
+	UIModules.PostStroke,
+	UIModules.SwitchScene
 }
 for _, module in requireList do
 	Spawn(function()

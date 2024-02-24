@@ -19,12 +19,12 @@ local POSITIONS = {
 	fromScale(0, -0.8),
 	fromScale(0.355, -0.8)
 }
-local STROKES_ENABLE = {
-	Value(false),
-	Value(false),
-	Value(false),
-	Value(false),
-	Value(false),
+local STROKES_TRANS = {
+	Value(1),
+	Value(1),
+	Value(1),
+	Value(1),
+	Value(1),
 }
 
 local function PassiveSlot(id: string, self: table): Frame
@@ -38,9 +38,10 @@ local function PassiveSlot(id: string, self: table): Frame
 			Components.RoundUICorner(),
 			Components.UIStroke({
 				Thickness = 3,
-				Enabled = Fusion.Computed(function(use)
-					return use(STROKES_ENABLE[id])
-				end)
+				Enabled = true,
+				Transparency = Fusion.Tween(Fusion.Computed(function(use)
+					return use(STROKES_TRANS[id])
+				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.ImageLabel({
 				Name = "Icon",
@@ -60,10 +61,10 @@ local function PassiveSlot(id: string, self: table): Frame
 				Visible = if UIS.TouchEnabled then false else true,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
-					STROKES_ENABLE[id]:set(true)
+					STROKES_TRANS[id]:set(0)
 				end,
 				[Fusion.OnEvent("MouseLeave")] = function()
-					STROKES_ENABLE[id]:set(false)
+					STROKES_TRANS[id]:set(1)
 				end,
 			}),
 		},

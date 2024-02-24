@@ -9,10 +9,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local ActiveSlot = require(RepS.Modules.UI.Components.ActiveSlot)
 local ExBindingBtn = require(RepS.Modules.UI.Components.ExBindingBtn)
-local StatText = require(RepS.Modules.UI.Components.StatText)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
-
-local EffectsFrame = require(RepS.Modules.UI.Views.PlayerEffectsFrame)
 
 local Children, Value, peek = Fusion.Children, Fusion.Value, Fusion.peek
 

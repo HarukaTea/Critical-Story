@@ -15,7 +15,14 @@ local cfAngles = CFrame.Angles
 local rad = math.rad
 
 
-local function playSFX(sound: Sound, pos: number)
+local function playSFX(sound: Sound | string, pos: number)
+	if sound == "StopAll" then
+		for _, music in workspace.Sounds:GetChildren() do
+			if music:IsA("Sound") then music:Stop() end
+		end
+		return
+	end
+
 	sound:Play()
 	if pos then sound.TimePosition = pos end
 end

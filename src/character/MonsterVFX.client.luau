@@ -14,9 +14,6 @@ local cfNew, cfAngles = CFrame.new, CFrame.Angles
 ---// Foxes
 local function spikeShot(blast: Model)
 	wait(0.5)
-	if not blast then return end
-	if not blast:FindFirstChild("Spike") then return end
-
 	blast.Spike:Play()
 end
 
@@ -24,26 +21,17 @@ local function spike1(blast: Model)
 	blast.Base.CFrame *= cfNew(0, 0, -80)
 
 	TS:Create(blast.Part, AssetBook.TweenInfos.one, { Position = blast.Base.Position }):Play()
-	--HyprTween:Create(blast.Part, AssetBook.TweenInfos.one, { Position = blast.Base.Position }):Play()
 end
 
 local function spike2Range(blast: BasePart)
 	TS:Create(blast, AssetBook.TweenInfos.one, { Transparency = 1 }):Play()
-
-	--HyprTween:Create(blast, AssetBook.TweenInfos.one, { Transparency = 1 }):Play()
 end
 
 local function spikeRain(blast: Model)
-	--- most issues come from here in public test
-	if not blast then return end
-	if not blast:FindFirstChild("Spike") then return end
-
 	blast.Spike:Play()
 	blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, 30, 0))
 
 	for _ = 1, 30 do
-		if not blast then break end
-
 		blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, -1, 0))
 		wait(0.01)
 	end
@@ -67,9 +55,8 @@ end
 
 --// Slimes
 local function slimeShot(blast: Model, char: Model)
-	if not blast:FindFirstChild("Shot") then return end
-
 	blast.Shot.Part.Color = blast:GetAttribute("SlimeColor")
+
 	TS:Create(blast.Base, AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
 
 	local length = (char.PrimaryPart.Position - blast.Base.Position).Magnitude
@@ -83,10 +70,9 @@ local function slimeShot(blast: Model, char: Model)
 	local rotatingangle = angle * 2 /10
 	for _ = 1, 10 do
 		wait(0.01)
-		if not blast:FindFirstChild("Shot") then return end
-
 		blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(-rotatingangle,0,0))
 	end
+
 	blast.Shot:Destroy()
 end
 
@@ -94,8 +80,6 @@ local function slimeWave(blast: Model)
 	blast.SlimeAttack:Play()
 
 	for i = 1, 5 do
-		if not blast:FindFirstChild("Position"..i) then continue end
-
 		TS:Create(blast["Position"..i], AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
 	end
 end
@@ -112,8 +96,6 @@ local function slimeBlast(blast: Model, noSound: boolean?)
 	if not noSound then blast.SlimeAttack:Play() end
 	for _ = 1, 4 do
 		wait(0.01)
-		if not blast:FindFirstChild("BlastCenter") then return end
-
 		blast.BlastCenter.Size += v3New(0, 10, 0)
 		blast.BlastCenter.CFrame = centerCFrame
 		blast.BlastCenter.Transparency += 0.05
@@ -126,8 +108,6 @@ local function slimeBlast(blast: Model, noSound: boolean?)
 	end
 	for _ = 1, 4 do
 		wait(0.01)
-		if not blast:FindFirstChild("BlastCenter") then return end
-
 		blast.BlastCenter.Size -= v3New(0, 10, 0)
 		blast.BlastCenter.CFrame = centerCFrame
 		blast.BlastCenter.Transparency += 0.25
@@ -152,8 +132,6 @@ local function slimeDive(blast: Model)
 	blast.SlimeAttack:Play()
 
 	for i = 1, 2 do
-		if not blast:FindFirstChild("Position"..i) then continue end
-
 		local size = if i == 1 then v3New(20, 1, 20) else v3New(4, 1, 4)
 
 		TS:Create(blast["Position" .. i], AssetBook.TweenInfos.twiceHalf, { Size = size }):Play()
@@ -182,51 +160,54 @@ local function vfxHandler(blast: Model | BasePart)
 	if not blast:IsDescendantOf(workspace) then return end
 	blast:WaitForChild("Owner")
 
-	if style == "SpikeWolf1" then
-		spikeShot(blast)
+	---// most errors here are unnecessary to fix, so just ignore them
+	pcall(function()
+		if style == "SpikeWolf1" or style == "LavaWolf1" then
+			spikeShot(blast)
 
-	elseif style == "SpikeWolfSpike1" then
-		spike1(blast)
+		elseif style == "SpikeWolfSpike1" or style == "LavaWolfSpike1" then
+			spike1(blast)
 
-	elseif style == "SpikeWolfSpike2" then
-		spikeRain(blast)
+		elseif style == "SpikeWolfSpike2" or style == "LavaWolfSpike2" then
+			spikeRain(blast)
 
-	elseif style == "SpikeWolf2Range" then
-		spike2Range(blast)
+		elseif style == "SpikeWolf2Range" then
+			spike2Range(blast)
 
-	elseif style == "SpikeWolf4" then
-		wolfBite(blast)
+		elseif style == "SpikeWolf4" or style == "LavaWolf4" then
+			wolfBite(blast)
 
 
 
-	elseif style == "Slime1" then
-		wait(0.3)
-		slimeShot(blast, blast.Owner.Value)
+		elseif style == "Slime1" then
+			wait(0.3)
+			slimeShot(blast, blast.Owner.Value)
 
-	elseif style == "Slime2" then
-		wait(0.5)
-		slimeWave(blast)
+		elseif style == "Slime2" then
+			wait(0.5)
+			slimeWave(blast)
 
-	elseif style == "Slime3" then
-		wait(0.5)
-		slimeDive(blast)
+		elseif style == "Slime3" then
+			wait(0.5)
+			slimeDive(blast)
 
-	elseif style == "Slime4" then
-		wait(0.3)
-		slimeShot(blast, blast.Owner.Value)
+		elseif style == "Slime4" then
+			wait(0.3)
+			slimeShot(blast, blast.Owner.Value)
 
-	elseif style == "SlimeBomb" then
-		wait(1)
-		slimeBomb(blast)
+		elseif style == "SlimeBomb" then
+			wait(1)
+			slimeBomb(blast)
 
-	elseif style == "SlimeSpin" then
-		slimeSpin(blast)
+		elseif style == "SlimeSpin" then
+			slimeSpin(blast)
 
-	elseif style == "SlimeBlast" then
-		slimeBlast(blast, blast:GetAttribute("SlimeWaveProjectile"))
+		elseif style == "SlimeBlast" then
+			slimeBlast(blast, blast:GetAttribute("SlimeWaveProjectile"))
 
-		wait(8)
-		slimeBlastFade(blast)
-	end
+			wait(8)
+			slimeBlastFade(blast)
+		end
+	end)
 end
 CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)

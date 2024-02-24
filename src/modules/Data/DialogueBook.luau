@@ -62,7 +62,18 @@ dialogues.Milk = {
     Main3 = {
         "There are a lot to be learned from combat, and this tutorial is no exception.",
         "Touch the glowing symbols and use your trust power to attack.",
-        "Simple, right? But practice makes perfect. Get ready to fight!"
+        "Are you ready for the fight?",
+        "CHOICE 1",
+
+        Choice1 = {
+            "Yes!",
+            "Yes!",
+            "Yes!",
+
+            Option1 = { "Get ready to fight then!" },
+            Option2 = { "Get ready to fight then!" },
+            Option3 = { "Get ready to fight then!" },
+        }
     },
 
     Main4 = {

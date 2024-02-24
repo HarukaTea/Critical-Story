@@ -89,7 +89,7 @@ local function CombatStyle(self: table, class: string) : Frame
                     Components.Frame({
                         Name = "TweenBar",
                         BackgroundColor3 = AssetBook.ClassInfo[class].Color,
-                        Size = Fusion.Tween(Fusion.Computed(function(use)
+                        Size = Fusion.Tween(Computed(function(use)
                             if class == "Archer" then
                                 local x = clamp(use(self.charClassInfo.Archer.Val) / 10, 0, 1)
 

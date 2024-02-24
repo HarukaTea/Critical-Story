@@ -2,6 +2,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -9,18 +10,8 @@ local Children = Fusion.Children
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
-local fromRGB = Color3.fromRGB
 local clamp = math.clamp
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
-
-local IMAGES = {
-    Burn = "rbxassetid://12218488404",
-    Poison = "rbxassetid://12371171272"
-}
-local COLORS = {
-    Burn = fromRGB(255, 0, 0),
-    Poison = fromRGB(170, 85, 255)
-}
 
 local function mapValue(val: number, duration: number) : number
     --- you may be confused about this math problem, well, I'm confused too lol
@@ -55,7 +46,7 @@ local function ProgressCircle(direction: string, effect: string, info: table) : 
 				Position = if direction == "Right" then fromScale(-1, 0) else fromScale(0, 0),
 				Size = fromScale(2, 1),
 				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
-                ImageColor3 = COLORS[effect],
+                ImageColor3 = AssetBook.BuffColors[effect],
 
 				[Children] = {
 					Fusion.New("UIGradient")({
@@ -82,7 +73,7 @@ local function MonsterEffect(effect: string, info: table, self: table) : ImageLa
         Name = effect,
         BackgroundTransparency = 0,
         Size = fromScale(0.22, 1),
-        Image = IMAGES[effect],
+        Image = AssetBook.BuffImages[effect],
 
         [Children] = {
             Components.RoundUICorner(),

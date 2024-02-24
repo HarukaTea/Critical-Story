@@ -72,7 +72,7 @@ local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
 local sFind = string.find
 
-local function charTakeDMG(monster: Model, dmgType: boolean?)
+local function charTakeDMG(monster: Model, dmgPart: Model)
 	if not monster then return end
 
 	local shield = char:GetAttribute("Shield") :: number
@@ -96,6 +96,18 @@ local function charTakeDMG(monster: Model, dmgType: boolean?)
     RepS.Resources.Unloads.RepairShield:Clone().Parent = char
     RepS.Resources.Unloads.HealHP:Clone().Parent = char
 
+    --- some extra damage
+    if dmgPart:GetAttribute("Burn") then
+        local burn = RepS.Resources.Unloads.BurnDMGPlayer:Clone() :: Script
+        burn:SetAttribute("Duration", 6)
+        burn:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+        burn:SetAttribute("Color", fromRGB(255, 85, 0))
+        burn:SetAttribute("Text", "BURN!")
+        burn:SetAttribute("Power", 0.5)
+        burn.Name = "Burn"
+        burn.Parent = char.CharStats.EffectsList
+    end
+
 	--- Knight class skills
 	if char:GetAttribute("Guard") > 0 then
         local oriDmg = dmg
@@ -106,7 +118,7 @@ local function charTakeDMG(monster: Model, dmgType: boolean?)
 
 	--- shield
 	if shield > 0 then
-		if dmgType == true then -- "Pierce"
+		if dmgPart:GetAttribute("Pierce") then -- "Pierce"
 			humanoid:TakeDamage(dmg)
 			ServerUtil:ShowNumber(char, dmg)
 			return
@@ -220,6 +232,22 @@ local function setup()
 
         if char:GetAttribute("HitCD") >= 0 then HarukaLib:Add(char, "HitCD", -1) end
     end)
+
+    --// Spawn to the nearest respawn point
+    local lastDeath = if plr:GetAttribute("LastDeath") then plr:GetAttribute("LastDeath") else char.PrimaryPart.Position
+    local spawnPoint, distance = nil, 9999999999
+	for _, child in workspace.Maps:GetDescendants() do
+		if child.Name == "SpawnPoint" then
+			local tDistance = (child.Position - lastDeath).Magnitude
+
+			if tDistance < distance then
+				distance = tDistance
+				spawnPoint = child
+			end
+		end
+	end
+
+	char:PivotTo(spawnPoint.CFrame)
 end
 setup()
 
@@ -291,6 +319,7 @@ questDataSetup()
 
 --// Connections
 local function onDead()
+    plr:SetAttribute("LastDeath", char.PrimaryPart.Position)
     char:SetAttribute("InCombat", false)
 
     for _, monster in char.CharStats.TargetMonsters:GetChildren() do
@@ -345,15 +374,16 @@ local function onTouch(hit: BasePart)
 
         orb:Destroy()
 
-    elseif hit.Parent:GetAttribute("IsDamage") then
-        local damagePart = hit.Parent :: Model
+    elseif hit.Parent:HasTag("MonsterAttack") then
+        local dmgPart = hit.Parent :: Model
 
         --- checks
         if dmgTouchCD then return end
-        if not damagePart:FindFirstChild("Owner") then return end
+        if not dmgPart then return end
+        if not dmgPart:FindFirstChild("Owner") then return end
         if not char.PrimaryPart then return end
-        if not damagePart.Owner.Value then return end
-        if not damagePart.Owner.Value.TargetingList:FindFirstChild(char.Name) then return end
+        if not dmgPart.Owner.Value then return end
+        if not dmgPart.Owner.Value.TargetingList:FindFirstChild(char.Name) then return end
 
         dmgTouchCD = true
         Spawn(function()
@@ -361,7 +391,7 @@ local function onTouch(hit: BasePart)
             dmgTouchCD = false
         end)
 
-        charTakeDMG(damagePart.Owner.Value, damagePart:GetAttribute("Pierce"))
+        charTakeDMG(dmgPart.Owner.Value, dmgPart)
     end
 end
 humanoid.Died:Once(onDead)

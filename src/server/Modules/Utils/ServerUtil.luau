@@ -7,10 +7,12 @@ local Players = game:GetService("Players")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
 local floor, random, rad = math.floor, math.random, math.rad
@@ -250,57 +252,54 @@ end
 	You can make it not respawn after defeated, like story monsters
 ]]
 function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespawn: boolean?)
-	--- there will be issues without task.Spawn, what's the problem with that???
+	local respawnLocatorTip = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+	local locator = monster.Parent
+
+	wait(1)
+	if monster.Holder.Value then monster.Holder.Value:Destroy() end
+
+	local defeatedEffect = RepS.Package.Effects.DefeatedEffect:Clone() :: Part
+	defeatedEffect.Position = deadPos
+	defeatedEffect.Parent = workspace
+
+	Debris:AddItem(defeatedEffect, 1)
+
 	Spawn(function()
-		local respawnLocatorTip = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
-		local locator = monster.Parent
+		wait(0.3)
+		defeatedEffect.Particle.Enabled = false
+	end)
 
-		wait(1)
-		if monster.Holder.Value then monster.Holder.Value:Destroy() end
-
-		local defeatedEffect = RepS.Package.Effects.DefeatedEffect:Clone() :: Part
-		defeatedEffect.Position = deadPos
-		defeatedEffect.Parent = workspace
-
-		Debris:AddItem(defeatedEffect, 1)
-
-		Spawn(function()
-			wait(0.3)
-			defeatedEffect.Particle.Enabled = false
-		end)
-
-		if not allowRespawn or locator:GetAttribute("CantRespawn") then
-			monster:Destroy()
-			return
-		end
-
-		--- multi-combat mechanic
-		local waitingLocators = {}
-		if monster.WaitingList:FindFirstChildOfClass("ObjectValue") then
-			for _, waitingMonster in monster.WaitingList:GetChildren() do
-				insert(waitingLocators, waitingMonster.Value)
-			end
-		end
-		local respawnTimer = RepS.Package.Unloads.RespawnTimer:Clone() :: Part
-		respawnTimer.Parent = workspace
-		respawnTimer.Position = respawnLocatorTip.Position
-		Debris:AddItem(respawnTimer, 13)
-		Spawn(function()
-			for i = 12, 0, -1 do
-				respawnTimer.Timer.Text.Text = i
-				wait(1)
-			end
-		end)
-
+	if not allowRespawn or locator:GetAttribute("CantRespawn") then
 		monster:Destroy()
-		if respawnLocatorTip:FindFirstChild("PublicJoinPrompt") then respawnLocatorTip.PublicJoinPrompt:Destroy() end
+		return
+	end
 
-		wait(13)
-		ServerUtil:SetupMonster(locator)
-		for _, waitingLocator in waitingLocators do
-			ServerUtil:SetupMonster(waitingLocator)
+	--- multi-combat mechanic
+	local waitingLocators = {}
+	if monster.WaitingList:FindFirstChildOfClass("ObjectValue") then
+		for _, waitingMonster in monster.WaitingList:GetChildren() do
+			insert(waitingLocators, waitingMonster.Value)
+		end
+	end
+	local respawnTimer = RepS.Package.Unloads.RespawnTimer:Clone() :: Part
+	respawnTimer.Parent = workspace
+	respawnTimer.Position = respawnLocatorTip.Position
+	Debris:AddItem(respawnTimer, 13)
+	Spawn(function()
+		for i = 12, 0, -1 do
+			respawnTimer.Timer.Text.Text = i
+			wait(1)
 		end
 	end)
+
+	monster:Destroy()
+	if respawnLocatorTip:FindFirstChild("PublicJoinPrompt") then respawnLocatorTip.PublicJoinPrompt:Destroy() end
+
+	wait(13)
+	ServerUtil:SetupMonster(locator)
+	for _, waitingLocator in waitingLocators do
+		ServerUtil:SetupMonster(waitingLocator)
+	end
 end
 
 --[[
@@ -509,10 +508,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 		end
 	end
 
-	Spawn(function()
-		wait(attributes.CD)
-		script:Destroy()
-	end)
+	Debris:AddItem(script, attributes.CD)
 
 	if not classUnique then
 		ServerUtil:RefreshBackpack(plr, item, attributes.CD, attributes.IS_SKILL)
@@ -653,6 +649,17 @@ function ServerUtil:GettingUpNPC(char: Model)
 	end
 
 	char.Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+end
+
+--[[
+	Reward the quest awards
+]]
+function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Player)
+	for reward, val in StoryBook[series][questId].Rewards do
+		HarukaLib:Add(plr, reward, val)
+
+		ServerUtil:ShowText(plr.Character, "+"..val.." "..reward, fromRGB(212, 255, 0))
+	end
 end
 
 return ServerUtil

@@ -51,7 +51,8 @@ local function LocationTitleFrame(self: table) : Frame
                     overworldMusic.SoundId = AssetBook.LocationInfo.Music[location]
                     overworldMusic:Play()
 
-                    TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = 0.5 }):Play()
+                    if not overworldMusic.Playing then return end
+                    TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = AssetBook.LocationInfo.MusicVolumes[overworldMusic.SoundId] }):Play()
                 end
             end)
 

@@ -18,7 +18,9 @@ local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
 local MonsterHPFrame = require(RepS.Modules.UI.Views.MonsterHPFrame)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
+local PlayerEffectsFrame = require(RepS.Modules.UI.Views.PlayerEffectsFrame)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
+local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
 local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
@@ -71,7 +73,6 @@ return function(plr: Player)
 
 	self.UI, self.classInfo, self.skillInfo, self.classFrame = Value(), Value(), Value(), Value()
 
-	local char = self.char
 	self.playerData = {
 		EXP = {
 			Value(plr:GetAttribute("EXP")),
@@ -79,10 +80,9 @@ return function(plr: Player)
 		},
 		Class = Value(plr:GetAttribute("Class")),
 		Levels = Value(plr:GetAttribute("Levels")),
-		DMG = Value(char:GetAttribute("Damage")),
-		Magic = Value(char:GetAttribute("Magic")),
 		Gold = Value(HarukaLib:NumberConvert(plr:GetAttribute("Gold"), "%.1f")),
 		RP = Value(HarukaLib:NumberConvert(plr:GetAttribute("RP"), "%.1f")),
+		LvPoints = Value(plr:GetAttribute("LvPoints"))
 	}
 	self.charClassInfo = {
 		Warrior = { Val = Value(0), UI = Value() },
@@ -165,7 +165,9 @@ return function(plr: Player)
 					}),
 
 					ClassFrame(self),
-					ChatFrame(self)
+					ChatFrame(self),
+					StatsTextsFrame(self),
+					PlayerEffectsFrame(self)
 				},
 			}),
 			Components.Frame({
@@ -250,14 +252,6 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	Hydrate(self.char)({
-		[AttributeChange("Damage")] = function(dmg)
-			playerData.DMG:set(dmg)
-		end,
-		[AttributeChange("Magic")] = function(magic)
-			playerData.Magic:set(magic)
-		end,
-	})
 	Hydrate(self.humanoid)({
 		[OnEvent("Touched")] = function(hit)
 			if hit:GetAttribute("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
@@ -281,6 +275,9 @@ return function(plr: Player)
 		[AttributeChange("RP")] = function(rep)
 			playerData.RP:set(HarukaLib:NumberConvert(rep, "%.1f"))
 		end,
+		[AttributeChange("LvPoints")] = function(lvPoints)
+			playerData.LvPoints:set(lvPoints)
+		end
 	})
 
 	local function _clearGarbage()

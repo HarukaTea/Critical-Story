@@ -205,7 +205,9 @@ local function endCombat()
 	isInCombat = false
 
 	humanoid.AutoRotate = true
-	musics[isPlaying]:Stop()
+	for _, sound in workspace.Sounds:GetChildren() do
+		if sound:IsA("Sound") and sound.Name ~= "Overworld" then sound:Stop() end
+	end
 
 	if humanoid.Health > 0 then
 		sfxs.CombatEnded:Play()
@@ -299,7 +301,7 @@ local function onTouched(hit: BasePart)
 		orb:Destroy()
 		animStep = if animStep == 1 then 2 else 1
 
-	elseif hit.Parent:GetAttribute("IsDamage") then
+	elseif hit.Parent:HasTag("MonsterAttack") then
 		local damagePart = hit.Parent :: Model
 
 		--- checks

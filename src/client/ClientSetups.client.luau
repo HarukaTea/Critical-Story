@@ -53,20 +53,3 @@ local function cameraSensitivityChange()
 end
 cameraSensitivityChange()
 UGS:GetPropertyChangedSignal("MouseSensitivity"):Connect(cameraSensitivityChange)
-
-
-local function setupUI()
-    local UIModules = RepS.Modules.UI
-    local requireList = {
-        UIModules.Hints,
-        UIModules.PostStroke,
-        UIModules.PlayerList,
-        UIModules.SwitchScene
-    }
-    for _, module in requireList do
-        Spawn(function()
-            require(module)(plr)
-        end)
-    end
-end
-setupUI()

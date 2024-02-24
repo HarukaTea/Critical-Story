@@ -11,6 +11,7 @@ local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
 local instanceNew = Instance.new
+local fromRGB = Color3.fromRGB
 
 local function firstCombat(plr: Player)
     local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: Part
@@ -31,9 +32,7 @@ local function firstCombat(plr: Player)
     until monster:GetAttribute("Health") <= 0 or huamnoid.Health <= 0
 
     if monster:GetAttribute("Health") <= 0 then
-        for reward, val in StoryBook.Main[3].Rewards do
-			HarukaLib:Add(plr, reward, val)
-		end
+        ServerUtil:GiveQuestRewards("Main", 3, plr)
 
 		plr.Quests.Main:Destroy()
 

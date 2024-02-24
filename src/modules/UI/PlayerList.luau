@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
@@ -34,6 +35,8 @@ return function(plr: Player)
 	self.absSize, self.absContentSize = Value(90), Value(30)
 	self.players = Value({})
 	self.isOpen = Value(true)
+
+	local char = plr.Character or plr.CharacterAdded:Wait()
 
 	Components.ScreenGui({
 		Name = "PlayerList",
@@ -149,4 +152,13 @@ return function(plr: Player)
 			self.isOpen:set(state)
 		end
 	})
+
+	local function _onDead()
+		peek(self.UI):Destroy()
+
+		CAS:UnbindAction("TogglePlayerList")
+
+		Events.PartyInvite:DisconnectAll()
+	end
+	char.Humanoid.Died:Once(_onDead)
 end

@@ -39,6 +39,8 @@ function AttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, for
 		local dmg = maxDmg * 2
         HarukaLib:Add(monster, "Health", -dmg)
 
+        ServerUtil:ShowNumber(monster, dmg, fromRGB(230, 241, 3))
+
 		local criEff = RepS.Package.Effects.CriticalHitEffect:Clone() :: ParticleEmitter
 		criEff.Parent = monster.PrimaryPart
 

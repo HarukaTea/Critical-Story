@@ -262,6 +262,8 @@ return function(plr: Player)
 		if plr:GetAttribute("CurrentMenu") == "None" then
 			_setVisible("Backpack", backpackFrame)
 
+			workspace.Sounds.SFXs.Equip:Play()
+
 		elseif plr:GetAttribute("CurrentMenu") == "Backpack" then
 			_setVisible("None", backpackFrame)
 

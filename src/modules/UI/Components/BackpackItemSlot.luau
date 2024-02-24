@@ -18,6 +18,8 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 	local equipped = Value(item:GetAttribute("Equipped"))
 	local pinned = Value(item:GetAttribute("Pinned"))
 
+	local stroke_trans = Value(1)
+
 	Fusion.Hydrate(item)({
 		[Fusion.OnChange("Value")] = function(newAmount)
 			amount:set(newAmount)
@@ -42,7 +44,13 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 
 		[Children] = {
 			Components.RoundUICorner(),
-			Components.UIStroke({ Thickness = 3 }),
+			Components.UIStroke({
+				Thickness = 3,
+				Enabled = true,
+				Transparency = Fusion.Tween(Computed(function(use)
+					return use(stroke_trans)
+				end), AssetBook.TweenInfos.twiceHalf)
+			}),
 			Components.TextLabel({
 				Name = "Equipped",
 				AnchorPoint = v2New(0.5, 0.5),
@@ -99,12 +107,13 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			}),
 		},
 		[OnEvent("MouseEnter")] = function()
+			stroke_trans:set(0)
 			peek(self.itemFrame)[item].UIStroke.Enabled = true
 		end,
 		[OnEvent("MouseLeave")] = function()
-			peek(self.itemFrame)[item].UIStroke.Enabled = if peek(self.itemFrame)[item]:GetAttribute("Selected")
-				then true
-				else false
+			stroke_trans:set(if peek(self.itemFrame)[item]:GetAttribute("Selected")
+				then 0
+				else 1)
 		end,
 		[OnEvent("MouseButton1Click")] = function()
 			local itemFrame, itemDescFrame, btnsFrame =
@@ -119,6 +128,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 
 			itemFrame[item]:SetAttribute("Selected", true)
 			itemFrame[item].UIStroke.Enabled = true
+			stroke_trans:set(0)
 
 			local itemType = AssetBook.Items.ItemType[item]
 

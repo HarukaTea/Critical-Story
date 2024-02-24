@@ -60,7 +60,6 @@ local function spikeRain(target: Model)
 	local rangeTip = RepS.Package.MonsterAttacks.Wolf.SpikeWolf2Range:Clone() :: Part
 	rangeTip.Position = rangePos
 	rangeTip.Owner.Value = char
-	rangeTip:AddTag("MonsterAttack")
 	rangeTip.Parent = char.Holder.Value
 
 	Debris:AddItem(rangeTip, 1)

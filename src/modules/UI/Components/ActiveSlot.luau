@@ -14,9 +14,9 @@ local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 
 local POSITIONS = { 0, 0.355, 0.71, 0.866 }
-local STROKES_ENABLE = { Value(false), Value(false), Value(false), Value(false) }
+local STROKES_TRANS = { Value(1), Value(1), Value(1), Value(1) }
 
-local function ActiveSlot(id: string, self: table): Frame
+local function ActiveSlot(id: number, self: table): Frame
 	return Fusion.New("Frame")({
 		Name = "Active"..id,
 		BackgroundColor3 = color3New(),
@@ -28,19 +28,20 @@ local function ActiveSlot(id: string, self: table): Frame
 			Components.RoundUICorner(),
 			Components.UIStroke({
 				Thickness = 3,
-				Enabled = Computed(function(use)
-					return use(STROKES_ENABLE[id])
-				end)
+				Enabled = true,
+				Transparency = Fusion.Tween(Computed(function(use)
+					return use(STROKES_TRANS[id])
+				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.HoverImageButton({
 				Name = "Hover",
 				ZIndex = 3,
 
 				[OnEvent("MouseEnter")] = function()
-					STROKES_ENABLE[id]:set(true)
+					STROKES_TRANS[id]:set(0)
 				end,
 				[OnEvent("MouseLeave")] = function()
-					STROKES_ENABLE[id]:set(false)
+					STROKES_TRANS[id]:set(1)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
 					self:UseItem(id)

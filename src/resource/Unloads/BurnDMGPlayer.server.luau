@@ -6,7 +6,7 @@ local SSS = game:GetService("ServerScriptService")
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
-local char = script.Parent.Parent :: Model
+local char = script.Parent.Parent.Parent :: Model
 local color = script:GetAttribute("Color") :: Color3
 local dmg = script:GetAttribute("Damage") :: number
 local duration = script:GetAttribute("Duration") :: number
@@ -26,7 +26,7 @@ local function dealDMG()
         if last >= 1 then
             last = 0
 
-            HarukaLib:Add(char, "Health", -dmg)
+            char.Humanoid.Health -= dmg
             ServerUtil:ShowNumber(char, dmg, color)
         end
 
@@ -36,7 +36,7 @@ end
 
 ServerUtil:ShowText(char, text, color)
 
-if char:GetAttribute("IsMonster") then
+if char:FindFirstChild("Humanoid") then
     local light = instanceNew("PointLight")
     light.Color = color
     light.Range = 10

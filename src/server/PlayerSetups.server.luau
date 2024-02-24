@@ -19,11 +19,10 @@ local TEMPLATE = {
 		RP = 0,
 		PlayTime = 0,
 		StoryId = 0,
+
 		Class = "Warrior",
-		ChestOpened = 0,
-		LastSeen = "MainWorld",
-		Cosmetic = "None",
-		Companion = "None",
+		LastSeen = "InitusVillage",
+
 		LvPoints = 0,
 		DmgPoints = 0,
 		MagicPoints = 0,

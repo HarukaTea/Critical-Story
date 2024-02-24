@@ -117,7 +117,7 @@ story.Town = {
         Name = "Fox Hunt",
         Target = "Get 6 Spiky Fur",
         Desc = "",
-        NPC = "None",
+        NPC = "FChenP",
         Hint = v3New(),
 
         Script = true,
