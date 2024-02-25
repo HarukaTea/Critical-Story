@@ -22,10 +22,7 @@ for i = 1, 10 do
 	wait(0.02)
 end
 
-model:SetAttribute("IsOrb", true)
-
 wait(orbLifeTime)
-model:SetAttribute("IsOrb", nil)
 
 for i = 10, 1, -1 do
 	model.Base.Beam1.Transparency = nsNew((1 - (0.2 * i)), 1)

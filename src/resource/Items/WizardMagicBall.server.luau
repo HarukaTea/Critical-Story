@@ -19,14 +19,13 @@ local cfLookAt = CFrame.lookAt
 local fromRGB = Color3.fromRGB
 local one = Vector3.one
 
-local ITEM_ATTRIBUTES = { CD = 6, COMBAT_REQ = true, MONSTER_REQ = true, IS_SKILL = true }
+local ITEM_ATTRIBUTES = { CD = 6, COMBAT_REQ = true, MONSTER_REQ = true }
 
-if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script, true) == false then
-	return
-end
+if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script, true) == false then return end
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
+Events.MagicCasted:Fire(plr)
 
 local magicBall = RepS.Package.MagicAssets.MagicBall:Clone() :: Part
 magicBall.CFrame = char.PrimaryPart.CFrame

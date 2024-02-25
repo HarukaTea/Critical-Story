@@ -8,7 +8,6 @@ local NewSignal = Signal.new
 
 local Signals = {
 	CreateHint = NewSignal(),
-	ClientTween = NewSignal(),
 	NPCChat = NewSignal(),
 	PlayAnimation = NewSignal(),
 	SwitchScene = NewSignal()

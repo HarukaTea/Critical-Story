@@ -147,7 +147,6 @@ function AttackUtil.Wizard(plr: Player, monster: Model)
     if char:GetAttribute("WizardCasted") >= 100 then
         char:SetAttribute("WizardCasted", 0)
 
-        Events.MagicCasted:Fire(plr)
         RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
     end
 

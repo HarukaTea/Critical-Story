@@ -6,6 +6,7 @@ local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local Fusion = require(RepS.Modules.Packages.Fusion)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
@@ -21,7 +22,6 @@ local TEMPLATE = {
 		StoryId = 0,
 
 		Class = "Warrior",
-		LastSeen = "InitusVillage",
 
 		LvPoints = 0,
 		DmgPoints = 0,
@@ -29,6 +29,8 @@ local TEMPLATE = {
 		ManaPoints = 0,
 		HealthPoints = 0,
 		ShieldPoints = 0,
+
+		LastLocation = { 0, 0, 0 }
 	},
 	Inventory = {},
 	EquippedItems = {},
@@ -43,6 +45,7 @@ local DS1, DS2, DS3 = "CSTORY_BETA1599", "CSTORY_BETA1599_S2", "CSTORY_BETA1599_
 local newInstance = Instance.new
 local wait = task.wait
 local insert = table.insert
+local v3New = Vector3.new
 
 
 local function findDataStore(plr: Player) : DataStore?
@@ -126,12 +129,19 @@ local function setup(plr: Player)
 	questsData.Parent = plr
 
 	for i, v in data.Stats do
+		if i == "LastLocation" then plr:SetAttribute(i, v3New(v[1], v[2], v[3])) continue end
+
 		plr:SetAttribute(i, v)
 
 		plr:GetAttributeChangedSignal(i):Connect(function()
 			data.Stats[i] = plr:GetAttribute(i)
 		end)
 	end
+	Fusion.Hydrate(plr)({
+		[Fusion.AttributeChange("LastLocation")] = function(newLocation)
+			data.Stats.LastLocation = { newLocation.X, newLocation.Y, newLocation.Z }
+		end
+	})
 
 	for questType, questId in data.Quests do
 		if questType == "Town" then

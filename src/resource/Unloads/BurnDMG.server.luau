@@ -36,7 +36,7 @@ end
 
 ServerUtil:ShowText(char, text, color)
 
-if char:GetAttribute("IsMonster") then
+if char:HasTag("Monster") then
     local light = instanceNew("PointLight")
     light.Color = color
     light.Range = 10

@@ -24,7 +24,6 @@ local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
 local monsterLocations = workspace:WaitForChild("Monsters") :: Folder
 
 local isInCombat, isPlaying = false, ""
-local isInReadyCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
 local encounterCD = false
@@ -38,6 +37,7 @@ local rad, random = math.rad, math.random
 local fromScale = UDim2.fromScale
 local tFind = table.find
 
+
 local function _hitVFX(monster: Model)
 	--- checks
 	if not monster then return end
@@ -47,11 +47,12 @@ local function _hitVFX(monster: Model)
 
 	local class = plr:GetAttribute("Class") :: string
 	if not AssetBook.ClassInfo[class] then return end
+	local color = AssetBook.ClassInfo[class].Color
 
 	local hitEff = RepS.Package.Effects.HitEffect:Clone() :: Part
 	hitEff.CFrame = monster.PrimaryPart.CFrame
-	hitEff.Effect.Image.ImageColor3 = AssetBook.ClassInfo[class].Color
-	hitEff.Particle.Color = csNew(AssetBook.ClassInfo[class].Color)
+	hitEff.Effect.Image.ImageColor3 = color
+	hitEff.Particle.Color = csNew(color)
 	hitEff.Effect.Image.Rotation = random(1, 360)
 	if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
 	hitEff.Parent = workspace
@@ -116,9 +117,10 @@ local function setup()
 	end
 	for _, folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
 
+	--- rotate the monsters to make them more "lively"
 	local function _rotateSimulate()
         for _, monster in monsterLocations:GetDescendants() do
-            if monster:GetAttribute("IsMonster")
+            if monster:HasTag("Monster")
 				and monster.PrimaryPart
 				and not monster:GetAttribute("InCombat") then
 
@@ -126,20 +128,25 @@ local function setup()
                     local rotating = random(5, 20)
                     local direction = random(-2, 2)
 
-					for _ = 1, rotating do
-						monster.PrimaryPart.CFrame *= cfAngles(0, rad(direction * 5), 0)
-						wait(0.01)
-					end
+					Spawn(function()
+						wait(random(0, 5) / 10)
+						for _ = 1, rotating do
+							monster.PrimaryPart.CFrame *= cfAngles(0, rad(direction * 5), 0)
+							wait(0.01)
+						end
+					end)
                 end
             end
         end
     end
+
+	--- detect mobs when player is near them
     local function _detectMonsters()
 		if isInCombat then return end
 		if encounterCD then return end
 
         for _, monster in monsterLocations:GetDescendants() do
-            if monster:GetAttribute("IsMonster")
+            if monster:HasTag("Monster")
 				and monster.PrimaryPart
 				and monster:GetAttribute("InCombat") == false
 				and not monster:GetAttribute("SubMonster") then
@@ -156,10 +163,11 @@ local function setup()
         end
     end
 
-    return Clock(1.5, _rotateSimulate), Clock(0.15, _detectMonsters)
+    return Clock(1.75, _rotateSimulate), Clock(0.15, _detectMonsters)
 end
 
 --// Connections
+
 local function startCombat(monster: Model)
 	--- checks
 	if not monster then return end
@@ -256,7 +264,7 @@ Events.MagicCasted:Connect(magicCasted)
 local function onTouched(hit: BasePart)
 	if not hit or not hit.Parent then return end
 
-	if hit.Parent:GetAttribute("IsOrb") then
+	if hit.Parent:HasTag("Orb") then
 		local orb = hit.Parent :: Model
 		local HRP = char.PrimaryPart
 
@@ -298,10 +306,12 @@ local function onTouched(hit: BasePart)
 			_hitVFX(char.CharStats.TargetMonster.Value)
 		end
 
+		Events.MobTakeDMG:Fire(hit.Parent)
+
 		orb:Destroy()
 		animStep = if animStep == 1 then 2 else 1
 
-	elseif hit.Parent:HasTag("MonsterAttack") then
+	elseif hit.Parent:HasTag("MonsterDMG") then
 		local damagePart = hit.Parent :: Model
 
 		--- checks
@@ -316,6 +326,8 @@ local function onTouched(hit: BasePart)
 		end)
 
 		if char:GetAttribute("Shield") > 0 then sfxs.ShieldAbsorb:Play() end
+
+		Events.CharTakeDMG:Fire(damagePart)
 
 		for _ = 1, 5 do
 			_setCharacterTransparency(0.5)

@@ -67,6 +67,7 @@ return function(plr: Player)
 			}),
 		},
 	})
+	repeat wait() until plr.PlayerGui:WaitForChild("Backpack")
 
 	--// Action bindings
 	local function _setExVisibleState(ui: ScreenGui, state: boolean)
@@ -89,7 +90,7 @@ return function(plr: Player)
 		if inputState ~= Enum.UserInputState.Begin then return end
 		if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
 
-		local menuFrame, backpackFrame = Fusion.peek(self.UI), self.plrGui.Backpack
+		local menuFrame = Fusion.peek(self.UI)
 
 		if plr:GetAttribute("CurrentMenu") == "None" then
 			_setVisible("Menu", menuFrame)
@@ -102,7 +103,7 @@ return function(plr: Player)
 		elseif plr:GetAttribute("CurrentMenu") == "Backpack" then
 			plr:SetAttribute("CurrentMenu", "Menu")
 
-			_setExVisibleState(backpackFrame, false)
+			_setExVisibleState(self.plrGui.Backpack, false)
 			_setExVisibleState(menuFrame, true)
 		end
 	end

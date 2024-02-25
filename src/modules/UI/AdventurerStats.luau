@@ -231,6 +231,23 @@ return function(plr: Player)
 	CAS:BindAction("UseWSkill", _useSkill, false, Enum.KeyCode.Two)
 	CAS:BindAction("UseESkill", _useSkill, false, Enum.KeyCode.Three)
 
+	self.nowMobIndex = 1
+	local function _changeMobTarget(_, inputState: Enum.UserInputState)
+		if inputState ~= Enum.UserInputState.Begin then return end
+
+		local monsters = self.char.CharStats.TargetMonsters:GetChildren()
+		if #monsters > 0 then
+			workspace.Sounds.SFXs.SelectionConfirmed:Play()
+
+			self.nowMobIndex += 1
+			if self.nowMobIndex > #monsters then self.nowMobIndex = 1 end
+
+			Events.ChangeMobTarget:Fire(monsters[self.nowMobIndex].Value)
+		end
+	end
+	CAS:BindAction("ChangeMobTarget", _changeMobTarget, false, Enum.KeyCode.LeftAlt)
+	CAS:BindAction("ChangeMobTarget2", _changeMobTarget, false, Enum.KeyCode.RightAlt)
+
 	--- Setups
 	local function _autoEquipItems()
 		for _, item in self.inventory:GetChildren() do
@@ -249,6 +266,11 @@ return function(plr: Player)
 		end
 	end
 	moveUpJumpBtn()
+	local function charCurrentZone()
+		local region = HarukaLib:IsInRegion(self.char.PrimaryPart.Position, workspace:WaitForChild("MapComponents").Zones:GetChildren())
+		if region then self.char:SetAttribute("CurrentRegion", region.Name) end
+	end
+	charCurrentZone()
 
 	---// Listening events
 	local playerData = self.playerData
@@ -286,8 +308,9 @@ return function(plr: Player)
 		CAS:UnbindAction("UseQSkill")
 		CAS:UnbindAction("UseWSkill")
 		CAS:UnbindAction("UseESkill")
-		CAS:UnbindAction("NextDialogue")
 		CAS:UnbindAction("FreezeControl")
+		CAS:UnbindAction("ChangeMobTarget")
+		CAS:UnbindAction("ChangeMobTarget2")
 
 		Events.EquipItems:DisconnectAll()
 		Events.ItemCD:DisconnectAll()

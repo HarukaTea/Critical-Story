@@ -7,6 +7,7 @@ local SSS = game:GetService("ServerScriptService")
 local TeleS = game:GetService("TeleportService")
 local TestS = game:GetService("TestService")
 
+local AttackUtil = require(SSS.Modules.Utils.AttackUtil)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
@@ -15,9 +16,10 @@ local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
+local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local PassiveUtil = require(SSS.Modules.Utils.PassiveUtil)
 
-local floor = math.floor
+local floor, random = math.floor, math.random
 local fromRGB = Color3.fromRGB
 local wait = task.wait
 local insert = table.insert
@@ -59,7 +61,6 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 			plr.Character:PivotTo(workspace.Maps[destination][locator].CFrame)
 		end
-		plr:SetAttribute("LastSeen", destination)
 
 	elseif prompt.Name == "Material" then
 		local hasTool = false
@@ -109,8 +110,8 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 		local hinted = false
 		local monsters = {}
-		for _, monster in locator:GetDescendants() do
-			if monster:GetAttribute("IsMonster") then
+		for _, monster: Instance in locator:GetDescendants() do
+			if monster:HasTag("Monster") then
 				if not monster:GetAttribute("SubMonster") then
 					insert(monsters, 1, monster)
 				else
@@ -168,7 +169,7 @@ local function combatStartSetup(plr: Player, monster: Model, mode: string)
 	--- sub-monster exist
 	if monster.Parent:FindFirstChildOfClass("Part") then
 		for _, subMonster in monster.Parent:GetDescendants() do
-			if subMonster:GetAttribute("IsMonster") and subMonster:GetAttribute("SubMonster") then
+			if subMonster:HasTag("Monster") and subMonster:GetAttribute("SubMonster") then
 				ServerUtil:AddTargetForMonster(plr, subMonster)
 
 				if not subMonster:GetAttribute("InCombat") then
@@ -204,11 +205,11 @@ local function combatEndSetup(monster: Model)
 
 			if tempPlr then insert(combatPlrs, tempPlr) end
 		end
-		for _, attack in attackFolder:GetDescendants() do
+		for _, attack: Instance in attackFolder:GetDescendants() do
 			if attack:IsA("BasePart") then
 				if attack.Transparency < 1 then insert(attacks, attack) end
 			end
-			attack:SetAttribute("IsDamage", nil)
+			attack:RemoveTag("MonsterDMG")
 		end
 		for _, player in combatPlrs do
 			Events.ClientTween:Fire(player, attacks, { Transparency = 1 }, "one")
@@ -255,7 +256,7 @@ local function combatEndSetup(monster: Model)
 
 		local locator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
 		for _, child in locator:GetDescendants() do
-			if child:GetAttribute("IsMonster")
+			if child:HasTag("Monster")
 				and child ~= monster
 				and child:GetAttribute("InCombat") == true
 				and child:GetAttribute("Health") > 0 then
@@ -284,6 +285,110 @@ local function combatEndSetup(monster: Model)
 end
 Events.CombatStart:Connect(combatStartSetup)
 Signals.CombatEnd:Connect(combatEndSetup)
+
+--[[
+	Player hit the orb and deal dmg to mobs
+]]
+local function mobTakeDMG(plr: Player, orb: Model)
+	local char = plr.Character :: Model
+	local HRP = char.PrimaryPart
+
+	--- pre checks
+	if not orb:FindFirstChild("Owner") then return end
+	if orb.Owner.Value ~= char then return end
+	if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
+	if not char.CharStats.TargetMonster.Value then return end
+	if not HRP then return end
+	if not orb.Parent then return end
+	if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then return end
+
+	local monster = char.CharStats.TargetMonster.Value :: Model
+	local minDMG, maxDMG = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")
+	local baseDamage = if minDMG >= maxDMG then maxDMG else random(minDMG, maxDMG)
+
+	orb.Owner:Destroy()
+
+	--- final check
+	if not monster.PrimaryPart then return end
+	if monster:GetAttribute("CantAttack") then baseDamage = 0 end
+
+	local subStyle = orb:GetAttribute("SubStyle") :: string?
+	local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
+	if AttackUtil[style] then AttackUtil[style](plr, monster, baseDamage, orb) end
+
+	orb:Destroy()
+end
+Events.MobTakeDMG:Connect(mobTakeDMG)
+
+--[[
+	Character is taking damage rn
+]]
+local function charTakeDMG(plr: Player, dmgPart: Model)
+    if not dmgPart:FindFirstChild("Owner") then return end
+	if not dmgPart.Owner.Value then return end
+
+	local char = plr.Character :: Model
+	local humanoid = char.Humanoid :: Humanoid
+    local monster = dmgPart.Owner.Value :: Model | string
+	local shield = char:GetAttribute("Shield") :: number
+	local dmg = monster:GetAttribute("Damage") :: number
+
+    --- if attacker is void
+	if monster == "Abyss" then
+		char.Humanoid:TakeDamage(char.Humanoid.MaxHealth + 1)
+		return
+	end
+
+    --- some hit cd detections
+    HarukaLib:Add(char, "HitCD", 5)
+    if char:GetAttribute("HitCD") > 5 then char:SetAttribute("HitCD", 5) end
+
+    if not char:FindFirstChild("RepairShield") then
+        RepS.Resources.Unloads.RepairShield:Clone().Parent = char
+    end
+    if not char:FindFirstChild("HealHP") then
+        RepS.Resources.Unloads.HealHP:Clone().Parent = char
+    end
+    char:SetAttribute("Repairing", false)
+    char:SetAttribute("Healing", false)
+
+    --- some extra damage
+    if dmgPart:GetAttribute("Burn") then SkillUtil:Burn(plr, monster, 6, true) end
+    if dmgPart:GetAttribute("Poison") then SkillUtil:Poison(plr, monster, 6, true) end
+
+	--- Knight class skills
+	if char:GetAttribute("Guard") > 0 then
+        local oriDmg = dmg
+		dmg = floor(oriDmg - (oriDmg * char:GetAttribute("Guard")) / 100)
+
+		char:SetAttribute("Guard", 0)
+	end
+
+	--- shield
+	if shield > 0 then
+		if dmgPart:GetAttribute("Pierce") then -- "Pierce"
+			humanoid:TakeDamage(dmg)
+			ServerUtil:ShowNumber(char, dmg)
+			return
+		end
+
+		if dmg > shield then
+			humanoid:TakeDamage(floor(dmg - shield))
+			ServerUtil:ShowNumber(char, dmg - shield)
+
+			char:SetAttribute("Shield", 0)
+			return
+		end
+
+		HarukaLib:Add(char, "Shield", -dmg)
+		ServerUtil:ShowNumber(char, dmg, fromRGB(122, 122, 122))
+		return
+	end
+
+	humanoid:TakeDamage(dmg)
+	ServerUtil:ShowNumber(char, dmg)
+end
+Events.CharTakeDMG:Connect(charTakeDMG)
 
 --[[
 	Player finally reach the requirement and level up!
@@ -640,8 +745,13 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 
 		for _, quest in plr.Quests:GetChildren() do
 			if quest.Name ~= "Town" then continue end
-			if StoryBook[series][quest.Value].NPC == npc.Name then currentId = quest.Value end
+			if StoryBook[series][quest.Value].NPC == npc.Name
+				and not plr.Character.CharStats.Quests:FindFirstChild(series..quest.Value) then
+
+				currentId = quest.Value
+			end
 		end
+		if currentId == nil then return end
 
 		ServerUtil:GiveQuestRewards(series, currentId, plr)
 
@@ -650,6 +760,10 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 		end
 
 		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.QuestComplete)
+
+		if DialogueBook[npc.Name].Extra[series..currentId] then
+			Signals[DialogueBook[npc.Name].Extra[series..currentId]]:Fire(plr)
+		end
 	end
 end
 Events.NPCChatEnded:Connect(npcChatEnded)
@@ -703,6 +817,18 @@ local function toggleInviteAccess(plr: Player)
 	plr:SetAttribute("InviteAccess", not plr:GetAttribute("InviteAccess"))
 end
 Events.ChangeInviteAccess:Connect(toggleInviteAccess)
+
+--[[
+	Switch mob target by ctrl or click
+]]
+local function switchMobTarget(plr: Player, monster: Model)
+	local char = plr.Character :: Model
+
+	if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 then
+		char.CharStats.TargetMonster.Value = monster
+	end
+end
+Events.ChangeMobTarget:Connect(switchMobTarget)
 
 --[[
 	Sometimes datastore can be easily down, and that will crash the game

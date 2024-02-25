@@ -236,6 +236,7 @@ return function(plr: Player)
 			}),
 		},
 	})
+	repeat wait() until plr.PlayerGui:WaitForChild("AdventurerMenu")
 
 	---// Actions
 	local function _setExVisibleState(ui: ScreenGui, state: boolean)
@@ -257,7 +258,7 @@ return function(plr: Player)
 		if inputState ~= Enum.UserInputState.Begin then return end
 		if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
 
-		local backpackFrame, menuFrame = peek(self.UI), self.plrGui.AdventurerMenu
+		local backpackFrame = peek(self.UI)
 
 		if plr:GetAttribute("CurrentMenu") == "None" then
 			_setVisible("Backpack", backpackFrame)
@@ -271,7 +272,7 @@ return function(plr: Player)
 			plr:SetAttribute("CurrentMenu", "Backpack")
 
 			_setExVisibleState(backpackFrame, true)
-			_setExVisibleState(menuFrame, false)
+			_setExVisibleState(self.plrGui.AdventurerMenu, false)
 		end
 	end
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)

@@ -13,6 +13,7 @@ local instanceNew = Instance.new
 local random, sin = math.random, math.sin
 local sub = string.sub
 
+--- Reload UI modules when character respawned
 local UIModules = RepS.Modules.UI
 local requireList = {
 	UIModules.AdventurerStats,
@@ -30,7 +31,7 @@ for _, module in requireList do
 	end)
 end
 
---- I optimized the animate script so it should be pretty good right now
+--- I optimized the animate script so it should be good right now
 local torso = char:WaitForChild("Torso")
 local rightShoulder = torso:WaitForChild("Right Shoulder")
 local leftShoulder = torso:WaitForChild("Left Shoulder")

@@ -15,7 +15,9 @@ local Signals = {
 	QuestComplete = NewSignal(),
 
 	--- story
-	FirstStepTutorial = NewSignal()
+	FirstStepTutorial = NewSignal(),
+
+	FChenPTown2 = NewSignal()
 }
 
 return Signals

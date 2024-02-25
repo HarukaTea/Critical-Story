@@ -1,10 +1,8 @@
 --!nocheck
 
 local Players = game:GetService("Players")
-local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Events = require(SSS.Modules.Data.ServerEvents)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 
 local char = script.Parent.Parent.Parent :: Model
@@ -12,13 +10,26 @@ local plr = Players:GetPlayerFromCharacter(char)
 
 local wait = task.wait
 
-RepS.Resources.Quests.Town1Client:Clone().Parent = script.Parent
-
 wait()
 local inventory = plr:WaitForChild("Inventory", 999) :: Folder
-repeat wait(5) until inventory:FindFirstChild("SpikyFur") and inventory.SpikyFur.Value >= 6
 
-inventory.SpikyFur.Value -= 6
+local function completed()
+    Signals.QuestComplete:Fire("Town", 1, plr, true)
+end
 
-Events.RefreshBackpack:Fire(plr)
-Signals.QuestComplete:Fire("Town", 1, plr, true)
+if inventory:FindFirstChild("SpikyFur") then
+    if inventory.SpikyFur.Value >= 6 then
+        completed()
+
+    else
+        repeat wait() until inventory.SpikyFur.Value >= 6
+
+        completed()
+    end
+
+else
+    repeat wait(2) until inventory:FindFirstChild("SpikyFur")
+    repeat wait() until inventory.SpikyFur.Value >= 6
+
+    completed()
+end

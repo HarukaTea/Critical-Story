@@ -34,7 +34,7 @@ local anims = {
 }
 
 local function playAnim(anim: string)
-	if anims[anim] then anims[anim]:Play() end
+	anims[anim]:Play()
 end
 Events.PlayAnimation:Connect(playAnim)
 Signals.PlayAnimation:Connect(playAnim)

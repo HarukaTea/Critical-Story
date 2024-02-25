@@ -64,8 +64,7 @@ local function ChatFrame(self: table) : Frame
         dialogueIndexChatting = 1
         dialogueChoiceIndex = 1
         canContinueChat = true
-
-        CAS:UnbindAction("NextDialogue")
+        
         CAS:UnbindAction("FreezeControl")
         UIS.ModalEnabled = false
 

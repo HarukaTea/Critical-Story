@@ -259,6 +259,10 @@ dialogues.FChenP = {
                 "Sure, you can come back whenever you want."
             }
         }
+    },
+
+    Extra = {
+        Town2 = "FChenPTown2"
     }
 }
 

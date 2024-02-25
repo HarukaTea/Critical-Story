@@ -3,9 +3,9 @@
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
+local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
 
-local AttackUtil = require(SSS.Modules.Utils.AttackUtil)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -21,7 +21,7 @@ local humanoid = char.Humanoid :: Humanoid
 
 local charStats = nil
 local isBroken = false
-local lvUpCD, dmgTouchCD, orbTouchCD = false, false, false
+local lvUpCD, dmgTouchCD = false, false
 
 local ATTRIBUTES = {
     InCombat = false,
@@ -63,83 +63,12 @@ local ATTRIBUTES = {
 
 local AttributeChange = Fusion.AttributeChange
 
-local CharacterSetups = {}
-CharacterSetups.__index = CharacterSetups
-
 local wait = task.wait
 local floor, random = math.floor, math.random
 local instanceNew = Instance.new
-local fromRGB = Color3.fromRGB
 local sFind = string.find
+local v3New = Vector3.new
 
-local function charTakeDMG(monster: Model, dmgPart: Model)
-	if not monster then return end
-
-	local shield = char:GetAttribute("Shield") :: number
-	local dmg = monster:GetAttribute("Damage") :: number
-
-    --- if attacker is void
-	if monster == "Abyss" then
-		char.Humanoid:TakeDamage(char.Humanoid.MaxHealth + 1)
-		return
-	end
-
-    --- some hit cd detections
-    HarukaLib:Add(char, "HitCD", 15)
-    if char:GetAttribute("HitCD") > 15 then char:SetAttribute("HitCD", 15) end
-
-    if char:FindFirstChild("HealHP") then char.HealHP:Destroy() end
-    if char:FindFirstChild("RepairShield") then char.RepairShield:Destroy() end
-    char:SetAttribute("Repairing", false)
-    char:SetAttribute("Healing", false)
-
-    RepS.Resources.Unloads.RepairShield:Clone().Parent = char
-    RepS.Resources.Unloads.HealHP:Clone().Parent = char
-
-    --- some extra damage
-    if dmgPart:GetAttribute("Burn") then
-        local burn = RepS.Resources.Unloads.BurnDMGPlayer:Clone() :: Script
-        burn:SetAttribute("Duration", 6)
-        burn:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
-        burn:SetAttribute("Color", fromRGB(255, 85, 0))
-        burn:SetAttribute("Text", "BURN!")
-        burn:SetAttribute("Power", 0.5)
-        burn.Name = "Burn"
-        burn.Parent = char.CharStats.EffectsList
-    end
-
-	--- Knight class skills
-	if char:GetAttribute("Guard") > 0 then
-        local oriDmg = dmg
-		dmg = floor(oriDmg - (oriDmg * char:GetAttribute("Guard")) / 100)
-
-		char:SetAttribute("Guard", 0)
-	end
-
-	--- shield
-	if shield > 0 then
-		if dmgPart:GetAttribute("Pierce") then -- "Pierce"
-			humanoid:TakeDamage(dmg)
-			ServerUtil:ShowNumber(char, dmg)
-			return
-		end
-
-		if dmg > shield then
-			humanoid:TakeDamage(floor(dmg - shield))
-			ServerUtil:ShowNumber(char, dmg - shield)
-
-			char:SetAttribute("Shield", 0)
-			return
-		end
-
-		HarukaLib:Add(char, "Shield", -dmg)
-		ServerUtil:ShowNumber(char, dmg, fromRGB(122, 122, 122))
-		return
-	end
-
-	humanoid:TakeDamage(dmg)
-	ServerUtil:ShowNumber(char, dmg)
-end
 
 local stopSpawn
 local function orbSpawnHandler(state: boolean)
@@ -234,20 +163,24 @@ local function setup()
     end)
 
     --// Spawn to the nearest respawn point
-    local lastDeath = if plr:GetAttribute("LastDeath") then plr:GetAttribute("LastDeath") else char.PrimaryPart.Position
-    local spawnPoint, distance = nil, 9999999999
-	for _, child in workspace.Maps:GetDescendants() do
-		if child.Name == "SpawnPoint" then
-			local tDistance = (child.Position - lastDeath).Magnitude
+    --if not RS:IsStudio() then
+        local lastLocation = plr:GetAttribute("LastLocation") :: Vector3
+        local lastDeath = if lastLocation and lastLocation ~= v3New() then lastLocation else char.PrimaryPart.Position
+        local spawnPoint, distance = nil, 9999999999
+        for _, child in workspace.Maps:GetDescendants() do
+            if child.Name == "SpawnPoint" then
+                local tDistance = (child.Position - lastDeath).Magnitude
 
-			if tDistance < distance then
-				distance = tDistance
-				spawnPoint = child
-			end
-		end
-	end
+                if tDistance < distance then
+                    distance = tDistance
+                    spawnPoint = child
+                end
+            end
+        end
 
-	char:PivotTo(spawnPoint.CFrame)
+        char:PivotTo(spawnPoint.CFrame)
+        plr:SetAttribute("LastLocation", spawnPoint.Position)
+    --end
 end
 setup()
 
@@ -319,7 +252,7 @@ questDataSetup()
 
 --// Connections
 local function onDead()
-    plr:SetAttribute("LastDeath", char.PrimaryPart.Position)
+    plr:SetAttribute("LastLocation", char.PrimaryPart.Position)
     char:SetAttribute("InCombat", false)
 
     for _, monster in char.CharStats.TargetMonsters:GetChildren() do
@@ -331,71 +264,7 @@ local function onDead()
 
     ServerUtil:RagdollNPC(char)
 end
-local function onTouch(hit: BasePart)
-    if not hit or not hit.Parent then return end
-
-    if hit.Parent:GetAttribute("IsOrb") then
-        local orb = hit.Parent :: Model
-        local HRP = char.PrimaryPart
-
-        --- pre checks
-        if orbTouchCD then return end
-        if not orb:FindFirstChild("Owner") then return end
-        if orb.Owner.Value ~= char then return end
-        if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
-        if not char.CharStats.TargetMonster.Value then return end
-        if not HRP then return end
-        if not orb.Parent then return end
-        if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then return end
-
-        orbTouchCD = true
-        char.Humanoid.AutoRotate = false
-        Spawn(function()
-            wait(0.1)
-            orbTouchCD = false
-            char.Humanoid.AutoRotate = true
-        end)
-
-        local monster = char.CharStats.TargetMonster.Value :: Model
-        local minDMG, maxDMG = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")
-        local baseDamage = if minDMG >= maxDMG then maxDMG else random(minDMG, maxDMG)
-
-        orb.Owner:Destroy()
-
-        --- final check
-        if not monster.PrimaryPart then return end
-        if monster:GetAttribute("CantAttack") then baseDamage = 0 end
-
-        local subStyle = orb:GetAttribute("SubStyle") :: string?
-        local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
-        if AttackUtil[style] then
-            AttackUtil[style](plr, monster, baseDamage, orb)
-        end
-
-        orb:Destroy()
-
-    elseif hit.Parent:HasTag("MonsterAttack") then
-        local dmgPart = hit.Parent :: Model
-
-        --- checks
-        if dmgTouchCD then return end
-        if not dmgPart then return end
-        if not dmgPart:FindFirstChild("Owner") then return end
-        if not char.PrimaryPart then return end
-        if not dmgPart.Owner.Value then return end
-        if not dmgPart.Owner.Value.TargetingList:FindFirstChild(char.Name) then return end
-
-        dmgTouchCD = true
-        Spawn(function()
-            wait(0.55)
-            dmgTouchCD = false
-        end)
-
-        charTakeDMG(dmgPart.Owner.Value, dmgPart)
-    end
-end
 humanoid.Died:Once(onDead)
-humanoid.Touched:Connect(onTouch)
 
 local function manaCheck(mana)
     local maxMana = char:GetAttribute("MaxMana")
@@ -412,15 +281,15 @@ local function updateMagic()
     char:SetAttribute("Magic", floor(plr:GetAttribute("MagicPoints") ^ 1.42) + 20 + char:GetAttribute("MagicBuff"))
 end
 local function updateMana()
-    char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") ^ 1.9) + 100 + char:GetAttribute("ManaBuff"))
+    char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 60) + 100 + char:GetAttribute("ManaBuff"))
     char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
 end
 local function updateShield()
-    char:SetAttribute("MaxShield", floor(plr:GetAttribute("ShieldPoints") ^ 1.4) + 20 + char:GetAttribute("ShieldBuff"))
+    char:SetAttribute("MaxShield", floor(plr:GetAttribute("ShieldPoints") * 20) + 20 + char:GetAttribute("ShieldBuff"))
     char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
 end
 local function updateHP()
-    humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") ^ 1.7) + 100 + char:GetAttribute("HealthBuff")
+    humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") * 80) + 100 + char:GetAttribute("HealthBuff")
     humanoid.Health = humanoid.MaxHealth
 end
 local function updateSpeed(speed)

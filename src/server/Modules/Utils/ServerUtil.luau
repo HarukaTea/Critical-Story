@@ -175,7 +175,6 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	monster:SetAttribute("EXP", floor(level ^ 1.25) + 25)
 	monster:SetAttribute("Damage", 5 * level)
 	monster:SetAttribute("InCombat", false)
-	monster:SetAttribute("IsMonster", true)
 
 	for _, child in monster:GetChildren() do
 		if child:IsA("Part") and monster:FindFirstChild(child.Name .. "Model") then
@@ -305,17 +304,28 @@ end
 --[[
 	Return a randomly generate a position in the combat area
 ]]
-function ServerUtil:GenerateOrbPos(monster: Model, char: Model) : CFrame
+function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	--- checks
 	if not monster then return end
 	if not monster.Parent then return end
 	if not monster.Parent.Parent then return end
 
+	local ignore = {}
+	for _, child in workspace.Monsters:GetDescendants() do
+		if child:HasTag("Monster") then insert(ignore, child) end
+	end
+	for _, plr in Players:GetPlayers() do
+		if plr.Character then insert(ignore, plr.Character) end
+	end
+	for _, child in workspace.MapComponents.CombatFolders:GetChildren() do
+		if child:HasTag("CombatHolder") then insert(ignore, child) end
+	end
+
 	local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
 	local ray = rayNew(
 		position,
 		cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
-	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, { monster, char })
+	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignore)
 
 	return cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
 end
@@ -511,7 +521,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	Debris:AddItem(script, attributes.CD)
 
 	if not classUnique then
-		ServerUtil:RefreshBackpack(plr, item, attributes.CD, attributes.IS_SKILL)
+		ServerUtil:RefreshBackpack(plr, item, attributes.CD, if AssetBook.Items.IsSkill[item] then true else false)
 	end
 
 	return true

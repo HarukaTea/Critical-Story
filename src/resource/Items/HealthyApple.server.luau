@@ -10,10 +10,8 @@ local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 
 local floor = math.floor
 
-local ITEM_ATTRIBUTES = { CD = 1, BUFF = 0.05 }
+local ITEM_ATTRIBUTES = { CD = 1, BUFF = 0.1 }
 
-if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then
-	return
-end
+if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 SkillUtil:Heal(plr, floor(char.Humanoid.MaxHealth * ITEM_ATTRIBUTES.BUFF))

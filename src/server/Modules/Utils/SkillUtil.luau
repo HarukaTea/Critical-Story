@@ -58,26 +58,6 @@ function SkillUtil:RestoreMana(plr: Player, healPower: number)
 end
 
 --[[
-	Heal health, by active items
-]]
-function SkillUtil:Heal(plr: Player, healPower: number)
-	local char = plr.Character
-
-	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Heal)
-
-	char.Humanoid.Health += healPower
-
-	local healEff = RepS.Package.Effects.HealEffect:Clone() :: ParticleEmitter
-	healEff.Parent = char.PrimaryPart
-	Debris:AddItem(healEff, 1)
-
-	Spawn(function()
-		wait(0.4)
-		healEff.Enabled = false
-	end)
-end
-
---[[
 	Mahoushoujiu bruh, I guess so, the power of magic is great
 ]]
 function SkillUtil:MagicVFX(plr: Player, monster: Model)
@@ -102,12 +82,37 @@ function SkillUtil:ManaCheck(plr: Player, req: number) : boolean
 	return true
 end
 
+--[[
+	Heal health, by active items
+]]
+function SkillUtil:Heal(plr: Player, healPower: number)
+	local char = plr.Character
+
+	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Heal)
+
+	char.Humanoid.Health += floor(char.Humanoid.MaxHealth * healPower)
+
+	local healEff = RepS.Package.Effects.HealEffect:Clone() :: ParticleEmitter
+	healEff.Parent = char.PrimaryPart
+	Debris:AddItem(healEff, 1)
+
+	Spawn(function()
+		wait(0.4)
+		healEff.Enabled = false
+	end)
+end
+
+--[[
+	Burn dmg, also can be used for players, related to Magic
+]]
 function SkillUtil:Burn(plr: Player, monster: Model, duration: number, isPlayer: boolean?)
+	if plr.Character.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
 	local debuff: Script
 	if isPlayer then
 		debuff = RepS.Resources.Unloads.BurnDMGPlayer:Clone()
+		debuff:SetAttribute("Power", 0.5)
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
 		debuff = RepS.Resources.Unloads.BurnDMG:Clone()
@@ -120,12 +125,17 @@ function SkillUtil:Burn(plr: Player, monster: Model, duration: number, isPlayer:
 	debuff.Parent = if isPlayer then plr.Character.CharStats.EffectsList else monster.EffectsList
 end
 
+--[[
+	Poison dmg, which is related to DMG
+]]
 function SkillUtil:Poison(plr: Player, monster: Model, duration: number, isPlayer: boolean?)
+	if plr.Character.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
 	local debuff: Script
 	if isPlayer then
 		debuff = RepS.Resources.Unloads.BurnDMGPlayer:Clone()
+		debuff:SetAttribute("Power", 0.5)
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
 		debuff = RepS.Resources.Unloads.BurnDMG:Clone()
@@ -138,18 +148,52 @@ function SkillUtil:Poison(plr: Player, monster: Model, duration: number, isPlaye
 	debuff.Parent = if isPlayer then plr.Character.CharStats.EffectsList else monster.EffectsList
 end
 
-function SkillUtil:AttackBuff(plr: Player, attackPower: number, duration: number)
-	local buff = RepS.Resources.Unloads.AttackBuff:Clone() :: Script
+--[[
+	Give player attack buff, also can be used for monsters
+]]
+function SkillUtil:AttackBuff(target: Model | Player, attackPower: number, duration: number, isMob: boolean?)
+	if isMob then
+		if not target:FindFirstChild("EffectsList") then return end
+	else
+		if target.Character.Humanoid.Health <= 0 then return end
+	end
+
+	local buff: Script
+	if isMob then
+		buff = RepS.Resources.Unloads.AttackBuffMob:Clone()
+	else
+		buff = RepS.Resources.Unloads.AttackBuff:Clone()
+	end
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("Power", attackPower)
 	buff:SetAttribute("Color", fromRGB(255, 255, 0))
 	buff:SetAttribute("Text", "ATTACK UP!")
 	buff.Name = "AttackBuff"
+	buff.Parent = if isMob then target.EffectsList else target.Character.CharStats.EffectsList
+
+	if not isMob then Events.PlaySound:Fire(target, workspace.Sounds.SFXs.Up) end
+end
+
+--[[
+	Give player magic buff, can't be used for monsters
+]]
+function SkillUtil:MagicBuff(plr: Player, power: number, duration: number)
+	if plr.Character.Humanoid.Health <= 0 then return end
+
+	local buff = RepS.Resources.Unloads.MagicBuff:Clone() :: Script
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("Power", power)
+	buff:SetAttribute("Color", fromRGB(162, 0, 255))
+	buff:SetAttribute("Text", "MAGIC UP!")
+	buff.Name = "MagicBuff"
 	buff.Parent = plr.Character.CharStats.EffectsList
 
 	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
 end
 
+--[[
+	Give player speed buff, can't be used for monsters
+]]
 function SkillUtil:SpeedBuff(plr: Player, exSpeed: number, duration: number)
 	local buff = RepS.Resources.Unloads.SpeedBuff:Clone() :: Script
 	buff:SetAttribute("Duration", duration)

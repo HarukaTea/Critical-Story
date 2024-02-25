@@ -6,6 +6,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local peek = Fusion.peek
 
@@ -49,6 +50,7 @@ local function _onClick(id: string, self: table)
 		local slot = self:CheckSlot(itemType) :: string?
 		local checkSame: string, sameSlot: string = self:CheckSameItem(item, itemType)
 
+		if slot == "Full" and checkSame == "None" then Signals.CreateHint:Fire("Not enough space to equip!", "Error") return end
 		if slot ~= "Full" and checkSame == "None" then
 			Events.EquipItems:Fire(itemType, slot, item)
 

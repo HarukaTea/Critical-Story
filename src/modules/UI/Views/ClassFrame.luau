@@ -44,11 +44,15 @@ local function ClassFrame(self: table) : Frame
 
 		--- cancel the cd
 		if cd == 0 then
-			local itemSlot = item
-			if not classFrame:FindFirstChild(itemSlot, true) then return end
+			if not classFrame:FindFirstChild(slot, true) then return end
 
-            local activeSlot = classFrame:FindFirstChild(itemSlot, true)
+            local activeSlot = classFrame:FindFirstChild(slot, true)
+			local index = tonumber(match(slot, "%d+"))
+
 			activeSlot:SetAttribute("InCD", false)
+			activeSlot.Cooldown.Visible = false
+			activeCDRotationList[index]:set(0)
+			activeCDText[index]:set("")
 			return
 		end
 		--- final check

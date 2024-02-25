@@ -4,10 +4,11 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, Computed, Tween, Hydrate, Value =
-	Fusion.Children, Fusion.Computed, Fusion.Tween, Fusion.Hydrate, Fusion.Value
+local Children, Computed, Tween, Hydrate, Value, OnEvent =
+	Fusion.Children, Fusion.Computed, Fusion.Tween, Fusion.Hydrate, Fusion.Value, Fusion.OnEvent
 
 local MonsterEffect = require(RepS.Modules.UI.Components.MonsterEffect)
 
@@ -17,9 +18,11 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local clamp = math.clamp
 local udNew = UDim.new
+local tFind, insert = table.find, table.insert
 
 local function MonsterHPFrame(info: table, self: table): Frame
-	local innerPosition = Fusion.Value(fromScale(1.02, 0))
+	local innerPosition = Value(fromScale(1.02, 0))
+	local stroke_trans = Value(1)
 
 	Hydrate(self.charData.TargetMonster)({
 		[Fusion.OnChange("Value")] = function(newTarget: Model?)
@@ -64,6 +67,13 @@ local function MonsterHPFrame(info: table, self: table): Frame
 
 				[Children] = {
 					Components.RoundUICorner(),
+					Components.UIStroke({
+						Thickness = 3,
+						Enabled = true,
+						Transparency = Tween(Computed(function(use)
+							return use(stroke_trans)
+						end), AssetBook.TweenInfos.twiceHalf)
+					}),
 					Components.ImageLabel({
 						Name = "Avatar",
 						BackgroundTransparency = 0,
@@ -154,6 +164,31 @@ local function MonsterHPFrame(info: table, self: table): Frame
 						end),
 
 						[Children] = { Components.TextUIStroke({ Thickness = 3.5 }) },
+					}),
+					Components.HoverImageButton({
+						Name = "Hover",
+
+						[OnEvent("MouseEnter")] = function()
+							stroke_trans:set(0)
+						end,
+						[OnEvent("MouseLeave")] = function()
+							stroke_trans:set(1)
+						end,
+						[OnEvent("MouseButton1Click")] = function()
+							workspace.Sounds.SFXs.SelectionConfirmed:Play()
+
+							Events.ChangeMobTarget:Fire(info.Model)
+
+							local monsterSymbols = self.char.CharStats.TargetMonsters:GetChildren()
+							local monsters = {}
+							for _, child in ipairs(monsterSymbols) do
+								if child.Value then insert(monsters, child.Value) end
+							end
+							if #monsters > 0 then
+								local index = tFind(monsters, info.Model)
+								if index then self.nowMobIndex = index end
+							end
+						end
 					}),
 					Components.Frame({
 						AnchorPoint = v2New(),

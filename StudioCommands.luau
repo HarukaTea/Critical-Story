@@ -7,6 +7,13 @@ for _, child in workspace.Monsters:GetDescendants() do
     end
 end
 
+for _, child in workspace.Monsters:GetDescendants() do
+    if child:GetAttribute("MonsterLocation") then
+        child:SetAttribute("MonsterLocation", nil)
+        child:AddTag("MonsterLocation")
+    end
+end
+
 for _, child in workspace.Maps:GetDescendants() do
     if child:FindFirstChild("Terrain") then
         child:SetAttribute("Terrain", true)
@@ -28,6 +35,18 @@ for _, child in workspace:GetDescendants() do
     if child.Name == "Tree" then
         for _, descendant in child:GetDescendants() do
             if descendant:IsA("BasePart") then descendant.Transparency = 0 end
+        end
+    end
+end
+
+for _, child in workspace:GetDescendants() do
+    child:SetAttribute("IsDamage", nil)
+end
+
+for _, child in workspace.Maps:GetDescendants() do
+    if child:IsA("Folder") and child.Name == "Terrain" then
+        for _, descendant in child:GetDescendants() do
+            if descendant:IsA("Weld") then descendant:Destroy() end
         end
     end
 end

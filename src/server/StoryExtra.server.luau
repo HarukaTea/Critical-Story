@@ -4,15 +4,14 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
 local instanceNew = Instance.new
-local fromRGB = Color3.fromRGB
 
+--// Main
 local function firstCombat(plr: Player)
     local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: Part
     locator:ClearAllChildren()
@@ -56,3 +55,12 @@ local function firstCombat(plr: Player)
     end
 end
 Signals.FirstStepTutorial:Connect(firstCombat)
+
+--// Town
+local function gaveFurs(plr: Player)
+    local inventory = plr:WaitForChild("Inventory", 999) :: Folder
+
+    inventory.SpikyFur.Value -= 6
+    if inventory.SpikyFur.Value <= 0 then inventory.SpikyFur:Destroy() end
+end
+Signals.FChenPTown2:Connect(gaveFurs)

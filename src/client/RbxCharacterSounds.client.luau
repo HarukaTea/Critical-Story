@@ -6,7 +6,6 @@ local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
-local Signals = require(RepS.Modules.Data.Signals)
 
 local plr = Players.LocalPlayer
 
@@ -15,21 +14,38 @@ local cfAngles = CFrame.Angles
 local rad = math.rad
 
 
-local function playSFX(sound: Sound | string, pos: number)
+--[[
+	Play the sound when server requests, usually used for
+	client-only SFXs
+]]
+local function playSound(sound: Sound | string, pos: number)
 	if sound == "StopAll" then
-		for _, music in workspace.Sounds:GetChildren() do
+		for _, music: Sound in workspace.Sounds:GetChildren() do
 			if music:IsA("Sound") then music:Stop() end
 		end
+		return
+	end
+	if sound.Playing then
+		local newSound = sound:Clone()
+		newSound.PlayOnRemove = true
+		newSound.TimePosition = if pos then pos else 0
+		newSound.Parent = workspace
+
+		wait()
+		newSound:Destroy()
 		return
 	end
 
 	sound:Play()
 	if pos then sound.TimePosition = pos end
 end
-Events.PlaySound:Connect(playSFX)
+Events.PlaySound:Connect(playSound)
 
 
-local function clientTweenPlayer(objs: table, goal: table, style: string?)
+--[[,
+	Used to perform client-only tweens
+]]
+local function clientTweenPlayer(objs: table, goal: table, style: string)
 	style = AssetBook.TweenInfos[style]
 
 	for _, obj: Instance in objs do
@@ -40,9 +56,11 @@ local function clientTweenPlayer(objs: table, goal: table, style: string?)
 	end
 end
 Events.ClientTween:Connect(clientTweenPlayer)
-Signals.ClientTween:Connect(clientTweenPlayer)
 
 
+--[[
+	Play VFX when a chest is unlocked
+]]
 local function vfxChestUnlock(chest: Model)
 	workspace.Sounds.SFXs.ChestOpened:Play()
 
@@ -54,12 +72,14 @@ end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
 
 
-local function rejoinCombat()
+--[[
+	Join the public or party combat by prompt requests
+]]
+local function joinCombat()
 	local char = plr.Character :: Model
 	local charStats = char:FindFirstChild("CharStats") :: Folder
 
-	assert(charStats, "Can't found CharStats when rejoining combat!")
-
+	if not charStats then return end
 	for _, monsterSymbol: ObjectValue in charStats.TargetMonsters:GetChildren() do
 		local monster = monsterSymbol.Value :: Model
 
@@ -72,4 +92,4 @@ local function rejoinCombat()
 		end
 	end
 end
-Events.RejoinCombat:Connect(rejoinCombat)
+Events.RejoinCombat:Connect(joinCombat)

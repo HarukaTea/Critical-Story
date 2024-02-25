@@ -2,8 +2,6 @@
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
-local UIS = game:GetService("UserInputService")
-local UGS = UserSettings():GetService("UserGameSettings")
 
 local Cmdr = require(RepS:WaitForChild("CmdrClient"))
 local Events = require(RepS.Modules.Data.Events)
@@ -46,10 +44,3 @@ local function cmdrRegister()
     end)
 end
 cmdrRegister()
-
-
-local function cameraSensitivityChange()
-    UIS.MouseDeltaSensitivity = 0.7 / UGS.MouseSensitivity
-end
-cameraSensitivityChange()
-UGS:GetPropertyChangedSignal("MouseSensitivity"):Connect(cameraSensitivityChange)

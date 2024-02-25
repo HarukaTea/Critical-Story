@@ -115,7 +115,7 @@ local function mainSetup()
 		end
 	end
 	for _, locator in workspace.Monsters:GetDescendants() do
-		if locator:GetAttribute("MonsterLocation") then ServerUtil:SetupMonster(locator) end
+		if locator:HasTag("MonsterLocation") then ServerUtil:SetupMonster(locator) end
 	end
 
 	--- player attacks setups
