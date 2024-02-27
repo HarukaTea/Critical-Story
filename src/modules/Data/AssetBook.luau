@@ -31,7 +31,7 @@ assets.TypeColor = {
 	Passive = fromRGB(99, 244, 9),
 	Material = fromRGB(0, 222, 238),
 	Cosmetic = fromRGB(170, 85, 255),
-	Companion = fromRGB(255, 255, 255),
+	Quest = fromRGB(46, 213, 115),
 }
 assets.QuestColor = {
     Main = fromRGB(46, 213, 115),
@@ -231,6 +231,8 @@ assets.Items = {
         BlackFur = "Black Fur",
 
         ValkyrieArmor = "Valkyrie Armor",
+
+        HeheLetter = "A Letter From Hehe"
     },
 
 	IsSkill = {
@@ -310,6 +312,8 @@ assets.Items = {
         BlackFur = "At least it's better than Spiky Fur, but manifesting negative energy",
 
         ValkyrieArmor = "Forged from adamantite and orichalcum along with enchantments of light",
+
+        HeheLetter = "Without any scent on it, after all, it is just the most ordinary letter."
     },
 
     --- 00ff00 green, ff3333 red, 11ebee blue, b266ff purple
@@ -377,6 +381,8 @@ assets.Items = {
         BlackFur = "Can be used for crafting",
 
         ValkyrieArmor = "Used by the valkyries from Valhalla",
+
+        HeheLetter = "A letter from Hehe in Initus Bay, maybe you will get good rewards in the future."
     },
 
     ItemTier = {
@@ -398,6 +404,7 @@ assets.Items = {
         HuntingDagger = "Common",
         MiningPickaxe = "Common",
         RabbitFoot = "Common",
+        HeheLetter = "Common",
 
         GoldenApple = "Rare",
         FireballScroll = "Rare",
@@ -509,6 +516,8 @@ assets.Items = {
         BlackFur = "Material",
 
         ValkyrieArmor = "Cosmetic",
+
+        HeheLetter = "Quest"
     },
 
     ItemImages = {
@@ -535,7 +544,7 @@ assets.Items = {
         WarriorsPride = "rbxassetid://16517556226",
 
         TravellerBoots = "rbxassetid://16517555735",
-        BurningTorch = "rbxassetid://2965771738",
+        BurningTorch = "rbxassetid://16529968136",
         CampfireWood = "rbxassetid://2970559088",
         HuntingDagger = "rbxassetid://16483882733",
         MiningPickaxe = "rbxassetid://12118509077",
@@ -578,6 +587,8 @@ assets.Items = {
         BlackFur = "rbxassetid://12285144842",
 
         ValkyrieArmor = "rbxassetid://14429563981",
+
+        HeheLetter = "rbxassetid://2985521957"
     }
 }
 

@@ -15,6 +15,7 @@ local Events = {
 	ChestUnlocked = Net("ChestUnlocked"),
 	ChangeMobTarget = Net("ChangeMobTarget"),
 	CharTakeDMG = Net("CharTakeDMG"),
+	ChangePlayerLocation = Net("ChangePlayerLocation"),
 	EquipItems = Net("EquipItems"),
 	ErrorDataStore = Net("ErrorDataStore"),
 	ForceReset = Net("ForceReset"),

@@ -172,7 +172,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 
 	monster:SetAttribute("MaxHealth", floor(level ^ 2.2) + 99)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", floor(level ^ 1.25) + 25)
+	monster:SetAttribute("EXP", (floor(level ^ 1.25) + 25) * if workspace:GetAttribute("2XEXPEvent") then 2 else 1)
 	monster:SetAttribute("Damage", 5 * level)
 	monster:SetAttribute("InCombat", false)
 
@@ -281,18 +281,15 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 		end
 	end
 	local respawnTimer = RepS.Package.Unloads.RespawnTimer:Clone() :: Part
-	respawnTimer.Parent = workspace
 	respawnTimer.Position = respawnLocatorTip.Position
+	respawnTimer.Parent = workspace
+
+	RepS.Resources.Unloads.RespawnCountdown:Clone().Parent = respawnTimer
 	Debris:AddItem(respawnTimer, 13)
-	Spawn(function()
-		for i = 12, 0, -1 do
-			respawnTimer.Timer.Text.Text = i
-			wait(1)
-		end
-	end)
 
 	monster:Destroy()
 	if respawnLocatorTip:FindFirstChild("PublicJoinPrompt") then respawnLocatorTip.PublicJoinPrompt:Destroy() end
+	if respawnLocatorTip:FindFirstChild("PartyJoinPrompt") then respawnLocatorTip.PartyJoinPrompt:Destroy() end
 
 	wait(13)
 	ServerUtil:SetupMonster(locator)
@@ -670,6 +667,29 @@ function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Playe
 
 		ServerUtil:ShowText(plr.Character, "+"..val.." "..reward, fromRGB(212, 255, 0))
 	end
+end
+
+--[[
+	Find the nearest spawn for character
+]]
+function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
+	local char = plr.Character
+
+	local lastLocation = plr:GetAttribute("LastLocation") :: Vector3
+	local lastDeath = if lastLocation and lastLocation ~= v3New() then lastLocation else char.PrimaryPart.Position
+	local spawnPoint, distance = nil, 9999999999
+	for _, child in workspace.Maps:GetDescendants() do
+		if child.Name == "SpawnPoint" then
+			local tDistance = (child.Position - lastDeath).Magnitude
+
+			if tDistance < distance then
+				distance = tDistance
+				spawnPoint = child
+			end
+		end
+	end
+
+	return spawnPoint
 end
 
 return ServerUtil

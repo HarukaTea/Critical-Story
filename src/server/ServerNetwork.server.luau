@@ -312,6 +312,13 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	if not monster.PrimaryPart then return end
 	if monster:GetAttribute("CantAttack") then baseDamage = 0 end
 
+	--- extra effects
+	local burnChance = LootPlan.new()
+	burnChance:Add("Burn", plr.Character:GetAttribute("BurnChance"))
+	burnChance:Add("None", 100 - plr.Character:GetAttribute("BurnChance"))
+	if burnChance:Roll() == "Burn" then SkillUtil:Burn(plr, monster, 6) end
+	burnChance:Destroy()
+
 	local subStyle = orb:GetAttribute("SubStyle") :: string?
 	local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
 	if AttackUtil[style] then AttackUtil[style](plr, monster, baseDamage, orb) end
@@ -339,9 +346,23 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 		return
 	end
 
+	--- dodge roll
+	local dodgeChance = LootPlan.new()
+	dodgeChance:Add("Dodge", plr.Character:GetAttribute("DodgeChance"))
+	dodgeChance:Add("None", 100 - plr.Character:GetAttribute("DodgeChance"))
+	if dodgeChance:Roll() == "Dodge" then
+		ServerUtil:ShowText(char, "BLOCKED!", fromRGB(255, 255, 255))
+
+		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Blocked)
+
+		dodgeChance:Destroy()
+		return
+	end
+	dodgeChance:Destroy()
+
     --- some hit cd detections
-    HarukaLib:Add(char, "HitCD", 5)
-    if char:GetAttribute("HitCD") > 5 then char:SetAttribute("HitCD", 5) end
+    HarukaLib:Add(char, "HitCD", 6)
+    if char:GetAttribute("HitCD") > 6 then char:SetAttribute("HitCD", 6) end
 
     if not char:FindFirstChild("RepairShield") then
         RepS.Resources.Unloads.RepairShield:Clone().Parent = char
@@ -787,8 +808,6 @@ local function questCompleted(series: string, questId: number, plr: Player, need
 	for _, quest: IntConstrainedValue in plr.Quests:GetChildren() do
 		if quest.Name == series and quest.Value == questId then
 			quest:Destroy()
-
-			if series == "Main" then _newQuest(series, questId, plr) end
 		end
 	end
 	if needNewQuest then _newQuest(series, questId, plr) end
@@ -809,6 +828,17 @@ local function newQuest(plr: Player, npc: Model, series: string, questId: number
 	quest.Parent = plr.Quests
 end
 Events.NewQuest:Connect(newQuest)
+
+--[[
+	Change player's last seen location
+]]
+local function changeLastSeen(plr: Player, location: string)
+	local spawnPoint = ServerUtil:FindNearestSpawn(plr)
+
+	plr:SetAttribute("LastLocation", spawnPoint.Position)
+	plr:SetAttribute("LastSeenLocation", location)
+end
+Events.ChangePlayerLocation:Connect(changeLastSeen)
 
 --[[
 	Handle the request to disable invite access for player

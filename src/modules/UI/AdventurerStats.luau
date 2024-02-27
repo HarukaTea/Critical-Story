@@ -10,6 +10,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
 local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
@@ -318,6 +319,8 @@ return function(plr: Player)
 		Events.GiveDrop:DisconnectAll()
 		Events.LevelUp:DisconnectAll()
 		Events.NPCChat:DisconnectAll()
+
+		Signals.NPCChat:DisconnectAll()
 
 		self.Empty()
 	end

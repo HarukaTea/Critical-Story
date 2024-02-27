@@ -115,14 +115,14 @@ end
 local head = char:WaitForChild("Head")
 
 local function onHit(hit: BasePart)
-    if hit and hit:GetAttribute("Water") then
+    if hit and hit:HasTag("Water") then
         workspace.Sounds.SFXs.Splash:Play()
 
         swimIn()
     end
 end
 local function endHit(hit: BasePart)
-    if hit and hit:GetAttribute("Water") then swimOut() end
+    if hit and hit:HasTag("Water") then swimOut() end
 end
 head.Touched:Connect(onHit)
 head.TouchEnded:Connect(endHit)

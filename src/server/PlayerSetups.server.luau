@@ -19,9 +19,9 @@ local TEMPLATE = {
 		Gold = 0,
 		RP = 0,
 		PlayTime = 0,
-		StoryId = 0,
 
 		Class = "Warrior",
+		LastSeenLocation = "InitusVillage",
 
 		LvPoints = 0,
 		DmgPoints = 0,
@@ -40,7 +40,7 @@ local TEMPLATE = {
 		Town = {}
 	}
 }
-local DS1, DS2, DS3 = "CSTORY_BETA1599", "CSTORY_BETA1599_S2", "CSTORY_BETA1599_S3"
+local DS1, DS2, DS3 = "CS_DEV1599", "CS_DEV1599_S2", "CS_DEV1599_S3"
 
 local newInstance = Instance.new
 local wait = task.wait
@@ -186,13 +186,13 @@ local function setup(plr: Player)
 		end
 	end
 	for item, slot in data.EquippedItems do
-		if AssetBook.Items.ItemName[item] then
+		if AssetBook.Items.ItemName[item] and backpackData:FindFirstChild(item) then
 			backpackData[item]:SetAttribute("Equipped", true)
 			backpackData[item]:SetAttribute("Slot", slot)
 		end
 	end
 	for _, item in data.PinnedItems do
-		if AssetBook.Items.ItemName[item] then
+		if AssetBook.Items.ItemName[item] and backpackData:FindFirstChild(item) then
 			backpackData[item]:SetAttribute("Pinned", true)
 		end
 	end

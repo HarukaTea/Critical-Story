@@ -14,7 +14,7 @@ story.Main = {
         Target = "Talk to Cyalm",
         Desc = "",
         NPC = "Cyalm",
-        Hint = if npcs:FindFirstChild("Cyalm") then npcs.Cyalm.PrimaryPart.Position else v3New(),
+        Hint = npcs.Cyalm.PrimaryPart.Position,
 
         Rewards = {
             EXP = 20,
@@ -26,7 +26,7 @@ story.Main = {
         Target = "Talk to Milk",
         Desc = "",
         NPC = "Milk",
-        Hint = if npcs:FindFirstChild("Milk") then npcs.Milk.PrimaryPart.Position else v3New(),
+        Hint = npcs.Milk.PrimaryPart.Position,
 
         Rewards = {
             EXP = 20,
@@ -38,7 +38,7 @@ story.Main = {
         Target = "Learn how to combat",
         Desc = "",
         NPC = "Milk",
-        Hint = if npcs:FindFirstChild("Milk") then npcs.Milk.PrimaryPart.Position else v3New(),
+        Hint = npcs.Milk.PrimaryPart.Position,
 
         Rewards = {
             EXP = 20,
@@ -50,7 +50,7 @@ story.Main = {
         Target = "Talk to Milk again",
         Desc = "",
         NPC = "Milk",
-        Hint = if npcs:FindFirstChild("Milk") then npcs.Milk.PrimaryPart.Position else v3New(),
+        Hint = npcs.Milk.PrimaryPart.Position,
 
         Rewards = {
             EXP = 20,
@@ -58,11 +58,11 @@ story.Main = {
         }
     },
     {
-        Name = "Monolith Grove",
-        Target = "Start your adventure!",
+        Name = "The Abyss - Paho", -- 5
+        Target = "Talk to Cyalm again",
         Desc = "",
-        NPC = "Firefly",
-        Hint = maps["Monolith Grove"].StoryLocator1.Position,
+        NPC = "Cyalm",
+        Hint = npcs.Cyalm.PrimaryPart.Position,
 
         Rewards = {
             EXP = 20,
@@ -70,38 +70,64 @@ story.Main = {
         }
     },
     {
-        Name = "To the Sky",
-        Target = "Go to Initus Bay",
+        Name = "Initus Bay", -- 6
+        Target = "Start your adventure!",
         Desc = "",
         NPC = "Hehe",
         Hint = maps["Initus Bay"].StoryLocator1.Position,
 
         Rewards = {
-            EXP = 20,
-            Gold = 100
+            EXP = 30,
+            Gold = 200
         }
     },
     {
-        Name = "The Secret",
-        Target = "Go back to Monolith Grove",
+        Name = "Slime Troubles", -- 7
+        Target = "Defeat Slimes to reach Level 10",
         Desc = "",
         NPC = "None",
-        Hint = maps["Monolith Grove"].StoryLocator1.Position,
+        Hint = maps["Primis Field"].StoryLocator1.Position,
+
+        Script = true,
 
         Rewards = {
-            EXP = 20,
-            Gold = 100
+            EXP = 40,
+            Gold = 200
+        }
+    },
+    {
+        Name = "The Next Journey", -- 8
+        Target = "Talk to hehe again",
+        Desc = "",
+        NPC = "Hehe",
+        Hint = npcs.Hehe.PrimaryPart.Position,
+
+        Rewards = {
+            EXP = 30,
+            Gold = 200
+        }
+    },
+    {
+        Name = "Misni Port", --- 9
+        Target = "Coming Soon",
+        Desc = "",
+        NPC = "None",
+        Hint = v3New(),
+
+        Rewards = {
+            EXP = 100,
+            Gold = 300
         }
     },
 }
 
 story.Side = {
     {
-        Name = "New Trust Power",
-        Target = "Get Archer power from its statue",
+        Name = "New Critical Power",
+        Target = "Get Archer class from its statue",
         Desc = "",
         NPC = "None",
-        Hint = if statues:FindFirstChild("Archer") then statues.Archer.PrimaryPart.Position else v3New(),
+        Hint = statues.Archer.PrimaryPart.Position,
 
         Script = true,
 
@@ -129,11 +155,11 @@ story.Town = {
         Target = "Return to FChenP",
         Desc = "",
         NPC = "FChenP",
-        Hint = if npcs:FindFirstChild("FChenP") then npcs.FChenP.PrimaryPart.Position else v3New(),
+        Hint = npcs.FChenP.PrimaryPart.Position,
 
         Rewards = {
-            EXP = 20,
-            Gold = 100
+            EXP = 40,
+            Gold = 150
         }
     }
 }
@@ -141,9 +167,12 @@ story.Town = {
 story.NPCs = {
     Cyalm = "Cyalm",
     Milk = "Milk",
-    FChenP = "FChenP",
     Firefly = "Firefly",
-    Hehe = "Hehe"
+    Hehe = "Hehe",
+
+    FChenP = "FChenP",
+    Xiaotie = "Xiaotie",
+    hnxtwyz = "hnxtwyz"
 }
 
 return story

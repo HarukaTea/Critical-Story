@@ -50,3 +50,27 @@ for _, child in workspace.Maps:GetDescendants() do
         end
     end
 end
+
+local locator = workspace.Monsters["Tundra"]["Lava Wolf"]:Clone()
+locator:ClearAllChildren()
+locator:SetAttribute("Levels", 100)
+locator.CFrame = workspace.IceX_Dust.PrimaryPart.CFrame * CFrame.new(0, -2, 0)
+locator.Parent = workspace.Monsters
+
+local monster = game.ReplicatedStorage.Package.MonsterModels[locator.Name]:Clone() :: Model
+monster:PivotTo(CFrame.new(locator.Position))
+monster:SetAttribute("Levels", 100)
+monster.Head.TierDisplay.Text.Text = monster.Name
+monster.Head.TierDisplay.Level.Text = "Level " .. 100
+monster.Head.TierDisplay.Enabled = true
+
+if locator:GetAttribute("SubMonster") then
+    monster.Head.TierDisplay.Enabled = false
+    monster:SetAttribute("SubMonster", true)
+end
+
+monster:SetAttribute("MaxHealth", math.floor(100 ^ 2.2) + 99)
+monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
+monster:SetAttribute("EXP", (math.floor(100 ^ 1.25) + 25) * if workspace:GetAttribute("2XEXPEvent") then 2 else 1)
+monster:SetAttribute("Damage", 5 * 100)
+monster:SetAttribute("InCombat", false)

@@ -8,7 +8,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local MonsterHPBar = require(RepS.Modules.UI.Components.MonsterHPFrame)
 
-local Children, New, Value = Fusion.Children, Fusion.New, Fusion.Value
+local Children, New, Value, peek = Fusion.Children, Fusion.New, Fusion.Value, Fusion.peek
 
 local v2New, udNew = Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
@@ -52,14 +52,17 @@ local function MonsterHPFrame(self: table) : Frame
 
     local function _addMonster(monster: ObjectValue)
 		wait()
-		local nowMonsters = Fusion.peek(self.charStatsDict.MonsterAmount)
+		local nowMonsters = peek(self.charStatsDict.MonsterAmount)
 
 		insert(nowMonsters, monster)
 		self.charStatsDict.MonsterAmount:set(nowMonsters)
 	end
 	local function _removeMonster(monster: ObjectValue)
+		local monsters = peek(self.charStatsDict.MonsterAmount)
+		if monster == monsters[self.nowMobIndex] then self.nowMobIndex = 1 end
+
 		wait(1)
-		local afterMonsters = Fusion.peek(self.charStatsDict.MonsterAmount)
+		local afterMonsters = peek(self.charStatsDict.MonsterAmount)
 
 		remove(afterMonsters, tFind(afterMonsters, monster))
 		self.charStatsDict.MonsterAmount:set(afterMonsters)

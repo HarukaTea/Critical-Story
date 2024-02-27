@@ -36,6 +36,8 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
     elseif item == "BurningTorch" then
         char:SetAttribute("CanLight", true)
 
+        RepS.Resources.Items.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
+
     elseif item == "CampfireWood" then
         HarukaLib:Add(char, "HealBuff", 30)
         HarukaLib:Add(char, "HealthBuff", 20)
@@ -134,6 +136,11 @@ function PassiveUtil:ClearAllPassives(char: Model)
 
         elseif find(attribute, "Can") then
             char:SetAttribute(attribute, nil)
+
+        elseif find(attribute, "Chance") then
+            char:SetAttribute(attribute, 0)
+
+            if attribute == "CriChance" then char:SetAttribute(attribute, 1) end
         end
     end
     for attribute, _ in char.CharStats.ExtraOrbs:GetAttributes() do

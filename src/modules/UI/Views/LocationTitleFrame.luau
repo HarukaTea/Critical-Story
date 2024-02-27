@@ -5,6 +5,7 @@ local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
@@ -41,6 +42,8 @@ local function LocationTitleFrame(self: table) : Frame
 		if locationInfo.Thread then cancel(locationInfo.Thread) end
 
 		wait()
+        Events.ChangePlayerLocation:Fire(location)
+
 		locationInfo.Thread = spawn(function()
             Spawn(function()
                 local overworldMusic = workspace.Sounds.Overworld :: Sound

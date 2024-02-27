@@ -303,4 +303,8 @@ function AttackUtil.Illusionist(plr: Player, monster: Model)
     SkillUtil:RestoreManaByOrb(plr)
 end
 
+function AttackUtil.FireStaff(plr: Player, monster: Model)
+    SkillUtil:Burn(plr, monster, 6)
+end
+
 return AttackUtil

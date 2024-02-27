@@ -16,6 +16,7 @@ local Signals = {
 
 	--- story
 	FirstStepTutorial = NewSignal(),
+	CompletedInitusBay = NewSignal(),
 
 	FChenPTown2 = NewSignal()
 }

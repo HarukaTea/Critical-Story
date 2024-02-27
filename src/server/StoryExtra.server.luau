@@ -13,10 +13,11 @@ local instanceNew = Instance.new
 
 --// Main
 local function firstCombat(plr: Player)
-    local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: Part
+    local locator = workspace.Monsters["Primis Field"]["Green Slime"]:Clone() :: Part
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", 1)
     locator:SetAttribute("CantRespawn", true)
+    locator:SetAttribute("MusicId", "Conquest")
     locator.CFrame = workspace.Maps["Initus Village"].TutorialLocator.CFrame
     locator.Parent = workspace.Monsters
 
@@ -55,6 +56,16 @@ local function firstCombat(plr: Player)
     end
 end
 Signals.FirstStepTutorial:Connect(firstCombat)
+
+local function afterInitusBay(plr: Player)
+    Signals.QuestComplete:Fire("Main", 8, plr, true)
+
+    wait(2)
+    Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.RareItemAcquired)
+
+    ServerUtil:GiveItem(plr, "HeheLetter", 1)
+end
+Signals.CompletedInitusBay:Connect(afterInitusBay)
 
 --// Town
 local function gaveFurs(plr: Player)

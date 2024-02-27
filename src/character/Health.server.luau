@@ -163,24 +163,12 @@ local function setup()
     end)
 
     --// Spawn to the nearest respawn point
-    --if not RS:IsStudio() then
-        local lastLocation = plr:GetAttribute("LastLocation") :: Vector3
-        local lastDeath = if lastLocation and lastLocation ~= v3New() then lastLocation else char.PrimaryPart.Position
-        local spawnPoint, distance = nil, 9999999999
-        for _, child in workspace.Maps:GetDescendants() do
-            if child.Name == "SpawnPoint" then
-                local tDistance = (child.Position - lastDeath).Magnitude
-
-                if tDistance < distance then
-                    distance = tDistance
-                    spawnPoint = child
-                end
-            end
-        end
+    if not RS:IsStudio() then
+        local spawnPoint = ServerUtil:FindNearestSpawn(plr)
 
         char:PivotTo(spawnPoint.CFrame)
         plr:SetAttribute("LastLocation", spawnPoint.Position)
-    --end
+    end
 end
 setup()
 

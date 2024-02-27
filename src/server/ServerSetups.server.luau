@@ -50,7 +50,10 @@ cmdrRegister()
 local function mainSetup()
 	--- clear extra events
 	for _, mapPart in workspace:GetDescendants() do
-		if mapPart:IsA("BasePart") and not mapPart:IsDescendantOf(workspace.MapComponents.Waters) then
+		if mapPart:IsA("BasePart") then
+			if mapPart:HasTag("Water") then continue end
+			if mapPart:HasTag("Walljump") then continue end
+			
 			mapPart.CanTouch = false
 		end
 	end

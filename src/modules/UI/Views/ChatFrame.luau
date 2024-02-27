@@ -64,7 +64,7 @@ local function ChatFrame(self: table) : Frame
         dialogueIndexChatting = 1
         dialogueChoiceIndex = 1
         canContinueChat = true
-        
+
         CAS:UnbindAction("FreezeControl")
         UIS.ModalEnabled = false
 
@@ -247,6 +247,7 @@ local function ChatFrame(self: table) : Frame
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Top,
                 TextWrapped = true,
+                RichText = true,
 
                 [Fusion.OnChange("AbsoluteSize")] = function(size)
                     self.chatDialogueAbsSize:set(size.Y)

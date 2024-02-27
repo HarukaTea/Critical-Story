@@ -4,33 +4,36 @@ local dialogues = {}
 
 dialogues.Cyalm = {
     Main1 = {
-        "Looks like you are finally awake...",
-        "Hello, my name is Cyalm. And it's me that summon you to this world.",
-        "Our world is full of Chaos, and I believe you are the next savior who can banish the evil.",
-        "Our first savior has sacrificed himself to defeat Epic.",
-        "But a new evil called Toucan has been discovered, we need another savior to save Critical Dimensions.",
-        "You need to collect Artifact that scattered in different worlds to increase your trust power.",
-        "Your first adventure starts here, Initus Village.",
-        "The world is counting on you, I know you can do it, right?"
+        "You have finally awakened. Still not accustomed to this world, are you?",
+        [[Let me introduce myself again. I am Cyalm from the <font color="#2ed573">Sky Empire</font>.]],
+        [[I have detected the rise of sinister forces from the neighboring <font color="#2ed573">Critical Dimension</font>.]],
+        "For certain reasons, I have decided to help this dimension. ",
+        [[I am aware that you recently saved the <font color="#2ed573">Sky Empire</font>, but...]],
+        [[This is a favor I ask of you. Here is the first stop on your journey: <font color="#1e90ff">Initus Village</font>.]],
+        "Try talking with the villagers here.",
+    },
+
+    Main5 = {
+        "It looks like you already have a rough understanding of this world.",
+        [[I have some matters to attend to in the <font color="#2ed573">Sky Empire</font>. Be extra cautious while I'm away.]],
+        [[One of <font color="#5352ed">the Abyss</font> members, <font color="#ff4757">Pahozinho</font>, seems to have been active recently.]]
     },
 
     Else = {
-        "You still have many questions to ask?",
+        "You still have other questions to ask?",
         "CHOICE 1",
 
         Choice1 = {
-            "Who is Epic?",
+            "Where do these sinister forces come from?",
             "EXIT Nothing else to ask, thanks.",
 
             Option1 = {
-                "Long long ago, I summoned the first Savior, to maintain balance in Critical Dimension.",
-                "But this tranquility proved finite. A being arose, it's about destruction, it was the Abyss.",
-                "The Abyss hated life in any form, they were destroying the worlds.",
-                "And Epic was one of the leaders in Abyss.",
-                "CHOICE 1"
+                [[It seems to be an organization called <font color="#5352ed">Abyss</font>, led by <font color="#ff4757">Epic Critical</font>.]],
+                [[I have a premonition that you will undoubtedly encounter members of <font color="#5352ed">Abyss</font> in your future travels.]],
+                "When that time comes, you must be extra cautious.",
             },
             Option2 = {
-                "Then just go ahead and do it.",
+                "No problem, good luck then!",
             },
         }
     },
@@ -40,28 +43,29 @@ dialogues.Cyalm = {
 
 dialogues.Milk = {
     Main2 = {
-        "Hello, Adventurer! Wait...Is that the Trust Manipulator you're carrying?",
-        "Excellent, you are our savior.",
+        "Hello, Adventurer! Wait...Is that the Critical Manipulator you're carrying?",
+        [[Excellent...really excellent..., my dear, you will be the <font color="#ff4757">Savior</font> of this world.]],
         "I'm sorry to say, perhaps...you are the last Savior.",
-        "It's inevitable that we meet here, is it Cyalm who brings you here?",
+        [[It's inevitable that we meet here, is it <font color="#ff4757">Cyalm</font> who brings you here?]],
         "My name is Edward Cole, a retired Protector, and you can call me Milk.",
         "Recently I discovered things forgotten that weigh heavy on the present.",
-        "Once upon a time, Cyalm summoned the first Savior, it maintained balance in Critical Dimension.",
-        "But this tranquility proved finite. A being arose, it's about destruction, it was the Abyss.",
-        "The Abyss hated life in any form, they were destroying the worlds.",
+        [[Once upon a time, Cyalm summoned the first Savior, <font color="#ff4757">Pioxit</font>, to maintain balance of this world.]],
+        [[But this tranquility proved finite. A being arose, it's about destruction, it was <font color="#5352ed">the Abyss</font>.]],
+        "The Abyss hated life in any form, they were destroying this world, and nearby Dimensions.",
         "It fought to blot out all life, and would have succeeded, but for the sacrifice of the first Savior.",
         "He succeeded in sealing them away, and by doing so, he exhausted his power completely.",
-        "Before its last energies dissipated, he gifted four artifacts to different critical worlds.",
-        "These four artifacts, when united, form the key that can open the gate to the Abyss.",
-        "This is a lot to take in dear, and a huge request to make of you...",
-        "The world is counting on you. I believe you can do it.",
-        "But before you start adventure, I'll teach you how to combat.",
-        "Talk to me again when you are ready.",
+        "Before its last energies dissipated, he gifted four artifacts to this world.",
+        [[These four artifacts, when united, form the key that can open the gate to <font color="#5352ed">the Ruins</font>, where <font color="#5352ed">Abyss</font> is sealed.]],
+        "The seal has started to weaken, and we must quickly reseal it!",
+        "But before that, as you are new to this world, you might not be familiar with the combat here.",
+        "In your realm, combat relies on targeting, but here, it's entirely different.",
+        "Why not experience it firsthand? Merely hearing about it from me won't allow you to grasp its intricacies.",
+        "Talk to me again when you are ready."
     },
 
     Main3 = {
         "There are a lot to be learned from combat, and this tutorial is no exception.",
-        "Touch the glowing symbols and use your trust power to attack.",
+        [[In Critical worlds, touch the glowing symbols and use your <font color="#ffa502">critical</font> power to attack.]],
         "Are you ready for the fight?",
         "CHOICE 1",
 
@@ -78,33 +82,16 @@ dialogues.Milk = {
 
     Main4 = {
         "Excellent! You may think it's trivial, but combat is an essential skill that will be pivotal in the future.",
-        "And I guess you have the ability to start the adventure.",
-        "I heard that something happened in Monolith Grove recently.",
-        "So I think you can set this as the first stop on your adventure.",
-        "Good luck, traveller!"
+        "I believe you have grasped the intricacies of it.",
+        "In the journeys ahead, you should learn more, but for now, these should suffice.",
+        "This world relies on you now, so go forth on your journey.",
+        "Good luck!"
     },
 
     Else = {
-        "What are you waiting for?",
-        "CHOICE 1",
-
-        Choice1 = {
-            "Where is Monolith Grove?",
-            "Why did you choose to be a protector?",
-            "EXIT Nothing else to ask, thanks.",
-
-            Option1 = {
-                "Have you seen the entrance over there? Just keep walking along this path, and you'll reach it.",
-                "CHOICE 1"
-            },
-            Option2 = {
-                "Regardless, we are all working towards the same goal, aren't we? To seal the Abyss and protect this planet.",
-                "CHOICE 1"
-            },
-            Option3 = {
-                "Good luck then!"
-            },
-        }
+        "I believe you have grasped the intricacies of it.",
+        "In the journeys ahead, you should learn more, but for now, these should suffice.",
+        "This world relies on you now, so go forth on your journey."
     },
 
     Extra = {
@@ -112,95 +99,33 @@ dialogues.Milk = {
     }
 }
 
-dialogues.Firefly = {
-    Main5 = {
-        "(Surprised) It's been a long time since I've seen a passing adventurer. Where are you from?",
-        "CHOICE 1",
-
-        Choice1 = {
-            "Initus Village",
-            "Arkus Enclave",
-
-            Option1 = {
-                "So why did you go out of the village? That's something I'm very curious about.",
-                "CHOICE 2"
-            },
-            Option2 = {
-                "Really? Judging by your attire, you don't seem to be from around there.",
-                "CHOICE 1"
-            }
-        },
-        Choice2 = {
-            "Cuz I'm the Savior!",
-            "I wanna adventure!",
-
-            Option1 = {
-                "Alright then, Well, it seems like another edgy teenager.",
-                "CHOICE 2"
-            },
-            Option2 = {
-                "Well, since you're so insistent, I'll point you in the right direction.",
-                "Heading left will take you to Initus Bay, where you should be able to use the Sky Galleon to reach another location."
-            }
-        }
-    },
-
-    Else = {
-        "Heading left will take you to Initus Bay, where you should be able to use the Sky Galleon to reach another location.",
-        "CHOICE 1",
-
-        Choice1 = {
-            "I may have seen you before.",
-            "EXIT Goodbye!",
-
-            Option1 = {
-                "That's not surprising. Perhaps you met me in another dimension.",
-                "CHOICE 1"
-            },
-            Option2 = {
-                "Good luck then!"
-            }
-        }
-    },
-
-    Extra = {}
-}
-
 dialogues.Hehe = {
     Main6 = {
-        "Hi, adventurer! You seem to be in a hurry. Have you encountered any trouble?",
+        "Hi, adventurer! Welcome to Initus Bay!",
+        "However, we've run into a bit of trouble... The road to Misni Port is blocked by Slimes.",
+        "Their presence is disrupting the flow of goods between us and Misni Port. So, could you help us clear them out?",
         "CHOICE 1",
 
         Choice1 = {
-            "I'm looking for Sky Galleon.",
-            "I want to level up!",
+            "Sure, I'll!",
+            "Yep, it's another way to lvl up!",
 
             Option1 = {
-                "Have you seen the Sky Galleon docked over there? I guess that's what you're looking for.",
-                "However, without Everfrost Seeds, you are not allowed to board it.",
-                "CHOICE 2"
+                "That would be greatly appreciated. I'll be waiting here for your good news!"
             },
             Option2 = {
-                "If you wanna level up quickly, you can try to defeat those slimes in field.",
-                "CHOICE 1"
+                "Yeah, even a level 950 adventuer will do it though.",
             }
         },
-        Choice2 = {
-            "How do I get it?",
-            "Is there another way?",
-
-            Option1 = {
-                "I heard that something happened in Monolith Grove, maybe you can get it there.",
-            },
-            Option2 = {
-                "Perhaps not, I can't say for sure. Maybe you can try going to Misni Port?",
-                "CHOICE 2"
-            }
-        }
+    },
+    Main8 = {
+        "Thank you so much! The danger on the way to Misni Port has been greatly reduced.",
+        "If you wish to continue your adventure, that would be a good choice.",
+        [[This is a letter of recommendation. Take it and look for <font color="#ff4757">MKK</font> at Misni Port. I believe she will treat you well.]]
     },
 
     Else = {
-        "If you need me in the future, you can come find me. I'm quite certain we will meet again.",
+        "If you need me in the future, you can come here and find me.",
         "CHOICE 1",
 
         Choice1 = {
@@ -217,7 +142,9 @@ dialogues.Hehe = {
         }
     },
 
-    Extra = {}
+    Extra = {
+        Main8 = "CompletedInitusBay"
+    }
 }
 
 
@@ -263,6 +190,34 @@ dialogues.FChenP = {
 
     Extra = {
         Town2 = "FChenPTown2"
+    }
+}
+dialogues.Xiaotie = {
+    --// Initus Village
+    Else = {
+        "How did you do that?",
+        "I was just relaxing under this tree, and then you suddenly appeared..."
+    }
+}
+dialogues.hnxtwyz = {
+    --// Primis Field
+    Else = {
+        "Touch these black parts will make you perform a walljump.",
+        "You may have done it before, but it's a mechanic in Critical worlds.",
+        "Also, keep jumping will make you climb trusses more quickly.",
+        "CHOICE 1",
+
+        Choice1 = {
+            "How do you know about it?",
+            "EXIT Thanks!",
+
+            Option1 = {
+                "Nah cuz I'm also a former protector, and Milk told me about you."
+            },
+            Option2 = {
+                "Then why not try it instead?"
+            }
+        }
     }
 }
 
