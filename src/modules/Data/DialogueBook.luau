@@ -107,7 +107,7 @@ dialogues.Hehe = {
         "CHOICE 1",
 
         Choice1 = {
-            "Sure, I'll!",
+            "Sure!",
             "Yep, it's another way to lvl up!",
 
             Option1 = {
@@ -200,24 +200,9 @@ dialogues.Xiaotie = {
     }
 }
 dialogues.hnxtwyz = {
-    --// Primis Field
+    --// Initus Village
     Else = {
-        "Touch these black parts will make you perform a walljump.",
-        "You may have done it before, but it's a mechanic in Critical worlds.",
-        "Also, keep jumping will make you climb trusses more quickly.",
-        "CHOICE 1",
-
-        Choice1 = {
-            "How do you know about it?",
-            "EXIT Thanks!",
-
-            Option1 = {
-                "Nah cuz I'm also a former protector, and Milk told me about you."
-            },
-            Option2 = {
-                "Then why not try it instead?"
-            }
-        }
+        "Keep jumping will make you climb trusses more quickly.",
     }
 }
 

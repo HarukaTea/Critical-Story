@@ -53,7 +53,7 @@ local function mainSetup()
 		if mapPart:IsA("BasePart") then
 			if mapPart:HasTag("Water") then continue end
 			if mapPart:HasTag("Walljump") then continue end
-			
+
 			mapPart.CanTouch = false
 		end
 	end
@@ -118,7 +118,12 @@ local function mainSetup()
 		end
 	end
 	for _, locator in workspace.Monsters:GetDescendants() do
-		if locator:HasTag("MonsterLocation") then ServerUtil:SetupMonster(locator) end
+		if locator:HasTag("MonsterLocation") then
+			RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
+
+			ServerUtil:SetupMonster(locator)
+			ServerUtil:ConnectMob(locator)
+		end
 	end
 
 	--- player attacks setups
@@ -147,6 +152,7 @@ local function mainSetup()
 		if plr.UserId == 2040399306 then plr:SetAttribute("Role", "CSV Founder") end
 		if plr.UserId == 1097119343 then plr:SetAttribute("Role", "CV Founder") end
 		if plr.UserId == 3563941913 then plr:SetAttribute("Role", "CO Founder") end
+		if plr.UserId == 91364976 then plr:SetAttribute("Role", "CR Founder") end
 
 		joinData = plr:GetJoinData().TeleportData
 	end)

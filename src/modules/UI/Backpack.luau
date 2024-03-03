@@ -253,6 +253,10 @@ return function(plr: Player)
 
 		_setExVisibleState(ui, if curUI == "None" then false else true)
 		_setOthersVisibleState(if curUI == "None" then true else false)
+
+		for _, child in self.plrGui.AdventurerStats:GetDescendants() do
+			if child:IsA("UIStroke") and child.Color == fromRGB(255, 255, 255) then child.Transparency = 1 end
+		end
 	end
 	local function _openBackpack(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end

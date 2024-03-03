@@ -12,7 +12,6 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local char = script.Parent :: Model
@@ -21,7 +20,7 @@ local humanoid = char.Humanoid :: Humanoid
 
 local charStats = nil
 local isBroken = false
-local lvUpCD, dmgTouchCD = false, false
+local lvUpCD = false
 
 local ATTRIBUTES = {
     InCombat = false,
@@ -67,13 +66,11 @@ local wait = task.wait
 local floor, random = math.floor, math.random
 local instanceNew = Instance.new
 local sFind = string.find
-local v3New = Vector3.new
 
 
 local stopSpawn
 local function orbSpawnHandler(state: boolean)
     local orbFolders = workspace.MapComponents.OrbFolders :: Folder
-    local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
 
     local function _placeOrb(orb: Model, pos: CFrame, lifeTime: number)
         orb.Owner.Value = char
@@ -84,6 +81,7 @@ local function orbSpawnHandler(state: boolean)
         Debris:AddItem(orb, lifeTime)
     end
     local function _spawnOrb(isSpawned: boolean?)
+        local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
         local isInCombat, class, lifeTime =
             char:GetAttribute("InCombat") :: boolean,
             plr:GetAttribute("Class") :: string,
@@ -96,14 +94,14 @@ local function orbSpawnHandler(state: boolean)
             else
                 orb = orbAttack[class .. "Orb"]:Clone() :: Model
             end
-            _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value, char), lifeTime)
+            _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
 
             --- extra orbs from items
             if not isSpawned then
                 for attr, val in char.CharStats.ExtraOrbs:GetAttributes() do
                     if not val then continue end
 
-                    _placeOrb(orbAttack[attr.Name]:Clone(), ServerUtil:GenerateOrbPos(monster.Value, char), lifeTime)
+                    _placeOrb(orbAttack[attr]:Clone(), ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
                 end
             end
         end
@@ -169,6 +167,8 @@ local function setup()
         char:PivotTo(spawnPoint.CFrame)
         plr:SetAttribute("LastLocation", spawnPoint.Position)
     end
+
+    char:SetAttribute("CharDataLoaded", true)
 end
 setup()
 
@@ -240,7 +240,7 @@ questDataSetup()
 
 --// Connections
 local function onDead()
-    plr:SetAttribute("LastLocation", char.PrimaryPart.Position)
+    if char.PrimaryPart then plr:SetAttribute("LastLocation", char.PrimaryPart.Position) end
     char:SetAttribute("InCombat", false)
 
     for _, monster in char.CharStats.TargetMonsters:GetChildren() do
@@ -353,5 +353,3 @@ Fusion.Hydrate(char)({
         ServerUtil:EquipWeapon(char)
     end
 })
-
-char:SetAttribute("CharDataLoaded", true)

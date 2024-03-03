@@ -157,7 +157,7 @@ return function(plr: Player)
 						TextXAlignment = Enum.TextXAlignment.Left,
 						Text = RepS.Package.ServerLocation.Value
 							.." "..RepS.Package.PrivateServerId.Value
-							.." v0.7",
+							.."v"..RepS.Package.Version.Value,
 
 						[Children] = {
 							New("UIPadding")({ PaddingLeft = udNew(0.005, 0) }),

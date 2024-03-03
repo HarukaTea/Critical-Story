@@ -156,12 +156,8 @@ PPS.PromptTriggered:Connect(promptsHandler)
 	Combat starts! Good luck players
 ]]
 local function combatStartSetup(plr: Player, monster: Model, mode: string)
-
-	--- if monster was occupied by another player, you wanna join it
-	if monster:GetAttribute("InCombat") then
-		ServerUtil:AddTargetForMonster(plr, monster)
-		return
-	end
+	--- if monster was occupied by another player, we will return it
+	if monster:GetAttribute("InCombat") then return end
 
 	ServerUtil:AddTargetForMonster(plr, monster)
 	ServerUtil:MonsterActivateCombat(monster, mode, plr)
@@ -179,112 +175,7 @@ local function combatStartSetup(plr: Player, monster: Model, mode: string)
 		end
 	end
 end
-
---[[
-	Combat ends, we don't know whether it's success or not
-]]
-local function combatEndSetup(monster: Model)
-	monster.Attack.Disabled = true
-
-	local attackFolder = monster.Holder.Value
-	local continueCombatCheck = false
-
-	--- another issue, don't change this else it will bug
-	local result = "Failed"
-	if monster:GetAttribute("Health") <= 0 then result = "Success" end
-
-	if result == "Failed" then
-		ServerUtil:MonsterDefeated(monster, monster.PrimaryPart.Position, true)
-		return
-	end
-
-	if result == "Success" then
-		local combatPlrs, attacks = {}, {}
-		for _, target in monster.TargetingList:GetChildren() do
-			local tempPlr = Players:GetPlayerFromCharacter(target.Value)
-
-			if tempPlr then insert(combatPlrs, tempPlr) end
-		end
-		for _, attack: Instance in attackFolder:GetDescendants() do
-			if attack:IsA("BasePart") then
-				if attack.Transparency < 1 then insert(attacks, attack) end
-			end
-			attack:RemoveTag("MonsterDMG")
-		end
-		for _, player in combatPlrs do
-			Events.ClientTween:Fire(player, attacks, { Transparency = 1 }, "one")
-		end
-
-		for _, player in combatPlrs do
-			local charStats = player.Character.CharStats
-
-			--- player finished combat
-			if not charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue") then
-				local beatList = { monster }
-				for _, otherMonster in monster.WaitingList:GetChildren() do
-					insert(beatList, otherMonster)
-				end
-
-				local totalEXP = 0
-				for _, defeated in beatList do
-					totalEXP += defeated:GetAttribute("EXP")
-
-					ServerUtil:GiveDrop(player, RepS.Package.MonsterModels[defeated.Name])
-				end
-
-				HarukaLib:Add(player, "EXP", totalEXP)
-				HarukaLib:Add(player, "Gold", floor(totalEXP / 1.5))
-				HarukaLib:Add(player, "RP", floor(totalEXP / 5))
-
-				ServerUtil:ShowText(player.Character, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
-				ServerUtil:ShowText(player.Character, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))
-				ServerUtil:ShowText(player.Character, "+" .. floor(totalEXP / 5) .. " RP", fromRGB(0, 255, 255))
-
-				player.Character:SetAttribute("InCombat", false)
-				charStats.TargetMonster.Value = nil
-
-				for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
-					if orbFolder.Name == player.Name then orbFolder:Destroy() end
-				end
-
-				continue
-			end
-
-			--- if still doesn't finished, then target next one
-			charStats.TargetMonster.Value = charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue").Value
-		end
-
-		local locator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
-		for _, child in locator:GetDescendants() do
-			if child:HasTag("Monster")
-				and child ~= monster
-				and child:GetAttribute("InCombat") == true
-				and child:GetAttribute("Health") > 0 then
-
-				if child:FindFirstChild("TargetingList") and
-					child.TargetingList:FindFirstChildOfClass("ObjectValue") then
-
-					continueCombatCheck = true
-
-					local locatorSymbol = instanceNew("ObjectValue")
-					locatorSymbol.Name = monster.Name
-					locatorSymbol.Value = monster.Parent
-					locatorSymbol:SetAttribute("EXP", monster:GetAttribute("EXP"))
-					locatorSymbol.Parent = child.WaitingList
-
-					for _, pastWaiting in monster.WaitingList:GetChildren() do
-						pastWaiting.Parent = child.WaitingList
-					end
-					break
-				end
-			end
-		end
-
-		ServerUtil:MonsterDefeated(monster, monster.PrimaryPart.Position, not continueCombatCheck)
-	end
-end
 Events.CombatStart:Connect(combatStartSetup)
-Signals.CombatEnd:Connect(combatEndSetup)
 
 --[[
 	Player hit the orb and deal dmg to mobs
@@ -331,6 +222,8 @@ Events.MobTakeDMG:Connect(mobTakeDMG)
 	Character is taking damage rn
 ]]
 local function charTakeDMG(plr: Player, dmgPart: Model)
+	if not dmgPart then return end
+	if not dmgPart.Parent then return end
     if not dmgPart:FindFirstChild("Owner") then return end
 	if not dmgPart.Owner.Value then return end
 

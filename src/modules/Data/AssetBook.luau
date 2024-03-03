@@ -142,7 +142,7 @@ assets.LocationInfo = {
 		SonusCave = "Bats make you crazy.",
         MisniPort = "Another port, larger than Initus Bay",
         Highland = "I don't know why it's called High Lands...",
-        Tundra = "Tempature start to drop..."
+        Tundra = "The temperature start to drop..."
 	},
     Music = {
         InitusVillage = "rbxassetid://11130054413",

@@ -7,7 +7,7 @@ local UIS = game:GetService("UserInputService")
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
-local humanoid = char:FindFirstChildOfClass("Humanoid") :: Humanoid
+local humanoid = char.Humanoid :: Humanoid
 
 local rayNew = Ray.new
 local cfNew = CFrame.new

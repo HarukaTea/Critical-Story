@@ -124,13 +124,15 @@ local function setup()
 				and monster.PrimaryPart
 				and not monster:GetAttribute("InCombat") then
 
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 256 then
+                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 166 then
                     local rotating = random(5, 20)
                     local direction = random(-2, 2)
 
 					Spawn(function()
-						wait(random(0, 5) / 10)
+						wait(random(0, 6) / 10)
 						for _ = 1, rotating do
+							if not monster and monster.PrimaryPart then break end
+
 							monster.PrimaryPart.CFrame *= cfAngles(0, rad(direction * 5), 0)
 							wait(0.01)
 						end
@@ -272,6 +274,8 @@ local function onTouched(hit: BasePart)
 		if orbTouchCD then return end
 		if not orb:FindFirstChild("Owner") then return end
 		if orb.Owner.Value ~= char then return end
+		if not char.PrimaryPart then return end
+		if not orb.PrimaryPart then return end
 		if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
 		if not char.CharStats.TargetMonster.Value then return end
 		if not HRP then return end

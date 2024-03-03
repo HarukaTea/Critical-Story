@@ -2,6 +2,7 @@
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
+local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
@@ -33,11 +34,12 @@ local function PlayerSlot(self: table, player: Player): Frame
 			New("ImageLabel")({
 				Name = "Class",
 				AnchorPoint = v2New(0, 0.5),
-				BackgroundColor3 = Color3.new(),
+				BackgroundColor3 = color3New(),
 				Position = fromScale(0.055, 0.5),
 				Size = fromScale(0.14, 0.665),
 				Image = Fusion.Computed(function(use)
-					return AssetBook.ClassInfo[use(class)].Image
+					local realClass = use(class)
+					return if AssetBook.ClassInfo[realClass] then AssetBook.ClassInfo[realClass].Image else ""
 				end),
 
 				[Fusion.Children] = { Components.RoundUICorner() },
@@ -60,8 +62,10 @@ local function PlayerSlot(self: table, player: Player): Frame
 
 					for _, element in list:GetChildren() do
 						if element:IsA("Frame") then
-							element.BackgroundColor3 = fromRGB(30, 30, 30)
-							element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+							local roleColor = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+
+							TS:Create(element, AssetBook.TweenInfos.twiceHalf, { BackgroundColor3 = fromRGB(30, 30, 30) }):Play()
+							TS:Create(element.PlayerName, AssetBook.TweenInfos.twiceHalf, { TextColor3 = roleColor }):Play()
 						end
 					end
 					for _, element in desc:GetChildren() do
@@ -70,8 +74,8 @@ local function PlayerSlot(self: table, player: Player): Frame
 						end
 					end
 
-					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
-					list[player.Name].PlayerName.TextColor3 = color3New()
+					TS:Create(list[player.Name], AssetBook.TweenInfos.twiceHalf, { BackgroundColor3 = color3New(1, 1, 1) }):Play()
+					TS:Create(list[player.Name].PlayerName, AssetBook.TweenInfos.twiceHalf, { TextColor3 = color3New() }):Play()
 
 					desc.Role.Text = ""
 					desc.DisplayName.Text = player.DisplayName
@@ -88,7 +92,6 @@ local function PlayerSlot(self: table, player: Player): Frame
 					end
 
 					local items = player:WaitForChild("Inventory", 999) :: Folder
-					local cosmeticIndex = 8
 
 					for _, item in items:GetChildren() do
 						if AssetBook.Items.ItemType[item.Name] == "Passive" and item:GetAttribute("Equipped") then

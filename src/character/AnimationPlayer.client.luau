@@ -19,19 +19,24 @@ local anims = {
 	WizardAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 	KnightAnim1 = animator:LoadAnimation(animations.KnightAttack),
 	KnightAnim2 = animator:LoadAnimation(animations.KnightAttack2),
-	RogueAnim1 = animator:LoadAnimation(animations.WarriorAttack),
-	RogueAnim2 = animator:LoadAnimation(animations.WarriorAttack2),
 	RepeaterAnim1 = animator:LoadAnimation(animations.RepeaterAttack),
 	RepeaterAnim2 = animator:LoadAnimation(animations.RepeaterAttack2),
 	StrikerAnim1 = animator:LoadAnimation(animations.StrikerAttack),
-	StrikerAnim2 = animator:LoadAnimation(animations.WarriorAttack2),
-	AlchemistAnim1 = animator:LoadAnimation(animations.ArcherAttack2),
 	AlchemistAnim2 = animator:LoadAnimation(animations.AlchemistAttack),
-	IllusionistAnim1 = animator:LoadAnimation(animations.WizardAttack),
-	IllusionistAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
 	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2),
+
+	FireStaffAnim1 = animator:LoadAnimation(animations.WizardAttack),
+	FireStaffAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 }
+anims.RogueAnim1 = anims.WarriorAnim1
+anims.RogueAnim2 = anims.WarriorAnim2
+anims.StrikerAnim2 = anims.WarriorAnim2
+anims.AlchemistAnim1 = anims.ArcherAnim2
+anims.IllusionistAnim1 = anims.WizardAnim1
+anims.IllusionistAnim2 = anims.WizardAnim2
+anims.FireStaffAnim1 = anims.WizardAnim1
+anims.FireStaffAnim2 = anims.WizardAnim2
 
 local function playAnim(anim: string)
 	anims[anim]:Play()

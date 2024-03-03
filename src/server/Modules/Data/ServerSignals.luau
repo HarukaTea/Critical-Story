@@ -7,7 +7,6 @@ local Signal = require(RepS.Modules.Packages.Signal)
 local NewSignal = Signal.new
 
 local Signals = {
-	CombatEnd = NewSignal(),
 	ItemsAdded = NewSignal(),
 	ItemsEquipped = NewSignal(),
 	ItemsPinned = NewSignal(),

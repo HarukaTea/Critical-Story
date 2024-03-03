@@ -64,6 +64,10 @@ local function ExCharButton(id: string, self: table): Frame
 					plrGui.PlayerList.Enabled = false
 					workspace.CurrentCamera.UIBlur.Enabled = true
 
+					for _, child in peek(self.UI):GetDescendants() do
+						if child:IsA("UIStroke") then child.Transparency = 1 end
+					end
+
 					if id == "Menu" then
 						workspace.Sounds.SFXs.MapOpen:Play()
 

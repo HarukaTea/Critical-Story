@@ -1,17 +1,14 @@
 --!nocheck
 
 local RepS = game:GetService("ReplicatedStorage")
-local SSS = game:GetService("ServerScriptService")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Signals = require(SSS.Modules.Data.ServerSignals)
 
 local char = script.Parent :: Model
 local isDead = false
 local isInStage = false
 
 local wait = task.wait
-local random = math.random
 
 char:GetAttributeChangedSignal("Health"):Connect(function()
 	local hp = char:GetAttribute("Health") :: number
@@ -40,7 +37,7 @@ char:GetAttributeChangedSignal("Health"):Connect(function()
 			end
 		end
 
-		Signals.CombatEnd:Fire(char)
+		char.Parent.CombatEnd:Fire()
 	end
 end)
 
@@ -49,7 +46,6 @@ char.TargetingList.ChildRemoved:Connect(function()
 	if not char.TargetingList:FindFirstChildOfClass("ObjectValue") and not isDead then
 		isDead = true
 
-		wait(random(0, 2) / 10) -- prevent signal floods, which will cause signal drop
-		Signals.CombatEnd:Fire(char)
+		char.Parent.CombatEnd:Fire()
 	end
 end)

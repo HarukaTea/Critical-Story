@@ -9,7 +9,7 @@ local function climb(isJumping: boolean) : nil
         local HRP = char.PrimaryPart :: BasePart
         local vel = HRP.AssemblyLinearVelocity
 
-        HRP.AssemblyLinearVelocity = v3New(vel.X, 55, vel.Z)
+        HRP.AssemblyLinearVelocity = v3New(vel.X, char.Humanoid.JumpPower * 1.1, vel.Z)
     end
 end
 char.Humanoid.Jumping:Connect(climb)

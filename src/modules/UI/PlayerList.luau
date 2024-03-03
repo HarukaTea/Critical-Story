@@ -91,8 +91,9 @@ return function(plr: Player)
 				Name = "Hover",
 				AnchorPoint = v2New(),
 				Position = ud2New(0.868, 0, 0.013, 20),
+
 				Size = Computed(function(use)
-					return ud2New(0.127, 0, 0, min(use(self.absContentSize), use(self.absSize)))
+					return ud2New(0.127, 0, 0, use(self.absSize))
 				end),
 				Visible = Computed(function(use)
 					return use(self.isOpen)
