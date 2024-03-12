@@ -1,23 +1,30 @@
---!strict
+--!nocheck
+
 local RunService = game:GetService("RunService")
+
 local Type = require(script.Parent.Type)
+
+local instanceNew = Instance.new
+local wait = task.wait
 
 if RunService:IsServer() then
 	if not script:FindFirstChild("Reliable") then
-		Instance.new("RemoteEvent", script).Name = "Reliable"
-	end
-	if not script:FindFirstChild("Unreliable") then
-		Instance.new("UnreliableRemoteEvent", script).Name = "Unreliable"
+		local reliableEvent = instanceNew("RemoteEvent")
+		reliableEvent.Name = "Reliable"
+		reliableEvent.Parent = script
+
 	end
 	if not script:FindFirstChild("Request") then
-		Instance.new("RemoteEvent", script).Name = "Request"
+		local reliableEvent = instanceNew("RemoteEvent")
+		reliableEvent.Name = "Request"
+		reliableEvent.Parent = script
 	end
-elseif not script:FindFirstChild("Reliable") or not script:FindFirstChild("Unreliable") or not script:FindFirstChild("Request") then
-	repeat task.wait() until script:FindFirstChild("Reliable") and script:FindFirstChild("Unreliable") and script:FindFirstChild("Request")
+
+elseif not script:FindFirstChild("Reliable") or not script:FindFirstChild("Request") then
+	repeat wait() until script:FindFirstChild("Reliable") and script:FindFirstChild("Request")
 end
 
 return {
 	Reliable = script.Reliable,
-	Unreliable = script.Unreliable,
 	Request = script.Request
 } :: Type.Event

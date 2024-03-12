@@ -87,7 +87,7 @@ return function(plr: Player)
 		_setExVisibleState(ui, if curUI == "None" then false else true)
 		_setOthersVisibleState(if curUI == "None" then true else false)
 
-		for _, child in self.plrGui.AdventurerStats:GetDescendants() do
+		for _, child in self.plrGui.AdventurerStats.BG:GetDescendants() do
 			if child:IsA("UIStroke") and child.Color == fromRGB(255, 255, 255) then child.Transparency = 1 end
 		end
 	end
@@ -113,17 +113,6 @@ return function(plr: Player)
 		end
 	end
 	CAS:BindAction("OpenMenu", _openMenu, false, Enum.KeyCode.C)
-
-	--// Setups
-	if not plr:GetAttribute("MenuSetups") then
-		plr:SetAttribute("MenuSetups", true)
-		plr:SetAttribute("CombatMode", "Solo")
-		plr:SetAttribute("Musics", true)
-		plr:SetAttribute("SFXs", true)
-		plr:SetAttribute("PotatoMode", false)
-		plr:SetAttribute("PlayerList", true)
-		plr:SetAttribute("InviteAccess", true)
-	end
 
 	--// Clear
 	local function _clearGarbage()

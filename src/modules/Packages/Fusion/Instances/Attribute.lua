@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	A special key for property tables, which allows users to apply custom

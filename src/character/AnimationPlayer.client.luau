@@ -29,6 +29,7 @@ local anims = {
 	FireStaffAnim1 = animator:LoadAnimation(animations.WizardAttack),
 	FireStaffAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 }
+-- Prevent animation duplication, but re-edit the table will cause table rehash?
 anims.RogueAnim1 = anims.WarriorAnim1
 anims.RogueAnim2 = anims.WarriorAnim2
 anims.StrikerAnim2 = anims.WarriorAnim2
@@ -38,12 +39,14 @@ anims.IllusionistAnim2 = anims.WizardAnim2
 anims.FireStaffAnim1 = anims.WizardAnim1
 anims.FireStaffAnim2 = anims.WizardAnim2
 
+--// Connections
 local function playAnim(anim: string)
 	anims[anim]:Play()
 end
 Events.PlayAnimation:Connect(playAnim)
 Signals.PlayAnimation:Connect(playAnim)
 
+--// Clear
 local function onDead()
 	Events.PlayAnimation:DisconnectAll()
 	Signals.PlayAnimation:DisconnectAll()

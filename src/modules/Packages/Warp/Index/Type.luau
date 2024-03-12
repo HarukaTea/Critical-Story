@@ -1,4 +1,5 @@
---!strict
+--!nocheck
+
 export type rateLimitArg = {
 	maxEntrance: number?,
 	interval: number?,
@@ -29,7 +30,6 @@ export type Server = {
 
 export type Event = {
 	Reliable: RemoteEvent,
-	Unreliable: UnreliableRemoteEvent,
 	Request: RemoteEvent,
 }
 

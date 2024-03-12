@@ -7,8 +7,8 @@ local Signal = require(RepS.Modules.Packages.Signal)
 
 local TypeWriter = {}
 TypeWriter.__index = TypeWriter
-TypeWriter.onTextUpdated = Signal.new()
-TypeWriter.onTyperFinished = Signal.new()
+TypeWriter.onTextUpdated = Signal()
+TypeWriter.onTyperFinished = Signal()
 
 local sFind, sub, match = string.find, string.sub, string.match
 local wait = task.wait

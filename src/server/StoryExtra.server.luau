@@ -21,7 +21,10 @@ local function firstCombat(plr: Player)
     locator.CFrame = workspace.Maps["Initus Village"].TutorialLocator.CFrame
     locator.Parent = workspace.Monsters
 
+    RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
+
     local monster = ServerUtil:SetupMonster(locator)
+    ServerUtil:ConnectMob(locator)
 
     plr.Character:PivotTo(locator.CFrame)
 

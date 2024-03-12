@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Manages batch updating of spring objects.

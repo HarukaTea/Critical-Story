@@ -22,7 +22,7 @@ local function StatImage(id: string, self: table) : ImageLabel
                 return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 
             elseif id == "Gold" then
-                return AssetBook.Items.ItemImages.Lux
+                return "rbxassetid://16654275243"
 
             elseif id == "RP" then
                 return "rbxassetid://16002068286"

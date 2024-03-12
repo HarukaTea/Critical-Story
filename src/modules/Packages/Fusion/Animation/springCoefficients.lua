@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Returns a 2x2 matrix of coefficients for a given time, damping and speed.

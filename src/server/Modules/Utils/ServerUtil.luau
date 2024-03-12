@@ -303,9 +303,14 @@ end
 ]]
 function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	--- checks
-	if not monster then return end
-	if not monster.Parent then return end
-	if not monster.Parent.Parent then return end
+	local check = true
+
+	Spawn(function()
+		if not monster then check = false end
+		if not monster.Parent then check = false end
+		if not monster.Parent.Parent then check = false end
+	end)
+	if not check then return cfNew(0, 0, 0) end
 
 	local ignore = {}
 	for _, child in workspace.Monsters:GetDescendants() do
@@ -461,7 +466,6 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	end
 
 	Events.GiveDrop:Fire(plr, item)
-	Signals.ItemsAdded:Fire(plr)
 	Events.RefreshBackpack:Fire(plr)
 end
 
@@ -528,14 +532,14 @@ end
 	The core function, fires a ray, if there's a part, return the ray position
 	where it ends
 ]]
-function ServerUtil:FindPartOnRay(givenPos: Vector3, ignores: table?)
+function ServerUtil:FindPartOnRay(givenPos: Vector3, ignores: table?) : Vector3
 	local ray = rayNew(givenPos, -(yAxis).Unit * 500)
 	local ignoreList = ignores or {}
 
 	while wait() do
 		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
 		if hit then
-			if not (hit.Parent:GetAttribute("Terrain") or hit.Parent.Name == "Terrain")
+			if not (hit.Parent:HasTag("Terrain") or hit.Parent.Name == "Terrain")
 				or not hit.CanCollide
 				or hit.Transparency >= 0.5 then
 
@@ -675,7 +679,7 @@ end
 function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
 	local char = plr.Character
 
-	local lastLocation = plr:GetAttribute("LastLocation") :: Vector3
+	local lastLocation = plr:GetAttribute("LastLeave") :: Vector3
 	local lastDeath = if lastLocation and lastLocation ~= v3New() then lastLocation else char.PrimaryPart.Position
 	local spawnPoint, distance = nil, 9999999999
 	for _, child in workspace.Maps:GetDescendants() do

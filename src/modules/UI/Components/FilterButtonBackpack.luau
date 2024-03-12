@@ -13,6 +13,7 @@ local peek = Fusion.peek
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
+local wait = task.wait
 
 local COLORS = {
 	Passive = fromRGB(40, 98, 3),
@@ -23,6 +24,8 @@ local COLORS = {
 	Pin = fromRGB(93, 47, 140),
 }
 local VISIBLES = { Equip = true, Pin = true }
+
+local clickCD = false
 
 local function _findItem(itemFrame: Frame) : string
 	local item: string?
@@ -35,7 +38,15 @@ local function _findItem(itemFrame: Frame) : string
 
 	return item
 end
+local function setCD()
+	clickCD = true
+
+	wait(0.5)
+	clickCD = false
+end
 local function _onClick(id: string, self: table)
+	if clickCD then return end
+
 	if peek(self.chosenFilter) == id then
 		self.chosenFilter:set("All")
 		return
@@ -58,11 +69,15 @@ local function _onClick(id: string, self: table)
 			Events.EquipItems:Fire("Clear" .. itemType, sameSlot, item)
 		end
 
+		setCD()
+
 	elseif id == "Pin" then
 		local item = _findItem(peek(self.itemFrame))
 		if item == "None" then return end
 
 		Events.UpdatePinnedItems:Fire(item)
+
+		setCD()
 	else
 		self.chosenFilter:set(id)
 		self.items:set(self.inventory:GetChildren())

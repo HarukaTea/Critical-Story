@@ -1,28 +1,32 @@
---!strict
+--!nocheck
+
 local RateLimit = {}
 
 local RunService = game:GetService("RunService")
-local Assert = require(script.Parent.Assert)
+
 local Event = require(script.Parent.Parent.Event).Reliable
 
+local delay, wait = task.delay, task.wait
+
 function RateLimit.create(Identifier: string, entrance: number?, interval: number?)
-	Assert(typeof(Identifier) == "string", "Identifier must a string type.")
 	if RunService:IsServer() then
-		Assert(typeof(entrance) == "number", "entrance must a number type.")
-		Assert(entrance :: number > 0, "entrance must above 0.")
+		assert(typeof(entrance) == "number", "entrance must a number type.")
+		assert(entrance :: number > 0, "entrance must above 0.")
+
 		Event:SetAttribute(Identifier.."_ent", entrance)
 		Event:SetAttribute(Identifier.."_int", interval)
 	else
 		while (not Event:GetAttribute(Identifier.."_ent")) or (not Event:GetAttribute(Identifier.."_int")) do
-			task.wait(0.5)
+			wait(0.5)
 		end
 		entrance = tonumber(Event:GetAttribute(Identifier.."_ent"))
 		interval = tonumber(Event:GetAttribute(Identifier.."_int"))
 	end
+
 	local entrances: number = 0
 	return function(incoming: number?): boolean
 		if entrances == 0 then
-			task.delay(interval, function()
+			delay(interval, function()
 				entrances = 0
 			end)
 		end

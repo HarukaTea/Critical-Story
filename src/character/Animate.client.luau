@@ -12,6 +12,7 @@ local wait = task.wait
 local instanceNew = Instance.new
 local random, sin = math.random, math.sin
 local sub = string.sub
+local v3New = Vector3.new
 
 --- Reload UI modules when character respawned
 local UIModules = RepS.Modules.UI
@@ -238,11 +239,19 @@ end
 local function onDied()
 	pose = "Dead"
 end
-local function onJumping()
+local function onJumping(isJumping: boolean)
 	playAnimation("jump", 0.1)
 
 	jumpAnimTime = jumpAnimDuration
 	pose = "Jumping"
+
+	--- quick truss mechanic
+	if isJumping then
+        local HRP = char.PrimaryPart :: BasePart
+        local vel = HRP.AssemblyLinearVelocity
+
+        HRP.AssemblyLinearVelocity = v3New(vel.X, char.Humanoid.JumpPower * 1.1, vel.Z)
+    end
 end
 local function onClimbing(speed: number)
 	playAnimation("climb", 0.1)

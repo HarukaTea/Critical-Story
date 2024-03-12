@@ -44,7 +44,7 @@ local Cmdr do
 end
 
 if SG:WaitForChild("Cmdr") and task.wait() and not plr:WaitForChild("PlayerGui"):FindFirstChild("Cmdr") then
-	SG.Cmdr:Clone().Parent = plr.PlayerGui
+	SG.Cmdr.Parent = plr.PlayerGui
 end
 
 local Interface = require(script.CmdrInterface)(Cmdr)

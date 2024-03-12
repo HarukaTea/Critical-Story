@@ -19,24 +19,24 @@ return function (context, level, amount)
         return "I guess you typed incorrectly..."
     end
 
-    -- if amountWant > 10 then
-    --     return "Bruh you are trying to explode the server!!!"
-    -- end
     if levelWant > 950 then
         return "Nah are you sure you can beat monsters that above level 950?"
     end
 
-    local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone()
+    local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: BasePart
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
     locator:SetAttribute("CantRespawn", true)
     locator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
     locator.Parent = workspace.Monsters
 
+    RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
+
     ServerUtil:SetupMonster(locator, levelWant)
+    ServerUtil:ConnectMob(locator)
 
     for _ = 1, amount do
-        local subLocator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone()
+        local subLocator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: BasePart
 
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)
@@ -45,7 +45,10 @@ return function (context, level, amount)
         subLocator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
         subLocator.Parent = locator
 
+        RepS.Package.Unloads.CombatEnd:Clone().Parent = subLocator
+
         ServerUtil:SetupMonster(subLocator, levelWant)
+        ServerUtil:ConnectMob(subLocator)
     end
 
     return "Level "..levelWant.." Spike Fox x"..amountWant.." Spawned"

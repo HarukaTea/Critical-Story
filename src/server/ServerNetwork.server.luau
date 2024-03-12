@@ -24,6 +24,7 @@ local fromRGB = Color3.fromRGB
 local wait = task.wait
 local insert = table.insert
 local instanceNew = Instance.new
+local sFind, sub = string.find, string.sub
 
 --[[
 	Handle the prompts that triggered
@@ -40,6 +41,8 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 	elseif prompt.Name == "Chest" then
 		local chest = prompt.Parent.Parent :: Model
+
+		chest:SetAttribute(plr.Name, true)
 
 		Events.ChestUnlocked:Fire(plr, chest)
 
@@ -155,9 +158,12 @@ PPS.PromptTriggered:Connect(promptsHandler)
 --[[
 	Combat starts! Good luck players
 ]]
-local function combatStartSetup(plr: Player, monster: Model, mode: string)
+local function combatStartSetup(plr: Player, monster: Model)
 	--- if monster was occupied by another player, we will return it
 	if monster:GetAttribute("InCombat") then return end
+
+	local mode = plr:GetAttribute("CombatMode") :: string
+	if not mode then return end
 
 	ServerUtil:AddTargetForMonster(plr, monster)
 	ServerUtil:MonsterActivateCombat(monster, mode, plr)
@@ -185,6 +191,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	local HRP = char.PrimaryPart
 
 	--- pre checks
+	if not orb then return end
 	if not orb:FindFirstChild("Owner") then return end
 	if orb.Owner.Value ~= char then return end
 	if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
@@ -728,24 +735,39 @@ Events.NewQuest:Connect(newQuest)
 local function changeLastSeen(plr: Player, location: string)
 	local spawnPoint = ServerUtil:FindNearestSpawn(plr)
 
-	plr:SetAttribute("LastLocation", spawnPoint.Position)
+	plr:SetAttribute("LastLeave", spawnPoint.Position)
 	plr:SetAttribute("LastSeenLocation", location)
 end
 Events.ChangePlayerLocation:Connect(changeLastSeen)
 
 --[[
-	Handle the request to disable invite access for player
+	Handle the request to change settings for player
 ]]
-local function toggleInviteAccess(plr: Player)
-	plr:SetAttribute("InviteAccess", not plr:GetAttribute("InviteAccess"))
+local function toggleSettings(plr: Player, id: string)
+	if sFind(id, "Combat") then
+		local mode = sub(id, 1, sFind(id, "Combat") - 1)
+
+		if plr:GetAttribute("CombatMode") == mode then
+			plr:SetAttribute("CombatMode", "Solo")
+			return
+		end
+
+		plr:SetAttribute("CombatMode", mode)
+		return
+	end
+
+	plr:SetAttribute(id, not plr:GetAttribute(id))
 end
-Events.ChangeInviteAccess:Connect(toggleInviteAccess)
+Events.ChangePlayerSetting:Connect(toggleSettings)
 
 --[[
 	Switch mob target by ctrl or click
 ]]
 local function switchMobTarget(plr: Player, monster: Model)
 	local char = plr.Character :: Model
+
+	if not char then return end
+	if not monster then return end
 
 	if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 then
 		char.CharStats.TargetMonster.Value = monster

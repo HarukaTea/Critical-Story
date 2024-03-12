@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Processes and returns an existing instance, with options for setting

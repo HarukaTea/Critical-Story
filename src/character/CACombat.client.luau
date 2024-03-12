@@ -8,6 +8,7 @@ local TS = game:GetService("TweenService")
 local TestS = game:GetService("TestService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClientUtil = require(RepS.Modules.ClientUtil)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -31,56 +32,13 @@ local encounterCD = false
 local cfAngles, cfNew = CFrame.Angles, CFrame.new
 local wait = task.wait
 local format = string.format
-local newInstance, csNew = Instance.new, ColorSequence.new
+local newInstance = Instance.new
 local v3New = Vector3.new
 local rad, random = math.rad, math.random
-local fromScale = UDim2.fromScale
 local tFind = table.find
 
 
-local function _hitVFX(monster: Model)
-	--- checks
-	if not monster then return end
-	if not monster.PrimaryPart then return end
-
-	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
-
-	local class = plr:GetAttribute("Class") :: string
-	if not AssetBook.ClassInfo[class] then return end
-	local color = AssetBook.ClassInfo[class].Color
-
-	local hitEff = RepS.Package.Effects.HitEffect:Clone() :: Part
-	hitEff.CFrame = monster.PrimaryPart.CFrame
-	hitEff.Effect.Image.ImageColor3 = color
-	hitEff.Particle.Color = csNew(color)
-	hitEff.Effect.Image.Rotation = random(1, 360)
-	if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
-	hitEff.Parent = workspace
-
-	Debris:AddItem(hitEff, 5)
-	Debris:AddItem(hitEff.Particle, 2)
-
-	Spawn(function()
-		wait(0.2)
-		hitEff.Particle.Enabled = false
-	end)
-
-	TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
-	TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
-end
-
-local function _setCharacterTransparency(trans: number)
-	for _, child in char:GetChildren() do
-		if child:IsA("Part") and child.Name ~= "HumanoidRootPart" then child.Transparency = trans end
-		if child:IsA("Model") then
-			for _, descendant in child:GetChildren() do
-				if descendant.Name == "Part" then descendant.Transparency = trans end
-			end
-		end
-		if child:IsA("Accessory") then child.Handle.Transparency = trans end
-	end
-end
-
+--// Pre-functions
 local function _partyCheck() : boolean
 	local partyCheck = true
 
@@ -156,7 +114,7 @@ local function setup()
                 if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 18 then
 					encounterCD = true
 
-                    Events.CombatStart:Fire(monster, plr:GetAttribute("CombatMode"))
+                    Events.CombatStart:Fire(monster)
 
 					wait(2)
 					encounterCD = false
@@ -169,7 +127,6 @@ local function setup()
 end
 
 --// Connections
-
 local function startCombat(monster: Model)
 	--- checks
 	if not monster then return end
@@ -234,17 +191,6 @@ local function endCombat()
 	overworld:Resume()
 	TS:Create(overworld, AssetBook.TweenInfos.twiceHalfOne, { Volume = pastVolume }):Play()
 end
-Fusion.Hydrate(char)({
-	[Fusion.AttributeChange("InCombat")] = function(state)
-		if state then
-			startCombat(char.CharStats.TargetMonster.Value)
-
-		elseif state == false then --- in case nil
-			endCombat()
-		end
-	end
-})
-
 local function magicCasted()
 	local class = plr:GetAttribute("Class") :: string
 	local monster = char.CharStats.TargetMonster.Value :: Model
@@ -261,8 +207,6 @@ local function magicCasted()
 	wait(0.2)
 	char.Humanoid.AutoRotate = true
 end
-Events.MagicCasted:Connect(magicCasted)
-
 local function onTouched(hit: BasePart)
 	if not hit or not hit.Parent then return end
 
@@ -307,7 +251,7 @@ local function onTouched(hit: BasePart)
 			local variant = format("%sAnim%s", orb:GetAttribute("Style"), tostring(animStep))
 			Signals.PlayAnimation:Fire(variant)
 
-			_hitVFX(char.CharStats.TargetMonster.Value)
+			ClientUtil:ClassHitVFX(char.CharStats.TargetMonster.Value, char)
 		end
 
 		Events.MobTakeDMG:Fire(hit.Parent)
@@ -334,17 +278,14 @@ local function onTouched(hit: BasePart)
 		Events.CharTakeDMG:Fire(damagePart)
 
 		for _ = 1, 5 do
-			_setCharacterTransparency(0.5)
+			ClientUtil:SetCharTrans(0.5, char)
 			wait(0.05)
 
-			_setCharacterTransparency(0)
+			ClientUtil:SetCharTrans(0, char)
 			wait(0.05)
 		end
 	end
 end
-humanoid.Touched:Connect(onTouched)
-
-
 local function combatHolderHandler(folder: Folder)
 	local owner = folder:WaitForChild("Owner") :: ObjectValue
 	repeat wait() until owner.Value
@@ -384,6 +325,20 @@ local function combatPromptHandler(prompt: ProximityPrompt)
 		if not _partyCheck() then prompt:Destroy() end
 	end
 end
+
+--// Connection setups
+Fusion.Hydrate(char)({
+	[Fusion.AttributeChange("InCombat")] = function(state)
+		if state then
+			startCombat(char.CharStats.TargetMonster.Value)
+
+		elseif state == false then --- must be false, else nil also trigger this
+			endCombat()
+		end
+	end
+})
+Events.MagicCasted:Connect(magicCasted)
+humanoid.Touched:Connect(onTouched)
 CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler)
 CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler)
 CS:GetInstanceAddedSignal("CombatJoinPrompt"):Connect(combatPromptHandler)
@@ -391,7 +346,7 @@ CS:GetInstanceAddedSignal("CombatJoinPrompt"):Connect(combatPromptHandler)
 --// Setup
 local stopSimulating, stopDetecting = setup()
 
---// Destroy
+--// Clear
 local function onDead()
 	Events.MagicCasted:DisconnectAll()
 

@@ -11,7 +11,7 @@ local sinh, random = math.sinh, math.random
 local v3New = Vector3.new
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
 
----// Foxes
+--// Mob attacks
 local function spikeShot(blast: Model)
 	wait(0.5)
 	blast.Spike:Play()
@@ -154,6 +154,7 @@ local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
+--// Connections
 local function vfxHandler(blast: Model | BasePart)
 	local style = blast.Name
 

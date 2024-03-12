@@ -1,3 +1,8 @@
+--!nocheck
+
+local yield, create, isRunning = coroutine.yield, coroutine.create, coroutine.running
+local cancel, spawn = task.cancel, task.spawn
+local clear = table.clear
 
 -- Signal types
 export type Connection = {
@@ -26,7 +31,7 @@ local freeRunnerThread = nil
 	If there was a currently idle runner thread already, that's okay, that old
 	one will just get thrown and eventually GCed.
 -]]
-local function acquireRunnerThreadAndCallEventHandler(fn, ...)
+local function acquireAndRun(fn, ...)
 	local acquiredRunnerThread = freeRunnerThread
 	freeRunnerThread = nil
 	fn(...)
@@ -40,10 +45,11 @@ end
 	repeatedly resumed with functions to run followed by the argument to run
 	them with.
 -]]
-local function runEventHandlerInFreeThread(...)
-	acquireRunnerThreadAndCallEventHandler(...)
+local function runEvent(...)
+	acquireAndRun(...)
+
 	while true do
-		acquireRunnerThreadAndCallEventHandler(coroutine.yield())
+		acquireAndRun(yield())
 	end
 end
 
@@ -74,7 +80,6 @@ function Connection:Disconnect()
 		end
 	end
 end
-
 Connection.Destroy = Connection.Disconnect
 
 -- Make Connection strict
@@ -119,33 +124,6 @@ function Signal.new<T...>(): Signal<T...>
 end
 
 --[=[
-	Constructs a new Signal that wraps around an RBXScriptSignal.
-
-	For example:
-	```lua
-	local signal = Signal.Wrap(workspace.ChildAdded)
-	signal:Connect(function(part)
-		print(part.Name .. " added")
-	end)
-
-	Instance.new("Part").Parent = workspace
-	```
-]=]
-function Signal.Wrap<T...>(rbxScriptSignal: RBXScriptSignal): Signal<T...>
-	assert(
-		typeof(rbxScriptSignal) == "RBXScriptSignal",
-		"Argument #1 to Signal.Wrap must be a RBXScriptSignal; got " .. typeof(rbxScriptSignal)
-	)
-
-	local signal = Signal.new()
-	signal._proxyHandler = rbxScriptSignal:Connect(function(...)
-		signal:Fire(...)
-	end)
-
-	return signal
-end
-
---[=[
 	Connects a function to the signal, which will be called anytime the signal is fired.
 
 	```lua
@@ -175,36 +153,6 @@ function Signal:Connect(fn)
 end
 
 --[=[
-	Connects a function to the signal, which will be called the next time the signal fires. Once
-	the connection is triggered, it will disconnect itself.
-
-	```lua
-	signal:Once(function(msg, num)
-		print(msg, num)
-	end)
-
-	signal:Fire("Hello", 25)
-	signal:Fire("This message will not go through", 10) --// doesn't show
-	```
-]=]
-function Signal:Once(fn)
-	local connection
-	local done = false
-
-	connection = self:Connect(function(...)
-		if done then
-			return
-		end
-
-		done = true
-		connection:Disconnect()
-		fn(...)
-	end)
-
-	return connection
-end
-
---[=[
 	Disconnects all connections from the signal.
 
 	```lua
@@ -224,10 +172,11 @@ function Signal:DisconnectAll()
 		for thread in yieldedThreads do
 			if coroutine.status(thread) == "suspended" then
 				warn(debug.traceback(thread, "signal disconnected; yielded thread cancelled", 2))
-				task.cancel(thread)
+
+				cancel(thread)
 			end
 		end
-		table.clear(self._yieldedThreads)
+		clear(self._yieldedThreads)
 	end
 end
 
@@ -247,9 +196,10 @@ function Signal:Fire(...)
 	while item do
 		if item.Connected then
 			if not freeRunnerThread then
-				freeRunnerThread = coroutine.create(runEventHandlerInFreeThread)
+				freeRunnerThread = create(runEvent)
 			end
-			task.spawn(freeRunnerThread, item._fn, ...)
+
+			spawn(freeRunnerThread, item._fn, ...)
 		end
 		item = item._next
 	end
@@ -277,15 +227,15 @@ function Signal:Wait()
 		rawset(self, "_yieldedThreads", yieldedThreads)
 	end
 
-	local thread = coroutine.running()
+	local thread = isRunning()
 	yieldedThreads[thread] = true
 
 	self:Once(function(...)
 		yieldedThreads[thread] = nil
-		task.spawn(thread, ...)
+		spawn(thread, ...)
 	end)
 
-	return coroutine.yield()
+	return yield()
 end
 
 --[=[
@@ -319,7 +269,4 @@ setmetatable(Signal, {
 	end,
 })
 
-return table.freeze({
-	new = Signal.new,
-	Wrap = Signal.Wrap,
-})
+return Signal.new

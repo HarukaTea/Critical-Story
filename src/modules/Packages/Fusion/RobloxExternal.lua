@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 --[[
     Roblox implementation for Fusion's abstract scheduler layer.
 ]]

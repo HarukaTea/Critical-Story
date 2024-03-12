@@ -4,20 +4,15 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Signal = require(RepS.Modules.Packages.Signal)
 
-local NewSignal = Signal.new
-
 local Signals = {
-	ItemsAdded = NewSignal(),
-	ItemsEquipped = NewSignal(),
-	ItemsPinned = NewSignal(),
-	LevelUp = NewSignal(),
-	QuestComplete = NewSignal(),
+	LevelUp = Signal(),
+	QuestComplete = Signal(),
 
 	--- story
-	FirstStepTutorial = NewSignal(),
-	CompletedInitusBay = NewSignal(),
+	FirstStepTutorial = Signal(),
+	CompletedInitusBay = Signal(),
 
-	FChenPTown2 = NewSignal()
+	FChenPTown2 = Signal()
 }
 
 return Signals

@@ -7,46 +7,19 @@ local SSS = game:GetService("ServerScriptService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
-local Signals = require(SSS.Modules.Data.ServerSignals)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local TEMPLATE = {
-	Stats = {
-		Levels = 1,
-		EXP = 0,
-		Gold = 0,
-		RP = 0,
-		PlayTime = 0,
+local Hydrate, AttributeChange = Fusion.Hydrate, Fusion.AttributeChange
 
-		Class = "Warrior",
-		LastSeenLocation = "InitusVillage",
-
-		LvPoints = 0,
-		DmgPoints = 0,
-		MagicPoints = 0,
-		ManaPoints = 0,
-		HealthPoints = 0,
-		ShieldPoints = 0,
-
-		LastLocation = { 0, 0, 0 }
-	},
-	Inventory = {},
-	EquippedItems = {},
-	PinnedItems = {},
-	Quests = {
-		Main = 1,
-		Town = {}
-	}
-}
+local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
 local DS1, DS2, DS3 = "CS_DEV1599", "CS_DEV1599_S2", "CS_DEV1599_S3"
 
 local newInstance = Instance.new
 local wait = task.wait
-local insert = table.insert
-local v3New = Vector3.new
-
+local tFind = table.find
 
 local function findDataStore(plr: Player) : DataStore?
 	local joinData = plr:GetJoinData().TeleportData :: table?
@@ -64,7 +37,7 @@ local function findDataStore(plr: Player) : DataStore?
 	return ds
 end
 
-local function _saveBackpackData(plr: Player, ds: any)
+local function _saveData(plr: Player, ds: any)
 	local data = ds.Value :: table
 	if not data then return end
 
@@ -83,7 +56,7 @@ local function _saveBackpackData(plr: Player, ds: any)
 	end
 	for _, quest in plr.Quests:GetChildren() do
 		if quest.Name == "Town" then
-			insert(townQuests, quest.Value)
+			townQuests[#townQuests + 1] = quest.Value
 			continue
 		end
 
@@ -128,60 +101,56 @@ local function setup(plr: Player)
 	questsData.Name = "Quests"
 	questsData.Parent = plr
 
-	for i, v in data.Stats do
-		if i == "LastLocation" then plr:SetAttribute(i, v3New(v[1], v[2], v[3])) continue end
+	---// Load stats
+	local blackList = { "LastLocation" } --- deprecated data but stored in the same table
+	for attr, val in data.Stats do
+		if tFind(blackList, attr) then continue end
+		
+		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
-		plr:SetAttribute(i, v)
+		Hydrate(plr)({
+			[AttributeChange(attr)] = function(newStat: any)
+				if newStat == nil then return end
 
-		plr:GetAttributeChangedSignal(i):Connect(function()
-			data.Stats[i] = plr:GetAttribute(i)
-		end)
-	end
-	Fusion.Hydrate(plr)({
-		[Fusion.AttributeChange("LastLocation")] = function(newLocation)
-			data.Stats.LastLocation = { newLocation.X, newLocation.Y, newLocation.Z }
-		end
-	})
-
-	for questType, questId in data.Quests do
-		if questType == "Town" then
-			for _, townQuest in questId do
-				local intValue = newInstance("IntConstrainedValue")
-				intValue.Name = "Town"
-				intValue.MinValue = 1
-				intValue.MaxValue = #StoryBook[questType]
-				intValue.Value = townQuest
-				intValue.Parent = questsData
+				data.Stats[attr] = HarukaLib:Serialize(newStat)
 			end
+		})
+	end
 
-			continue
-		end
-
+	--// Load quests
+	local function _createQuestVal(questType: string, val: number)
 		local intValue = newInstance("IntConstrainedValue")
 		intValue.Name = questType
 		intValue.MinValue = 1
 		intValue.MaxValue = #StoryBook[questType]
-		intValue.Value = questId
+		intValue.Value = val
 		intValue.Parent = questsData
 	end
+	for questType, questId in data.Quests do
+		if questType == "Town" then
+			for _, townQuest: number in questId do _createQuestVal("Town", townQuest) end
+			continue
+		end
 
-	for index, amount in data.Inventory do
+		_createQuestVal(questType, questId)
+	end
+
+	--// Load items
+	local function _createItemVal(name: string, maxVal: number, val: number)
+		local intValue = newInstance("IntConstrainedValue")
+		intValue.Name = name
+		intValue.MaxValue = maxVal
+		intValue.Value = val
+		intValue.Parent = backpackData
+	end
+	for index: string, amount: number in data.Inventory do
 		if AssetBook.Items.ItemName[index] then
 			local itemType = AssetBook.Items.ItemType[index]
 
 			if not AssetBook.Items.IsSkill[index] and (itemType == "Active" or itemType == "Material") then
-				local intValue = newInstance("IntConstrainedValue")
-				intValue.Name = index
-				intValue.MaxValue = 9999
-				intValue.Value = amount
-				intValue.Parent = backpackData
-
+				_createItemVal(index, 9999, amount)
 			else
-				local intValue = newInstance("IntConstrainedValue")
-				intValue.Name = index
-				intValue.MaxValue = 1
-				intValue.Value = amount
-				intValue.Parent = backpackData
+				_createItemVal(index, 1, amount)
 			end
 		end
 	end
@@ -197,24 +166,36 @@ local function setup(plr: Player)
 		end
 	end
 
-	plr:SetAttribute("PlayerDataLoaded", true)
-	plr:SetAttribute("InviteAccess", true)
+	--// Load settings
+	for setting, val in data.Settings do
+		plr:SetAttribute(setting, val)
 
-	local function _saveData(player: Player)
-		if player ~= plr then return end
+		Hydrate(plr)({
+			[AttributeChange(setting)] = function(newSetting: any)
+				if newSetting == nil then return end
 
-		_saveBackpackData(plr, ds)
+				data.Settings[setting] = newSetting
+			end
+		})
 	end
-	Signals.ItemsAdded:Connect(_saveData)
-	Signals.ItemsEquipped:Connect(_saveData)
-	Signals.ItemsPinned:Connect(_saveData)
+
+	--// Connections
+	local function _save()
+		wait()
+		_saveData(plr, ds)
+	end
+	backpackData.ChildAdded:Connect(_save)
+	backpackData.ChildRemoved:Connect(_save)
+
+	--// Finish
+	plr:SetAttribute("PlayerDataLoaded", true)
 end
 
 local function clear(plr: Player)
 	local ds = findDataStore(plr)
 
 	if ds then
-		_saveBackpackData(plr, ds)
+		_saveData(plr, ds)
 		ds:Destroy()
 	end
 

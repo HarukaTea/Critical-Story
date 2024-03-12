@@ -11,6 +11,7 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
 local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
@@ -157,7 +158,7 @@ return function(plr: Player)
 						TextXAlignment = Enum.TextXAlignment.Left,
 						Text = RepS.Package.ServerLocation.Value
 							.." "..RepS.Package.PrivateServerId.Value
-							.."v"..RepS.Package.Version.Value,
+							.." v"..RepS.Package.Version.Value,
 
 						[Children] = {
 							New("UIPadding")({ PaddingLeft = udNew(0.005, 0) }),
@@ -260,13 +261,13 @@ return function(plr: Player)
 	_autoEquipItems()
 	local function moveUpJumpBtn()
 		if UIS.TouchEnabled then
-			local touchGui = plr.PlayerGui:WaitForChild("TouchGui") :: ScreenGui
+			local touchGui = plr.PlayerGui:WaitForChild("TouchGui", 999) :: ScreenGui
 
-			touchGui:WaitForChild("TouchControlFrame"):WaitForChild("JumpButton").AnchorPoint = v2New(0.82, 0.8)
-			touchGui:WaitForChild("TouchControlFrame"):WaitForChild("JumpButton").Position = fromScale(0.82, 0.8)
+			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).AnchorPoint = v2New(0.82, 0.8)
+			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).Position = fromScale(0.82, 0.8)
 		end
 	end
-	moveUpJumpBtn()
+	Spawn(moveUpJumpBtn)
 	local function charCurrentZone()
 		local region = HarukaLib:IsInRegion(self.char.PrimaryPart.Position, workspace:WaitForChild("MapComponents").Zones:GetChildren())
 		if region then self.char:SetAttribute("CurrentRegion", region.Name) end

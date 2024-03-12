@@ -205,6 +205,7 @@ local function ChatFrame(self: table) : Frame
             Fusion.New("UICorner")({ CornerRadius = udNew(0.07, 0)  }),
             Components.UIStroke({
                 Thickness = 3.5,
+                Color = fromRGB(254, 254, 254),
                 Enabled = true
             }),
             Components.HoverImageButton({

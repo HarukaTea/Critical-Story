@@ -1,4 +1,8 @@
---!strict
+--!nocheck
+
+local sub = string.sub
+local randomNew = Random.new
+
 return function(): number?
-	return tonumber(string.sub(tostring(Random.new():NextNumber()), 3, 6))
+	return tonumber(sub(tostring(randomNew():NextNumber()), 3, 6))
 end

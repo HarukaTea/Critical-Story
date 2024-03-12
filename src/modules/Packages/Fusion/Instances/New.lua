@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Constructs and returns a new instance, with options for setting properties,

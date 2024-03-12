@@ -134,7 +134,6 @@ dialogues.Hehe = {
 
             Option1 = {
                 "Nothing too surprising, many adventurers have come here before and reached level 950. I believe you will be no exception.",
-                "CHOICE 1"
             },
             Option2 = {
                 "Wish you have a wonderful adventure!"

@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Given a reactive object, updates all dependent reactive objects.

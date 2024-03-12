@@ -4,13 +4,38 @@ local LootPlan = {}
 LootPlan.prototype = {}
 LootPlan.__index = LootPlan.prototype
 
+local insert, clear, sort, freeze = table.insert, table.clear, table.sort, table.freeze
+local randomNew = Random.new
+
+--// Private
+
+function LootPlan.prototype:_UpdateLootList()
+	if self._ListUpdated == true then
+		return
+	end
+
+	self._ListUpdated = true
+
+	clear(self.LootList)
+
+	for _, loot in self.Loot do
+		insert(self.LootList, loot)
+	end
+
+	sort(self.LootList, function(a, b)
+		return a.Weight < b.Weight
+	end)
+end
+
+--// Public
+
 --[[
 	Create a new lootplan object, and waiting for RNG
 ]]
 function LootPlan.new()
 	local plan = {}
 
-	plan.Randomiser = Random.new()
+	plan.Randomiser = randomNew()
 	plan.Loot = {}
 	plan.LootList = {}
 	plan.LootCount = 0
@@ -20,32 +45,6 @@ function LootPlan.new()
 	setmetatable(plan, LootPlan)
 
 	return plan
-end
-
---[[
-	Updates the loot array of a LootPlan. This takes the existing
-	loot dictionary and converts it into an array sorted by weight in
-	ascending order as rarer loots need to be checked first for winning
-	results.
-
-	@private
-]]
-function LootPlan.prototype:_UpdateLootList()
-	if self._ListUpdated == true then
-		return
-	end
-
-	self._ListUpdated = true
-
-	table.clear(self.LootList)
-
-	for _, loot in self.Loot do
-		table.insert(self.LootList, loot)
-	end
-
-	table.sort(self.LootList, function(a, b)
-		return a.Weight < b.Weight
-	end)
 end
 
 
@@ -143,8 +142,8 @@ end
 	Cleans up the LootPlan object and locks the table from changes.
 ]=]
 function LootPlan.prototype:Destroy()
-	table.clear(self)
-	table.freeze(self)
+	clear(self)
+	freeze(self)
 end
 
 return LootPlan

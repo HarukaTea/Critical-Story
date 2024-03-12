@@ -18,7 +18,9 @@ local function openAcquiredChests()
     local inventory = plr:WaitForChild("Inventory", 999) :: Folder
 
     for _, chest: Model in chests:GetChildren() do
-        if inventory:FindFirstChild(chest.Name) and not chest:GetAttribute("Active") then
+        if inventory:FindFirstChild(chest.Name) then
+            if chest:GetAttribute("Active") then if not chest:GetAttribute(plr.Name) then continue end end
+
             chest:SetAttribute("Opened", true)
             chest.Giver.Chest.Enabled = false
 
@@ -31,16 +33,16 @@ local function openAcquiredChests()
         end
     end
 end
-openAcquiredChests()
+Spawn(openAcquiredChests)
 
 
 local function cmdrRegister()
     Cmdr:SetActivationKeys({ Enum.KeyCode.Quote })
-    Cmdr:SetPlaceName("CStory-0.7")
+    Cmdr:SetPlaceName("CStory-0.8-Test")
 
     plr.Chatted:Connect(function(msg)
         if msg == "!cmds" then Cmdr:Show() end
         if msg == "!rejoin" then Events.RejoinRequest:Fire() end
     end)
 end
-cmdrRegister()
+Spawn(cmdrRegister)

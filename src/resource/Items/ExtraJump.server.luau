@@ -25,7 +25,7 @@ ServerUtil:ShowText(char, "Extra Jump!", fromRGB(255, 255, 255))
 local bv = instanceNew("BodyVelocity")
 bv.P = math.huge
 bv.MaxForce = v3New(0, math.huge, 0)
-bv.Velocity = v3New(0, 60, 0)
+bv.Velocity = v3New(0, char.Humanoid.JumpPower * 1.1, 0)
 bv.Parent = char.PrimaryPart
 Debris:AddItem(bv, 0.05)
 

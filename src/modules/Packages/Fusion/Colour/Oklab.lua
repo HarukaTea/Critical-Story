@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Provides functions for converting Color3s into Oklab space, for more

@@ -64,8 +64,8 @@ local function PlayerSlot(self: table, player: Player): Frame
 						if element:IsA("Frame") then
 							local roleColor = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
 
-							TS:Create(element, AssetBook.TweenInfos.twiceHalf, { BackgroundColor3 = fromRGB(30, 30, 30) }):Play()
-							TS:Create(element.PlayerName, AssetBook.TweenInfos.twiceHalf, { TextColor3 = roleColor }):Play()
+							element.BackgroundColor3 = fromRGB(30, 30, 30)
+							element.PlayerName.TextColor3 = roleColor
 						end
 					end
 					for _, element in desc:GetChildren() do
@@ -74,8 +74,8 @@ local function PlayerSlot(self: table, player: Player): Frame
 						end
 					end
 
-					TS:Create(list[player.Name], AssetBook.TweenInfos.twiceHalf, { BackgroundColor3 = color3New(1, 1, 1) }):Play()
-					TS:Create(list[player.Name].PlayerName, AssetBook.TweenInfos.twiceHalf, { TextColor3 = color3New() }):Play()
+					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
+					list[player.Name].PlayerName.TextColor3 = color3New()
 
 					desc.Role.Text = ""
 					desc.DisplayName.Text = player.DisplayName

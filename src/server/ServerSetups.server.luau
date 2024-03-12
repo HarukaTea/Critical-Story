@@ -134,7 +134,7 @@ local function mainSetup()
 
 	--- player extra info setup
 	local joinData
-	Players.PlayerAdded:Connect(function(plr)
+	local function playerAdded(plr: Player)
 		local groups = GS:GetGroupsAsync(plr.UserId)
 		local rank = 0
 		for _, group in groups do
@@ -142,9 +142,8 @@ local function mainSetup()
 		end
 		plr:SetAttribute("Rank", rank)
 
-		if rank == 2 then plr:SetAttribute("Role", "Artist") end
-		if rank == 3 then plr:SetAttribute("Role", "Tester") end
-		if rank == 4 then plr:SetAttribute("Role", "Head Tester") end
+		if rank == 2 then plr:SetAttribute("Role", "Tester") end
+		if rank == 125 then plr:SetAttribute("Role", "CStory Contributor") end
 
 		--- some other CA series developers should be included as well
 		if plr.UserId == 304008764 then plr:SetAttribute("Role", "CStory Founder") end
@@ -155,7 +154,8 @@ local function mainSetup()
 		if plr.UserId == 91364976 then plr:SetAttribute("Role", "CR Founder") end
 
 		joinData = plr:GetJoinData().TeleportData
-	end)
+	end
+	Players.PlayerAdded:Connect(playerAdded)
 
 	--- join friend in titlescreen return info
 	MS:SubscribeAsync("ReturnFriendLocation", function(message)
@@ -171,7 +171,7 @@ local function mainSetup()
 		local privateId, code = game.PrivateServerId, nil
 
 		if privateId ~= "" then
-			repeat wait() until joinData
+			repeat wait() until joinData ~= nil
 
 			code = joinData[2]
 			local accessCode = sub(privateId, 1, 8)

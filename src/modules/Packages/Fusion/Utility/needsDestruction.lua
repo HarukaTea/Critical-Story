@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
     Returns true if the given value is not automatically memory managed, and

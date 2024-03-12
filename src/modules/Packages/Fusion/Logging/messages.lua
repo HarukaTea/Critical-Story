@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Stores templates for different kinds of logging messages.

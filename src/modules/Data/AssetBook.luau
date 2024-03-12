@@ -588,7 +588,7 @@ assets.Items = {
 
         ValkyrieArmor = "rbxassetid://14429563981",
 
-        HeheLetter = "rbxassetid://2985521957"
+        HeheLetter = "rbxassetid://16654291188"
     }
 }
 

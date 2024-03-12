@@ -22,6 +22,7 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local clear = table.clear
+local sFind, sub = string.find, string.sub
 
 local TEXTS = {
 	Musics = "Musics",
@@ -68,48 +69,22 @@ local function OptionFrame(id: string, self: table) : Frame
 						workspace.Sounds.SFXs.SwitchOn:Play()
 					end
 
-					if id == "PublicCombat" then
-						if plr:GetAttribute("CombatMode") == "Public" then
+					Events.ChangePlayerSetting:Fire(id)
+
+					--// Local
+					if sFind(id, "Combat") then
+						local mode = sub(id, 1, sFind(id, "Combat") - 1)
+
+						if plr:GetAttribute("CombatMode") == mode then
 							plr:SetAttribute("CombatMode", "Solo")
-						else
-							plr:SetAttribute("CombatMode", "Public")
-						end
-
-						return
-
-					elseif id == "PartyCombat" then
-						if plr:GetAttribute("CombatMode") == "Party" then
-							plr:SetAttribute("CombatMode", "Solo")
-						else
-							plr:SetAttribute("CombatMode", "Party")
-						end
-
-						return
-
-					elseif id == "PotatoMode" then
-						if plr:GetAttribute("PotatoMode") then
-							for part, material in self.potatoStoreParts do
-								if part.Parent then part.Material = material end
-							end
-
-							clear(self.potatoStoreParts)
-
-							plr:SetAttribute("PotatoMode", false)
 							return
 						end
 
-						for _, child in workspace.Maps:GetDescendants() do
-							if child:IsA("BasePart") then
-								self.potatoStoreParts[child] = child.Material
-								child.Material = Enum.Material.Plastic
-							end
-						end
-
-					elseif id == "InviteAccess" then
-						Events.ChangeInviteAccess:Fire()
+						plr:SetAttribute("CombatMode", mode)
+						return
 					end
 
-					self.plr:SetAttribute(id, not self.plr:GetAttribute(id))
+					plr:SetAttribute(id, not plr:GetAttribute(id))
 				end,
 
 				[Children] = {
@@ -156,27 +131,43 @@ local function SettingsFrame(self: table): Frame
 
 	local playerSettings = self.playerSettings
 	Fusion.Hydrate(self.plr)({
-		[AttributeChange("CombatMode")] = function(style)
+		[AttributeChange("CombatMode")] = function(style: string)
 			playerSettings.PartyCombat:set(style == "Party")
 			playerSettings.PublicCombat:set(style == "Public")
 		end,
-		[AttributeChange("Musics")] = function(state)
+		[AttributeChange("Musics")] = function(state: boolean)
 			playerSettings.Musics:set(state)
 
 			SoundService.Musics.Volume = if state then 1 else 0
 		end,
-		[AttributeChange("SFXs")] = function(state)
+		[AttributeChange("SFXs")] = function(state: boolean)
 			playerSettings.SFXs:set(state)
 
 			SoundService.SFXs.Volume = if state then 1 else 0
 		end,
-		[AttributeChange("PotatoMode")] = function(state)
+		[AttributeChange("PotatoMode")] = function(state: boolean)
 			playerSettings.PotatoMode:set(state)
+
+			if state == false then
+				for part, material in self.potatoStoreParts do
+					if part.Parent then part.Material = material end
+				end
+
+				clear(self.potatoStoreParts)
+
+			elseif state then
+				for _, child in workspace.Maps:GetDescendants() do
+					if child:IsA("BasePart") then
+						self.potatoStoreParts[child] = child.Material
+						child.Material = Enum.Material.Plastic
+					end
+				end
+			end
 		end,
-		[AttributeChange("PlayerList")] = function(state)
+		[AttributeChange("PlayerList")] = function(state: boolean)
 			playerSettings.PlayerList:set(state)
 		end,
-		[AttributeChange("InviteAccess")] = function(state)
+		[AttributeChange("InviteAccess")] = function(state: boolean)
 			playerSettings.InviteAccess:set(state)
 		end
 	})

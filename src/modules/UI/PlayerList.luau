@@ -93,7 +93,7 @@ return function(plr: Player)
 				Position = ud2New(0.868, 0, 0.013, 20),
 
 				Size = Computed(function(use)
-					return ud2New(0.127, 0, 0, use(self.absSize))
+					return ud2New(0.127, 0, 0, min(use(self.absSize), use(self.absContentSize)))
 				end),
 				Visible = Computed(function(use)
 					return use(self.isOpen)
@@ -129,7 +129,7 @@ return function(plr: Player)
 	local function _togglePlayerList(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
 
-		plr:SetAttribute("PlayerList", not plr:GetAttribute("PlayerList"))
+		Events.ChangePlayerSetting:Fire("PlayerList")
 	end
 	CAS:BindAction("TogglePlayerList", _togglePlayerList, false, Enum.KeyCode.Tab)
 

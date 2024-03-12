@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Constructs special keys for property tables which connect event listeners to

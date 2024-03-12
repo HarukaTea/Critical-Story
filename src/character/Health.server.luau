@@ -13,114 +13,24 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
 local humanoid = char.Humanoid :: Humanoid
 
-local charStats = nil
 local isBroken = false
 local lvUpCD = false
 
-local ATTRIBUTES = {
-    InCombat = false,
-
-    Magic = 0,
-    Mana = 0,
-    MinDMG = 5,
-    MaxDMG = 15,
-    MaxMana = 0,
-    MaxShield = 0,
-    OrbLifeTime = 10,
-    Shield = 0,
-
-    Repairing = false,
-    Healing = false,
-    HitCD = 0,
-
-    HealthBuff = 0,
-    JumpBuff = 0,
-    MagicBuff = 0,
-    ManaBuff = 0,
-    MinDMGBuff = 0,
-    MaxDMGBuff = 0,
-    ShieldBuff = 0,
-    SpeedBuff = 0,
-    RestoreBuff = 15,
-    HealBuff = 10,
-
-    BurnChance = 0,
-    DodgeChance = 0,
-    CriChance = 1,
-
-    Combo = 0,
-    Arrows = 0,
-    WizardCasted = 0,
-    Guard = 0,
-    RogueCritical = 0
-}
-
 local AttributeChange = Fusion.AttributeChange
+
+local ATTRIBUTES = require(SSS.Modules.Data.CharTemplate)
 
 local wait = task.wait
 local floor, random = math.floor, math.random
 local instanceNew = Instance.new
 local sFind = string.find
 
-
-local stopSpawn
-local function orbSpawnHandler(state: boolean)
-    local orbFolders = workspace.MapComponents.OrbFolders :: Folder
-
-    local function _placeOrb(orb: Model, pos: CFrame, lifeTime: number)
-        orb.Owner.Value = char
-        orb:PivotTo(pos)
-        orb:SetAttribute("OrbLifeTime", lifeTime)
-        orb.Parent = orbFolders[char.Name]
-
-        Debris:AddItem(orb, lifeTime)
-    end
-    local function _spawnOrb(isSpawned: boolean?)
-        local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
-        local isInCombat, class, lifeTime =
-            char:GetAttribute("InCombat") :: boolean,
-            plr:GetAttribute("Class") :: string,
-            char:GetAttribute("OrbLifeTime") :: number
-
-        if monster.Value and isInCombat and orbFolders:FindFirstChild(char.Name) and char.Humanoid.Health > 0 then
-            local orb
-            if class == "Alchemist" then
-                orb = orbAttack["AlchemistOrb" .. random(1, 3)]:Clone() :: Model
-            else
-                orb = orbAttack[class .. "Orb"]:Clone() :: Model
-            end
-            _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
-
-            --- extra orbs from items
-            if not isSpawned then
-                for attr, val in char.CharStats.ExtraOrbs:GetAttributes() do
-                    if not val then continue end
-
-                    _placeOrb(orbAttack[attr]:Clone(), ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
-                end
-            end
-        end
-    end
-
-    if state then
-		if char:GetAttribute("CanSpawnMultiOrb") then
-			for _ = 1, 3 do _spawnOrb(true) end
-		end
-
-		stopSpawn = Clock(3, function()
-			if char:GetAttribute("InCombat") then _spawnOrb() end
-		end)
-	else
-		if stopSpawn then stopSpawn() end
-
-        stopSpawn = nil
-	end
-end
 
 repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 local function setup()
@@ -134,7 +44,7 @@ local function setup()
         return folder
     end
     local function _createStats()
-        charStats = _createFolder("CharStats", char)
+        local charStats = _createFolder("CharStats", char)
 
         for i, v in ATTRIBUTES do
             char:SetAttribute(i, v)
@@ -165,12 +75,12 @@ local function setup()
         local spawnPoint = ServerUtil:FindNearestSpawn(plr)
 
         char:PivotTo(spawnPoint.CFrame)
-        plr:SetAttribute("LastLocation", spawnPoint.Position)
+        plr:SetAttribute("LastLeave", spawnPoint.Position)
     end
 
     char:SetAttribute("CharDataLoaded", true)
 end
-setup()
+Spawn(setup)
 
 local function classAttributesSetup()
     --- warrior
@@ -207,7 +117,7 @@ local function classAttributesSetup()
         HarukaLib:Add(char, "RogueCritical", -1)
     end)
 end
-classAttributesSetup()
+Spawn(classAttributesSetup)
 
 local function questDataSetup()
     local quests = plr:WaitForChild("Quests", 999) :: Folder
@@ -236,14 +146,18 @@ local function questDataSetup()
     quests.ChildAdded:Connect(setQuestsScriptsAdded)
     quests.ChildRemoved:Connect(setQuestsScriptsRemoved)
 end
-questDataSetup()
+Spawn(questDataSetup)
 
 --// Connections
 local function onDead()
-    if char.PrimaryPart then plr:SetAttribute("LastLocation", char.PrimaryPart.Position) end
+    if char.PrimaryPart then plr:SetAttribute("LastLeave", char.PrimaryPart.Position) end
     char:SetAttribute("InCombat", false)
 
     for _, monster in char.CharStats.TargetMonsters:GetChildren() do
+        if not monster.Value then continue end
+        if not monster.Value:FindFirstChild("TargetingList") then continue end
+        if not monster.Value.TargetingList:FindFirstChild(char.Name) then continue end
+
         monster.Value.TargetingList[char.Name]:Destroy()
     end
     for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
@@ -309,6 +223,73 @@ updateSpeed(0)
 updateJump(0)
 levelReqCheck()
 
+local function _shieldCheck(shield)
+    local maxShield = char:GetAttribute("MaxShield")
+
+    if shield > 0 and isBroken then isBroken = false end
+    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
+
+    if shield == 0 and not isBroken then
+        isBroken = true
+
+        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
+    end
+end
+
+local stopSpawn
+local function orbSpawnHandler(state: boolean)
+    local orbFolders = workspace.MapComponents.OrbFolders :: Folder
+
+    local function _placeOrb(orb: Model, pos: CFrame, lifeTime: number)
+        orb.Owner.Value = char
+        orb:PivotTo(pos)
+        orb:SetAttribute("OrbLifeTime", lifeTime)
+        orb.Parent = orbFolders[char.Name]
+
+        Debris:AddItem(orb, lifeTime)
+    end
+    local function _spawnOrb(isSpawned: boolean?)
+        local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
+        local isInCombat, class, lifeTime =
+            char:GetAttribute("InCombat") :: boolean,
+            plr:GetAttribute("Class") :: string,
+            char:GetAttribute("OrbLifeTime") :: number
+
+        if monster.Value and isInCombat and orbFolders:FindFirstChild(char.Name) and char.Humanoid.Health > 0 then
+            local orb
+            if class == "Alchemist" then
+                orb = orbAttack["AlchemistOrb" .. random(1, 3)]:Clone() :: Model
+            else
+                orb = orbAttack[class .. "Orb"]:Clone() :: Model
+            end
+            _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
+
+            --- extra orbs from items
+            if not isSpawned then
+                for attr, val in char.CharStats.ExtraOrbs:GetAttributes() do
+                    if not val then continue end
+
+                    _placeOrb(orbAttack[attr]:Clone(), ServerUtil:GenerateOrbPos(monster.Value), lifeTime)
+                end
+            end
+        end
+    end
+
+    if state then
+		if char:GetAttribute("CanSpawnMultiOrb") then
+			for _ = 1, 3 do _spawnOrb(true) end
+		end
+
+		stopSpawn = Clock(3, function()
+			if char:GetAttribute("InCombat") then _spawnOrb() end
+		end)
+	else
+		if stopSpawn then stopSpawn() end
+
+        stopSpawn = nil
+	end
+end
+
 Fusion.Hydrate(plr)({
     [AttributeChange("DmgPoints")] = function()
         updateMinDMG()
@@ -323,19 +304,6 @@ Fusion.Hydrate(plr)({
         ServerUtil:EquipWeapon(char)
     end
 })
-
-local function _shieldCheck(shield)
-    local maxShield = char:GetAttribute("MaxShield")
-
-    if shield > 0 and isBroken then isBroken = false end
-    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
-
-    if shield == 0 and not isBroken then
-        isBroken = true
-
-        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
-    end
-end
 Fusion.Hydrate(char)({
     [AttributeChange("MinDMGBuff")] = updateMinDMG,
     [AttributeChange("MaxDMGBuff")] = updateMaxDMG,

@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --[[
 	Linearly interpolates the given animatable types by a ratio.

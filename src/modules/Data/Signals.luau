@@ -4,13 +4,11 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Signal = require(RepS.Modules.Packages.Signal)
 
-local NewSignal = Signal.new
-
 local Signals = {
-	CreateHint = NewSignal(),
-	NPCChat = NewSignal(),
-	PlayAnimation = NewSignal(),
-	SwitchScene = NewSignal()
+	CreateHint = Signal(),
+	NPCChat = Signal(),
+	PlayAnimation = Signal(),
+	SwitchScene = Signal()
 }
 
 return Signals

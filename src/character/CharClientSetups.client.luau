@@ -7,27 +7,30 @@ local RS = game:GetService("RunService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Bin = require(RepS.Modules.Packages.Bin)
+local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
 local camera = workspace.CurrentCamera
 local musics = workspace:WaitForChild("Sounds") :: Folder
 local effects = RepS.Package.Effects :: Folder
+local map = workspace:WaitForChild("Maps") :: Folder
 local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
 
 local Add, Empty = Bin()
 
 local fromRGB = Color3.fromRGB
-local v3Zero = Vector3.zero
-local cfNew = CFrame.new
-local insert, clear = table.insert, table.clear
-local floor = math.floor
+local v3Zero, yAxis = Vector3.zero, Vector3.yAxis
+local cfNew, cfAngles = CFrame.new, CFrame.Angles
+local clear = table.clear
+local floor, rad = math.floor, math.rad
 local wait = task.wait
 
---// Setup
-local function spawn()
+--// Setups
+local function setup()
 	musics.Overworld:Play()
 
 	for _, effect in camera:GetChildren() do
@@ -44,7 +47,36 @@ local function spawn()
 	Lighting.ColorShift_Top = fromRGB(220, 255, 255)
 	Lighting.ColorShift_Bottom = fromRGB(220, 255, 255)
 end
-spawn()
+Spawn(setup)
+
+local function worldAnims()
+    for _, child in map:GetDescendants() do
+        if child.Name == "Wings" and child.Parent.Name == "Windmill" then
+			Clock(0.01, function()
+				if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 555 then return end
+
+				child:PivotTo(child.PrimaryPart.CFrame * cfAngles(rad(-1.5), 0, 0))
+			end)
+
+        elseif child.Name == "Sky Galleon" then
+            Spawn(function()
+                while wait(0.01) do
+					if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 256 then continue end
+
+                    for _ = 1, 100 do
+                        child:PivotTo(child.PrimaryPart.CFrame + yAxis * 0.03)
+                        wait(0.01)
+                    end
+                    for _ = 1, 100 do
+                        child:PivotTo(child.PrimaryPart.CFrame - yAxis * 0.03)
+                        wait(0.01)
+                    end
+                end
+            end)
+        end
+    end
+end
+Spawn(worldAnims)
 
 
 --// Connections
@@ -70,7 +102,7 @@ local function onDied()
 end
 char.Humanoid.Died:Once(onDied)
 
-
+--// Quest connections
 local markers = {}
 local quests = plr:WaitForChild("Quests", 999) :: Folder
 
@@ -103,7 +135,7 @@ local function targetCurrentQuest()
 		marker.TargetUI.Frame.BackgroundColor3 = AssetBook.QuestColor[quest.Name]
         marker.Parent = camera
 
-		insert(markers, marker)
+		markers[#markers + 1] = marker
 
 		if mapComponents.NPCs:FindFirstChild(StoryBook[quest.Name][quest.Value].NPC) then
 			local indicator = RepS.Package.Unloads.QuestIndicator:Clone() :: BillboardGui
@@ -112,7 +144,7 @@ local function targetCurrentQuest()
 		end
     end
 end
-targetCurrentQuest()
+Spawn(targetCurrentQuest)
 Add(quests.ChildAdded:Connect(targetCurrentQuest))
 Add(quests.ChildRemoved:Connect(targetCurrentQuest))
 Add(RS.Heartbeat:Connect(__distanceCheck))
