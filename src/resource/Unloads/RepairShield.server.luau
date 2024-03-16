@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local HarukaLib = require(game:GetService("ReplicatedStorage").Modules.Packages.HarukaLib)
 

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Lighting = game:GetService("Lighting")
 local RepS = game:GetService("ReplicatedStorage")

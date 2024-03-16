@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Stores common type information used internally.

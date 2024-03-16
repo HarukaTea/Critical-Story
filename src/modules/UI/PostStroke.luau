@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local CS = game:GetService("CollectionService")
 local RS = game:GetService("RunService")

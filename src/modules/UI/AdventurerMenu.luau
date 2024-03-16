@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")

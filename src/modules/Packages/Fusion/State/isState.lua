@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Returns true if the given value can be assumed to be a valid state object.

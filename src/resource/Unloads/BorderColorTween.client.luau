@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local AssetBook = require(game:GetService("ReplicatedStorage").Modules.Data.AssetBook)
 

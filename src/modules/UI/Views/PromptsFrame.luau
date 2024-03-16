@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local PPS = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")

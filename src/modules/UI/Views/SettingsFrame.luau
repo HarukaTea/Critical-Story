@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local RepS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")

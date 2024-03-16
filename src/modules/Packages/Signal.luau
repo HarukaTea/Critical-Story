@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local yield, create, isRunning = coroutine.yield, coroutine.create, coroutine.running
 local cancel, spawn = task.cancel, task.spawn

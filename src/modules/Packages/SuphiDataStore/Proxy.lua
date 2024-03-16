@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Constructor = {}
 local Index, NewIndex

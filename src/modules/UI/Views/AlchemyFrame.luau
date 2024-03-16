@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local function AlchemyFrame(self: table) : Frame
 

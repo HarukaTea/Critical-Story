@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local CS = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")

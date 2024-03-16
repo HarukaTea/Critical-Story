@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local CAS = game:GetService("ContextActionService")
 local Debris = game:GetService("Debris")
@@ -88,8 +88,6 @@ local function swimIn()
     TS:Create(diveVel, tweenInfoNew(0.2), { Velocity = v3New(vel.X, 0, vel.Z) }):Play()
 
     _changeAnim("SwimIdle")
-
-    CAS:BindActionAtPriority("SwimDown", changeAction, false, 3000, Enum.KeyCode.LeftShift)
 end
 local function swimOut()
     if not isSwimming then return end

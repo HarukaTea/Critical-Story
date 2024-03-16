@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Fusion = require(game:GetService("ReplicatedStorage").Modules.Packages.Fusion)
 

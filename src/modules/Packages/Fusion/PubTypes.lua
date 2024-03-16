@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Stores common public-facing type information for Fusion APIs.

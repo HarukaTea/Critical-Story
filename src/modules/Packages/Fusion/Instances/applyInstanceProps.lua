@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Applies a table of properties to an instance, including binding to any

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local function ShopFrame(self: table) : Frame
 

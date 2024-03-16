@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
@@ -236,7 +236,7 @@ return function(plr: Player)
 			}),
 		},
 	})
-	repeat wait() until plr.PlayerGui:WaitForChild("AdventurerMenu")
+	repeat wait() until plr.PlayerGui:WaitForChild("AdventurerMenu", 999)
 
 	---// Actions
 	local function _setExVisibleState(ui: ScreenGui, state: boolean)

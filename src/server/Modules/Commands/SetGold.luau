@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 return {
     Name = "setgold",

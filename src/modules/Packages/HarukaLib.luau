@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local HarukaLib = {}
 
@@ -17,12 +17,10 @@ function HarukaLib:NumberConvert(number: number, type: string) : string
 	if abbrFactor > 0 then
 		if prefixes[abbrFactor + 1] then
 			return format(type, number / 10 ^ (abbrFactor * 3)) .. prefixes[abbrFactor + 1]
-		else
-			return tostring(number)
 		end
-	else
-		return tostring(number)
 	end
+
+	return tostring(number)
 end
 
 --[[

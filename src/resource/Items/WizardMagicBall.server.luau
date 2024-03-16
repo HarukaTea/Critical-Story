@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")

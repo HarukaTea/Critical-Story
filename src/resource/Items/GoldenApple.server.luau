@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local SSS = game:GetService("ServerScriptService")
 

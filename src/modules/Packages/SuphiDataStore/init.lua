@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local DSS = game:GetService("DataStoreService")
 local MSS = game:GetService("MemoryStoreService")

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -53,6 +53,8 @@ local function worldAnims()
     for _, child in map:GetDescendants() do
         if child.Name == "Wings" and child.Parent.Name == "Windmill" then
 			Clock(0.01, function()
+				if not char then return end
+				if not char.PrimaryPart then return end
 				if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 555 then return end
 
 				child:PivotTo(child.PrimaryPart.CFrame * cfAngles(rad(-1.5), 0, 0))
@@ -61,6 +63,8 @@ local function worldAnims()
         elseif child.Name == "Sky Galleon" then
             Spawn(function()
                 while wait(0.01) do
+					if not char then continue end
+					if not char.PrimaryPart then continue end
 					if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 256 then continue end
 
                     for _ = 1, 100 do

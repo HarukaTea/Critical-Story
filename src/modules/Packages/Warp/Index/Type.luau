@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 export type rateLimitArg = {
 	maxEntrance: number?,

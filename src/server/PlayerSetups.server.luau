@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -105,7 +105,7 @@ local function setup(plr: Player)
 	local blackList = { "LastLocation" } --- deprecated data but stored in the same table
 	for attr, val in data.Stats do
 		if tFind(blackList, attr) then continue end
-		
+
 		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
 		Hydrate(plr)({

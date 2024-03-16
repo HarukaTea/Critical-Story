@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	Packs an array of numbers into a given animatable data type.

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Spawn = require(script.Parent.Spawn)
 

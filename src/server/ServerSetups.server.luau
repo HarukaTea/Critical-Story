@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local GS = game:GetService("GroupService")
 local HttpService = game:GetService("HttpService")

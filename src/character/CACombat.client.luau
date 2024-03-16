@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local CS = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
@@ -35,7 +35,7 @@ local format = string.format
 local newInstance = Instance.new
 local v3New = Vector3.new
 local rad, random = math.rad, math.random
-local tFind = table.find
+local tFind, remove = table.find, table.remove
 
 
 --// Pre-functions
@@ -59,7 +59,7 @@ local function _partyCheck() : boolean
 	return partyCheck
 end
 local function setup()
-	for _, folder in mapComponents.CombatFolders:GetChildren() do
+	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do
 		if folder:GetAttribute("PublicCombat") then
 			if folder:GetAttribute(char.Name) then folder:Destroy() continue end
 
@@ -73,15 +73,28 @@ local function setup()
 			folder:Destroy()
 		end
 	end
-	for _, folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
+	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
+
+	--- add all mobs
+	local monsters = {}
+	for _, monster in monsterLocations:GetDescendants() do
+		if monster:HasTag("Monster") then monsters[#monsters + 1] = monster end
+	end
+	local function _handleMonster(monster: Model)
+		wait()
+		if tFind(monsters, monster) then
+			remove(monsters, tFind(monsters, monster))
+		else
+			monsters[#monsters + 1] = monster
+		end
+	end
+	CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
+	CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
 	--- rotate the monsters to make them more "lively"
 	local function _rotateSimulate()
-        for _, monster in monsterLocations:GetDescendants() do
-            if monster:HasTag("Monster")
-				and monster.PrimaryPart
-				and not monster:GetAttribute("InCombat") then
-
+        for _, monster: Model in monsters do
+            if monster.PrimaryPart and not monster:GetAttribute("InCombat") then
                 if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 166 then
                     local rotating = random(5, 20)
                     local direction = random(-2, 2)
@@ -105,9 +118,8 @@ local function setup()
 		if isInCombat then return end
 		if encounterCD then return end
 
-        for _, monster in monsterLocations:GetDescendants() do
-            if monster:HasTag("Monster")
-				and monster.PrimaryPart
+        for _, monster: Model in monsters do
+            if monster.PrimaryPart
 				and monster:GetAttribute("InCombat") == false
 				and not monster:GetAttribute("SubMonster") then
 

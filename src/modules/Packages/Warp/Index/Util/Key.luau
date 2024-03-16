@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local sub = string.sub
 local randomNew = Random.new

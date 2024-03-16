@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local RepS = game:GetService("ReplicatedStorage")
 
@@ -44,6 +44,9 @@ local function MonsterHPFrame(info: table, self: table): Frame
 
 	local function _setNewEffectList()
 		wait()
+		if not info.Model then return end
+		if not info.Model:FindFirstChild("EffectsList") then return end
+
 		info.EffectsList:set(info.Model.EffectsList:GetChildren())
 	end
 	Hydrate(info.Model.EffectsList)({

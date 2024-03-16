@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local RS = game:GetService("RunService")
 

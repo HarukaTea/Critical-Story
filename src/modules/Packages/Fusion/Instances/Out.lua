@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --[[
 	A special key for property tables, which allows users to extract values from

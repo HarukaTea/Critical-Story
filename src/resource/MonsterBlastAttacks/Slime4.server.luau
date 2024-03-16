@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local model = script.Parent :: Model
 local char = model.Owner.Value :: Model

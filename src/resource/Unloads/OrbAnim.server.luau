@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
 

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local RepS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")

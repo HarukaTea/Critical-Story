@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Players = game:GetService("Players")
 local SSS = game:GetService("ServerScriptService")

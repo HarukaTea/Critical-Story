@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 local Server = {}
 Server.__index = Server

@@ -1,4 +1,4 @@
---!nocheck
+--!strict
 
 --// Warp Library (@Eternity_Devs)
 --// version 1.0.5
