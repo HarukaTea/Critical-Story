@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local DSS = game:GetService("DataStoreService")
 local MSS = game:GetService("MemoryStoreService")

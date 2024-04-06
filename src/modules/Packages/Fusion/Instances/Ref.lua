@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	A special key for property tables, which stores a reference to the instance

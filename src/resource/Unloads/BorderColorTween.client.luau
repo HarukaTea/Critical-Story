@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local AssetBook = require(game:GetService("ReplicatedStorage").Modules.Data.AssetBook)
 

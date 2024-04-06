@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local isMainGame = if game.PlaceId == 12343565896 then true else false
 

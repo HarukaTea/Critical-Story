@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	Cleans up the tasks passed in as the arguments.

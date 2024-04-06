@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -70,26 +72,3 @@ local function vfxChestUnlock(chest: Model)
 	end
 end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
-
-
---[[
-	Join the public or party combat by prompt requests
-]]
-local function joinCombat()
-	local char = plr.Character :: Model
-	local charStats = char:FindFirstChild("CharStats") :: Folder
-
-	if not charStats then return end
-	for _, monsterSymbol: ObjectValue in charStats.TargetMonsters:GetChildren() do
-		local monster = monsterSymbol.Value :: Model
-
-		if monster and monster:FindFirstChild("Holder") and monster.Holder.Value then
-			local folder = monster.Holder.Value :: Folder
-			if not folder then return end
-			if not folder.Parent then return end
-
-			folder.Parent = workspace.MapComponents.CombatFolders
-		end
-	end
-end
-Events.RejoinCombat:Connect(joinCombat)

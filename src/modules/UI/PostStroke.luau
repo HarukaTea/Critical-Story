@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local CS = game:GetService("CollectionService")
 local RS = game:GetService("RunService")
@@ -19,56 +21,45 @@ local function _calScreenRatio() : number
 	return average(workspace.CurrentCamera.ViewportSize) / average(DESIGN_VP_SIZE)
 end
 
---[[
-	Automatically tag all UIStrokes in PlayerGui
-]]
-function PostStroke:FindAndGiveTag()
-	for _, element in self.plrGui:GetDescendants() do
-		if element:IsA("UIStroke") then
-			CS:AddTag(element, "ScreenStroke")
-		end
-	end
+return function(plr: Player)
+	local plrGui = plr.PlayerGui
+	local uiStrokes = {}
+	local fpsLimit, lastTick = 0.5, 0
 
-	self.plrGui.DescendantAdded:Connect(function(added)
+	--// Connections
+	local function _strokeAdded(added: UIStroke)
+		uiStrokes[added] = added.Thickness
+
+		added.Thickness *= _calScreenRatio()
+	end
+	CS:GetInstanceAddedSignal("ScreenStroke"):Connect(_strokeAdded)
+
+	local function _uiAdded(added: Instance)
 		if added:IsA("UIStroke") then
 			CS:AddTag(added, "ScreenStroke")
 		end
-	end)
-end
+	end
+	plrGui.DescendantAdded:Connect(_uiAdded)
 
---[[
-	Update the tagged UIStrokes every 0.5 seconds
-]]
-function PostStroke:UpdateStroke()
-	local fpsLimit, lastTick = 0.5, 0
-
-	RS.Heartbeat:Connect(function()
+	local function _onHeartbeat()
 		if clock() - lastTick >= fpsLimit then
 			lastTick = clock()
 
-			for i, thickness in self.uiStrokes do
+			for i, thickness in uiStrokes do
 				if not i.Parent then
-					self.uiStrokes[i] = nil
+					uiStrokes[i] = nil
 				else
 					i.Thickness = thickness * _calScreenRatio()
 				end
 			end
 		end
-	end)
-end
+	end
+	RS.Heartbeat:Connect(_onHeartbeat)
 
-return function(plr: Player)
-	local self = setmetatable({}, PostStroke)
-
-	self.plrGui = plr.PlayerGui
-	self.uiStrokes = {}
-
-	CS:GetInstanceAddedSignal("ScreenStroke"):Connect(function(added: Instance)
-		self.uiStrokes[added] = added.Thickness
-
-		added.Thickness *= _calScreenRatio()
-	end)
-
-	self:FindAndGiveTag()
-	self:UpdateStroke()
+	--// Setups
+	for _, element in plrGui:GetDescendants() do
+		if element:IsA("UIStroke") then
+			CS:AddTag(element, "ScreenStroke")
+		end
+	end
 end

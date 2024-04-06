@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	Processes and returns an existing instance, with options for setting

@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	Packs an array of numbers into a given animatable data type.

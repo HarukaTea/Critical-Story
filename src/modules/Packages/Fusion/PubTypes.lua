@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	Stores common public-facing type information for Fusion APIs.

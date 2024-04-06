@@ -1,5 +1,8 @@
 --!strict
+--!optimize 2
+--!native
 
+local BS = game:GetService("BadgeService")
 local GS = game:GetService("GroupService")
 local HttpService = game:GetService("HttpService")
 local MS = game:GetService("MessagingService")
@@ -38,23 +41,23 @@ local function collisionRegister()
 	ServerUtil:SetCollisionGroup(workspace.MapComponents.NPCs, "NPC")
 	ServerUtil:SetCollisionGroup(RepS.Package.Unloads["CombatBorder"], "Barrier")
 end
-collisionRegister()
+Spawn(collisionRegister)
 
 local function cmdrRegister()
 	Cmdr:RegisterDefaultCommands({"Help", "DefaultAdmin"})
 	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
 	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
 end
-cmdrRegister()
+Spawn(cmdrRegister)
 
 local function mainSetup()
 	--- clear extra events
 	for _, mapPart in workspace:GetDescendants() do
 		if mapPart:IsA("BasePart") then
 			if mapPart:HasTag("Water") then continue end
-			if mapPart:HasTag("Walljump") then continue end
 
 			mapPart.CanTouch = false
+			mapPart.Locked = true
 		end
 	end
 	for _, link in RepS:GetDescendants() do
@@ -134,7 +137,9 @@ local function mainSetup()
 
 	--- player extra info setup
 	local joinData
-	local function playerAdded(plr: Player)
+	local function _playerAdded(plr: Player)
+		BS:AwardBadge(plr.UserId, 2129794618)
+
 		local groups = GS:GetGroupsAsync(plr.UserId)
 		local rank = 0
 		for _, group in groups do
@@ -155,19 +160,20 @@ local function mainSetup()
 
 		joinData = plr:GetJoinData().TeleportData
 	end
-	Players.PlayerAdded:Connect(playerAdded)
+	Players.PlayerAdded:Connect(_playerAdded)
 
 	--- join friend in titlescreen return info
-	MS:SubscribeAsync("ReturnFriendLocation", function(message)
+	local function _returnFriends(message: table)
 		for _, player in Players:GetPlayers() do
 			if player.UserId == message.Data then
 				MS:PublishAsync("JoinFriendCheck", game.JobId)
 			end
 		end
-	end)
+	end
+	MS:SubscribeAsync("ReturnFriendLocation", _returnFriends)
 
 	--- private server setup
-	Spawn(function()
+	local function _privateServerSetup()
 		local privateId, code = game.PrivateServerId, nil
 
 		if privateId ~= "" then
@@ -187,10 +193,11 @@ local function mainSetup()
 
 			print("Private Server Id: "..accessCode)
 		end
-	end)
+	end
+	Spawn(_privateServerSetup)
 
 	--- server location info
-	Spawn(function()
+	local function _serverLocationDetection()
 		if RS:IsStudio() then return end
 
 		local serverInfo = HttpService:GetAsync("https://ipapi.co/json", true)
@@ -209,6 +216,7 @@ local function mainSetup()
 		else
 			warn("Failed to fetch IP data")
 		end
-	end)
+	end
+	Spawn(_serverLocationDetection)
 end
 mainSetup()

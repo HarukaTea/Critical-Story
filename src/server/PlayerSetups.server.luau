@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")

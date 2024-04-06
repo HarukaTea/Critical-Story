@@ -1,12 +1,16 @@
 --!strict
+--!optimize 2
+--!native
+
+local RepS = game:GetService("ReplicatedStorage")
+
+local ClientUtil = require(RepS.Modules.ClientUtil)
 
 local story = {}
 
-local maps = workspace:WaitForChild("Maps") :: Folder
-local npcs = workspace:WaitForChild("MapComponents").NPCs :: Folder
-local statues = workspace.MapComponents.Statues :: Folder
-
 local v3New = Vector3.new
+
+local pos = ClientUtil:GetKeyStoryLocations()
 
 story.Main = {
     {
@@ -14,7 +18,7 @@ story.Main = {
         Target = "Talk to Cyalm",
         Desc = "",
         NPC = "Cyalm",
-        Hint = npcs.Cyalm.PrimaryPart.Position,
+        Hint = if pos.Cyalm then pos.Cyalm else v3New(),
 
         Rewards = {
             EXP = 20,
@@ -26,7 +30,7 @@ story.Main = {
         Target = "Talk to Milk",
         Desc = "",
         NPC = "Milk",
-        Hint = npcs.Milk.PrimaryPart.Position,
+        Hint = if pos.Milk then pos.Milk else v3New(),
 
         Rewards = {
             EXP = 20,
@@ -38,7 +42,7 @@ story.Main = {
         Target = "Learn how to combat",
         Desc = "",
         NPC = "Milk",
-        Hint = npcs.Milk.PrimaryPart.Position,
+        Hint = if pos.Milk then pos.Milk else v3New(),
 
         Rewards = {
             EXP = 20,
@@ -50,7 +54,7 @@ story.Main = {
         Target = "Talk to Milk again",
         Desc = "",
         NPC = "Milk",
-        Hint = npcs.Milk.PrimaryPart.Position,
+        Hint = if pos.Milk then pos.Milk else v3New(),
 
         Rewards = {
             EXP = 20,
@@ -62,7 +66,7 @@ story.Main = {
         Target = "Talk to Cyalm again",
         Desc = "",
         NPC = "Cyalm",
-        Hint = npcs.Cyalm.PrimaryPart.Position,
+        Hint = if pos.Cyalm then pos.Cyalm else v3New(),
 
         Rewards = {
             EXP = 20,
@@ -74,7 +78,7 @@ story.Main = {
         Target = "Start your adventure!",
         Desc = "",
         NPC = "Hehe",
-        Hint = maps["Initus Bay"].StoryLocator1.Position,
+        Hint = if pos["Initus Bay"] then pos["Initus Bay"].StoryLocator1 else v3New(),
 
         Rewards = {
             EXP = 30,
@@ -86,7 +90,7 @@ story.Main = {
         Target = "Defeat Slimes to reach Level 10",
         Desc = "",
         NPC = "None",
-        Hint = maps["Primis Field"].StoryLocator1.Position,
+        Hint = if pos["Primis Field"] then pos["Primis Field"].StoryLocator1 else v3New(),
 
         Script = true,
 
@@ -100,7 +104,7 @@ story.Main = {
         Target = "Talk to hehe again",
         Desc = "",
         NPC = "Hehe",
-        Hint = npcs.Hehe.PrimaryPart.Position,
+        Hint = if pos.Hehe then pos.Hehe else v3New(),
 
         Rewards = {
             EXP = 30,
@@ -127,7 +131,7 @@ story.Side = {
         Target = "Get Archer class from its statue",
         Desc = "",
         NPC = "None",
-        Hint = statues.Archer.PrimaryPart.Position,
+        Hint = if pos.Archer then pos.Archer else v3New(),
 
         Script = true,
 
@@ -155,7 +159,7 @@ story.Town = {
         Target = "Return to FChenP",
         Desc = "",
         NPC = "FChenP",
-        Hint = npcs.FChenP.PrimaryPart.Position,
+        Hint = if pos.FChenP then pos.FChenP else v3New(),
 
         Rewards = {
             EXP = 40,

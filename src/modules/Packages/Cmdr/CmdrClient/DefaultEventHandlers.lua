@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local SG = game:GetService("StarterGui")
 

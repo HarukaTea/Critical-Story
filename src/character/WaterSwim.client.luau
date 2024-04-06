@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local CAS = game:GetService("ContextActionService")
 local Debris = game:GetService("Debris")

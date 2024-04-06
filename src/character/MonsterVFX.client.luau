@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local CS = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")

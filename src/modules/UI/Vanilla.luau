@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Fusion = require(game:GetService("ReplicatedStorage").Modules.Packages.Fusion)
 

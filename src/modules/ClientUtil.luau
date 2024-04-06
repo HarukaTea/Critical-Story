@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -13,6 +15,7 @@ local csNew = ColorSequence.new
 local random = math.random
 local wait = task.wait
 local fromScale = UDim2.fromScale
+local sFind = string.find
 
 local ClientUtil = {}
 
@@ -68,6 +71,31 @@ function ClientUtil:SetCharTrans(trans: number, char: Model)
 		end
 		if child:IsA("Accessory") then child.Handle.Transparency = trans end
 	end
+end
+
+--[[
+    Get all key locations in story
+]]
+function ClientUtil:GetKeyStoryLocations() : table
+    local pos = {}
+
+    for _, child in workspace:WaitForChild("MapComponents").NPCs:GetChildren() do
+        pos[child.Name] = child.PrimaryPart.Position
+    end
+    for _, child in workspace.MapComponents.Statues:GetChildren() do
+        pos[child.Name] = child.PrimaryPart.Position
+    end
+    for _, child in workspace:GetDescendants() do
+        if sFind(child.Name, "StoryLocator") then
+            local map, locator = child.Parent.Name, child.Name
+
+            if not pos[map] then pos[map] = {} end
+
+            pos[map][locator] = child.Position
+        end
+    end
+
+    return pos
 end
 
 return ClientUtil

@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local RepS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")

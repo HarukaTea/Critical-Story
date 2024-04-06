@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 export type Check<T> = () -> T
 

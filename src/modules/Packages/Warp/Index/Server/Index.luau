@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Server = {}
 Server.__index = Server

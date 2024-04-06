@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local CS = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
@@ -59,20 +61,7 @@ local function _partyCheck() : boolean
 	return partyCheck
 end
 local function setup()
-	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do
-		if folder:GetAttribute("PublicCombat") then
-			if folder:GetAttribute(char.Name) then folder:Destroy() continue end
-
-			folder.Parent = TestS
-
-		elseif folder:GetAttribute("PartyCombat") then
-			if not _partyCheck() then folder:Destroy() continue end
-
-			folder.Parent = TestS
-		else
-			folder:Destroy()
-		end
-	end
+	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do folder:Destroy() end
 	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
@@ -326,17 +315,6 @@ local function orbFolderHandler(folder: Folder)
 
 	if folder.Name ~= char.Name then folder:Destroy() end
 end
-local function combatPromptHandler(prompt: ProximityPrompt)
-	wait()
-	if prompt.Name == "PublicJoin" then
-		if prompt:GetAttribute("Owner") == char.Name then prompt:Destroy() end
-
-	elseif prompt.Name == "PartyJoin" then
-		if prompt:GetAttribute("Owner") == char.Name then prompt:Destroy() end
-
-		if not _partyCheck() then prompt:Destroy() end
-	end
-end
 
 --// Connection setups
 Fusion.Hydrate(char)({
@@ -353,7 +331,6 @@ Events.MagicCasted:Connect(magicCasted)
 humanoid.Touched:Connect(onTouched)
 CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler)
 CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler)
-CS:GetInstanceAddedSignal("CombatJoinPrompt"):Connect(combatPromptHandler)
 
 --// Setup
 local stopSimulating, stopDetecting = setup()

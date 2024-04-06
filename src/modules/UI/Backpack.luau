@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")

@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local sub = string.sub
 local randomNew = Random.new

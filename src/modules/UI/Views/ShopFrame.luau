@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local function ShopFrame(self: table) : Frame
 

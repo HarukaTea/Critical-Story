@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Client = {}
 Client.__index = Client

@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	Given a `tweenInfo` and `currentTime`, returns a ratio which can be used to

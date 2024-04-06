@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
 

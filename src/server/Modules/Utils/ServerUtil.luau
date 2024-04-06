@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
@@ -9,7 +11,6 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
-local Signals = require(SSS.Modules.Data.ServerSignals)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
@@ -215,34 +216,6 @@ function ServerUtil:MonsterActivateCombat(monster: Model, mode: string?, plr: Pl
 	monster.Holder.Value = folder
 	monster.MonsterHP.Disabled = false
 	monster.Attack.Disabled = false
-
-	if monster:GetAttribute("SubMonster") then return end
-
-	if mode == "Public" then
-		local locator = monster.Parent
-
-		local joinPrompt = RepS.Package.Unloads.PublicJoinPrompt:Clone() :: Part
-		joinPrompt.CFrame = cfNew(locator.Position) * cfNew(0, 4, 0)
-
-		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
-		prompt:SetAttribute("Owner", plr.Name)
-		prompt:AddTag("CombatJoinPrompt")
-
-		joinPrompt.Parent = locator
-
-	elseif mode == "Party" then
-		local locator = monster.Parent
-
-		local joinPrompt = RepS.Package.Unloads.PublicJoinPrompt:Clone() :: Part
-		joinPrompt.CFrame = cfNew(locator.Position) * cfNew(0, 4, 0)
-
-		local prompt = joinPrompt.PublicJoin :: ProximityPrompt
-		prompt:SetAttribute("Owner", plr.Name)
-		prompt.Name = "PartyJoin"
-		prompt:AddTag("CombatJoinPrompt")
-
-		joinPrompt.Parent = locator
-	end
 end
 
 --[[
@@ -288,8 +261,6 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	Debris:AddItem(respawnTimer, 13)
 
 	monster:Destroy()
-	if respawnLocatorTip:FindFirstChild("PublicJoinPrompt") then respawnLocatorTip.PublicJoinPrompt:Destroy() end
-	if respawnLocatorTip:FindFirstChild("PartyJoinPrompt") then respawnLocatorTip.PartyJoinPrompt:Destroy() end
 
 	wait(13)
 	ServerUtil:SetupMonster(locator)
@@ -543,7 +514,7 @@ function ServerUtil:FindPartOnRay(givenPos: Vector3, ignores: table?) : Vector3
 				or not hit.CanCollide
 				or hit.Transparency >= 0.5 then
 
-				insert(ignoreList, hit)
+				insert(ignoreList, 1, hit)
 			else
 				return pos
 			end

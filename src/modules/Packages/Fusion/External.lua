@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 --[[
     Abstraction layer between Fusion internals and external environments,
     allowing for flexible integration with schedulers and test mocks.

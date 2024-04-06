@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 --[[
 	A special key for property tables, which adds user-specified tasks to be run

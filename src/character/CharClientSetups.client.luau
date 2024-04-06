@@ -1,4 +1,6 @@
 --!strict
+--!optimize 2
+--!native
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -51,7 +53,7 @@ Spawn(setup)
 
 local function worldAnims()
     for _, child in map:GetDescendants() do
-        if child.Name == "Wings" and child.Parent.Name == "Windmill" then
+        if child.Name == "Wings" then
 			Clock(0.01, function()
 				if not char then return end
 				if not char.PrimaryPart then return end
