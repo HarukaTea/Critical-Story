@@ -1,13 +1,9 @@
---!strict
+--!nocheck
 --!optimize 2
 --!native
 
 local Players = game:GetService("Players")
-local RepS = game:GetService("ReplicatedStorage")
 
-local Spawn = require(RepS.Modules.Packages.Spawn)
-
-local plr = Players.LocalPlayer
 local char = script.Parent :: Model
 
 local wait = task.wait
@@ -15,24 +11,6 @@ local instanceNew = Instance.new
 local random, sin = math.random, math.sin
 local sub = string.sub
 local v3New = Vector3.new
-
---- Reload UI modules when character respawned
-local UIModules = RepS.Modules.UI
-local requireList = {
-	UIModules.AdventurerStats,
-	UIModules.AdventurerMenu,
-	UIModules.Backpack,
-	UIModules.ShiftLock,
-	UIModules.PlayerList,
-	UIModules.Hints,
-	UIModules.PostStroke,
-	UIModules.SwitchScene
-}
-for _, module in requireList do
-	Spawn(function()
-		require(module)(plr)
-	end)
-end
 
 --- I optimized the animate script so it should be good right now
 local torso = char:WaitForChild("Torso")

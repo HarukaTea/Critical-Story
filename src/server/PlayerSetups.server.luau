@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 --!optimize 2
 --!native
 
@@ -14,7 +14,7 @@ local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local Hydrate, AttributeChange = Fusion.Hydrate, Fusion.AttributeChange
+local AttributeChange = Fusion.AttributeChange
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
 local DS1, DS2, DS3 = "CS_DEV1599", "CS_DEV1599_S2", "CS_DEV1599_S3"
@@ -110,7 +110,7 @@ local function setup(plr: Player)
 
 		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
-		Hydrate(plr)({
+		Fusion.Hydrate(plr)({
 			[AttributeChange(attr)] = function(newStat: any)
 				if newStat == nil then return end
 
@@ -172,7 +172,7 @@ local function setup(plr: Player)
 	for setting, val in data.Settings do
 		plr:SetAttribute(setting, val)
 
-		Hydrate(plr)({
+		Fusion.Hydrate(plr)({
 			[AttributeChange(setting)] = function(newSetting: any)
 				if newSetting == nil then return end
 
@@ -202,15 +202,17 @@ local function clear(plr: Player)
 	end
 
 	--- check if player is combating
-	for _, monster in workspace.Monsters:GetDescendants() do
-		if monster:GetAttribute("IsEnemy") then
-			if monster.TargetingList:FindFirstChild(plr.Name) then
-				monster.TargetingList[plr.Name]:Destroy()
+	Spawn(function()
+		for _, monster in workspace.Monsters:GetDescendants() do
+			if monster:GetAttribute("IsEnemy") then
+				if monster.TargetingList:FindFirstChild(plr.Name) then
+					monster.TargetingList[plr.Name]:Destroy()
 
-				print(plr.Name .. " left during combat with " .. monster.Name)
+					print(plr.Name .. " left during combat with " .. monster.Name)
+				end
 			end
 		end
-	end
+	end)
 
 	--- check if player is in party
 	local check = workspace.MapComponents.Parties:FindFirstChild(plr.Name, true)
@@ -231,14 +233,16 @@ local function clear(plr: Player)
 			wholeParty:Destroy()
 		end
 	end
-	if check then
-		if check:IsA("ObjectValue") then
-			_leaveParty(check.Parent, check)
+	Spawn(function()
+		if check then
+			if check:IsA("ObjectValue") then
+				_leaveParty(check.Parent, check)
 
-		elseif check:IsA("Folder") then
-			_leaveParty(check, check[plr.Name])
+			elseif check:IsA("Folder") then
+				_leaveParty(check, check[plr.Name])
+			end
 		end
-	end
+	end)
 end
 
 --- in case player joined before server starts

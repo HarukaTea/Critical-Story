@@ -3,5 +3,18 @@
     ".vscode",
     "**/_Index/**",
     "src/modules/Packages/Cmdr/Shared/Util.lua"
-  ]
+  ],
+
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+
+    "src/character/Health.server.luau": true,
+    "src/client/BubbleChat.client.luau": true,
+    "src/client/RbxCharacterSounds.client.luau": true
+  }
 }

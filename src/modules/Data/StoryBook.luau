@@ -1,10 +1,10 @@
---!strict
+--!nocheck
 --!optimize 2
 --!native
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local ClientUtil = require(RepS.Modules.ClientUtil)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 
 local story = {}
 

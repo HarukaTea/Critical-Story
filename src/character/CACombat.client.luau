@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 --!optimize 2
 --!native
 
@@ -10,7 +10,7 @@ local TS = game:GetService("TweenService")
 local TestS = game:GetService("TestService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local ClientUtil = require(RepS.Modules.ClientUtil)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)

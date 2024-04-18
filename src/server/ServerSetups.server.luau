@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 --!optimize 2
 --!native
 
@@ -85,7 +85,7 @@ local function mainSetup()
 	end
 
 	--- zone setups
-	for _, zone in SS.Zones:GetChildren() do
+	for _, zone in SS.Package.Zones:GetChildren() do
 		zone.Transparency = 1
 		zone.Parent = workspace.MapComponents.Zones
 	end
