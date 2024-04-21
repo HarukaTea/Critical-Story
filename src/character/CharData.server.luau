@@ -8,6 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
 
+local Bin = require(RepS.Modules.Packages.Bin)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -16,6 +17,8 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+
+local Add, Empty = Bin()
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
@@ -66,11 +69,9 @@ local function setup()
     ServerUtil:SetCollisionGroup(char, "Player")
 
     humanoid.BreakJointsOnDeath = false
-    Clock(1, function()
+    Add(Clock(1, function()
         HarukaLib:Add(plr, "PlayTime", 1)
-
-        if char:GetAttribute("HitCD") >= 0 then HarukaLib:Add(char, "HitCD", -1) end
-    end)
+    end))
 
     --// Spawn to the nearest respawn point
     if not RS:IsStudio() then
@@ -86,38 +87,38 @@ Spawn(setup)
 
 local function classAttributesSetup()
     --- warrior
-    char.Humanoid.StateChanged:Connect(function(state)
+    Add(char.Humanoid.StateChanged:Connect(function(state)
         if state == Enum.HumanoidStateType.Landed
             or state ~= Enum.HumanoidStateType.Jumping
             or state ~= Enum.HumanoidStateType.Freefall
         then
             char:SetAttribute("Combo", 0)
         end
-    end)
+    end))
 
     --- wizard
-    char:GetAttributeChangedSignal("InCombat"):Connect(function()
+    Add(char:GetAttributeChangedSignal("InCombat"):Connect(function()
         if not char:GetAttribute("InCombat") then
             char:SetAttribute("WizardCasted", 0)
             char:SetAttribute("Guard", 0)
             char:SetAttribute("RogueCritical", 0)
             char:SetAttribute("ResearchStage", 0)
         end
-    end)
+    end))
 
     --- knight
-    Clock(1.1, function()
+    Add(Clock(1.1, function()
         if char:GetAttribute("Guard") <= 0 then return end
 
         HarukaLib:Add(char, "Guard", -1)
-    end)
+    end))
 
     --- rogue
-    Clock(0.7, function()
+    Add(Clock(0.7, function()
         if char:GetAttribute("RogueCritical") <= 0 then return end
 
         HarukaLib:Add(char, "RogueCritical", -1)
-    end)
+    end))
 end
 Spawn(classAttributesSetup)
 
@@ -145,13 +146,15 @@ local function questDataSetup()
             if sFind(child.Name, questName) then child:Destroy() end
         end
     end
-    quests.ChildAdded:Connect(setQuestsScriptsAdded)
-    quests.ChildRemoved:Connect(setQuestsScriptsRemoved)
+    Add(quests.ChildAdded:Connect(setQuestsScriptsAdded))
+    Add(quests.ChildRemoved:Connect(setQuestsScriptsRemoved))
 end
 Spawn(questDataSetup)
 
 --// Connections
 local function onDead()
+    Empty()
+
     if char.PrimaryPart then plr:SetAttribute("LastLeave", char.PrimaryPart.Position) end
     char:SetAttribute("InCombat", false)
 
@@ -170,36 +173,37 @@ local function onDead()
 end
 humanoid.Died:Once(onDead)
 
-local function manaCheck(mana)
-    local maxMana = char:GetAttribute("MaxMana")
+local function tpCheck(tp: number)
+    if tp > 100 then char:SetAttribute("TP", 100) end
+end
+local function shieldCheck(shield: number)
+    local maxShield = char:GetAttribute("MaxShield")
 
-    if mana > maxMana then char:SetAttribute("Mana", maxMana) end
+    if shield > 0 and isBroken then isBroken = false end
+    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
+
+    if shield == 0 and not isBroken then
+        isBroken = true
+
+        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
+    end
 end
-local function updateMinDMG()
-    char:SetAttribute("MinDMG", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 5 + char:GetAttribute("MinDMGBuff"))
-end
-local function updateMaxDMG()
-    char:SetAttribute("MaxDMG", floor(plr:GetAttribute("DmgPoints") ^ 1.5) + 15 + char:GetAttribute("MaxDMGBuff"))
-end
-local function updateMagic()
-    char:SetAttribute("Magic", floor(plr:GetAttribute("MagicPoints") ^ 1.42) + 20 + char:GetAttribute("MagicBuff"))
-end
-local function updateMana()
-    char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 60) + 100 + char:GetAttribute("ManaBuff"))
-    char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
+
+local function updateATK()
+    char:SetAttribute("ATKDMG", floor(plr:GetAttribute("ATKPoints") ^ 1.5) + 10 + char:GetAttribute("ATKDMGBuff"))
 end
 local function updateShield()
-    char:SetAttribute("MaxShield", floor(plr:GetAttribute("ShieldPoints") * 20) + 20 + char:GetAttribute("ShieldBuff"))
+    char:SetAttribute("MaxShield", floor(plr:GetAttribute("ShieldPoints") * 5) + 5 + char:GetAttribute("ShieldBuff"))
     char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
 end
 local function updateHP()
-    humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") * 80) + 100 + char:GetAttribute("HealthBuff")
+    humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") * 80) + 80 + char:GetAttribute("HealthBuff")
     humanoid.Health = humanoid.MaxHealth
 end
-local function updateSpeed(speed)
+local function updateSpeed(speed: number)
     humanoid.WalkSpeed = 30 + speed
 end
-local function updateJump(jump)
+local function updateJump(jump: number)
     humanoid.JumpPower = 50 + jump
 end
 local function levelReqCheck()
@@ -215,28 +219,12 @@ local function levelReqCheck()
         lvUpCD = false
     end
 end
-updateMinDMG()
-updateMaxDMG()
-updateMagic()
-updateMana()
+updateATK()
 updateShield()
 updateHP()
 updateSpeed(0)
 updateJump(0)
 levelReqCheck()
-
-local function _shieldCheck(shield)
-    local maxShield = char:GetAttribute("MaxShield")
-
-    if shield > 0 and isBroken then isBroken = false end
-    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
-
-    if shield == 0 and not isBroken then
-        isBroken = true
-
-        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
-    end
-end
 
 local stopSpawn
 local function orbSpawnHandler(state: boolean)
@@ -293,12 +281,7 @@ local function orbSpawnHandler(state: boolean)
 end
 
 Fusion.Hydrate(plr)({
-    [AttributeChange("DmgPoints")] = function()
-        updateMinDMG()
-        updateMaxDMG()
-    end,
-    [AttributeChange("MagicPoints")] = updateMagic,
-    [AttributeChange("ManaPoints")] = updateMana,
+    [AttributeChange("ATKPoints")] = updateATK,
     [AttributeChange("ShieldPoints")] = updateShield,
     [AttributeChange("HealthPoints")] = updateHP,
     [AttributeChange("EXP")] = levelReqCheck,
@@ -307,17 +290,13 @@ Fusion.Hydrate(plr)({
     end
 })
 Fusion.Hydrate(char)({
-    [AttributeChange("MinDMGBuff")] = updateMinDMG,
-    [AttributeChange("MaxDMGBuff")] = updateMaxDMG,
-    [AttributeChange("MagicBuff")] = updateMagic,
-    [AttributeChange("ManaBuff")] = updateMana,
-    [AttributeChange("Mana")] = manaCheck,
+    [AttributeChange("TP")] = tpCheck,
     [AttributeChange("ShieldBuff")] = updateShield,
     [AttributeChange("HealthBuff")] = updateHP,
     [AttributeChange("SpeedBuff")] = updateSpeed,
     [AttributeChange("JumpBuff")] = updateJump,
-    [AttributeChange("Shield")] = _shieldCheck,
-    [AttributeChange("InCombat")] = function(state)
+    [AttributeChange("Shield")] = shieldCheck,
+    [AttributeChange("InCombat")] = function(state: boolean)
         orbSpawnHandler(state)
 
         ServerUtil:EquipWeapon(char)

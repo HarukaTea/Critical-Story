@@ -56,47 +56,38 @@ assets.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
 		Color = fromRGB(255, 100, 100),
-        Type = "DMG"
 	},
 	Archer = {
 		Image = "rbxassetid://2965863905",
 		Color = fromRGB(100, 255, 100),
-        Type = "DMG"
 	},
 	Wizard = {
 		Image = "rbxassetid://2965863231",
 		Color = fromRGB(100, 100, 254),
-        Type = "Magic"
 	},
 	Knight = {
 		Image = "rbxassetid://2965863677",
 		Color = fromRGB(255, 255, 50),
-        Type = "DMG"
 	},
 	Rogue = {
 		Image = "rbxassetid://12284961892",
 		Color = fromRGB(255, 170, 255),
-        Type = "DMG"
 	},
 	Repeater = {
 		Image = "rbxassetid://12190533959",
 		Color = fromRGB(65, 179, 255),
-        Type = "DMG"
 	},
 	Striker = {
 		Image = "rbxassetid://12190535870",
 		Color = fromRGB(253, 148, 44),
-        Type = "DMG"
 	},
 	Alchemist = {
 		Image = "rbxassetid://12236618949",
 		Color = fromRGB(0, 255, 22),
-        Type = "Magic"
 	},
 	Illusionist = {
 		Image = "rbxassetid://15875390788",
 		Color = fromRGB(0, 255, 252),
-        Type = "Magic"
 	}
 }
 assets.MonsterAvatars = {

@@ -12,15 +12,12 @@ return {
 
 		Class = "Warrior",
 		LastSeenLocation = "InitusVillage",
+		LastLeave = { "Vector3", 0, 0, 0 },
 
 		LvPoints = 0,
-		DmgPoints = 0,
-		MagicPoints = 0,
-		ManaPoints = 0,
-		HealthPoints = 0,
+		ATKPoints = 0,
 		ShieldPoints = 0,
-
-		LastLeave = { "Vector3", 0, 0, 0 }
+		HealthPoints = 0,
 	},
 
 	Inventory = {},
@@ -37,7 +34,6 @@ return {
 		SFXs = true,
 		PotatoMode = false,
 		PlayerList = true,
-		InviteAccess = true,
 		CombatMode = "Solo"
 	}
 }

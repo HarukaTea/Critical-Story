@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
@@ -256,9 +257,7 @@ return function(plr: Player)
 		_setExVisibleState(ui, if curUI == "None" then false else true)
 		_setOthersVisibleState(if curUI == "None" then true else false)
 
-		for _, child in self.plrGui.AdventurerStats.BG:GetDescendants() do
-			if child:IsA("UIStroke") and child.Color == fromRGB(255, 255, 255) then child.Transparency = 1 end
-		end
+		Signals.ExCategoryOpened:Fire()
 	end
 	local function _openBackpack(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
@@ -288,7 +287,7 @@ return function(plr: Player)
 
 	---// listening events
 	Fusion.Hydrate(workspace.CurrentCamera)({
-		[OnChange("ViewportSize")] = function(newSize)
+		[OnChange("ViewportSize")] = function(newSize: Vector2)
 			self.absSize:set({
 				newSize.X * 0.71,
 				newSize.Y * 0.662,

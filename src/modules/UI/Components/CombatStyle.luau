@@ -21,7 +21,7 @@ local function CombatStyle(self: table, class: string) : Frame
     local charClassInfo = self.charClassInfo
 
     Fusion.Hydrate(self.char)({
-		[AttributeChange("Combo")] = function(combo)
+		[AttributeChange("Combo")] = function(combo: number)
 			if combo <= 0 then
 				charClassInfo.Warrior.Val:set(combo)
 				return
@@ -35,16 +35,16 @@ local function CombatStyle(self: table, class: string) : Frame
 			wait(0.2)
 			TS:Create(tagUI.BarBG.Bar, AssetBook.TweenInfos.threeHalfOne, { Size = fromScale(0, 1) }):Play()
 		end,
-		[AttributeChange("Arrows")] = function(arrows)
+		[AttributeChange("Arrows")] = function(arrows: number)
 			charClassInfo.Archer.Val:set(arrows)
 		end,
-		[AttributeChange("WizardCasted")] = function(casted)
+		[AttributeChange("WizardCasted")] = function(casted: number)
 			charClassInfo.Wizard.Val:set(casted)
 		end,
-		[AttributeChange("Guard")] = function(guarded)
+		[AttributeChange("Guard")] = function(guarded: number)
 			charClassInfo.Knight.Val:set(guarded)
 		end,
-		[AttributeChange("RogueCritical")] = function(criChance)
+		[AttributeChange("RogueCritical")] = function(criChance: number)
 			charClassInfo.Rogue.Val:set(criChance)
 		end
 	})

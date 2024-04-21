@@ -30,10 +30,8 @@ local TEXTS = {
 	Musics = "Musics",
 	SFXs = "Sound Effects",
 	PublicCombat = "Public Combat Mode",
-	PartyCombat = "Party Combat Mode",
 	PotatoMode = "Low Detail Mode",
 	PlayerList = "Player List",
-	InviteAccess = "Can Be Invited"
 }
 
 local function OptionFrame(id: string, self: table) : Frame
@@ -124,17 +122,14 @@ local function SettingsFrame(self: table): Frame
 		Musics = Value(true),
 		SFXs = Value(true),
 		PublicCombat = Value(false),
-		PartyCombat = Value(false),
 		PotatoMode = Value(false),
 		PlayerList = Value(true),
-		InviteAccess = Value(true)
 	}
 	self.potatoStoreParts = {}
 
 	local playerSettings = self.playerSettings
 	Fusion.Hydrate(self.plr)({
 		[AttributeChange("CombatMode")] = function(style: string)
-			playerSettings.PartyCombat:set(style == "Party")
 			playerSettings.PublicCombat:set(style == "Public")
 		end,
 		[AttributeChange("Musics")] = function(state: boolean)
@@ -169,9 +164,6 @@ local function SettingsFrame(self: table): Frame
 		[AttributeChange("PlayerList")] = function(state: boolean)
 			playerSettings.PlayerList:set(state)
 		end,
-		[AttributeChange("InviteAccess")] = function(state: boolean)
-			playerSettings.InviteAccess:set(state)
-		end
 	})
 
 	return Components.Frame({
@@ -191,10 +183,8 @@ local function SettingsFrame(self: table): Frame
 			OptionFrame("Musics", self),
 			OptionFrame("SFXs", self),
 			OptionFrame("PublicCombat", self),
-			OptionFrame("PartyCombat", self),
 			OptionFrame("PotatoMode", self),
 			OptionFrame("PlayerList", self),
-			OptionFrame("InviteAccess", self)
 		},
 	})
 end

@@ -31,7 +31,6 @@ local Events = {
 	NewQuest = Net("NewQuest"),
 	PlaySound = Net("PlaySound"),
 	PlayAnimation = Net("PlayAnimation"),
-	PartyInvite = Net("PartyInvite"),
 	RefreshBackpack = Net("RefreshBackpack"),
 	RejoinCombat = Net("RejoinCombat"),
 	RejoinRequest = Net("RejoinRequest"),

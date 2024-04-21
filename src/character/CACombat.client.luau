@@ -41,25 +41,6 @@ local tFind, remove = table.find, table.remove
 
 
 --// Pre-functions
-local function _partyCheck() : boolean
-	local partyCheck = true
-
-	if not plr:GetAttribute("InParty") then partyCheck = false end
-
-	local check = mapComponents.Parties:FindFirstChild(char.Name, true)
-	if check then
-		if check:IsA("Folder") then
-			if not check:FindFirstChild(char.Name) then partyCheck = false end
-
-		elseif check:IsA("ObjectValue") and check.Parent then
-			if not check.Parent:FindFirstChild(char.Name) then partyCheck = false end
-		end
-	else
-		partyCheck = false
-	end
-
-	return partyCheck
-end
 local function setup()
 	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do folder:Destroy() end
 	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
@@ -112,7 +93,7 @@ local function setup()
 				and monster:GetAttribute("InCombat") == false
 				and not monster:GetAttribute("SubMonster") then
 
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 18 then
+                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 20 then
 					encounterCD = true
 
                     Events.CombatStart:Fire(monster)
@@ -294,19 +275,7 @@ local function combatHolderHandler(folder: Folder)
 	local monster = owner.Value :: Model
 	if not monster then folder:Destroy() return end
 	if not monster:FindFirstChild("TargetingList") then folder:Destroy() return end
-
-	if not monster.TargetingList:FindFirstChild(char.Name) then
-		if folder:GetAttribute("PublicCombat") then
-			folder.Parent = TestS
-
-		elseif folder:GetAttribute("PartyCombat") then
-			if _partyCheck() then folder.Parent = TestS return end
-
-			folder:Destroy()
-		else
-			folder:Destroy()
-		end
-	end
+	if not monster.TargetingList:FindFirstChild(char.Name) then folder:Destroy() end
 end
 local function orbFolderHandler(folder: Folder)
 	--- the purpose is to yield enough time, cuz `wait()` is not long
@@ -318,7 +287,7 @@ end
 
 --// Connection setups
 Fusion.Hydrate(char)({
-	[Fusion.AttributeChange("InCombat")] = function(state)
+	[Fusion.AttributeChange("InCombat")] = function(state: boolean)
 		if state then
 			startCombat(char.CharStats.TargetMonster.Value)
 

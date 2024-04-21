@@ -22,13 +22,13 @@ local WEAK_KEYS_METATABLE = {__mode = "k"}
 --[[
 	Returns the current value of this contextual.
 ]]
-function class:now()
+function class:now(): any
 	local thread = coroutine.running()
 	local value = self._valuesNow[thread]
 	if typeof(value) ~= "table" then
 		return self._defaultValue
 	else
-		local value: {} = value :: any
+		local value: {value: any} = value :: any
 		return value.value
 	end
 end
@@ -37,7 +37,7 @@ end
 	Temporarily assigns a value to this contextual.
 ]]
 function class:is(
-	newValue
+	newValue: any
 )
 	local methods = {}
 	-- Methods use colon `:` syntax for consistency and autocomplete but we

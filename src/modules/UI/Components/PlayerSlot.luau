@@ -4,13 +4,12 @@
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
-local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local New, peek = Fusion.New, Fusion.peek
+local New, Children, peek = Fusion.New, Fusion.Children, Fusion.peek
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
@@ -20,43 +19,49 @@ local sFind, format, match = string.find, string.format, string.match
 local function PlayerSlot(self: table, player: Player): Frame
 	local class = Fusion.Value("Warrior")
 	Fusion.Hydrate(player)({
-		[Fusion.AttributeChange("Class")] = function(newClass)
+		[Fusion.AttributeChange("Class")] = function(newClass: string)
 			class:set(newClass)
 		end
 	})
 
 	return Components.Frame({
 		BackgroundTransparency = 0,
-		Size = fromScale(1, 0.205),
+		Size = fromScale(1, 0.2),
 		Name = player.Name,
 
-		[Fusion.Children] = {
-			New("UIAspectRatioConstraint")({ AspectRatio = 4.891 }),
+		[Children] = {
+			New("UIAspectRatioConstraint")({ AspectRatio = 4.993 }),
+
 			New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
 			New("ImageLabel")({
 				Name = "Class",
 				AnchorPoint = v2New(0, 0.5),
 				BackgroundColor3 = color3New(),
 				Position = fromScale(0.055, 0.5),
-				Size = fromScale(0.14, 0.665),
+				Size = fromScale(0.13, 0.665),
 				Image = Fusion.Computed(function(use)
 					local realClass = use(class)
 					return if AssetBook.ClassInfo[realClass] then AssetBook.ClassInfo[realClass].Image else ""
 				end),
 
-				[Fusion.Children] = { Components.RoundUICorner() },
+				[Children] = { Components.RoundUICorner() },
 			}),
 			Components.TextLabel({
 				Name = "PlayerName",
-				AnchorPoint = v2New(0, 0.5),
-				Position = fromScale(0.245, 0.5),
-				Size = fromScale(0.7, 0.62),
+				Position = fromScale(0.24, 0),
+				Size = fromScale(0.721, 1),
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Text = player.DisplayName,
-				TextColor3 = if player:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+				TextColor3 = if player:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1),
+
+				[Children] = {
+					New("UIPadding")({
+						PaddingBottom = udNew(0.18, 0),
+						PaddingTop = udNew(0.18, 0)
+					})
+				}
 			}),
 			Components.HoverImageButton({
-				Name = "Hover",
 				ZIndex = 2,
 
 				[Fusion.OnEvent("MouseEnter")] = function()

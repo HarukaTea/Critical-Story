@@ -27,7 +27,7 @@ local function ProgressCircle(direction: string, effect: string, info: table) : 
     local maxDuration = 0
 
     Fusion.Hydrate(info.Script)({
-        [Fusion.AttributeChange("Duration")] = function(newDuration)
+        [Fusion.AttributeChange("Duration")] = function(newDuration: number)
             if newDuration > maxDuration then maxDuration = newDuration end
 
             info.Duration:set(newDuration)

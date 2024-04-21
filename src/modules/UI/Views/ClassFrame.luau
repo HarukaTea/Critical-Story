@@ -9,7 +9,6 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local ActiveSlot = require(RepS.Modules.UI.Components.ActiveSlot)
 local ExBindingBtn = require(RepS.Modules.UI.Components.ExBindingBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
 
@@ -174,10 +173,6 @@ local function ClassFrame(self: table) : Frame
                 Size = fromScale(0.15, 1.5),
 
                 [Children] = {
-                    ActiveSlot(1, self),
-                    ActiveSlot(2, self),
-                    ActiveSlot(3, self),
-
                     ExBindingBtn("Menu", self),
                     ExBindingBtn("Backpack", self)
                 }

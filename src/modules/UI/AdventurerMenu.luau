@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
@@ -14,13 +15,11 @@ local FilterButton = require(RepS.Modules.UI.Components.FilterButtonMenu)
 
 local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
 local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
-local PartyFrame = require(RepS.Modules.UI.Views.PartyFrame)
 
 local AdventurerMenu = {}
 AdventurerMenu.__index = AdventurerMenu
 
 local wait = task.wait
-local fromRGB = Color3.fromRGB
 
 return function(plr: Player)
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -50,16 +49,11 @@ return function(plr: Player)
 				[Fusion.Children] = {
 					CharacterFrame(self),
 					SettingsFrame(self),
-					PartyFrame(self),
 
 					BGTitle("Menu", self),
 					BottomBtns("Left", {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
-						FilterButton("Party", self)
-					}, self),
-					BottomBtns("Right", {
-						FilterButton("Disband", self)
 					}, self),
 				}
 			}),
@@ -89,9 +83,7 @@ return function(plr: Player)
 		_setExVisibleState(ui, if curUI == "None" then false else true)
 		_setOthersVisibleState(if curUI == "None" then true else false)
 
-		for _, child in self.plrGui.AdventurerStats.BG:GetDescendants() do
-			if child:IsA("UIStroke") and child.Color == fromRGB(255, 255, 255) then child.Transparency = 1 end
-		end
+		Signals.ExCategoryOpened:Fire()
 	end
 	local function _openMenu(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end

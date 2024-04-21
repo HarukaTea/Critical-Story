@@ -211,7 +211,6 @@ local function ChatFrame(self: table) : Frame
                 Enabled = true
             }),
             Components.HoverImageButton({
-                Name = "Hover",
                 ZIndex = 2,
 
                 [Fusion.OnEvent("MouseButton1Click")] = _nextDialogue

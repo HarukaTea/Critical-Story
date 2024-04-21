@@ -23,15 +23,15 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 	local stroke_trans = Value(1)
 
 	Fusion.Hydrate(item)({
-		[Fusion.OnChange("Value")] = function(newAmount)
+		[Fusion.OnChange("Value")] = function(newAmount: number)
 			amount:set(newAmount)
 		end,
-		[Fusion.AttributeChange("Equipped")] = function(state)
+		[Fusion.AttributeChange("Equipped")] = function(state: boolean)
 			equipped:set(state)
 
 			peek(self.btnsFrame.Right).Equip.Text = if state then "Unequip" else "Equip"
 		end,
-		[Fusion.AttributeChange("Pinned")] = function(state)
+		[Fusion.AttributeChange("Pinned")] = function(state: boolean)
 			pinned:set(state)
 
 			peek(self.btnsFrame.Right).Pin.Text = if state then "Unpin" else "Pin"

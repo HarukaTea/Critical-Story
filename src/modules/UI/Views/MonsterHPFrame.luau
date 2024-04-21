@@ -42,7 +42,7 @@ local function MonsterHPFrame(self: table) : Frame
 		self.monsterHPPos:set(fromScale(1.5, -0.3))
 	end
 	Fusion.Hydrate(self.char)({
-		[Fusion.AttributeChange("InCombat")] = function(state)
+		[Fusion.AttributeChange("InCombat")] = function(state: boolean)
 			if state then
 				_combatStartSetup(self.charData.TargetMonster.Value)
 

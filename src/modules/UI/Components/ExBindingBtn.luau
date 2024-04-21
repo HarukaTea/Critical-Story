@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local OnEvent, Children, Computed, peek =
 	Fusion.OnEvent, Fusion.Children, Fusion.Computed, Fusion.peek
@@ -15,14 +16,45 @@ local color3New = Color3.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local udNew = UDim.new
+local fontFromEnum = Font.fromEnum
 
-local POSITIONS = { Menu = fromScale(0.355, -1.1), Backpack = fromScale(0.71, -1.1) }
+local POSITIONS = { Menu = fromScale(0.355, 0), Backpack = fromScale(0.71, 0) }
 local ICON_COLORS = { Menu = color3New(1, 1, 1), Backpack = fromRGB(148, 148, 148) }
 local KEYS = { Menu = "C", Backpack = "B" }
 local OPENS = { Menu = "AdventurerMenu", Backpack = "Backpack" }
 local STROKES_TRANS = { Menu = Fusion.Value(1), Backpack = Fusion.Value(1) }
 
 local function ExCharButton(id: string, self: table): Frame
+	local children: ImageLabel?
+	if id == "Menu" then
+		children = Components.ImageLabel({
+			Name = "Hint",
+			BackgroundColor3 = fromRGB(195, 0, 0),
+			BackgroundTransparency = 0,
+			Position = fromScale(0.65, 0),
+			Size = fromScale(0.4, 0.4),
+			ZIndex = 3,
+			Visible = Computed(function(use)
+				return if use(self.playerData.LvPoints) > 0 then true else false
+			end),
+
+			[Children] = {
+				Components.RoundUICorner(),
+				Components.TextLabel({
+					Name = "Attention",
+					Size = fromScale(1, 1),
+					FontFace = fontFromEnum(Enum.Font.GothamBlack),
+					Text = "!"
+				})
+			}
+		})
+	end
+
+	local function exCategoryOpened()
+		STROKES_TRANS[id]:set(1)
+	end
+	Signals.ExCategoryOpened:Connect(exCategoryOpened)
+
 	return Fusion.New("Frame")({
 		Name = id,
 		BackgroundColor3 = color3New(),
@@ -39,7 +71,6 @@ local function ExCharButton(id: string, self: table): Frame
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.HoverImageButton({
-				Name = "Hover",
 				Image = Computed(function(use)
 					if id == "Backpack" then
 						return "rbxassetid://2970814599"
@@ -66,16 +97,14 @@ local function ExCharButton(id: string, self: table): Frame
 					plrGui.PlayerList.Enabled = false
 					workspace.CurrentCamera.UIBlur.Enabled = true
 
-					for _, child in peek(self.UI).BG:GetDescendants() do
-						if child:IsA("UIStroke") and child.Color == fromRGB(255, 255, 255) then child.Transparency = 1 end
-					end
-
 					if id == "Menu" then
 						workspace.Sounds.SFXs.MapOpen:Play()
 
 					elseif id == "Backpack" then
 						workspace.Sounds.SFXs.Equip:Play()
 					end
+
+					Signals.ExCategoryOpened:Fire()
 				end,
 			}),
 			Components.TextLabel({
@@ -91,19 +120,7 @@ local function ExCharButton(id: string, self: table): Frame
 				[Children] = { Fusion.New("UICorner")({ CornerRadius = udNew(0.3, 0) })},
 			}),
 
-			Components.ImageLabel({
-				Name = "Hint",
-				BackgroundColor3 = fromRGB(255, 85, 0),
-				BackgroundTransparency = 0,
-				Position = fromScale(0.65, 0),
-				Size = fromScale(0.3, 0.3),
-				ZIndex = 3,
-				Visible = Computed(function(use)
-					return if use(self.playerData.LvPoints) > 0 and id == "Menu" then true else false
-				end),
-
-				[Children] = { Components.RoundUICorner() }
-			})
+			children
 		},
 	})
 end

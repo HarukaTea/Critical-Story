@@ -146,9 +146,7 @@ return function(plr: Player)
 								FillDirection = Enum.FillDirection.Horizontal,
 								SortOrder = Enum.SortOrder.LayoutOrder,
 							}),
-							StatBar("DEF", self),
 							StatBar("HP", self),
-							StatBar("MP", self),
 						},
 					}),
 					Components.TextLabel({
@@ -163,7 +161,7 @@ return function(plr: Player)
 							.." v"..RepS.Package.Version.Value,
 
 						[Children] = {
-							New("UIPadding")({ PaddingLeft = udNew(0.005, 0) }),
+							New("UIPadding")({ PaddingLeft = udNew(0.01, 0) }),
 							New("UITextSizeConstraint")({ MaxTextSize = 14 })
 						}
 					}),
@@ -217,24 +215,6 @@ return function(plr: Player)
 		},
 	})
 
-	--// Action bindings
-	local function _useSkill(id: string, inputState: Enum.UserInputState)
-		if inputState ~= Enum.UserInputState.Begin then return end
-
-		if id == "UseQSkill" then
-			self:UseItem(1)
-
-		elseif id == "UseWSkill" then
-			self:UseItem(2)
-
-		elseif id == "UseESkill" then
-			self:UseItem(3)
-		end
-	end
-	CAS:BindAction("UseQSkill", _useSkill, false, Enum.KeyCode.One)
-	CAS:BindAction("UseWSkill", _useSkill, false, Enum.KeyCode.Two)
-	CAS:BindAction("UseESkill", _useSkill, false, Enum.KeyCode.Three)
-
 	self.nowMobIndex = 1
 	local function _changeMobTarget(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
@@ -284,24 +264,24 @@ return function(plr: Player)
 		end
 	})
 	Hydrate(plr)({
-		[AttributeChange("EXP")] = function(exp)
+		[AttributeChange("EXP")] = function(exp: number)
 			playerData.EXP[1]:set(exp)
 			playerData.EXP[2]:set(floor(peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
 		end,
-		[AttributeChange("Levels")] = function(level)
+		[AttributeChange("Levels")] = function(level: number)
 			playerData.Levels:set(level)
 			playerData.EXP[2]:set(floor(level ^ 1.85) + 60)
 		end,
-		[AttributeChange("Class")] = function(class)
+		[AttributeChange("Class")] = function(class: string)
 			playerData.Class:set(class)
 		end,
-		[AttributeChange("Gold")] = function(gold)
+		[AttributeChange("Gold")] = function(gold: number)
 			playerData.Gold:set(HarukaLib:NumberConvert(gold, "%.1f"))
 		end,
-		[AttributeChange("RP")] = function(rep)
+		[AttributeChange("RP")] = function(rep: number)
 			playerData.RP:set(HarukaLib:NumberConvert(rep, "%.1f"))
 		end,
-		[AttributeChange("LvPoints")] = function(lvPoints)
+		[AttributeChange("LvPoints")] = function(lvPoints: number)
 			playerData.LvPoints:set(lvPoints)
 		end
 	})
@@ -309,9 +289,6 @@ return function(plr: Player)
 	local function _clearGarbage()
 		peek(self.UI):Destroy()
 
-		CAS:UnbindAction("UseQSkill")
-		CAS:UnbindAction("UseWSkill")
-		CAS:UnbindAction("UseESkill")
 		CAS:UnbindAction("FreezeControl")
 		CAS:UnbindAction("ChangeMobTarget")
 		CAS:UnbindAction("ChangeMobTarget2")
@@ -324,6 +301,7 @@ return function(plr: Player)
 		Events.NPCChat:DisconnectAll()
 
 		Signals.NPCChat:DisconnectAll()
+		Signals.ExCategoryOpened:DisconnectAll()
 
 		self.Empty()
 	end

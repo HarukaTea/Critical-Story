@@ -8,6 +8,7 @@ local Signal = require(RepS.Modules.Packages.Signal)
 
 local Signals = {
 	CreateHint = Signal(),
+	ExCategoryOpened = Signal(),
 	NPCChat = Signal(),
 	PlayAnimation = Signal(),
 	SwitchScene = Signal()

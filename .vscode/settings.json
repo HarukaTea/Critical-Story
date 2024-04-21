@@ -13,6 +13,7 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
 
+    "src/character/Animate.client.luau": true,
     "src/character/Health.server.luau": true,
     "src/client/BubbleChat.client.luau": true,
     "src/client/RbxCharacterSounds.client.luau": true

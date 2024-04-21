@@ -7,7 +7,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Events = require(SSS.Modules.Data.ServerEvents)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
@@ -17,7 +16,7 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 local AttributeChange = Fusion.AttributeChange
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
-local DS1, DS2, DS3 = "CS_DEV1599", "CS_DEV1599_S2", "CS_DEV1599_S3"
+local DS1, DS2, DS3 = "CS_AS01_T1", "CS_AS01_T1_S1", "CS_AS01_T1_S3"
 
 local newInstance = Instance.new
 local wait = task.wait
@@ -210,36 +209,6 @@ local function clear(plr: Player)
 
 					print(plr.Name .. " left during combat with " .. monster.Name)
 				end
-			end
-		end
-	end)
-
-	--- check if player is in party
-	local check = workspace.MapComponents.Parties:FindFirstChild(plr.Name, true)
-
-	local function _leaveParty(wholeParty: Folder, member: ObjectValue)
-		member:Destroy()
-
-		for _, player in wholeParty:GetChildren() do
-			Events.CreateHint:Fire(player.Value, plr.Name.." has left the party...", "Hint")
-		end
-
-		if #wholeParty:GetChildren() <= 1 then
-			local player = wholeParty:FindFirstChildOfClass("ObjectValue")
-
-			player.Value:SetAttribute("InParty", false)
-			Events.CreateHint:Fire(player.Value, "The party has been disbanded due to the lack of people...", "Hint")
-
-			wholeParty:Destroy()
-		end
-	end
-	Spawn(function()
-		if check then
-			if check:IsA("ObjectValue") then
-				_leaveParty(check.Parent, check)
-
-			elseif check:IsA("Folder") then
-				_leaveParty(check, check[plr.Name])
 			end
 		end
 	end)

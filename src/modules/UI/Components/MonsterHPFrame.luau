@@ -171,8 +171,6 @@ local function MonsterHPFrame(info: table, self: table): Frame
 						[Children] = { Components.TextUIStroke({ Thickness = 3.5 }) },
 					}),
 					Components.HoverImageButton({
-						Name = "Hover",
-
 						[OnEvent("MouseEnter")] = function()
 							stroke_trans:set(0)
 						end,

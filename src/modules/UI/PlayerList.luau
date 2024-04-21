@@ -14,7 +14,6 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
 
 local PlayerDescFrame = require(RepS.Modules.UI.Views.PlayerDescFrame)
-local PartyInvFrame = require(RepS.Modules.UI.Views.PartyInvFrame)
 
 local Children, Value, Computed, peek = Fusion.Children, Fusion.Value, Fusion.Computed, Fusion.peek
 
@@ -42,88 +41,86 @@ return function(plr: Player)
 
 	Components.ScreenGui({
 		Name = "PlayerList",
+		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		Parent = self.plrGui,
 		[Fusion.Ref] = self.UI,
 
 		[Children] = {
-			Components.ScrollingFrame({
-				Name = "List",
-				ClipsDescendants = true,
+			Components.Frame({
+				Name = "Top",
 				AnchorPoint = v2New(),
-				Position = Fusion.Tween(Computed(function(use)
-					return if use(self.isOpen) then ud2New(0.868, 0, 0.013, 20) else ud2New(1.2, 0, 0.013, 20)
-				end), AssetBook.TweenInfos.half),
-				Size = fromScale(0.127, 0.32),
-				ZIndex = 2,
-				ScrollingDirection = Enum.ScrollingDirection.Y,
-				CanvasSize = Computed(function(use)
-					if use(self.absContentSize) > use(self.absSize) then
-						return fromOffset(0, use(self.absContentSize))
-					else
-						return fromOffset(0, 0)
-					end
-				end),
-				ScrollingEnabled = Computed(function(use)
-					return if use(self.absContentSize) > use(self.absSize) then true else false
-				end),
-
-				[Fusion.Ref] = self.list,
-				[Fusion.OnChange("AbsoluteSize")] = function(newSize)
-					self.absSize:set(newSize.Y)
-				end,
+				Position = fromOffset(0, 20),
+				Size = fromScale(1, 0.1),
 
 				[Children] = {
-					Fusion.New("UIListLayout")({
-						Padding = udNew(0, 2),
-						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 25.386 }),
 
-						[Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
-							self.absContentSize:set(newSize.Y)
+					Components.ScrollingFrame({
+						Name = "List",
+						ClipsDescendants = true,
+						AnchorPoint = v2New(),
+						Position = Fusion.Tween(Computed(function(use)
+							return if use(self.isOpen) then fromScale(0.87, 0) else fromScale(1.2, 0)
+						end), AssetBook.TweenInfos.half),
+						Size = fromScale(0.118, 3),
+						ZIndex = 2,
+						ScrollingDirection = Enum.ScrollingDirection.Y,
+						CanvasSize = Computed(function(use)
+							if use(self.absContentSize) > use(self.absSize) then
+								return fromOffset(0, use(self.absContentSize))
+							else
+								return fromOffset(0, 0)
+							end
+						end),
+						ScrollingEnabled = Computed(function(use)
+							return if use(self.absContentSize) > use(self.absSize) then true else false
+						end),
+
+						[Fusion.Ref] = self.list,
+						[Fusion.OnChange("AbsoluteSize")] = function(newSize)
+							self.absSize:set(newSize.Y)
+						end,
+
+						[Children] = {
+							Fusion.New("UIListLayout")({
+								Padding = udNew(0, 2),
+								HorizontalAlignment = Enum.HorizontalAlignment.Center,
+
+								[Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
+									self.absContentSize:set(newSize.Y)
+								end,
+							}),
+							Fusion.ForValues(self.players, function(_, player: Player)
+								return PlayerSlot(self, player)
+							end, Fusion.cleanup),
+						},
+					}),
+					Components.HoverImageButton({
+						AnchorPoint = v2New(),
+						Position = fromScale(0.87, 0),
+
+						Size = Computed(function(use)
+							return ud2New(0.118, 0, 0, min(use(self.absSize), use(self.absContentSize)))
+						end),
+						Visible = Computed(function(use)
+							return use(self.isOpen)
+						end),
+
+						[Fusion.OnEvent("MouseLeave")] = function()
+							for _, element in peek(self.list):GetChildren() do
+								if element:IsA("Frame") then
+									element.BackgroundColor3 = fromRGB(30, 30, 30)
+									element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+								end
+							end
+
+							peek(self.desc).Visible = false
 						end,
 					}),
-					Fusion.ForValues(self.players, function(use, player: Player)
-						return PlayerSlot(self, player)
-					end, Fusion.cleanup),
-				},
-			}),
 
-			PlayerDescFrame(self),
-
-			Components.HoverImageButton({
-				Name = "Hover",
-				AnchorPoint = v2New(),
-				Position = ud2New(0.868, 0, 0.013, 20),
-
-				Size = Computed(function(use)
-					return ud2New(0.127, 0, 0, min(use(self.absSize), use(self.absContentSize)))
-				end),
-				Visible = Computed(function(use)
-					return use(self.isOpen)
-				end),
-
-				[Fusion.OnEvent("MouseLeave")] = function()
-					for _, element in peek(self.list):GetChildren() do
-						if element:IsA("Frame") then
-							element.BackgroundColor3 = fromRGB(30, 30, 30)
-							element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
-						end
-					end
-
-					peek(self.desc).Visible = false
-				end,
-			}),
-
-			Components.Frame({
-				Name = "TopBG",
-				AnchorPoint = v2New(0.5, 0),
-				Position = ud2New(0.5, 0, 0, 25),
-
-				[Children] = {
-					Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
-
-					PartyInvFrame(self)
+					PlayerDescFrame(self),
 				}
-			})
+			}),
 		},
 	})
 
@@ -151,7 +148,7 @@ return function(plr: Player)
 		self.players:set(Players:GetPlayers())
 	end)
 	Fusion.Hydrate(plr)({
-		[Fusion.AttributeChange("PlayerList")] = function(state)
+		[Fusion.AttributeChange("PlayerList")] = function(state: boolean)
 			self.isOpen:set(state)
 		end
 	})
@@ -160,8 +157,6 @@ return function(plr: Player)
 		peek(self.UI):Destroy()
 
 		CAS:UnbindAction("TogglePlayerList")
-
-		Events.PartyInvite:DisconnectAll()
 	end
 	char.Humanoid.Died:Once(_onDead)
 end

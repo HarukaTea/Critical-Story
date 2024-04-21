@@ -11,10 +11,6 @@ local Signals = {
 	QuestComplete = Signal(),
 
 	--- story
-	FirstStepTutorial = Signal(),
-	CompletedInitusBay = Signal(),
-
-	FChenPTown2 = Signal()
 }
 
 return Signals

@@ -17,27 +17,22 @@ local udNew = UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local upper = string.upper
+local fontFromName = Font.fromName
 
 local COLORS = {
-	DMG = fromRGB(255, 0, 0),
+	ATK = fromRGB(255, 0, 0),
 	Health = fromRGB(85, 255, 0),
-	Mana = fromRGB(0, 255, 255),
 	Shield = fromRGB(255, 255, 0),
-	Magic = fromRGB(170, 170, 255),
 }
 local POS = {
-	DMG = fromScale(0.721, 0.732),
-	Health = fromScale(0.669, 0.322),
-	Mana = fromScale(0.162, 0.125),
+	ATK = fromScale(0.72, 0.566),
+	Health = fromScale(0.162, 0.125),
 	Shield = fromScale(0.162, 0.847),
-	Magic = fromScale(0.106, 0.556),
 }
 local POINTS = {
-	DMG = "DmgPoints",
+	ATK = "ATKPoints",
 	Health = "HealthPoints",
-	Mana = "ManaPoints",
 	Shield = "ShieldPoints",
-	Magic = "MagicPoints"
 }
 
 local function PointsButton(id: string, direction: string, self: table): Frame
@@ -54,15 +49,11 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 			Components.TextLabel({
 				Name = "Stat",
 				Size = fromScale(1, 1),
-				FontFace = Font.fromName("TitilliumWeb", Enum.FontWeight.Bold),
+				FontFace = fontFromName("TitilliumWeb", Enum.FontWeight.Bold),
 				TextXAlignment = if direction == "Left" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				TextColor3 = COLORS[id],
                 Text = Computed(function(use)
-					if id ~= "DMG" then
-						return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
-					else
-						return "DMG: "..use(self.playerData[id]).." ("..use(self.charData.MinDMG).."-"..use(self.charData.MaxDMG)..")"
-					end
+					return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
 				end)
 			}),
 			Components.TextButton({

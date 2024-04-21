@@ -15,11 +15,22 @@ local color3New, ud2New, udNew = Color3.new, UDim2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local ICONS = { Menu = "rbxassetid://12180639811", Backpack = "rbxassetid://2970814599" }
 local BG_COLOR = { Menu = Value(fromRGB(30, 30, 30)), Backpack = Value(fromRGB(30, 30, 30)) }
 local CONTENT_COLOR = { Menu = Value(fromRGB(255, 255, 255)), Backpack = Value(fromRGB(255, 255, 255)) }
 
 local function TitleFrame(id: string, self: table): Frame
+	local plr = self.plr :: Player
+
+	if id == "Menu" then
+		self.playerClass = Value(plr:GetAttribute("Class"))
+
+		Fusion.Hydrate(plr)({
+			[Fusion.AttributeChange("Class")] = function(newClass: string)
+				self.playerClass:set(newClass)
+			end
+		})
+	end
+
 	return New("Frame")({
 		Name = "Top",
 		BackgroundTransparency = 1,
@@ -30,7 +41,14 @@ local function TitleFrame(id: string, self: table): Frame
 			New("UIAspectRatioConstraint")({ AspectRatio = 25.255 }),
 			Components.ImageLabel({
 				Name = "Icon",
-				Image = ICONS[id],
+				Image = Computed(function(use)
+					if id == "Menu" then
+						return AssetBook.ClassInfo[use(self.playerClass)].Image
+
+					elseif id == "Backpack" then
+						return "rbxassetid://2970814599"
+					end
+				end),
 				ImageColor3 = id == "Backpack" and fromRGB(148, 148, 148) or color3New(1, 1, 1),
 				Position = fromScale(0.01, 0),
 				Size = fromScale(0.04, 1),

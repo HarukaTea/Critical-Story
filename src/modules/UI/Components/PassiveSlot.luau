@@ -8,6 +8,7 @@ local UIS = game:GetService("UserInputService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local Value = Fusion.Value
 
@@ -30,6 +31,12 @@ local STROKES_TRANS = {
 }
 
 local function PassiveSlot(id: string, self: table): Frame
+
+	local function exCategoryOpened()
+		STROKES_TRANS[id]:set(1)
+	end
+	Signals.ExCategoryOpened:Connect(exCategoryOpened)
+
 	return Fusion.New("Frame")({
 		Name = "Passive" .. id,
 		BackgroundColor3 = color3New(),
@@ -59,7 +66,6 @@ local function PassiveSlot(id: string, self: table): Frame
 				end),
 			}),
 			Components.HoverImageButton({
-				Name = "Hover",
 				Visible = if UIS.TouchEnabled then false else true,
 
 				[Fusion.OnEvent("MouseEnter")] = function()

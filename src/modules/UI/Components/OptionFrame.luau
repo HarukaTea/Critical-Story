@@ -41,8 +41,6 @@ local function OptionFrame(option: string, icon: string, self: table, index: num
                 end), AssetBook.TweenInfos.threeHalf)
             }),
             Components.HoverImageButton({
-                Name = "Hover",
-
                 [OnEvent("MouseEnter")] = function()
                     bgColor:set(fromRGB(255, 255, 255))
                     contentColor:set(fromRGB())

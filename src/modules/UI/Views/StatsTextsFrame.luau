@@ -41,20 +41,12 @@ local function StatText(id: string, self: table) : TextLabel
     local char = self.char :: Model
 
     self.charDMGStats = {
-        MinDMG = Value(char:GetAttribute("MinDMG")),
-        MaxDMG = Value(char:GetAttribute("MaxDMG")),
-        Magic = Value(char:GetAttribute("Magic")),
+        ATKDMG = Value(char:GetAttribute("ATKDMG")),
     }
     local charDMGStats = self.charDMGStats
     Fusion.Hydrate(char)({
-        [AttributeChange("MinDMG")] = function(newDMG)
-            charDMGStats.MinDMG:set(newDMG)
-        end,
-        [AttributeChange("MaxDMG")] = function(newDMG)
-            charDMGStats.MaxDMG:set(newDMG)
-        end,
-        [AttributeChange("Magic")] = function(newDMG)
-            charDMGStats.Magic:set(newDMG)
+        [AttributeChange("ATKDMG")] = function(newDMG: number)
+            charDMGStats.ATKDMG:set(newDMG)
         end,
     })
 
@@ -64,11 +56,7 @@ local function StatText(id: string, self: table) : TextLabel
         Size = fromScale(0, 1),
         Text = Fusion.Computed(function(use)
             if id == "ClassATK" then
-                if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
-                    return use(charDMGStats.MinDMG).."-"..use(charDMGStats.MaxDMG)
-                else
-                    return use(charDMGStats.Magic)
-                end
+                return use(self.charDMGStats.ATKDMG)
 
             elseif id == "Gold" then
                 return use(self.playerData.Gold)
@@ -79,7 +67,7 @@ local function StatText(id: string, self: table) : TextLabel
         end),
 
         [Children] = {
-            Components.TextUIStroke({ Thickness = 3 })
+            Components.TextUIStroke({ Thickness = 2 })
         }
     })
 end

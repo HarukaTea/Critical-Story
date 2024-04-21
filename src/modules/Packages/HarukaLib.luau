@@ -69,7 +69,7 @@ function HarukaLib:Serialize(val: CFrame | Vector3 | Color3)
 		return { "CFrame", val:GetComponents() }
 
 	elseif valType == "Vector3" then
-		return { "Vector3", val.X, val.Y, val.Z }
+		return { "Vector3", floor(val.X), floor(val.Y), floor(val.Z) }
 
 	elseif valType == "Color3" then
 		return { "Color3", val.R, val.G, val.B }
