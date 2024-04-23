@@ -12,8 +12,18 @@ local PlayerEffect = require(RepS.Modules.UI.Components.PlayerEffect)
 local v2New = Vector2.new
 local udNew =  UDim.new
 local fromScale = UDim2.fromScale
+local wait = task.wait
 
 local function PlayerEffectsFrame(self: table) : Frame
+    local function _setEffectsChildren()
+		wait()
+		self.charStatsDict.EffectsList:set(self.charData.EffectsList:GetChildren())
+	end
+	Fusion.Hydrate(self.charData.EffectsList)({
+		[Fusion.OnEvent("ChildAdded")] = _setEffectsChildren,
+		[Fusion.OnEvent("ChildRemoved")] = _setEffectsChildren
+	})
+
     return Components.Frame({
         Name = "EffectsFrame",
         AnchorPoint = v2New(0.5, 0),

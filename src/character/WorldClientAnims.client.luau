@@ -17,7 +17,7 @@ local wait = task.wait
 
 local function worldAnims()
     for _, child in map:GetDescendants() do
-        if child.Name == "Wings" then
+        if child.Name == "Wings" and child.Parent.Name == "Windmill" then
 			Clock(0.01, function()
 				if not char then return end
 				if not char.PrimaryPart then return end
@@ -46,4 +46,4 @@ local function worldAnims()
         end
     end
 end
-Spawn(worldAnims)
+worldAnims()

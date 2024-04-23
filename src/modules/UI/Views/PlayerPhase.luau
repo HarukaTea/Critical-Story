@@ -4,24 +4,87 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local PlayerPhasePlrBar = require(RepS.Modules.UI.Components.PlayerPhasePlrBar)
 
-local Children = Fusion.Children
+local Children, Value, Hydrate, peek = Fusion.Children, Fusion.Value, Fusion.Hydrate, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local udNew = UDim.new
+local wait = task.wait
+local insert, remove, tFind = table.insert, table.remove, table.find
 
 local function PlayerPhase(self: table) : Frame
-    self.playersInCombat = {}
-    
+    self.playersInCombat = Value({})
+    self.playersListPos = Value(fromScale(-0.015, -0.5))
+    self.targetingMob = Value(self.charData.TargetMonster.Value)
+
+    local function _addPlr(char: ObjectValue)
+		wait()
+        local nowPlayers = peek(self.playersInCombat)
+
+        insert(nowPlayers, char)
+        self.playersInCombat:set(nowPlayers)
+	end
+	local function _removePlr(char: ObjectValue)
+        wait(1)
+        local afterPlayers = peek(self.playersInCombat)
+
+        remove(afterPlayers, tFind(afterPlayers, char))
+        self.playersInCombat:set(afterPlayers)
+	end
+
+    local taggedMob = {}
+    Hydrate(self.charData.TargetMonster)({
+        [Fusion.OnChange("Value")] = function(newMob: Model?)
+            if not newMob then return end
+
+            self.targetingMob:set(newMob)
+
+            if tFind(taggedMob, newMob) then return end
+            if newMob:FindFirstChild("TargetingList") then
+                self.playersInCombat:set(newMob.TargetingList:GetChildren())
+
+                taggedMob[#taggedMob + 1] = newMob
+
+                Hydrate(newMob)({
+                    [Fusion.OnEvent("ChildAdded")] = _addPlr,
+                    [Fusion.OnEvent("ChildRemoved")] = _removePlr
+                })
+            end
+        end
+    })
+
+	local function _combatStartSetup(monster: Model)
+		if not monster then return end
+
+		self.playersListPos:set(fromScale(-0.015, -0.5))
+	end
+	local function _combatEndAction()
+		self.playersListPos:set(fromScale(-0.3, -0.5))
+	end
+	Fusion.Hydrate(self.char)({
+		[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+			if state then
+				_combatStartSetup(self.charData.TargetMonster.Value)
+
+			elseif not state then
+				_combatEndAction()
+			end
+		end
+	})
+
     return Components.Frame({
         Name = "PlayerPhase",
         AnchorPoint = v2New(),
-        Position = fromScale(-0.015, -0.5),
+
+        Position = Fusion.Tween(Fusion.Computed(function(use)
+			return use(self.playersListPos)
+		end), AssetBook.TweenInfos.half),
 
         [Children] = {
             Fusion.New("UIListLayout")({
@@ -31,9 +94,9 @@ local function PlayerPhase(self: table) : Frame
                 VerticalAlignment = Enum.VerticalAlignment.Bottom
             }),
 
-            Fusion.ForValues(self.playersInCombat, function(use, plr: ObjectValue)
-                return PlayerPhasePlrBar(plr.Value, self)
-            end)
+            Fusion.ForValues(self.playersInCombat, function(_, char: ObjectValue)
+                return PlayerPhasePlrBar(char.Value, self)
+            end, Fusion.cleanup)
         }
     })
 end

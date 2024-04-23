@@ -8,10 +8,12 @@ return {
     TP = 0,
     Shield = 0,
     MaxShield = 5,
-    OrbSpawnTime = 3,
+    Defense = 0,
+    OrbSpawnAmount = 2,
 
     --- States
     InCombat = false,
+    AttackingTime = false,
 
     --- Buffes
     HealthBuff = 0,

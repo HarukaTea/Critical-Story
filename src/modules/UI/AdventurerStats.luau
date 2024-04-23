@@ -8,6 +8,7 @@ local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Bin = require(RepS.Modules.Packages.Bin)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -20,7 +21,6 @@ local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
-local MonsterHPFrame = require(RepS.Modules.UI.Views.MonsterHPFrame)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
 local PlayerEffectsFrame = require(RepS.Modules.UI.Views.PlayerEffectsFrame)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
@@ -29,8 +29,15 @@ local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
-local Children, New, Value, Hydrate, AttributeChange, OnEvent, peek =
-	Fusion.Children, Fusion.New, Fusion.Value, Fusion.Hydrate, Fusion.AttributeChange, Fusion.OnEvent, Fusion.peek
+local Children, New, Value, Hydrate, AttributeChange, OnEvent, Computed, peek =
+	Fusion.Children,
+	Fusion.New,
+	Fusion.Value,
+	Fusion.Hydrate,
+	Fusion.AttributeChange,
+	Fusion.OnEvent,
+	Fusion.Computed,
+	Fusion.peek
 
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
@@ -40,24 +47,6 @@ local floor, clamp = math.floor, math.clamp
 local v2New, udNew, ud2New = Vector2.new, UDim.new, UDim2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-
---[[
-	Send a request to server to use an item with the given slot, 1s inner CD
-]]
-function AdventurerStats:UseItem(slot: number)
-	local itemSlot = peek(self.activeList[slot])
-	local activeInnerCDList = self.activeInnerCDList
-
-	if not itemSlot:GetAttribute("InCD") and itemSlot:GetAttribute("Equipped") then
-		if activeInnerCDList[slot] then return end
-
-		activeInnerCDList[slot] = true
-		Events.UseItem:Fire(itemSlot:GetAttribute("ItemEquipped"))
-
-		wait(0.1)
-		activeInnerCDList[slot] = false
-	end
-end
 
 return function(plr: Player)
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -95,12 +84,20 @@ return function(plr: Player)
 		Knight = { Val = Value(0), UI = Value() },
 		Rogue = { Val = Value(0), UI = Value() }
 	}
+	self.charStatsDict = {
+		HP = { Value(self.char.Humanoid.Health), Value(self.char.Humanoid.MaxHealth) },
+
+		MonsterAmount = Value({}),
+		IsInCombat = Value(false),
+		EffectsList = Value({}),
+	}
 	self.shadowTrans = Value(1)
 	self.Add, self.Empty = Bin()
 
 	Components.ScreenGui({
 		Name = "AdventurerStats",
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
+		DisplayOrder = 2,
 		Parent = self.plrGui,
 		[Fusion.Ref] = self.UI,
 
@@ -111,6 +108,9 @@ return function(plr: Player)
 				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
+				Visible = Fusion.Computed(function(use)
+					return not use(self.charStatsDict.IsInCombat)
+				end),
 
 				[Children] = {
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
@@ -195,7 +195,6 @@ return function(plr: Player)
 
 					LevelUpVFXFrame(self),
 					PromptsFrame(self),
-					MonsterHPFrame(self),
 					ItemAcquiredFrame(self),
 					QuestFrame(self),
 
@@ -260,7 +259,7 @@ return function(plr: Player)
 	local playerData = self.playerData
 	Hydrate(self.humanoid)({
 		[OnEvent("Touched")] = function(hit)
-			if hit:GetAttribute("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
+			if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
 		end
 	})
 	Hydrate(plr)({
@@ -289,12 +288,12 @@ return function(plr: Player)
 	local function _clearGarbage()
 		peek(self.UI):Destroy()
 
-		CAS:UnbindAction("FreezeControl")
+		ClientUtil:FreezePlayerControls("Unfreeze")
+
 		CAS:UnbindAction("ChangeMobTarget")
 		CAS:UnbindAction("ChangeMobTarget2")
 
 		Events.EquipItems:DisconnectAll()
-		Events.ItemCD:DisconnectAll()
 		Events.RefreshBackpack:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()
 		Events.LevelUp:DisconnectAll()

@@ -3,8 +3,10 @@
 --!native
 
 local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 
-local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
+local Signals = require(SSS.Modules.Data.ServerSignals)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent :: Model
 
@@ -22,7 +24,7 @@ local function lookAt(target: Model)
 end
 
 local function slimeShot(target: Model)
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
+	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position + v3New(random(-30, 30), 0, random(-30, 30)))
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = char
@@ -31,9 +33,11 @@ local function slimeShot(target: Model)
 	blast.Parent = char.Holder.Value
 end
 
-local function slimeWave(target: Model)
-	lookAt(target)
-	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position, { target })
+local function slimeWave()
+	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position + v3New(random(-30, 30), 0, random(-30, 30)))
+
+	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, post)
+	char.PrimaryPart.Orientation *= v3New(0, 1, 1)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime2:Clone() :: Model
 	blast.Owner.Value = char
@@ -42,7 +46,10 @@ local function slimeWave(target: Model)
 	blast.Parent = char.Holder.Value
 end
 
-local function attacking()
+local function attacking(monster: Model)
+	if not monster then return end
+	if monster ~= char then return end
+
 	wait(1)
 	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
 		local list = char.TargetingList:GetChildren()
@@ -56,10 +63,10 @@ local function attacking()
 				wait(0.5)
 			end
 
-			for q = 1, random(2, 3) do
+			for _ = 1, random(2, 3) do
 				lookAt(target.Value)
 
-				for i = 1, 3 do
+				for _ = 1, 3 do
 					slimeShot(target.Value)
 					wait(0.2)
 				end
@@ -67,7 +74,7 @@ local function attacking()
 			end
 
 		elseif style == 2 then
-			for i = 1, random(1, 3) do
+			for _ = 1, random(1, 3) do
 				slimeWave(target.Value)
 				wait(0.8)
 			end
@@ -76,6 +83,4 @@ local function attacking()
 		attacking()
 	end
 end
-
-wait(0.5)
-attacking()
+Signals.MobPhaseStart:Connect(attacking)

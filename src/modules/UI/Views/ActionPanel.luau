@@ -4,10 +4,11 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local TurnBasedAction = require(RepS.Modules.UI.Components.TurnBasedAction)
+local TurnBaseAction = require(RepS.Modules.UI.Components.TurnBaseAction)
 
 local Children = Fusion.Children
 
@@ -15,8 +16,14 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 
 local function ActionPanel(self: table) : Frame
+    self.panelPos = Fusion.Value(fromScale(0.5, 0.5))
+
     return Components.Frame({
         Name = "ActionPanel",
+
+        Position = Fusion.Tween(Fusion.Computed(function(use)
+            return use(self.panelPos)
+        end), AssetBook.TweenInfos.half),
 
         [Children] = {
             Components.Frame({
@@ -43,13 +50,14 @@ local function ActionPanel(self: table) : Frame
                 [Children] = {
                     Fusion.New("UIGridLayout")({
                         CellPadding = fromScale(0.1, 0.1),
-                        CellSize = fromScale(0.437, 0.457)
+                        CellSize = fromScale(0.437, 0.457),
+                        SortOrder = Enum.SortOrder.LayoutOrder
                     }),
 
-                    TurnBasedAction("Attack", self),
-                    TurnBasedAction("Items", self),
-                    TurnBasedAction("Skills", self),
-                    TurnBasedAction("Defend", self)
+                    TurnBaseAction("Attack", self),
+                    TurnBaseAction("Items", self),
+                    TurnBaseAction("Skills", self),
+                    TurnBaseAction("Defend", self)
                 }
             })
         }

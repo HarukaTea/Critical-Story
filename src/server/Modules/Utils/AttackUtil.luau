@@ -22,7 +22,7 @@ local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
 local cfNew, v3New = CFrame.new, Vector3.new
 local cfAngles = CFrame.Angles
-local rad = math.rad
+local rad, floor = math.rad, math.floor
 
 --[[
     RNG this attack to be a critical attack, and return the result
@@ -76,7 +76,9 @@ function AttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 	HarukaLib:Add(char, "Combo", 1)
 
 	if char:GetAttribute("Combo") > 1 then
-		local finalDamage = baseDamage * char:GetAttribute("Combo")
+        local combo = char:GetAttribute("Combo") :: number
+        local multiplier = if combo % 2 == 1 then (combo + 1) / 2 else combo / 2 + 0.5
+		local finalDamage = floor(baseDamage * multiplier)
 
 		local comboEff = RepS.Package.Effects.ComboEffect:Clone() :: ParticleEmitter
 		comboEff.Parent = monster.PrimaryPart
@@ -92,7 +94,7 @@ function AttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 		AttackUtil:DealDMG(plr, monster, baseDamage)
 	end
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
@@ -122,7 +124,7 @@ function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
         AttackUtil:DealDMG(plr, monster, baseDamage)
     end
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 function AttackUtil.PoisonArcher(plr: Player, monster: Model, baseDamage: number)
     AttackUtil:DealDMG(plr, monster, baseDamage)
@@ -152,7 +154,7 @@ function AttackUtil.Wizard(plr: Player, monster: Model)
         RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
     end
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
@@ -165,7 +167,7 @@ function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
         char:SetAttribute("Guard", 100)
     end
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
@@ -183,7 +185,7 @@ function AttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
 
     if result == "CriticalHit" then char:SetAttribute("RogueCritical", 0) end
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
@@ -219,11 +221,11 @@ function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, or
     end
 
     AttackUtil:DealDMG(plr, monster, baseDamage)
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 
     Spawn(function()
         local char = plr.Character
@@ -283,26 +285,26 @@ function AttackUtil.AlchemistRed(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 function AttackUtil.AlchemistBlue(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 function AttackUtil.AlchemistGreen(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.Illusionist(plr: Player, monster: Model)
     local magicDmg = plr.Character:GetAttribute("Magic")
     AttackUtil:DealDMG(plr, monster, magicDmg)
 
-    SkillUtil:RestoreManaByOrb(plr)
+    SkillUtil:RestoreTPByOrb(plr)
 end
 
 function AttackUtil.FireStaff(plr: Player, monster: Model)

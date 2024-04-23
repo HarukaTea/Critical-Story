@@ -6,6 +6,7 @@ local RS = game:GetService("RunService")
 local SG = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 
+local CreateGui = require(script.CreateGui)
 local Shared = script:WaitForChild("Shared")
 local Util = require(Shared:WaitForChild("Util"))
 
@@ -20,7 +21,7 @@ local Cmdr do
 		ReplicatedRoot = script;
 		RemoteFunction = script:WaitForChild("CmdrFunction");
 		RemoteEvent = script:WaitForChild("CmdrEvent");
-		ActivationKeys = {[Enum.KeyCode.F2] = true};
+		ActivationKeys = {};
 		Enabled = true;
 		MashToEnable = false;
 		ActivationUnlocksMouse = false;
@@ -45,9 +46,7 @@ local Cmdr do
 	Cmdr.Dispatcher = require(Shared.Dispatcher)(Cmdr)
 end
 
-if SG:WaitForChild("Cmdr") and task.wait() and not plr:WaitForChild("PlayerGui"):FindFirstChild("Cmdr") then
-	SG.Cmdr.Parent = plr.PlayerGui
-end
+CreateGui().Parent = plr.PlayerGui
 
 local Interface = require(script.CmdrInterface)(Cmdr)
 

@@ -35,7 +35,8 @@ local function LocationTitleFrame(self: table) : Frame
 		Shown = Value(false),
 		OverallTrans = Value(1),
 		OverallStrokeTrans = Value(1),
-		HorizonLineSize = Value(fromScale(0.25, 0.07))
+		HorizonLineSize = Value(fromScale(0.25, 0.07)),
+        HorizonLineTweenInfo = Value(AssetBook.TweenInfos.two)
 	}
     local function _showCurrentLocation(location: string)
         if not location or location == "" then return end
@@ -62,6 +63,7 @@ local function LocationTitleFrame(self: table) : Frame
             end)
 
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
+            locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
 			locationInfo.Shown:set(true)
 
 			wait(0.3)
@@ -72,6 +74,7 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.Desc:set(AssetBook.LocationInfo.Desc[location])
 
 			wait(0.1)
+            locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.two)
 			locationInfo.HorizonLineSize:set(fromScale(0, 0.07))
 
 			wait(2)
@@ -80,6 +83,7 @@ local function LocationTitleFrame(self: table) : Frame
 
 			wait(1)
 			locationInfo.Shown:set(false)
+            locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 		end)
 	end
@@ -96,7 +100,7 @@ local function LocationTitleFrame(self: table) : Frame
         [Children] = {
             Components.TextLabel({
                 Name = "Title",
-                Text = "Now Entering Area :",
+                Text = "Entering Area:",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0),
                 Size = fromScale(1, 0.45),
@@ -115,6 +119,7 @@ local function LocationTitleFrame(self: table) : Frame
                 Position = fromScale(0.5, 0.6),
                 Size = fromScale(1, 0.6),
                 TextColor3 = fromRGB(74, 222, 109),
+
                 TextTransparency = Tween(Computed(function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
@@ -125,9 +130,10 @@ local function LocationTitleFrame(self: table) : Frame
                 Name = "HorizonLine",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 1.4),
+
                 Size = Fusion.Tween(Computed(function(use)
                     return use(self.locationInfo.HorizonLineSize)
-                end), AssetBook.TweenInfos.two),
+                end), self.locationInfo.HorizonLineTweenInfo),
                 BackgroundTransparency = Tween(Computed(function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
@@ -142,6 +148,7 @@ local function LocationTitleFrame(self: table) : Frame
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 1.7),
                 Size = fromScale(1, 0.45),
+
                 TextTransparency = Tween(Computed(function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),

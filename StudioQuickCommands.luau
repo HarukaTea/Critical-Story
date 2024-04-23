@@ -1,6 +1,11 @@
 
+--- tree solid
 for _, child in workspace:GetDescendants() do
-
+    if child:IsA("Model") and child.Name == "Tree" then
+        for _, descendant in child:GetDescendants() do
+            if descendant:IsA("BasePart") then descendant.Transparency = 0 end
+        end
+    end
 end
 
 for _, child in workspace.Maps:GetChildren() do

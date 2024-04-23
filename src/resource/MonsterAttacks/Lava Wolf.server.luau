@@ -17,19 +17,13 @@ local wait = task.wait
 local v3New = Vector3.new
 local random, rad = math.random, math.rad
 local cfNew, cfLookat, cfAngles = CFrame.new, CFrame.lookAt, CFrame.Angles
-local insert = table.insert
 
 --// Boss fights then
 char:SetAttribute("Stage", 1)
 Spawn(function()
 	repeat wait() until char:GetAttribute("Stage") > 1
 
-	local combatPlrs = {}
-	for _, target in char.TargetingList:GetChildren() do
-		local tempPlr = Players:GetPlayerFromCharacter(target.Value)
-
-		if tempPlr then insert(combatPlrs, tempPlr) end
-	end
+	local combatPlrs = ServerUtil:GetPlayersByMonster(char)
 
 	for _, plr in combatPlrs do
 		Events.PlaySound:Fire(plr, "StopAll")

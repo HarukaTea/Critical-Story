@@ -2,14 +2,12 @@
 --!optimize 2
 --!native
 
-local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Events = require(RepS.Modules.Data.Events)
-
-local plr = Players.LocalPlayer
 
 local wait = task.wait
 local cfAngles = CFrame.Angles
@@ -72,3 +70,11 @@ local function vfxChestUnlock(chest: Model)
 	end
 end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
+
+--[[
+	Freeze player controls
+]]
+local function freezePlayerControls(action: string)
+	ClientUtil:FreezePlayerControls(action)
+end
+Events.FreezePlayerControls:Connect(freezePlayerControls)

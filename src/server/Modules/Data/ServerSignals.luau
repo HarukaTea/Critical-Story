@@ -8,6 +8,7 @@ local Signal = require(RepS.Modules.Packages.Signal)
 
 local Signals = {
 	LevelUp = Signal(),
+	MobPhaseStart = Signal(),
 	QuestComplete = Signal(),
 
 	--- story

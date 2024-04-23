@@ -6,6 +6,7 @@ local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 local UIS = game:GetService("UserInputService")
 
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(RepS.Modules.Data.Events)
@@ -67,8 +68,7 @@ local function ChatFrame(self: table) : Frame
         dialogueChoiceIndex = 1
         canContinueChat = true
 
-        CAS:UnbindAction("FreezeControl")
-        UIS.ModalEnabled = false
+        ClientUtil:FreezePlayerControls("Unfreeze")
 
         promptChatting.Enabled = true
 
@@ -141,11 +141,7 @@ local function ChatFrame(self: table) : Frame
         self.chatSpeaker:set(speaker)
         self.isChatting:set(true)
 
-        --- freeze player control
-        UIS.ModalEnabled = true
-        CAS:BindActionAtPriority("FreezeControl", function()
-            return Enum.ContextActionResult.Sink
-        end, false, Enum.ContextActionPriority.High.Value, unpack(Enum.PlayerActions:GetEnumItems()))
+        ClientUtil:FreezePlayerControls("Freeze")
 
         local quests = self.plr.Quests:GetChildren() :: Folder
 

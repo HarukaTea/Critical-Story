@@ -2,13 +2,16 @@
 --!optimize 2
 --!native
 
+local CAS = game:GetService("ContextActionService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local cfNew = CFrame.new
 local csNew = ColorSequence.new
@@ -96,6 +99,72 @@ function ClientUtil:GetKeyStoryLocations() : table
     end
 
     return pos
+end
+
+--[[
+    Freeze player's controls, usually used for chat and combat
+]]
+function ClientUtil:FreezePlayerControls(action: string)
+    if action == "Freeze" then
+        UIS.ModalEnabled = true
+
+        CAS:BindActionAtPriority("FreezeControl", function()
+            return Enum.ContextActionResult.Sink
+        end, false, Enum.ContextActionPriority.High.Value, unpack(Enum.PlayerActions:GetEnumItems()))
+    else
+        UIS.ModalEnabled = false
+
+        CAS:UnbindAction("FreezeControl")
+    end
+end
+
+--[[
+    Common functions for menu and backpack UI
+]]
+function ClientUtil:OpenUI(plr: Player, targetUI: string)
+    if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
+    if not plr.Character then return end
+
+    --// In combat check
+    if plr.Character:GetAttribute("InCombat") then
+        Signals.CreateHint:Fire("You can't open it in combat!", "Error")
+        return
+    end
+
+    local plrGui = plr.PlayerGui
+    local function _setExVisibleState(ui: ScreenGui, state: boolean)
+		ui.BG.Visible = state
+		ui.Shadow.Visible = state
+
+        if state then workspace.Sounds.SFXs[if ui.Name == "Backpack" then "Equip" else "MapOpen"]:Play() end
+	end
+	local function _setOthersVisibleState(state: boolean)
+		plrGui.AdventurerStats.Enabled = state
+		plrGui.PlayerList.Enabled = state
+
+		workspace.CurrentCamera.UIBlur.Enabled = not state
+	end
+    local function _setVisible(curUI: string, ui: ScreenGui)
+		plr:SetAttribute("CurrentMenu", curUI)
+
+		_setExVisibleState(ui, if curUI == "None" then false else true)
+		_setOthersVisibleState(if curUI == "None" then true else false)
+
+		Signals.ExCategoryOpened:Fire()
+	end
+
+    if plr:GetAttribute("CurrentMenu") == "None" then
+        _setVisible(targetUI, plrGui[targetUI])
+
+    elseif plr:GetAttribute("CurrentMenu") == targetUI then
+        _setVisible("None", plrGui[targetUI])
+
+    else
+        plr:SetAttribute("CurrentMenu", targetUI)
+
+        _setExVisibleState(plrGui[targetUI], true)
+        _setExVisibleState(if targetUI == "Backpack" then plrGui.AdventurerMenu else plrGui.Backpack, false)
+    end
 end
 
 return ClientUtil

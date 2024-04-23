@@ -9,8 +9,8 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, Computed, Value, AttributeChange =
-    Fusion.Children, Fusion.Computed, Fusion.Value, Fusion.AttributeChange
+local Children, Computed, AttributeChange =
+    Fusion.Children, Fusion.Computed, Fusion.AttributeChange
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -53,11 +53,11 @@ local function CombatStyle(self: table, class: string) : Frame
         Name = class.."Style",
         Position = fromScale(0.5, 1.85),
         Visible = Computed(function(use)
-            local neededClass = use(self.playerData.Class) :: string
+            local plrClass = use(self.playerData.Class) :: string
             local inCombat = use(self.charStatsDict.IsInCombat) :: boolean
 
             --- in combat condition
-            if inCombat and neededClass == class and use(self.charClassInfo[neededClass].Val) > 0 then
+            if inCombat and plrClass == class and use(self.charClassInfo[plrClass].Val) > 0 then
                 return true
             end
 

@@ -213,7 +213,5 @@ return function()
 	Type.TextXAlignment = Enum.TextXAlignment.Left
 	Type.Parent = Field
 
-	Cmdr.Parent = game:GetService("StarterGui")
-
 	return Cmdr
 end

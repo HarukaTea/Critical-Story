@@ -103,14 +103,6 @@ local function PlayerSlot(self: table, player: Player): Frame
 					for _, item in items:GetChildren() do
 						if AssetBook.Items.ItemType[item.Name] == "Passive" and item:GetAttribute("Equipped") then
 							local index = tonumber(match(item:GetAttribute("Slot"), "%d"))
-							if index > 3 then index += 4 end
-
-							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
-						end
-					end
-					for _, item in items:GetChildren() do
-						if AssetBook.Items.ItemType[item.Name] == "Active" and item:GetAttribute("Equipped") then
-							local index = tonumber(match(item:GetAttribute("Slot"), "%d")) + 3
 
 							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
 						end

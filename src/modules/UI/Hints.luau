@@ -28,7 +28,7 @@ return function(plr: Player)
 
 	local UI = Components.ScreenGui({
 		Name = "Hints",
-		DisplayOrder = 5,
+		DisplayOrder = 100,
 		Parent = plr.PlayerGui,
 
 		[Children] = {

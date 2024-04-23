@@ -27,6 +27,7 @@ local function ItemBar(info: table): Frame
 		wait(3.2)
 		info.Position:set(fromScale(1.2, 0))
 	end)
+	local isSelecting = Fusion.Value(false)
 
 	return Components.Frame({
 		Name = "Acquired",
@@ -43,6 +44,14 @@ local function ItemBar(info: table): Frame
 
 				[Children] = {
 					Components.RoundUICorner(),
+					Components.UIStroke({
+						Enabled = true,
+						Thickness = 3,
+
+						Transparency = Fusion.Tween(Fusion.Computed(function(use)
+							return if use(isSelecting) then 0.3 else 1
+						end), AssetBook.TweenInfos.twiceHalfOne)
+					}),
 					Components.ImageLabel({
 						Name = "Icon",
 						Size = fromScale(0.196, 1),
@@ -67,6 +76,15 @@ local function ItemBar(info: table): Frame
 						TextColor3 = info.TierColor,
 						TextXAlignment = Enum.TextXAlignment.Left
 					}),
+
+					Components.HoverImageButton({
+						[Fusion.OnEvent("MouseEnter")] = function()
+							isSelecting:set(true)
+						end,
+						[Fusion.OnEvent("MouseLeave")] = function()
+							isSelecting:set(false)
+						end
+					})
 				},
 			}),
 		},

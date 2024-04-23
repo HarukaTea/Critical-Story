@@ -5,9 +5,9 @@
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local Signals = require(RepS.Modules.Data.Signals)
 
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
@@ -38,6 +38,7 @@ return function(plr: Player)
 		Name = "AdventurerMenu",
 		Parent = plr.PlayerGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
+		DisplayOrder = 10,
 		[Fusion.Ref] = self.UI,
 
 		[Fusion.Children] = {
@@ -67,44 +68,10 @@ return function(plr: Player)
 	repeat wait() until plr.PlayerGui:WaitForChild("Backpack")
 
 	--// Action bindings
-	local function _setExVisibleState(ui: ScreenGui, state: boolean)
-		ui.BG.Visible = state
-		ui.Shadow.Visible = state
-	end
-	local function _setOthersVisibleState(state: boolean)
-		self.plrGui.AdventurerStats.Enabled = state
-		self.plrGui.PlayerList.Enabled = state
-
-		workspace.CurrentCamera.UIBlur.Enabled = not state
-	end
-	local function _setVisible(curUI: string, ui: ScreenGui)
-		plr:SetAttribute("CurrentMenu", curUI)
-
-		_setExVisibleState(ui, if curUI == "None" then false else true)
-		_setOthersVisibleState(if curUI == "None" then true else false)
-
-		Signals.ExCategoryOpened:Fire()
-	end
 	local function _openMenu(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
-		if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
 
-		local menuFrame = Fusion.peek(self.UI)
-
-		if plr:GetAttribute("CurrentMenu") == "None" then
-			_setVisible("Menu", menuFrame)
-
-			workspace.Sounds.SFXs.MapOpen:Play()
-
-		elseif plr:GetAttribute("CurrentMenu") == "Menu" then
-			_setVisible("None", menuFrame)
-
-		elseif plr:GetAttribute("CurrentMenu") == "Backpack" then
-			plr:SetAttribute("CurrentMenu", "Menu")
-
-			_setExVisibleState(self.plrGui.Backpack, false)
-			_setExVisibleState(menuFrame, true)
-		end
+		ClientUtil:OpenUI(plr, "AdventurerMenu")
 	end
 	CAS:BindAction("OpenMenu", _openMenu, false, Enum.KeyCode.C)
 

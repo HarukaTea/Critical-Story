@@ -54,7 +54,6 @@ return function(plr: Player)
 
 	local self = setmetatable({}, MobileShiftLock)
 
-	self.plrGui = plr.PlayerGui
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	self.rsConnection, self.enabled = nil, false
@@ -63,8 +62,9 @@ return function(plr: Player)
 
 	Fusion.New("ScreenGui")({
 		Name = "MobileShiftLock",
-		Parent = self.plrGui,
 		ScreenInsets = Enum.ScreenInsets.None,
+		DisplayOrder = 10,
+		Parent = plr.PlayerGui,
 		[Fusion.Ref] = self.UI,
 
 		[Fusion.Children] = {

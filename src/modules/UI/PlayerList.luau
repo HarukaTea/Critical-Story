@@ -42,6 +42,7 @@ return function(plr: Player)
 	Components.ScreenGui({
 		Name = "PlayerList",
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
+		DisplayOrder = 10,
 		Parent = self.plrGui,
 		[Fusion.Ref] = self.UI,
 

@@ -196,7 +196,7 @@ end
 --[[
 	Make monster enter combat state from "relax" one
 ]]
-function ServerUtil:MonsterActivateCombat(monster: Model, mode: string?, plr: Player?)
+function ServerUtil:MonsterActivateCombat(monster: Model)
 	monster:SetAttribute("InCombat", true)
 	monster.Head.TierDisplay.Enabled = false
 	monster.Head.Display.Enabled = true
@@ -204,7 +204,6 @@ function ServerUtil:MonsterActivateCombat(monster: Model, mode: string?, plr: Pl
 
 	local folder = instanceNew("Folder")
 	folder.Name = monster.Name
-	if mode then folder:SetAttribute(mode.."Combat", true) end
 	folder:AddTag("CombatHolder")
 	folder.Parent = workspace.MapComponents.CombatFolders
 
@@ -270,20 +269,29 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 end
 
 --[[
-	Return a randomly generate a position in the combat area
+	Get all players that fighting a same monster
 ]]
-function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
-	--- checks
-	local check = true
+function ServerUtil:GetPlayersByMonster(monster: Model) : table
+	if not monster then return end
+	if not monster:FindFirstChild("TargetingList") then return end
 
-	Spawn(function()
-		if not monster then check = false end
-		if not monster.Parent then check = false end
-		if not monster.Parent.Parent then check = false end
-	end)
-	if not check then return cfNew(0, 0, 0) end
+	local combatPlrs = {}
 
+	for _, target: ObjectValue in monster.TargetingList:GetChildren() do
+		local tempPlr = Players:GetPlayerFromCharacter(target.Value)
+
+		if tempPlr then insert(combatPlrs, tempPlr) end
+	end
+
+	return combatPlrs
+end
+
+--[[
+	Find all ignore list when casting rays
+]]
+function ServerUtil:FindAllIgnoreParts() : table
 	local ignore = {}
+
 	for _, child in workspace.Monsters:GetDescendants() do
 		if child:HasTag("Monster") then insert(ignore, child) end
 	end
@@ -294,11 +302,28 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 		if child:HasTag("CombatHolder") then insert(ignore, child) end
 	end
 
+	return ignore
+end
+
+--[[
+	Return a randomly generate a position in the combat area
+]]
+function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
+	--- checks
+	local check = true
+
+	Spawn(function()
+		if not monster then check = false return end
+		if not monster.Parent then check = false return end
+		if not monster.Parent.Parent then check = false return end
+	end)
+	if not check then return cfNew(0, 0, 0) end
+
 	local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
 	local ray = rayNew(
 		position,
 		cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
-	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignore)
+	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ServerUtil:FindAllIgnoreParts())
 
 	return cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
 end
@@ -446,13 +471,11 @@ end
 function ServerUtil:RefreshBackpack(plr: Player, item: string, cd: number, isSkill: boolean?)
 	if not isSkill then plr.Inventory[item].Value -= 1 end
 
-	Events.ItemCD:Fire(plr, cd, item)
 	Events.RefreshBackpack:Fire(plr)
 
 	if plr.Inventory[item].Value == 0 then
 		plr.Inventory[item]:Destroy()
 
-		Events.ItemCD:Fire(plr, 0, item)
 		Events.RefreshBackpack:Fire(plr)
 	end
 end
@@ -503,9 +526,9 @@ end
 	The core function, fires a ray, if there's a part, return the ray position
 	where it ends
 ]]
-function ServerUtil:FindPartOnRay(givenPos: Vector3, ignores: table?) : Vector3
+function ServerUtil:FindPartOnRay(givenPos: Vector3) : Vector3
 	local ray = rayNew(givenPos, -(yAxis).Unit * 500)
-	local ignoreList = ignores or {}
+	local ignoreList = ServerUtil:FindAllIgnoreParts()
 
 	while wait() do
 		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
@@ -689,12 +712,8 @@ function ServerUtil:ConnectMob(locator: BasePart)
 		end
 
 		if result == "Success" then
-			local combatPlrs, attacks = {}, {}
-			for _, target in monster.TargetingList:GetChildren() do
-				local tempPlr = Players:GetPlayerFromCharacter(target.Value)
+			local combatPlrs, attacks = ServerUtil:GetPlayersByMonster(monster), {}
 
-				if tempPlr then insert(combatPlrs, tempPlr) end
-			end
 			for _, attack: Instance in attackFolder:GetDescendants() do
 				if attack:IsA("BasePart") then
 					if attack.Transparency < 1 then insert(attacks, attack) end
@@ -744,8 +763,8 @@ function ServerUtil:ConnectMob(locator: BasePart)
 				charStats.TargetMonster.Value = charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue").Value
 			end
 
-			local locator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
-			for _, child in locator:GetDescendants() do
+			local realLocator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+			for _, child in realLocator:GetDescendants() do
 				if child:HasTag("Monster")
 					and child ~= monster
 					and child:GetAttribute("InCombat") == true

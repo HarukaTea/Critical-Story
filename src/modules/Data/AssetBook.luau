@@ -52,6 +52,12 @@ assets.PromptIcons = {
     Quest = "rbxassetid://16468992982",
     Travel = "rbxassetid://16458254833"
 }
+assets.ActionPanelIcons = {
+    Attack = "rbxassetid://2034122114",
+    Items = "rbxassetid://2228031606",
+    Skills = "rbxassetid://2034172262",
+    Defend = "rbxassetid://4601012009"
+}
 assets.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
@@ -125,7 +131,9 @@ assets.LocationInfo = {
 		SonusCave = "Sonus Cave",
         MisniPort = "Misni Port",
         Highland = "High Lands",
-        Tundra = "Tundra"
+        Tundra = "Tundra",
+
+        TestPlace = "Secret Cave"
 	},
 	Desc = {
 		InitusVillage = "The start of every adventure...",
@@ -135,7 +143,9 @@ assets.LocationInfo = {
 		SonusCave = "Bats make you crazy.",
         MisniPort = "Another port, larger than Initus Bay",
         Highland = "I don't know why it's called High Lands...",
-        Tundra = "The temperature start to drop..."
+        Tundra = "The temperature start to drop...",
+
+        TestPlace = "A cave that everyone can't find out, but luckily now you can find it."
 	},
     Music = {
         InitusVillage = "rbxassetid://11130054413",
@@ -145,7 +155,9 @@ assets.LocationInfo = {
 		SonusCave = "rbxassetid://12076218714",
         MisniPort = "rbxassetid://16471110687",
         Highland = "rbxassetid://15842496353",
-        Tundra = "rbxassetid://12294493784"
+        Tundra = "rbxassetid://12294493784",
+
+        TestPlace = "rbxassetid://11130054413",
     },
     MusicVolumes = {
         ["rbxassetid://11130054413"] = 0.5, --- initus village

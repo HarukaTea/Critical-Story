@@ -29,15 +29,12 @@ local STROKES_TRANS = {
 }
 
 local function StatBar(id: string, self: table): Frame
-	local humanoid = self.humanoid :: Humanoid
-	self.charStatsDict = {
-		HP = { Value(humanoid.Health), Value(humanoid.MaxHealth) },
-
-		MonsterAmount = Value({}),
-		IsInCombat = Value(false),
-		EffectsList = Value({}),
-	}
 	local charStatsDict = self.charStatsDict
+	Hydrate(self.char)({
+		[Fusion.AttributeChange("InCombat")] = function(newState: boolean)
+			charStatsDict.IsInCombat:set(newState)
+		end
+	})
 	Hydrate(self.humanoid)({
 		[Fusion.OnChange("Health")] = function(health: number)
 			charStatsDict.HP[1]:set(health)
@@ -45,15 +42,6 @@ local function StatBar(id: string, self: table): Frame
 		[Fusion.OnChange("MaxHealth")] = function(health: number)
 			charStatsDict.HP[2]:set(health)
 		end
-	})
-
-	local function _setEffectsChildren()
-		wait()
-		self.charStatsDict.EffectsList:set(self.charData.EffectsList:GetChildren())
-	end
-	Hydrate(self.charData.EffectsList)({
-		[OnEvent("ChildAdded")] = _setEffectsChildren,
-		[OnEvent("ChildRemoved")] = _setEffectsChildren
 	})
 
 	local function exCategoryOpened()

@@ -6,12 +6,13 @@ local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClientUtil =require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
+local BackpackItemList = require(RepS.Modules.UI.Views.BackpackItemList)
+
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonBackpack)
@@ -24,9 +25,8 @@ local Children, Computed, Value, OnChange, OnEvent, peek =
 local Backpack = {}
 Backpack.__index = Backpack
 
-local tFind = table.find
 local wait = task.wait
-local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
+local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local sFind = string.find
 
@@ -95,14 +95,10 @@ return function(plr: Player)
 
 	self.plr = plr
 	self.plrGui = plr.PlayerGui
-	local char = plr.Character or plr.CharacterAdded:Wait()
-	local camVPSize = workspace.CurrentCamera.ViewportSize
+	self.char = plr.Character or plr.CharacterAdded:Wait()
+	local char = self.char
 
 	self.inventory = plr:WaitForChild("Inventory", 999)
-	self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })
-	self.absCellPadding = Value({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
-	self.absCellSize, self.absTextSize = Value(peek(self.absSize)[1] / 15.58), Value(peek(self.absSize)[2] * 0.345 / 4.66)
-	self.absScrollSize, self.absContentSize = Value(90), Value(30)
 
 	self.UI, self.itemFrame, self.itemDescFrame = Value(), Value(), Value()
 	self.items, self.noItemsShow = Value({}), Value(false)
@@ -111,6 +107,7 @@ return function(plr: Player)
 		Name = "Backpack",
 		Parent = self.plrGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
+		DisplayOrder = 10,
 		[Fusion.Ref] = self.UI,
 
 		[Children] = {
@@ -130,6 +127,7 @@ return function(plr: Player)
 						FilterButton("Equip", self),
 						FilterButton("Pin", self),
 					}, self),
+
 					Components.Frame({
 						Name = "ItemBG",
 						Position = fromScale(0.375, 0.567),
@@ -137,74 +135,12 @@ return function(plr: Player)
 						ClipsDescendants = true,
 
 						[Children] = {
-							Components.ScrollingFrame({
-								Name = "Items",
-								Size = fromScale(0.99, 0.93),
-								ScrollBarThickness = 6,
-								ScrollingDirection = Enum.ScrollingDirection.Y,
-								CanvasSize = Computed(function(use)
-									if use(self.absContentSize) > use(self.absScrollSize) then
-										return fromOffset(0, use(self.absContentSize))
-									else
-										return fromOffset(0, 0)
-									end
-								end),
-								ScrollingEnabled = Computed(function(use)
-									return if use(self.absContentSize) > use(self.absScrollSize) then true else false
-								end),
-
-								[Fusion.Ref] = self.itemFrame,
-								[OnEvent("ChildAdded")] = function()
-									wait()
-									self.noItemsShow:set(false)
-								end,
-								[OnEvent("ChildRemoved")] = function()
-									wait()
-									if not peek(self.itemFrame) then return end --- in case ui destroy
-
-									if #peek(self.itemFrame):GetChildren() == 1 then
-										self.noItemsShow:set(true)
-									else
-										self.noItemsShow:set(false)
-									end
-								end,
-								[Fusion.OnChange("AbsoluteSize")] = function(newSize)
-									self.absScrollSize:set(newSize.Y)
-								end,
-
-								[Children] = {
-									Fusion.New("UIGridLayout")({
-										CellPadding = Computed(function(use)
-											return fromOffset(use(self.absCellPadding)[1], use(self.absCellPadding)[2])
-										end),
-										CellSize = Computed(function(use)
-											return fromOffset(use(self.absCellSize), use(self.absCellSize))
-										end),
-
-										[Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
-											self.absContentSize:set(newSize.Y)
-										end,
-									}),
-									Fusion.ForValues(self.items, function(use, item: IntValue)
-										if use(self.chosenFilter) == "All" then
-											return BackpackItemSlot(item, self)
-
-										elseif use(self.chosenFilter) == "Others" then
-											local filter = { "Material", "Cosmetic", "Companion" }
-											if tFind(filter, AssetBook.Items.ItemType[item.Name]) then
-												return BackpackItemSlot(item, self)
-											end
-										else
-											if AssetBook.Items.ItemType[item.Name] == use(self.chosenFilter) then
-												return BackpackItemSlot(item, self)
-											end
-										end
-									end, Fusion.cleanup),
-								},
-							}),
+							BackpackItemList(self)
 						},
 					}),
+
 					ItemDescFrame(self),
+
 					Components.ImageLabel({
 						Name = "EmptySymbol",
 						Size = fromScale(0.1, 0.255),
@@ -242,43 +178,10 @@ return function(plr: Player)
 	repeat wait() until plr.PlayerGui:WaitForChild("AdventurerMenu", 999)
 
 	---// Actions
-	local function _setExVisibleState(ui: ScreenGui, state: boolean)
-		ui.BG.Visible = state
-		ui.Shadow.Visible = state
-	end
-	local function _setOthersVisibleState(state: boolean)
-		self.plrGui.AdventurerStats.Enabled = state
-		self.plrGui.PlayerList.Enabled = state
-		workspace.CurrentCamera.UIBlur.Enabled = not state
-	end
-	local function _setVisible(curUI: string, ui: ScreenGui)
-		plr:SetAttribute("CurrentMenu", curUI)
-
-		_setExVisibleState(ui, if curUI == "None" then false else true)
-		_setOthersVisibleState(if curUI == "None" then true else false)
-
-		Signals.ExCategoryOpened:Fire()
-	end
 	local function _openBackpack(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
-		if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
 
-		local backpackFrame = peek(self.UI)
-
-		if plr:GetAttribute("CurrentMenu") == "None" then
-			_setVisible("Backpack", backpackFrame)
-
-			workspace.Sounds.SFXs.Equip:Play()
-
-		elseif plr:GetAttribute("CurrentMenu") == "Backpack" then
-			_setVisible("None", backpackFrame)
-
-		elseif plr:GetAttribute("CurrentMenu") == "Menu" then
-			plr:SetAttribute("CurrentMenu", "Backpack")
-
-			_setExVisibleState(backpackFrame, true)
-			_setExVisibleState(self.plrGui.AdventurerMenu, false)
-		end
+		ClientUtil:OpenUI(plr, "Backpack")
 	end
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
 

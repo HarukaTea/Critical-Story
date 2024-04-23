@@ -19,15 +19,13 @@ local SkillUtil = {}
 --[[
 	Arrow players to restore mana by orbs, magic-class only
 ]]
-function SkillUtil:RestoreManaByOrb(plr: Player)
+function SkillUtil:RestoreTPByOrb(plr: Player)
 	local char = plr.Character
 
-	local currentMana = char:GetAttribute("Mana")
-	local maxMana = char:GetAttribute("MaxMana")
+	local currentTP = char:GetAttribute("TP")
+	if currentTP >= 100 then return end
 
-	if currentMana >= maxMana then return end
-
-	HarukaLib:Add(char, "Mana", ceil(maxMana * (char:GetAttribute("RestoreBuff") / 100)))
+	HarukaLib:Add(char, "TP", ceil(100 * (char:GetAttribute("RestoreBuff") / 100)))
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
@@ -187,7 +185,6 @@ function SkillUtil:MagicBuff(plr: Player, power: number, duration: number)
 	buff:SetAttribute("Power", power)
 	buff:SetAttribute("Color", fromRGB(162, 0, 255))
 	buff:SetAttribute("Text", "MAGIC UP!")
-	buff.Name = "MagicBuff"
 	buff.Parent = plr.Character.CharStats.EffectsList
 
 	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
@@ -198,11 +195,26 @@ end
 ]]
 function SkillUtil:SpeedBuff(plr: Player, exSpeed: number, duration: number)
 	local buff = RepS.Resources.Unloads.SpeedBuff:Clone() :: Script
+
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("Power", exSpeed)
 	buff:SetAttribute("Color", fromRGB(255, 255, 0))
 	buff:SetAttribute("Text", "SPEED UP!")
-	buff.Name = "SpeedBuff"
+	buff.Parent = plr.Character.CharStats.EffectsList
+
+	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
+end
+
+--[[
+	Give player defense buff, it's real defense
+]]
+function SkillUtil:DefenseBuff(plr: Player, def: number, duration: number)
+	local buff = RepS.Resources.Unloads.DefenseBuff:Clone() :: Script
+
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("Power", def)
+	buff:SetAttribute("Color", fromRGB(128, 128, 128))
+	buff:SetAttribute("Text", "DEFENSE UP!")
 	buff.Parent = plr.Character.CharStats.EffectsList
 
 	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)

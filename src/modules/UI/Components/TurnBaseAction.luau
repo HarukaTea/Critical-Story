@@ -6,36 +6,46 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local OnEvent, Computed, Tween, Value =
-    Fusion.OnEvent, Fusion.Computed, Fusion.Tween, Fusion.Value
+local OnEvent, Computed, Value =
+    Fusion.OnEvent, Fusion.Computed, Fusion.Value
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local upper = string.upper
 local fromRGB = Color3.fromRGB
 local udNew = UDim.new
+local tFind = table.find
 
-local function TurnBasedAction(id: string, self: table) : Frame
+local function TurnBaseAction(id: string, self: table) : Frame
     local IS_SELECTED = {
         Attack = Value(false),
         Items = Value(false),
         Skills = Value(false),
         Defend = Value(false)
     }
-    local ICONS = {
-        Attack = "rbxassetid://2034122114",
-        Items = "rbxassetid://2228031606",
-        Skills = "rbxassetid://2034172262",
-        Defend = "rbxassetid://4601012009"
-    }
+
+    local function _hidePanel()
+        self.panelPos:set(fromScale(0.5, 4))
+        self.transHPBarSize:set(fromScale(0, 0.875))
+    end
+
+    local whitelist = { "Combat", "Player" }
+    local function _showPanel(phase: string)
+        if not tFind(whitelist, phase) then return end
+
+        self.panelPos:set(fromScale(0.5, 0.5))
+        self.transHPBarSize:set(fromScale(0.14, 0.875))
+    end
+    Events.NewPhase:Connect(_showPanel)
 
     return Components.Frame({
         Name = id,
-        BackgroundColor3 = Tween(Computed(function(use)
+        BackgroundColor3 = Computed(function(use)
             return if use(IS_SELECTED[id]) then fromRGB(255, 255, 255) else fromRGB()
-        end), AssetBook.TweenInfos.half),
+        end),
         BackgroundTransparency = 0,
 
         [Fusion.Children] = {
@@ -43,12 +53,12 @@ local function TurnBasedAction(id: string, self: table) : Frame
             Components.UIStroke({
                 Enabled = true,
 
-                Thickness = Tween(Computed(function(use)
+                Thickness = Fusion.Tween(Computed(function(use)
                     return if use(IS_SELECTED[id]) then 4 else 3
                 end), AssetBook.TweenInfos.half),
-                Color = Tween(Computed(function(use)
+                Color = Computed(function(use)
                     return if use(IS_SELECTED[id]) then fromRGB() else fromRGB(255, 255, 255)
-                end), AssetBook.TweenInfos.half),
+                end),
             }),
             Components.HoverImageButton({
                 [OnEvent("MouseEnter")] = function()
@@ -61,6 +71,26 @@ local function TurnBasedAction(id: string, self: table) : Frame
                     --[[
                         TODO: Action
                     ]]
+                    if self.plr:GetAttribute("NextAction") ~= "" then return end
+
+                    if id == "Attack" then
+                        Events.NextActionRequest:Fire("Attack")
+
+                        _hidePanel()
+
+                    elseif id == "Items" then
+
+                        _hidePanel()
+
+                    elseif id == "Skills" then
+
+                        _hidePanel()
+
+                    elseif id == "Defend" then
+                        Events.NextActionRequest:Fire("Defend")
+
+                        _hidePanel()
+                    end
                 end
             }),
             Components.ImageLabel({
@@ -69,10 +99,10 @@ local function TurnBasedAction(id: string, self: table) : Frame
                 Position = fromScale(0.5, 0.1),
                 Size = fromScale(0.5, 0.5),
 
-                Image = ICONS[id],
-                ImageColor3 = Tween(Computed(function(use)
+                Image = AssetBook.ActionPanelIcons[id],
+                ImageColor3 = Computed(function(use)
                     return if use(IS_SELECTED[id]) then fromRGB() else fromRGB(255, 255, 255)
-                end), AssetBook.TweenInfos.half),
+                end),
             }),
             Components.TextLabel({
                 Name = "Action",
@@ -80,12 +110,12 @@ local function TurnBasedAction(id: string, self: table) : Frame
                 Position = fromScale(0.5, 0.6),
                 Size = fromScale(0.9, 0.3),
                 Text = upper(id),
-                TextColor3 = Tween(Computed(function(use)
+                TextColor3 = Computed(function(use)
                     return if use(IS_SELECTED[id]) then fromRGB() else fromRGB(255, 255, 255)
-                end), AssetBook.TweenInfos.half),
+                end),
             })
         }
     })
 end
 
-return TurnBasedAction
+return TurnBaseAction
