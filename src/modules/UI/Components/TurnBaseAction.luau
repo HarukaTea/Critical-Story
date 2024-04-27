@@ -17,30 +17,18 @@ local fromScale = UDim2.fromScale
 local upper = string.upper
 local fromRGB = Color3.fromRGB
 local udNew = UDim.new
-local tFind = table.find
+local wait = task.wait
 
 local function TurnBaseAction(id: string, self: table) : Frame
     local IS_SELECTED = {
         Attack = Value(false),
-        Items = Value(false),
-        Skills = Value(false),
         Defend = Value(false)
     }
 
     local function _hidePanel()
-        self.panelPos:set(fromScale(0.5, 4))
+        self.panelPos:set(fromScale(0.5, 5))
         self.transHPBarSize:set(fromScale(0, 0.875))
     end
-
-    local whitelist = { "Combat", "Player" }
-    local function _showPanel(phase: string)
-        if not tFind(whitelist, phase) then return end
-
-        self.panelPos:set(fromScale(0.5, 0.5))
-        self.transHPBarSize:set(fromScale(0.14, 0.875))
-    end
-    Events.NewPhase:Connect(_showPanel)
-
     return Components.Frame({
         Name = id,
         BackgroundColor3 = Computed(function(use)
@@ -68,29 +56,16 @@ local function TurnBaseAction(id: string, self: table) : Frame
                     IS_SELECTED[id]:set(false)
                 end,
                 [OnEvent("MouseButton1Click")] = function()
-                    --[[
-                        TODO: Action
-                    ]]
                     if self.plr:GetAttribute("NextAction") ~= "" then return end
+                    if self.actionClickCD then return end
 
-                    if id == "Attack" then
-                        Events.NextActionRequest:Fire("Attack")
+                    self.actionClickCD = true
 
-                        _hidePanel()
+                    _hidePanel()
+                    Events.NextActionRequest:Fire(id)
 
-                    elseif id == "Items" then
-
-                        _hidePanel()
-
-                    elseif id == "Skills" then
-
-                        _hidePanel()
-
-                    elseif id == "Defend" then
-                        Events.NextActionRequest:Fire("Defend")
-
-                        _hidePanel()
-                    end
+                    wait(1)
+                    self.actionClickCD = false
                 end
             }),
             Components.ImageLabel({

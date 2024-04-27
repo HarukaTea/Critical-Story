@@ -19,7 +19,8 @@ assets.TweenInfos = {
 	one = newTweenInfo(1),
 	oneHalf = newTweenInfo(1.5),
 	two = newTweenInfo(2),
-	six = newTweenInfo(6)
+	six = newTweenInfo(6),
+    fifteen = newTweenInfo(15, Enum.EasingStyle.Linear)
 }
 assets.TierColor = {
 	Common = fromRGB(0, 255, 0),
@@ -62,38 +63,47 @@ assets.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
 		Color = fromRGB(255, 100, 100),
+        Type = "DMG"
 	},
 	Archer = {
 		Image = "rbxassetid://2965863905",
 		Color = fromRGB(100, 255, 100),
+        Type = "DMG"
 	},
 	Wizard = {
 		Image = "rbxassetid://2965863231",
 		Color = fromRGB(100, 100, 254),
+        Type = "Magic"
 	},
 	Knight = {
 		Image = "rbxassetid://2965863677",
 		Color = fromRGB(255, 255, 50),
+        Type = "DMG"
 	},
 	Rogue = {
 		Image = "rbxassetid://12284961892",
 		Color = fromRGB(255, 170, 255),
+        Type = "DMG"
 	},
 	Repeater = {
 		Image = "rbxassetid://12190533959",
 		Color = fromRGB(65, 179, 255),
+        Type = "DMG"
 	},
 	Striker = {
 		Image = "rbxassetid://12190535870",
 		Color = fromRGB(253, 148, 44),
+        Type = "DMG"
 	},
 	Alchemist = {
 		Image = "rbxassetid://12236618949",
 		Color = fromRGB(0, 255, 22),
+        Type = "Magic"
 	},
 	Illusionist = {
 		Image = "rbxassetid://15875390788",
 		Color = fromRGB(0, 255, 252),
+        Type = "Magic"
 	}
 }
 assets.MonsterAvatars = {
@@ -180,7 +190,6 @@ assets.Items = {
         HastePotion = "Haste Potion",
         MagicPotion = "Magic Potion",
         FireballScroll = "Ignition Scroll",
-        Agility = "Agility",
         BloxyCola = "Bloxy Cola",
         CookedSteak = "Cooked Steak",
         ArcaneMark = "Arcane Mark",
@@ -242,7 +251,6 @@ assets.Items = {
 
 	IsSkill = {
 		FireballScroll = true,
-		Agility = true,
 		ArcaneMark = true,
 		DarkChain = true,
 		ExtraJump = true,
@@ -261,7 +269,6 @@ assets.Items = {
         HastePotion = "Created by great alchemists who controls Time",
         MagicPotion = "Created by great alchemists who controls Heart",
         FireballScroll = "A magical scroll created by great wizards",
-        Agility = "A skill that allows the user to increase their speed for a short time",
         BloxyCola = "Refreshing sweet soda that would give you a sugar rush",
         CookedSteak = "Tasty, a piece of well cooked steak",
         ArcaneMark = "wait, where is the magic circle?",
@@ -330,7 +337,6 @@ assets.Items = {
         HastePotion = "Gain <font color='#11ebee'>15 Speed</font> for <font color='#11ebee'>10s</font>, but the world needs to rest for <font color='#11ebee'>15s</font>",
         MagicPotion = "Gives <font color='#B266FF'>1.5x Magic</font> buff for <font color='#11ebee'>5s</font>, it will break your Heart if you don't rest for <font color='#11ebee'>10s</font>",
         FireballScroll = "Shoot a fireball towards the monster, deals <font color='#B266FF'>0.5x of magic damage</font> <font color='#FF3333'>if hits</font>, has <font color='#11ebee'>10s</font> cooldown, costs <font color='#11ebee'>100 MP</font>",
-        Agility = "Gain <font color='#11ebee'>10</font> speed for <font color='#11ebee'>10s</font>, along with <font color='#11ebee'>15s</font> cooldown",
         BloxyCola = "Gain <font color='#11ebee'>10</font> speed for <font color='#11ebee'>5s</font>, and heals <font color='#00FF00'>30%</font> HP, along with <font color='#11ebee'>10s</font> cooldown",
         CookedSteak = "Gives <font color='#FF3333'>1.5x DMG</font> buff for <font color='#11ebee'>5s</font> and heals <font color='#00FF00'>25%</font> HP, along with <font color='#11ebee'>10s</font> cooldown",
         ArcaneMark = "Mark an area under the monster which deals <font color='#B266FF'>magic damage</font> over time, costs <font color='#11ebee'>600 MP</font>, along with <font color='#11ebee'>10s</font> cooldown",
@@ -402,7 +408,6 @@ assets.Items = {
         KitsuneFur = "Common",
         Iron = "Common",
         StalkerBranch = "Common",
-        Agility = "Common",
         TravellerBoots = "Common",
         BurningTorch = "Common",
         CampfireWood = "Common",
@@ -465,7 +470,6 @@ assets.Items = {
         HastePotion = "Active",
         GoldenApple = "Active",
         FireballScroll = "Active",
-        Agility = "Active",
         BloxyCola = "Active",
         CookedSteak = "Active",
         ArcaneMark = "Active",
@@ -529,14 +533,16 @@ assets.Items = {
         Null = "rbxassetid://1637592633",
         Unknown = "rbxassetid://2985521957",
 
-        HealthyApple = "rbxassetid://16517555126",
-        GoldenApple = "rbxassetid://16517555443",
-        HealthPotion = "rbxassetid://16517629939",
-        PowerPotion = "rbxassetid://16517630555",
-        HastePotion = "rbxassetid://16517630813",
-        MagicPotion = "rbxassetid://16517630290",
-        FireballScroll = "rbxassetid://16517555986",
-        Agility = "rbxassetid://16517556633",
+        Gold = "rbxassetid://16654275243",
+        RP = "rbxassetid://16002068286",
+
+        HealthyApple = "rbxassetid://1637563032",
+        GoldenApple = "rbxassetid://2970814988",
+        HealthPotion = "rbxassetid://2970816690",
+        PowerPotion = "rbxassetid://2970818097",
+        HastePotion = "rbxassetid://2970816149",
+        MagicPotion = "rbxassetid://2970818438",
+        FireballScroll = "rbxassetid://12027128477",
         BloxyCola = "rbxassetid://4865339572",
         CookedSteak = "rbxassetid://4795912293",
         ArcaneMark = "rbxassetid://14429505922",
@@ -545,11 +551,11 @@ assets.Items = {
         FoxFlameScroll = "rbxassetid://16517556428",
         GhostlyLantern = "rbxassetid://16517557897",
         HolySmite = "rbxassetid://14429523818",
-        Lux = "rbxassetid://4820492332",
-        WarriorsPride = "rbxassetid://16517556226",
+        Lux = "rbxassetid://17286829881",
+        WarriorsPride = "rbxassetid://17286830224",
 
-        TravellerBoots = "rbxassetid://16517555735",
-        BurningTorch = "rbxassetid://16529968136",
+        TravellerBoots = "rbxassetid://17286829777",
+        BurningTorch = "rbxassetid://17286830043",
         CampfireWood = "rbxassetid://2970559088",
         HuntingDagger = "rbxassetid://16483882733",
         MiningPickaxe = "rbxassetid://12118509077",
@@ -558,8 +564,8 @@ assets.Items = {
         ManaCrystal = "rbxassetid://12119869276",
         AdventurersKit = "rbxassetid://12370527641",
         RabbitFoot = "rbxassetid://16517558186",
-        ArcaneSpellbook = "rbxassetid://16483876342",
-        EnchantedBlade = "rbxassetid://16517557599",
+        ArcaneSpellbook = "rbxassetid://17286830798",
+        EnchantedBlade = "rbxassetid://17286830606",
         MagicianHat = "rbxassetid://14429547149",
         StalkerCape = "rbxassetid://12284033809",
         RegenerationGem = "rbxassetid://12284830343",
@@ -575,8 +581,8 @@ assets.Items = {
         FoxSpirit = "rbxassetid://16517557109",
         NorthernHalberd = "rbxassetid://4827596848",
         AbsorptionCrystal = "rbxassetid://4820513616",
-        FireStaff = "rbxassetid://16517558762",
-        MountainKingCrown = "rbxassetid://16517558893",
+        FireStaff = "rbxassetid://17286829652",
+        MountainKingCrown = "rbxassetid://17286830433",
         MilkPillow = "rbxassetid://15753183350",
 
         SlimeCore = "rbxassetid://12118510527",

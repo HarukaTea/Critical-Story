@@ -39,28 +39,27 @@ return function (plr: Player)
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
-	self.UI = Value()
+	self.isInCombat = Value(self.char:GetAttribute("InCombat"))
 
-	self.transHPBarSize = Value(fromScale(0.14, 0.875))
+	self.transHPBarSize = Value(fromScale(0, 0.875))
+
 	self.attackingTimeBar = Value(fromScale(1, 1))
 	self.attackingTimeTweenInfo = Value(AssetBook.TweenInfos.fourHalf)
 
-	local isInCombat = Value(self.char:GetAttribute("InCombat"))
 	Fusion.Hydrate(self.char)({
 		[Fusion.AttributeChange("InCombat")] = function(newState: boolean)
-			isInCombat:set(newState)
+			self.isInCombat:set(newState)
 		end,
-		[Fusion.AttributeChange("AttackingTime")] = function(newState: boolean)
-			self.attackingTimeTweenInfo:set(if newState then AssetBook.TweenInfos.six else AssetBook.TweenInfos.fourHalf)
+		[Fusion.AttributeChange("OrbAttackingTime")] = function(newState: boolean)
+			self.attackingTimeTweenInfo:set(if newState then AssetBook.TweenInfos.fifteen else AssetBook.TweenInfos.fourHalf)
 			self.attackingTimeBar:set(if newState then fromScale(0, 1) else fromScale(1, 1))
 		end
 	})
 
-    Components.ScreenGui({
+    local UI = Components.ScreenGui({
         Name = "TurnBasedUI",
 		DisplayOrder = 5,
         Parent = plr.PlayerGui,
-		[Fusion.Ref] = self.UI,
 
         [Children] = {
             Components.Frame({
@@ -69,12 +68,15 @@ return function (plr: Player)
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
+				Visible = Computed(function(use)
+					return use(self.isInCombat)
+				end),
 				Position = Tween(Computed(function(use)
-					return if use(isInCombat) then fromScale(0.5, 1) else fromScale(0.5, 1.5)
+					return if use(self.isInCombat) then fromScale(0.5, 1) else fromScale(0.5, 1.5)
 				end), AssetBook.TweenInfos.twiceHalfOne),
 
                 [Children] = {
-                    New("UIAspectRatioConstraint")({ AspectRatio = 25.386 }),
+                    New("UIAspectRatioConstraint")({ AspectRatio = 25.146 }),
 
                     ActionPanel(self),
                     MobPhase(self),
@@ -85,6 +87,7 @@ return function (plr: Player)
 						AnchorPoint = v2New(0.5, 0),
 						Position = fromScale(0.5, 0.15),
 						Size = fromScale(1, 0.42),
+						ZIndex = 2,
 
 						[Children] = {
 							New("UIListLayout")({
@@ -106,13 +109,14 @@ return function (plr: Player)
 						},
 					}),
 					New("Frame")({
-						Name = "AttackingTimeBar",
+						Name = "MobAttackingTimeBar",
 						BackgroundColor3 = fromRGB(30, 30, 30),
 						Position = fromScale(0, 0.8),
 						Size = fromScale(1, 0.1),
+						ZIndex = 2,
 
 						Visible = Computed(function(use)
-							return use(self.attackingTimeTweenInfo).Time == 6
+							return use(self.attackingTimeTweenInfo).Time == 15
 						end),
 
 						[Children] = {
@@ -126,22 +130,6 @@ return function (plr: Player)
 							})
 						}
 					}),
-					Components.TextLabel({
-						Name = "AttackTip",
-						Position = fromScale(0, -1.2),
-						Size = fromScale(1, 0.5),
-						RichText = true,
-						TextStrokeTransparency = 0,
-						Text = [[- Touch <font color="#e74c3c">orb</font> to attack enemy! -]],
-
-						Visible = Computed(function(use)
-							return use(self.attackingTimeTweenInfo).Time == 6
-						end),
-
-						[Children] = {
-							New("UITextSizeConstraint")({ MaxTextSize = 29 })
-						}
-					})
                 }
             }),
 			Components.Frame({
@@ -168,10 +156,8 @@ return function (plr: Player)
         }
     })
 
-
-	--// Connections
 	local function onDead()
-		Fusion.peek(self.UI):Destroy()
+		UI:Destroy()
 
 		Events.NewPhase:DisconnectAll()
 	end

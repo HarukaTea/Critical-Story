@@ -52,8 +52,6 @@ local function onDead()
     for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end
     end
-
-    ServerUtil:RagdollNPC(char)
 end
 humanoid.Died:Once(onDead)
 
@@ -73,15 +71,21 @@ local function shieldCheck(shield: number)
     end
 end
 
-local function updateATK()
-    char:SetAttribute("ATKDMG", floor(plr:GetAttribute("ATKPoints") ^ 1.5) + 10 + char:GetAttribute("ATKDMGBuff"))
+local function updateMinDMG()
+    char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
+end
+local function updateMaxDMG()
+    char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+end
+local function updateMagic()
+    char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
 end
 local function updateShield()
-    char:SetAttribute("MaxShield", floor(plr:GetAttribute("ShieldPoints") * 5) + 5 + char:GetAttribute("ShieldBuff"))
+    char:SetAttribute("MaxShield", 5 * plr:GetAttribute("ShieldPoints") + 5 + char:GetAttribute("ShieldBuff"))
     char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
 end
 local function updateHP()
-    humanoid.MaxHealth = floor(plr:GetAttribute("HealthPoints") * 80) + 80 + char:GetAttribute("HealthBuff")
+    humanoid.MaxHealth = 30 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
     humanoid.Health = humanoid.MaxHealth
 end
 local function updateSpeed(speed: number)
@@ -103,35 +107,7 @@ local function levelReqCheck()
         lvUpCD = false
     end
 end
-updateATK()
-updateShield()
-updateHP()
-updateSpeed(0)
-updateJump(0)
-levelReqCheck()
 
-Fusion.Hydrate(plr)({
-    [AttributeChange("ATKPoints")] = updateATK,
-    [AttributeChange("ShieldPoints")] = updateShield,
-    [AttributeChange("HealthPoints")] = updateHP,
-    [AttributeChange("EXP")] = levelReqCheck,
-    [AttributeChange("Class")] = function()
-        ServerUtil:EquipWeapon(char)
-    end
-})
-Fusion.Hydrate(char)({
-    [AttributeChange("TP")] = tpCheck,
-    [AttributeChange("ShieldBuff")] = updateShield,
-    [AttributeChange("HealthBuff")] = updateHP,
-    [AttributeChange("SpeedBuff")] = updateSpeed,
-    [AttributeChange("JumpBuff")] = updateJump,
-    [AttributeChange("Shield")] = shieldCheck,
-    [AttributeChange("InCombat")] = function()
-        ServerUtil:EquipWeapon(char)
-    end
-})
-
---// Setups
 local function setup()
     char.PrimaryPart = char.Humanoid.RootPart
 
@@ -193,10 +169,12 @@ local function classAttributesSetup()
     --- wizard
     Add(char:GetAttributeChangedSignal("InCombat"):Connect(function()
         if not char:GetAttribute("InCombat") then
-            char:SetAttribute("WizardCasted", 0)
+            char:SetAttribute("Arrows", 0)
             char:SetAttribute("Guard", 0)
+            char:SetAttribute("WizardCasted", 0)
             char:SetAttribute("RogueCritical", 0)
             char:SetAttribute("ResearchStage", 0)
+            char:SetAttribute("TP", 0)
         end
     end))
 
@@ -218,3 +196,38 @@ local function classAttributesSetup()
     plr:SetAttribute("NextAction", "")
 end
 Spawn(classAttributesSetup)
+
+--// Setups
+updateMinDMG()
+updateMaxDMG()
+updateMagic()
+updateShield()
+updateHP()
+updateSpeed(0)
+updateJump(0)
+levelReqCheck()
+
+Fusion.Hydrate(plr)({
+    [AttributeChange("DMGPoints")] = function()
+        updateMinDMG()
+        updateMaxDMG()
+    end,
+    [AttributeChange("MagicPoints")] = updateMagic,
+    [AttributeChange("ShieldPoints")] = updateShield,
+    [AttributeChange("HealthPoints")] = updateHP,
+    [AttributeChange("EXP")] = levelReqCheck,
+    [AttributeChange("Class")] = function()
+        ServerUtil:EquipWeapon(char)
+    end
+})
+Fusion.Hydrate(char)({
+    [AttributeChange("TP")] = tpCheck,
+    [AttributeChange("ShieldBuff")] = updateShield,
+    [AttributeChange("HealthBuff")] = updateHP,
+    [AttributeChange("SpeedBuff")] = updateSpeed,
+    [AttributeChange("JumpBuff")] = updateJump,
+    [AttributeChange("Shield")] = shieldCheck,
+    [AttributeChange("InCombat")] = function()
+        ServerUtil:EquipWeapon(char)
+    end
+})

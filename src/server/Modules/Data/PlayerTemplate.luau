@@ -15,7 +15,8 @@ return {
 		LastLeave = { "Vector3", 0, 0, 0 },
 
 		LvPoints = 0,
-		ATKPoints = 0,
+		DMGPoints = 0,
+		MagicPoints = 0,
 		ShieldPoints = 0,
 		HealthPoints = 0,
 	},

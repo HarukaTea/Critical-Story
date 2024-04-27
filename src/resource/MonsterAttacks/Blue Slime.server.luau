@@ -22,7 +22,7 @@ local function lookAt(target: Model)
 end
 
 local function slimeShot(target: Model)
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = char
@@ -33,7 +33,7 @@ end
 
 local function slimeWave(target: Model)
 	lookAt(target)
-	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position, { target })
+	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime2:Clone() :: Model
 	blast.Owner.Value = char

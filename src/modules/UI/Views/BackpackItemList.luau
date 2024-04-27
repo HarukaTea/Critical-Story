@@ -53,11 +53,8 @@ local function BackpackItemList(self: table) : ScrollingFrame
             wait()
             if not peek(self.itemFrame) then return end --- in case ui destroy
 
-            if #peek(self.itemFrame):GetChildren() == 1 then
-                self.noItemsShow:set(true)
-            else
-                self.noItemsShow:set(false)
-            end
+            --- 1, stands for UIGridLayout
+            self.noItemsShow:set(if #peek(self.itemFrame):GetChildren() == 1 then true else false)
         end,
         [Fusion.OnChange("AbsoluteSize")] = function(newSize)
             self.absScrollSize:set(newSize.Y)

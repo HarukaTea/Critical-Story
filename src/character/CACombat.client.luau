@@ -4,12 +4,8 @@
 
 local CS = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
-local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
-local TS = game:GetService("TweenService")
-local TestS = game:GetService("TestService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
@@ -18,7 +14,6 @@ local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
-local plr = Players:GetPlayerFromCharacter(char)
 local humanoid = char.Humanoid :: Humanoid
 
 local musics = workspace:WaitForChild("Sounds") :: Folder
@@ -26,17 +21,14 @@ local sfxs = musics.SFXs :: Folder
 local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
 local monsterLocations = workspace:WaitForChild("Monsters") :: Folder
 
-local isInCombat, isPlaying = false, ""
+local isInCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
 local encounterCD = false
 
-local cfAngles, cfNew = CFrame.Angles, CFrame.new
 local wait = task.wait
-local format = string.format
 local newInstance = Instance.new
 local v3New = Vector3.new
-local rad, random = math.rad, math.random
 local tFind, remove = table.find, table.remove
 
 
@@ -44,11 +36,12 @@ local tFind, remove = table.find, table.remove
 local function setup()
 	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do folder:Destroy() end
 	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
+	for _, folder: Folder in mapComponents.CageFolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
 	local monsters = {}
-	for _, monster in monsterLocations:GetDescendants() do
-		if monster:HasTag("Monster") then monsters[#monsters + 1] = monster end
+	for _, monster: Model in monsterLocations:GetDescendants() do
+		if monster:HasTag("Monster") and not monster:GetAttribute("SubMonster") then monsters[#monsters + 1] = monster end
 	end
 	local function _handleMonster(monster: Model)
 		wait()
@@ -61,39 +54,14 @@ local function setup()
 	CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
 	CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
-	--- rotate the monsters to make them more "lively"
-	local function _rotateSimulate()
-        for _, monster: Model in monsters do
-            if monster.PrimaryPart and not monster:GetAttribute("InCombat") then
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 166 then
-                    local rotating = random(5, 20)
-                    local direction = random(-2, 2)
-
-					Spawn(function()
-						wait(random(0, 6) / 10)
-						for _ = 1, rotating do
-							if not monster and monster.PrimaryPart then break end
-
-							monster.PrimaryPart.CFrame *= cfAngles(0, rad(direction * 5), 0)
-							wait(0.01)
-						end
-					end)
-                end
-            end
-        end
-    end
-
 	--- detect mobs when player is near them
-    local function _detectMonsters()
+    return Clock(0.3, function()
 		if isInCombat then return end
 		if encounterCD then return end
 
         for _, monster: Model in monsters do
-            if monster.PrimaryPart
-				and monster:GetAttribute("InCombat") == false
-				and not monster:GetAttribute("SubMonster") then
-
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 20 then
+            if monster.PrimaryPart and monster:GetAttribute("InCombat") == false then
+                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 22 then
 					encounterCD = true
 
                     Events.CombatStart:Fire(monster)
@@ -103,24 +71,18 @@ local function setup()
                 end
             end
         end
-    end
-
-    return Clock(1.75, _rotateSimulate), Clock(0.15, _detectMonsters)
+	end)
 end
 
 --// Connections
 local function startCombat(monster: Model)
-	--- checks
 	if not monster then return end
-	if not monster.Parent then return end
+	if not monster.PrimaryPart then return end
 
-	local locator = monster.Parent :: Part
-
-	if isInCombat then return end
 	isInCombat = true
-	isPlaying = locator:GetAttribute("MusicId") or "Combat"
 
-	musics.Overworld:Pause()
+	--- sound actions
+	musics.Overworld:Stop()
 	Spawn(function()
 		wait(0.15)
 		sfxs.EnterCombat:Play()
@@ -129,65 +91,34 @@ local function startCombat(monster: Model)
 		wait(0.39)
 		sfxs.EnterCombat2:Play()
 	end)
-
-	local combatMusic = musics[isPlaying] :: Sound
-	local pastVolume = combatMusic.Volume
-
-	combatMusic.Volume = 0
-	combatMusic:Play()
-	TS:Create(combatMusic, AssetBook.TweenInfos.twiceHalfOne, { Volume = pastVolume }):Play()
-
-	if (char.PrimaryPart.Position - monster.PrimaryPart.Position).Magnitude >= 32 then
-		char:PivotTo(cfNew(locator.Position) * cfNew(0, 8, 0))
-	end
-
-	local border = RepS.Package.Unloads.CombatBorder:Clone() :: Model
-	border:PivotTo(cfNew(locator.Position))
-	border.Parent = char
+	musics.Combat:Play()
 end
 local function endCombat()
 	--- checks
 	if not isInCombat then return end
-
 	if char:FindFirstChild("CombatBorder") then char.CombatBorder:Destroy() end
 
 	isInCombat = false
-
 	humanoid.AutoRotate = true
-	for _, sound in workspace.Sounds:GetChildren() do
-		if sound:IsA("Sound") and sound.Name ~= "Overworld" then sound:Stop() end
-	end
 
-	if humanoid.Health > 0 then
-		sfxs.CombatEnded:Play()
-	else
+	ClientUtil:FreezePlayerControls("Unfreeze")
+	Signals.CameraPointTo:Fire("Reset")
+
+	--- sound actions
+	for _, sound: Sound in workspace.Sounds:GetChildren() do
+		if sound:IsA("Sound") and sound.Name ~= "Overworld" and sound.IsPlaying then
+			sound:Stop()
+		end
+	end
+	if humanoid.Health <= 0 then
 		sfxs.Sad:Play()
 		return
 	end
 
-	wait(3)
-	local overworld = musics.Overworld
-	local pastVolume = overworld.Volume
+	sfxs.CombatEnded:Play()
 
-	overworld.Volume = 0
-	overworld:Resume()
-	TS:Create(overworld, AssetBook.TweenInfos.twiceHalfOne, { Volume = pastVolume }):Play()
-end
-local function magicCasted()
-	local class = plr:GetAttribute("Class") :: string
-	local monster = char.CharStats.TargetMonster.Value :: Model
-
-	--- checks
-	if not monster then return end
-
-	local spClass = { "Wizard", "Alchemist", "Illusionist" }
-	Signals.PlayAnimation:Fire(if tFind(spClass, class) then "MagicCastedAnim2" else "MagicCastedAnim1")
-
-	char.Humanoid.AutoRotate = false
-	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
-
-	wait(0.2)
-	char.Humanoid.AutoRotate = true
+	wait(2)
+	musics.Overworld:Play()
 end
 local function onTouched(hit: BasePart)
 	if not hit or not hit.Parent then return end
@@ -230,8 +161,7 @@ local function onTouched(hit: BasePart)
 
 			humanoid.AutoRotate = false
 
-			local variant = format("%sAnim%s", orb:GetAttribute("Style"), tostring(animStep))
-			Signals.PlayAnimation:Fire(variant)
+			Signals.PlayAnimation:Fire(orb:GetAttribute("Style").."Anim"..animStep)
 
 			ClientUtil:ClassHitVFX(char.CharStats.TargetMonster.Value, char)
 		end
@@ -248,6 +178,9 @@ local function onTouched(hit: BasePart)
 		if dmgTouchCD then return end
 		if not damagePart:FindFirstChild("Owner") then return end
 		if not char.PrimaryPart then return end
+
+		damagePart:RemoveTag("MonsterDMG")
+		damagePart:Destroy()
 
 		dmgTouchCD = true
 		Spawn(function()
@@ -296,19 +229,12 @@ Fusion.Hydrate(char)({
 		end
 	end
 })
-Events.MagicCasted:Connect(magicCasted)
 humanoid.Touched:Connect(onTouched)
 CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler)
 CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler)
 
 --// Setup
-local stopSimulating, stopDetecting = setup()
+local stopDetecting = setup()
 
 --// Clear
-local function onDead()
-	Events.MagicCasted:DisconnectAll()
-
-	stopSimulating()
-	stopDetecting()
-end
-humanoid.Died:Once(onDead)
+humanoid.Died:Once(stopDetecting)

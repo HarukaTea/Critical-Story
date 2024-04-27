@@ -63,7 +63,7 @@ local function ItemDescFrame(self: table): Frame
 					return use(self.absTextSize) - 3
 				end),
 				TextWrapped = true,
-				TextColor3 = fromRGB(186, 186, 186),
+				TextTransparency = 0.6,
 
 				[Children] = {
 					New("UITextSizeConstraint")({ MaxTextSize = 32 }),

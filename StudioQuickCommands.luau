@@ -15,6 +15,36 @@ for _, child in workspace.Maps:GetChildren() do
         folder.Parent = workspace.Maps
 
         for _, mapPart in child:GetChildren() do
+            if mapPart.Name == "Models" then
+                local modelsContainer = Instance.new("Folder")
+                modelsContainer.Name = "Models"
+                modelsContainer.Parent = folder
+
+                for _, mapDescendants in mapPart:GetChildren() do
+                    mapDescendants.Parent = modelsContainer
+                end
+
+                mapPart:Destroy()
+                continue
+            end
+            if mapPart.Name == "Terrain" then
+                local terrainContainer = Instance.new("Folder")
+                terrainContainer.Name = "Terrain"
+                terrainContainer:AddTag("Terrain")
+                terrainContainer.Parent = folder
+
+                for _, mapDescendants in mapPart:GetChildren() do
+                    if mapDescendants:IsA("IntValue") and mapDescendants.Name == "Terrain" then
+                        mapDescendants:Destroy()
+                        continue
+                    end
+
+                    mapDescendants.Parent = terrainContainer
+                end
+
+                mapPart:Destroy()
+                continue
+            end
             mapPart.Parent = folder
         end
 

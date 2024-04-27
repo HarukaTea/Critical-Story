@@ -105,7 +105,7 @@ local function TurnBaseStatBar(id: string, self: table) : Frame
 						return use(charStatsDict.Shield) .. "/" ..use(charStatsDict.MaxShield)
 
 					elseif id == "TP" then
-						return use(charStatsDict.TP) .. "/100"
+						return use(charStatsDict.TP) .. "%"
 					end
 				end),
 			}),

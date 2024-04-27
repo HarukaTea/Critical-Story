@@ -40,12 +40,10 @@ end
 --[[
 	Restore mana, by script lol
 ]]
-function SkillUtil:RestoreMana(plr: Player, healPower: number)
+function SkillUtil:RestoreTP(plr: Player, restoreVal: number)
 	local char = plr.Character
 
-	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Heal)
-
-	HarukaLib:Add(char, "Mana", healPower)
+	HarukaLib:Add(char, "TP", restoreVal)
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart

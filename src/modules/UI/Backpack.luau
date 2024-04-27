@@ -9,7 +9,6 @@ local Players = game:GetService("Players")
 local ClientUtil =require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local Signals = require(RepS.Modules.Data.Signals)
 
 local BackpackItemList = require(RepS.Modules.UI.Views.BackpackItemList)
 
@@ -29,6 +28,7 @@ local wait = task.wait
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local sFind = string.find
+local fontFromName = Font.fromName
 
 --[[
 	Deselect all items, and hide the item description
@@ -101,7 +101,8 @@ return function(plr: Player)
 	self.inventory = plr:WaitForChild("Inventory", 999)
 
 	self.UI, self.itemFrame, self.itemDescFrame = Value(), Value(), Value()
-	self.items, self.noItemsShow = Value({}), Value(false)
+	self.items, self.noItemsShow = Value(self.inventory:GetChildren()), Value(true)
+	self.chosenFilter = Value("All")
 
 	Components.ScreenGui({
 		Name = "Backpack",
@@ -148,6 +149,7 @@ return function(plr: Player)
 						Image = "rbxassetid://2970814599",
 						ImageColor3 = fromRGB(129, 129, 129),
 						ImageTransparency = 0.8,
+
 						Visible = Computed(function(use)
 							return use(self.noItemsShow)
 						end),
@@ -158,7 +160,7 @@ return function(plr: Player)
 								Name = "What",
 								Position = fromScale(0.85, -0.2),
 								Size = fromScale(0.6, 0.6),
-								FontFace = Font.fromName("GothamSSm", Enum.FontWeight.Bold),
+								FontFace = fontFromName("GothamSSm", Enum.FontWeight.Bold),
 								TextColor3 = fromRGB(129, 129, 129),
 								TextTransparency = 0.6,
 								Text = "?",
@@ -184,9 +186,6 @@ return function(plr: Player)
 		ClientUtil:OpenUI(plr, "Backpack")
 	end
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
-
-	--// Setup
-	self.items:set(self.inventory:GetChildren())
 
 	---// listening events
 	Fusion.Hydrate(workspace.CurrentCamera)({

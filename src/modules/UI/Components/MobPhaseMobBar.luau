@@ -83,18 +83,16 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                     Components.TextLabel({
                         Name = "MobName",
                         Position = fromScale(0.253, 0.1),
-                        Size = fromScale(0.627, 0.32),
+                        Size = fromScale(0.627, 0.35),
                         Text = mob.Name,
-                        FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                         TextXAlignment = Enum.TextXAlignment.Left
                     }),
                     Components.TextLabel({
                         Name = "MobLvl",
                         Position = fromScale(0.253, 0.1),
-                        Size = fromScale(0.627, 0.32),
+                        Size = fromScale(0.627, 0.35),
                         Text = "Lv."..mob:GetAttribute("Levels"),
                         TextColor3 = fromRGB(234, 234, 117),
-                        FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                         TextXAlignment = Enum.TextXAlignment.Right
                     }),
                     Components.TextLabel({
@@ -143,8 +141,8 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                     Fusion.New("Frame")({
                         Name = "HP",
                         BackgroundColor3 = fromRGB(),
-                        Position = fromScale(0.253, 0.55),
-                        Size = fromScale(0.625, 0.3),
+                        Position = fromScale(0.253, 0.53),
+                        Size = fromScale(0.625, 0.35),
 
                         [Children] = {
                             Components.RoundUICorner(),
@@ -174,7 +172,6 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                                 Name = "Stat",
                                 Size = fromScale(1, 1),
                                 ZIndex = 2,
-                                FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Right,
                                 Text = Computed(function(use)
@@ -190,7 +187,6 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                                 Text = "HP",
                                 Size = fromScale(1, 1),
                                 ZIndex = 2,
-                                FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Left,
 

@@ -85,10 +85,8 @@ local function mainSetup()
 	end
 
 	--- zone setups
-	for _, zone in SS.Package.Zones:GetChildren() do
-		zone.Transparency = 1
-		zone.Parent = workspace.MapComponents.Zones
-	end
+	SS.Package.Zones.Parent = workspace.MapComponents
+	for _, zone in workspace.MapComponents.Zones:GetChildren() do zone.Transparency = 1 end
 
 	--- monster setups
 	for _, child in resources.MonsterAttacks:GetChildren() do
@@ -114,6 +112,10 @@ local function mainSetup()
 		local holder = instanceNew("ObjectValue")
 		holder.Name = "Holder"
 		holder.Parent = child
+
+		local cageHolder = instanceNew("ObjectValue")
+		cageHolder.Name = "CageHolder"
+		cageHolder.Parent = child
 	end
 	for _, child in package.MonsterAttacks:GetDescendants() do
 		if resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
@@ -133,7 +135,8 @@ local function mainSetup()
 	for _, child in package.PlayerAttacks:GetChildren() do
 		resources.Unloads.OrbAnim:Clone().Parent = child
 	end
-	resources.Unloads.BorderColorTween.Parent = package.Unloads.CombatBorder.Border
+	resources.Unloads.BorderColorTween:Clone().Parent = package.Unloads.CombatBorder.Border
+	resources.Unloads.BorderColorTween.Parent = package.Unloads.PublicBorder.Border
 
 	--- player extra info setup
 	local joinData

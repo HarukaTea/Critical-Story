@@ -29,13 +29,12 @@ local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
-local Children, New, Value, Hydrate, AttributeChange, OnEvent, Computed, peek =
+local Children, New, Value, AttributeChange, Tween, Computed, peek =
 	Fusion.Children,
 	Fusion.New,
 	Fusion.Value,
-	Fusion.Hydrate,
 	Fusion.AttributeChange,
-	Fusion.OnEvent,
+	Fusion.Tween,
 	Fusion.Computed,
 	Fusion.peek
 
@@ -105,12 +104,15 @@ return function(plr: Player)
 			Components.Frame({
 				Name = "BG",
 				AnchorPoint = v2New(0.5, 0.9),
-				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
-				Visible = Fusion.Computed(function(use)
+
+				Visible = Computed(function(use)
 					return not use(self.charStatsDict.IsInCombat)
 				end),
+				Position = Tween(Computed(function(use)
+					return if use(self.charStatsDict.IsInCombat) then fromScale(0.5, 3) else fromScale(0.5, 1)
+				end), AssetBook.TweenInfos.twiceHalfOne),
 
 				[Children] = {
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
@@ -125,7 +127,7 @@ return function(plr: Player)
 								Name = "Bar",
 								BackgroundColor3 = fromRGB(217, 193, 144),
 								BackgroundTransparency = 0.2,
-								Size = Fusion.Tween(Fusion.Computed(function(use)
+								Size = Tween(Computed(function(use)
 									local x = clamp(use(self.playerData.EXP[1]) / use(self.playerData.EXP[2]), 0, 1)
 
 									return fromScale(x, 1)
@@ -200,14 +202,13 @@ return function(plr: Player)
 
 					CombatStyle(self, "Warrior"),
 					CombatStyle(self, "Archer"),
-					CombatStyle(self, "Wizard"),
 					CombatStyle(self, "Knight"),
 					CombatStyle(self, "Rogue"),
 				}
 			}),
 			Components.Frame({
 				Name = "Shadow",
-				BackgroundTransparency = Fusion.Tween(Fusion.Computed(function(use)
+				BackgroundTransparency = Tween(Computed(function(use)
 					return use(self.shadowTrans)
 				end), AssetBook.TweenInfos.twiceHalf),
 			})
@@ -257,12 +258,12 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	Hydrate(self.humanoid)({
-		[OnEvent("Touched")] = function(hit)
+	Fusion.Hydrate(self.humanoid)({
+		[Fusion.OnEvent("Touched")] = function(hit)
 			if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
 		end
 	})
-	Hydrate(plr)({
+	Fusion.Hydrate(plr)({
 		[AttributeChange("EXP")] = function(exp: number)
 			playerData.EXP[1]:set(exp)
 			playerData.EXP[2]:set(floor(peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)

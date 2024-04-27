@@ -18,7 +18,9 @@ local Events = {
 	ChangeMobTarget = Net("ChangeMobTarget"),
 	CharTakeDMG = Net("CharTakeDMG"),
 	ChangePlayerLocation = Net("ChangePlayerLocation"),
-	CastSkillRequest = Net("CastSkillRequest"),
+	CreateCombatBorder = Net("CreateCombatBorder"),
+	CameraPointTo = Net("CameraPointTo"),
+	ClassClientVFX = Net("ClassClientVFX"),
 	NewPhase = Net("NewPhase"),
 	NextActionRequest = Net("NextActionRequest"),
 	EquipItems = Net("EquipItems"),
@@ -27,7 +29,6 @@ local Events = {
 	FreezePlayerControls = Net("FreezePlayerControls"),
 	GiveDrop = Net("GiveDrop"),
 	LevelUp = Net("LevelUpVFX"),
-	MagicCasted = Net("MagicCasted"),
 	MobTakeDMG = Net("MobTakeDMG"),
 	NPCChat = Net("NPCChat"),
 	NPCChatEnded = Net("NPCChatEnded"),
@@ -37,7 +38,7 @@ local Events = {
 	RefreshBackpack = Net("RefreshBackpack"),
 	RejoinRequest = Net("RejoinRequest"),
 	SwitchScene = Net("SwitchScene"),
-	UseItemRequest = Net("UseItemRequest"),
+	UseItem = Net("UseItem"),
 	UpdatePinnedItems = Net("UpdatePinnedItems"),
 }
 

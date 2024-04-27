@@ -5,7 +5,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent :: Model
@@ -24,7 +23,7 @@ local function lookAt(target: Model)
 end
 
 local function slimeShot(target: Model)
-	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position + v3New(random(-30, 30), 0, random(-30, 30)))
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = char
@@ -33,11 +32,9 @@ local function slimeShot(target: Model)
 	blast.Parent = char.Holder.Value
 end
 
-local function slimeWave()
-	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position + v3New(random(-30, 30), 0, random(-30, 30)))
-
-	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, post)
-	char.PrimaryPart.Orientation *= v3New(0, 1, 1)
+local function slimeWave(target: Model)
+	lookAt(target)
+	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime2:Clone() :: Model
 	blast.Owner.Value = char
@@ -46,10 +43,7 @@ local function slimeWave()
 	blast.Parent = char.Holder.Value
 end
 
-local function attacking(monster: Model)
-	if not monster then return end
-	if monster ~= char then return end
-
+local function attackingCA()
 	wait(1)
 	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
 		local list = char.TargetingList:GetChildren()
@@ -80,7 +74,7 @@ local function attacking(monster: Model)
 			end
 		end
 
-		attacking()
+		attackingCA()
 	end
 end
-Signals.MobPhaseStart:Connect(attacking)
+attackingCA()

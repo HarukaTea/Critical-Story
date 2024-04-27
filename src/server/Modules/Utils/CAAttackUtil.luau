@@ -14,7 +14,7 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local AttackUtil = {}
+local CAAttackUtil = {}
 
 local wait = task.wait
 local insert = table.insert
@@ -27,7 +27,7 @@ local rad, floor = math.rad, math.floor
 --[[
     RNG this attack to be a critical attack, and return the result
 ]]
-function AttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, forceRarity: number?) : string
+function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, forceRarity: number?) : string
     local char = plr.Character
     local criChanceRarity = forceRarity or char:GetAttribute("CriChance")
 
@@ -62,15 +62,15 @@ end
 --[[
     Deal damage to monsters
 ]]
-function AttackUtil:DealDMG(plr: Player, monster: Model, dmg: number)
+function CAAttackUtil:DealDMG(plr: Player, monster: Model, dmg: number)
     ServerUtil:ShowNumber(monster, dmg, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
     HarukaLib:Add(monster, "Health", -dmg)
 
-    AttackUtil:CriticalHit(plr, monster, dmg)
+    CAAttackUtil:CriticalHit(plr, monster, dmg)
 end
 
 
-function AttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
+function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
 	HarukaLib:Add(char, "Combo", 1)
@@ -89,15 +89,15 @@ function AttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 			comboEff.Enabled = false
 		end)
 
-        AttackUtil:DealDMG(plr, monster, finalDamage)
+        CAAttackUtil:DealDMG(plr, monster, finalDamage)
 	else
-		AttackUtil:DealDMG(plr, monster, baseDamage)
+		CAAttackUtil:DealDMG(plr, monster, baseDamage)
 	end
 
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
+function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
     local arrow = RepS.Package.PlayerAttacks.ArrowOrb:Clone() :: Model
@@ -109,7 +109,7 @@ function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
 
     if char:GetAttribute("Arrows") > 0 then
         --- bow dmg
-        AttackUtil:DealDMG(plr, monster, baseDamage)
+        CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
         --- arrow dmg
         for i = char:GetAttribute("Arrows"), 1, -1 do
@@ -117,21 +117,16 @@ function AttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
 
             HarukaLib:Add(char, "Arrows", -1)
 
-            AttackUtil:DealDMG(plr, monster, baseDamage)
+            CAAttackUtil:DealDMG(plr, monster, baseDamage)
         end
         if char:GetAttribute("Arrows") <= 0 then char:SetAttribute("Arrows", 0) end
     else
-        AttackUtil:DealDMG(plr, monster, baseDamage)
+        CAAttackUtil:DealDMG(plr, monster, baseDamage)
     end
 
     SkillUtil:RestoreTPByOrb(plr)
 end
-function AttackUtil.PoisonArcher(plr: Player, monster: Model, baseDamage: number)
-    AttackUtil:DealDMG(plr, monster, baseDamage)
-
-    SkillUtil:Poison(plr, monster, 4)
-end
-function AttackUtil.ArcherArrow(plr: Player)
+function CAAttackUtil.ArcherArrow(plr: Player)
     local char = plr.Character
 
     HarukaLib:Add(char, "Arrows", 1)
@@ -141,27 +136,19 @@ function AttackUtil.ArcherArrow(plr: Player)
     end
 end
 
-function AttackUtil.Wizard(plr: Player, monster: Model)
-    local char = plr.Character
-    local magicDmg = char:GetAttribute("Magic")
+function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
+    HarukaLib:Add(plr.Character, "TP", 35)
 
-    HarukaLib:Add(char, "WizardCasted", 35)
-    AttackUtil:DealDMG(plr, monster, magicDmg)
-
-    if char:GetAttribute("WizardCasted") >= 100 then
-        char:SetAttribute("WizardCasted", 0)
-
-        RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
-    end
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
+function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
     HarukaLib:Add(char, "Guard", 15)
-    AttackUtil:DealDMG(plr, monster, baseDamage)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     if char:GetAttribute("Guard") > 100 then
         char:SetAttribute("Guard", 100)
@@ -170,27 +157,27 @@ function AttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
+function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
     HarukaLib:Add(char, "RogueCritical", 10)
-    AttackUtil:DealDMG(plr, monster, baseDamage)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     if char:GetAttribute("RogueCritical") > 100 then
         char:SetAttribute("RogueCritical", 100)
     end
 
     --- extra critical hit roll cuz it's rogue class
-    local result = AttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCritical"))
+    local result = CAAttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCritical"))
 
     if result == "CriticalHit" then char:SetAttribute("RogueCritical", 0) end
 
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
+function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
     if not orb:GetAttribute("RepeaterSpawned") then
-        local pos = ServerUtil:GenerateOrbPos(monster, plr.Character)
+        local pos = ServerUtil:GenerateOrbPos(monster)
         local repeaterOrb = RepS.Package.PlayerAttacks.RepeaterOrb:Clone() :: Model
 
         repeaterOrb.Owner.Value = plr.Character
@@ -220,11 +207,11 @@ function AttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, or
         end)
     end
 
-    AttackUtil:DealDMG(plr, monster, baseDamage)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
+function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
     SkillUtil:RestoreTPByOrb(plr)
 
     Spawn(function()
@@ -246,7 +233,7 @@ function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
 
         Spawn(function()
             for _ = 1, #strikerOrbs do
-                AttackUtil:DealDMG(plr, monster, baseDamage)
+                CAAttackUtil:DealDMG(plr, monster, baseDamage)
                 wait(0.3)
             end
         end)
@@ -281,34 +268,30 @@ function AttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
     end)
 end
 
-function AttackUtil.AlchemistRed(plr: Player, monster: Model)
-    local magicDmg = plr.Character:GetAttribute("Magic")
-    AttackUtil:DealDMG(plr, monster, magicDmg)
+function CAAttackUtil.AlchemistRed(plr: Player, monster: Model, baseDamage: number)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     SkillUtil:RestoreTPByOrb(plr)
 end
-function AttackUtil.AlchemistBlue(plr: Player, monster: Model)
-    local magicDmg = plr.Character:GetAttribute("Magic")
-    AttackUtil:DealDMG(plr, monster, magicDmg)
+function CAAttackUtil.AlchemistBlue(plr: Player, monster: Model, baseDamage: number)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     SkillUtil:RestoreTPByOrb(plr)
 end
-function AttackUtil.AlchemistGreen(plr: Player, monster: Model)
-    local magicDmg = plr.Character:GetAttribute("Magic")
-    AttackUtil:DealDMG(plr, monster, magicDmg)
+function CAAttackUtil.AlchemistGreen(plr: Player, monster: Model, baseDamage: number)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.Illusionist(plr: Player, monster: Model)
-    local magicDmg = plr.Character:GetAttribute("Magic")
-    AttackUtil:DealDMG(plr, monster, magicDmg)
+function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: number)
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     SkillUtil:RestoreTPByOrb(plr)
 end
 
-function AttackUtil.FireStaff(plr: Player, monster: Model)
+function CAAttackUtil.FireStaff(plr: Player, monster: Model)
     SkillUtil:Burn(plr, monster, 6)
 end
 
-return AttackUtil
+return CAAttackUtil

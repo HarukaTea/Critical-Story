@@ -2,100 +2,170 @@
 --!optimize 2
 --!native
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local AttackUtil = require(SSS.Modules.Utils.AttackUtil)
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
+local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local Future = require(RepS.Modules.Packages.Future)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
-local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local Signals = require(SSS.Modules.Data.ServerSignals)
 
 local floor, random = math.floor, math.random
 local fromRGB = Color3.fromRGB
 local wait = task.wait
+local insert = table.insert
+local cfNew = CFrame.new
+local v3New = Vector3.new
 
 --[[
-    So mob is ready to combat too
+    mob is ready to combat
 ]]
-local function turnBaseCombatStart(monster: Model)
+local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
     if not monster then return end
     if not monster:FindFirstChild("TargetingList") then return end
 
-	--// Player phase
-	wait(0.6)
-	for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-		if not plr then continue end
-
-		plr:SetAttribute("NextAction", "")
-
-		Events.FreezePlayerControls:Fire(plr, "Unfreeze")
-		Events.NewPhase:Fire(plr, "Combat")
-		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.PlayerPhaseStart)
-	end
-
-	--// Wait
-	local function _playerAllDoneCheck() : boolean
-		local check = true
-
-		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-			if not plr then continue end
-			if plr:GetAttribute("NextAction") == "" then check = false end
-		end
-
-		return check
-	end
-	repeat wait() until _playerAllDoneCheck()
-
-	--// Player execution phase
-	for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-		if not plr then continue end
-
-		Events.NewPhase:Fire(plr, "Execution")
-		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
-
-		Spawn(function()
-			local nextAction = plr:GetAttribute("NextAction") :: string
-			if nextAction == "Attack" then
-				plr.Character:SetAttribute("AttackingTime", true)
-
-				wait(6)
-				if plr and plr.Character then plr.Character:SetAttribute("AttackingTime", false) end
-
-			elseif nextAction == "Items" then
-
-			elseif nextAction == "Skills" then
-
-			else
-				SkillUtil:DefenseBuff(plr, 30, 1)
-			end
-		end)
-	end
-
-	wait(6)
-	--// Mob phase
+	local cage = monster.CageHolder.Value :: Model
 	local locator: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
 
-	for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-		if not plr then continue end
+	pcall(function()
+		if isFirstRound then
+			local mobs = {}
+			for _, mob in locator:GetDescendants() do
+				if mob:HasTag("Monster") and mob.PrimaryPart then mobs[#mobs + 1] = mob end
+			end
 
-		Events.NewPhase:Fire(plr, "Mob")
-		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.MobPhaseStart)
-		Events.FreezePlayerControls:Fire(plr, "Freeze")
-	end
-	if locator:FindFirstChildOfClass("Part") then
-		for _, subMonster in locator:GetDescendants() do
-			if subMonster:HasTag("Monster") and subMonster:GetAttribute("SubMonster") then
-				Signals.MobPhaseStart:Fire(subMonster)
+			ServerUtil:SortMonsters(mobs, cage)
+		end
+
+		--// Player phase
+		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
+			if not plr then continue end
+
+			Events.FreezePlayerControls:Fire(plr, "Freeze")
+			Events.CameraPointTo:Fire(plr, cage.Cam)
+		end
+		ServerUtil:SortPlayers(ServerUtil:GetPlayersByMonster(monster), monster, cage)
+
+		wait(2)
+		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
+			if not plr then continue end
+
+			plr:SetAttribute("NextAction", "")
+			plr:SetAttribute("NextItem", nil)
+
+			Events.NewPhase:Fire(plr, if isFirstRound then "Combat" else "Player")
+			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.PlayerPhaseStart)
+		end
+
+		--// Wait
+		local maxTimeOut = 15
+		local function _playerAllDoneCheck() : boolean
+			local check = true
+
+			for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
+				if not plr then continue end
+				if plr:GetAttribute("NextAction") == "" then check = false break end
+			end
+
+			return check
+		end
+		repeat wait(1) maxTimeOut -= 1 until _playerAllDoneCheck() or maxTimeOut <= 0
+
+		--// Player execution phase
+		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
+			if not plr then continue end
+
+			Events.NewPhase:Fire(plr, "Execution")
+			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
+
+			Spawn(function()
+				wait(0.5)
+				local nextAction = plr:GetAttribute("NextAction") :: string
+
+				if nextAction == "Attack" then
+					CSAttackUtil[plr:GetAttribute("Class")](plr)
+
+				elseif nextAction == "Items" then
+					local item = plr:GetAttribute("NextItem") :: string
+					if not item then return end
+
+					Signals.UseItem:Fire(plr, item)
+
+				else
+					--- pass or defend
+					plr:SetAttribute("NextAction", "Defend")
+
+					SkillUtil:DefenseBuff(plr, 30, 1)
+					SkillUtil:RestoreTP(plr, 30)
+				end
+			end)
+		end
+
+		wait(2)
+		--// Mob phase
+		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
+			if not plr then continue end
+
+			local char = plr.Character
+
+			char.Humanoid.AutoRotate = true
+
+			Events.NewPhase:Fire(plr, "Mob")
+			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.MobPhaseStart)
+			Events.CreateCombatBorder:Fire(plr, "Create", locator)
+			Events.CameraPointTo:Fire(plr, "Reset")
+			Events.FreezePlayerControls:Fire(plr, "Unfreeze")
+
+			char:SetAttribute("OrbAttackingTime", true)
+		end
+		for _, mob in locator:GetDescendants() do
+			if mob:HasTag("Monster") and mob.PrimaryPart then mob.Attack.Disabled = false end
+		end
+
+		--// Prepare to end
+		wait(13)
+		for _, mob in locator:GetDescendants() do
+			if mob:HasTag("Monster") and mob.PrimaryPart then mob.Attack.Disabled = true end
+		end
+
+		--// End mob phase
+		wait(2)
+		local attacks, mobs = {}, {}
+		for _, mob in locator:GetDescendants() do
+			if mob:HasTag("Monster") and mob.PrimaryPart then
+				if not mob:FindFirstChild("Holder") then continue end
+				if not mob.Holder.Value then continue end
+
+				for _, attack: Instance in mob.Holder.Value:GetDescendants() do
+					if attack:IsA("BasePart") then
+						if attack.Transparency < 1 then insert(attacks, attack) end
+					end
+					attack:RemoveTag("MonsterDMG")
+				end
+
+				mobs[#mobs + 1] = mob
 			end
 		end
-	end
+		ServerUtil:SortMonsters(mobs, cage)
 
-	turnBaseCombatStart(locator:FindFirstChildWhichIsA("Model", true))
+		for _, plr in ServerUtil:GetPlayersByMonster(monster) do
+			if not plr then continue end
+
+			Events.CreateCombatBorder:Fire(plr, "Destroy")
+			Events.ClientTween:Fire(plr, attacks, { Transparency = 1 }, "one")
+
+			plr.Character:SetAttribute("OrbAttackingTime", false)
+		end
+
+		turnBaseCombatRound(locator:FindFirstChildWhichIsA("Model", true))
+	end)
 end
 
 --[[
@@ -105,23 +175,55 @@ local function combatStartSetup(plr: Player, monster: Model)
 	--- if monster was occupied by another player, we will return it
 	if monster:GetAttribute("InCombat") then return end
 
-	ServerUtil:AddTargetForMonster(plr, monster)
-	ServerUtil:MonsterActivateCombat(monster)
+	local locator: BasePart = monster.Parent
+	local combatMode = plr:GetAttribute("CombatMode") :: string
 
-	--- sub-monster exist
-	if monster.Parent:FindFirstChildOfClass("Part") then
-		for _, subMonster in monster.Parent:GetDescendants() do
-			if subMonster:HasTag("Monster") and subMonster:GetAttribute("SubMonster") then
-				ServerUtil:AddTargetForMonster(plr, subMonster)
+	if combatMode == "Public" then
+		monster:SetAttribute("InCombat", true)
 
-				if not subMonster:GetAttribute("InCombat") then
-					ServerUtil:MonsterActivateCombat(subMonster)
+		local char = plr.Character
+		char:PivotTo(cfNew(locator.Position + v3New(0, 8, 0)))
+		char.PrimaryPart.Anchored = true
+
+		local border = RepS.Package.Unloads.PublicBorder:Clone() :: Model
+		border:PivotTo(cfNew(locator.Position))
+		border.Parent = char
+
+		wait(5)
+		if not char then monster:SetAttribute("InCombat", false) return end
+		if not char.PrimaryPart then monster:SetAttribute("InCombat", false) return end
+
+		local maxPlayer = 0
+		for _, player: Player in Players:GetPlayers() do
+			if not player then continue end
+			if not player.Character then continue end
+			if not player.Character.PrimaryPart then continue end
+			if maxPlayer >= 4 then break end
+			if player == plr then continue end
+
+			if (player.Character.PrimaryPart.Position - locator.Position).Magnitude <= 22 then
+				maxPlayer += 1
+
+				for _, mob in locator:GetDescendants() do
+					if mob:HasTag("Monster") and mob.PrimaryPart then ServerUtil:AddTargetForMonster(player, mob) end
 				end
 			end
 		end
+
+		border:Destroy()
+		char.PrimaryPart.Anchored = false
 	end
 
-	turnBaseCombatStart(monster)
+	for _, mob in locator:GetDescendants() do
+		if mob:HasTag("Monster") and mob.PrimaryPart then
+			ServerUtil:AddTargetForMonster(plr, mob)
+
+			if combatMode == "Public" then ServerUtil:MonsterActivateCombat(mob) continue end
+			if not mob:GetAttribute("InCombat") then ServerUtil:MonsterActivateCombat(mob) end
+		end
+	end
+
+	turnBaseCombatRound(monster, true)
 end
 Events.CombatStart:Connect(combatStartSetup)
 
@@ -144,8 +246,15 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then return end
 
 	local monster = char.CharStats.TargetMonster.Value :: Model
-	local atk = char:GetAttribute("ATKDMG") :: number
-	local baseDamage = random(floor(atk * 0.9), floor(atk * 1.1))
+	local class = orb:GetAttribute("Style") :: string
+	local dmgType = if orb:GetAttribute("IsNotDMG") then "DMG" else AssetBook.ClassInfo[class].Type
+	local baseDamage = 0
+	if dmgType == "DMG" then
+		local minDMG: number, maxDMG: number = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")
+		baseDamage = if minDMG >= maxDMG then maxDMG else random(minDMG, maxDMG)
+	else
+		baseDamage = char:GetAttribute("Magic")
+	end
 
 	orb.Owner:Destroy()
 
@@ -168,7 +277,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 
 	local subStyle = orb:GetAttribute("SubStyle") :: string?
 	local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
-	if AttackUtil[style] then AttackUtil[style](plr, monster, baseDamage, orb) end
+	if CAAttackUtil[style] then CAAttackUtil[style](plr, monster, baseDamage, orb) end
 
 	orb:Destroy()
 end
@@ -258,9 +367,10 @@ Events.CharTakeDMG:Connect(charTakeDMG)
 --[[
 	Player request to do next action
 ]]
-local function nextActionRequest(plr: Player, action: string)
+local function nextActionRequest(plr: Player, action: string, extra: string?)
 	if plr:GetAttribute("NextAction") ~= "" then return end
+	if action == "Items" then plr:SetAttribute("NextItem", extra) end
 
-	plr:SetAttribute("NextAction", "Attack")
+	plr:SetAttribute("NextAction", action)
 end
 Events.NextActionRequest:Connect(nextActionRequest)

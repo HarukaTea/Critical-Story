@@ -46,8 +46,9 @@ local function PassiveSlot(id: string, self: table): Frame
 		[Fusion.Children] = {
 			Components.RoundUICorner(),
 			Components.UIStroke({
-				Thickness = 3,
+				Thickness = 2.7,
 				Enabled = true,
+
 				Transparency = Fusion.Tween(Fusion.Computed(function(use)
 					return use(STROKES_TRANS[id])
 				end), AssetBook.TweenInfos.twiceHalf)
@@ -69,7 +70,7 @@ local function PassiveSlot(id: string, self: table): Frame
 				Visible = if UIS.TouchEnabled then false else true,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
-					STROKES_TRANS[id]:set(0)
+					STROKES_TRANS[id]:set(0.3)
 				end,
 				[Fusion.OnEvent("MouseLeave")] = function()
 					STROKES_TRANS[id]:set(1)

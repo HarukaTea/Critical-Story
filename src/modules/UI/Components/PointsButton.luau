@@ -20,17 +20,20 @@ local upper = string.upper
 local fontFromName = Font.fromName
 
 local COLORS = {
-	ATK = fromRGB(255, 0, 0),
+	DMG = fromRGB(255, 0, 0),
+	Magic = fromRGB(170, 170, 255),
 	Health = fromRGB(85, 255, 0),
 	Shield = fromRGB(255, 255, 0),
 }
 local POS = {
-	ATK = fromScale(0.72, 0.566),
+	DMG = fromScale(0.721, 0.566),
+	Magic = fromScale(0.106, 0.556),
 	Health = fromScale(0.162, 0.125),
 	Shield = fromScale(0.162, 0.847),
 }
 local POINTS = {
-	ATK = "ATKPoints",
+	DMG = "DMGPoints",
+	Magic = "MagicPoints",
 	Health = "HealthPoints",
 	Shield = "ShieldPoints",
 }
@@ -53,7 +56,11 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 				TextXAlignment = if direction == "Left" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				TextColor3 = COLORS[id],
                 Text = Computed(function(use)
-					return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
+					if id ~= "DMG" then
+						return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
+					else
+						return "DMG: "..use(self.playerData[id]).." ("..use(self.charData.MinDMG).."-"..use(self.charData.MaxDMG)..")"
+					end
 				end)
 			}),
 			Components.TextButton({
@@ -99,7 +106,7 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 
 						Color = Tween(Computed(function(use)
 							return if use(bgColors[1]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
-						end))
+						end), AssetBook.TweenInfos.twiceHalf)
 					})
 				}
 			}),

@@ -23,12 +23,15 @@ for i = 1, 5 do
 				return
 			end
 
-			local post = ServerUtil:FindPartOnRay(child.Position + v3New(0, 10, 0), { model })
+			local post = ServerUtil:FindPartOnRay(child.Position + v3New(0, 10, 0))
 
 			local blast = model.Projectile.Value:Clone() :: Model
 			blast.Owner.Value = model.Owner.Value
 			blast:PivotTo(cfNew(post, post + child.CFrame.LookVector))
+
 			blast:SetAttribute("SlimeWaveProjectile", true)
+			if model:HasTag("TurnBase") then blast:AddTag("TurnBase") end
+
 			blast.Parent = char.Holder.Value
 			for _, descendant in blast:GetDescendants() do
 				if descendant:IsA("BasePart") then

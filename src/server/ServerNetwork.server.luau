@@ -258,7 +258,6 @@ Events.EquipItems:Connect(equipItem)
 local function essentialCheck(plr: Player, item: string) : string
 	if plr.Inventory:FindFirstChild(item)
 		and plr.Inventory[item].Value > 0
-		and plr.Inventory[item]:GetAttribute("Equipped")
 	then
 		return "Exist"
 	else
@@ -267,12 +266,15 @@ local function essentialCheck(plr: Player, item: string) : string
 end
 local function useItem(plr: Player, item: string)
 	if RepS.Resources.Items:FindFirstChild(item) and essentialCheck(plr, item) == "Exist" then
-		if plr.Character.CharStats.Items:FindFirstChild(item) then return end
+		local charStats = plr.Character.CharStats
 
-		RepS.Resources.Items[item]:Clone().Parent = plr.Character.CharStats.Items
+		if charStats.Items:FindFirstChild(item) then return end
+
+		RepS.Resources.Items[item]:Clone().Parent = charStats.Items
 	end
 end
-Events.UseItemRequest:Connect(useItem)
+Events.UseItem:Connect(useItem)
+Signals.UseItem:Connect(useItem)
 
 --[[
 	Handle the request from player to pin an item

@@ -29,12 +29,12 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 		[Fusion.AttributeChange("Equipped")] = function(state: boolean)
 			equipped:set(state)
 
-			peek(self.btnsFrame.Right).Equip.Text = if state then "Unequip" else "Equip"
+			peek(self.btnsFrame.Right).Equip.Text = if state then "UNEQUIP" else "EQUIP"
 		end,
 		[Fusion.AttributeChange("Pinned")] = function(state: boolean)
 			pinned:set(state)
 
-			peek(self.btnsFrame.Right).Pin.Text = if state then "Unpin" else "Pin"
+			peek(self.btnsFrame.Right).Pin.Text = if state then "UNPIN" else "PIN"
 		end
 	})
 
@@ -145,9 +145,9 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			itemDescFrame.ItemTier.TextColor3 = AssetBook.TierColor[AssetBook.Items.ItemTier[item]]
 
 			btnsFrame.Equip.Visible = if itemType ~= "Material" then true else false
-			btnsFrame.Equip.Text = if peek(equipped) then "Unequip" else "Equip"
+			btnsFrame.Equip.Text = if peek(equipped) then "UNEQUIP" else "EQUIP"
 			btnsFrame.Pin.Visible = true
-			btnsFrame.Pin.Text = if peek(pinned) then "Unpin" else "Pin"
+			btnsFrame.Pin.Text = if peek(pinned) then "UNPIN" else "PIN"
 			btnsFrame.Pin.Size = if btnsFrame.Equip.Visible
 				then fromScale(0.116, 1)
 				else fromScale(0.237, 1)

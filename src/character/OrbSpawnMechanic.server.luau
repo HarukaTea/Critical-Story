@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local Clock = require(RepS.Modules.Packages.Clock)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -16,16 +17,17 @@ local plr = Players:GetPlayerFromCharacter(char)
 local random = math.random
 
 --// Connections
+local stopSpawn = nil
 local function orbSpawnHandler(state: boolean)
     local orbFolders = workspace.MapComponents.OrbFolders :: Folder
 
     local function _placeOrb(orb: Model, pos: CFrame)
         orb.Owner.Value = char
         orb:PivotTo(pos)
-        orb:SetAttribute("OrbLifeTime", 6)
+        orb:SetAttribute("OrbLifeTime", 4)
         orb.Parent = orbFolders[char.Name]
 
-        Debris:AddItem(orb, 6)
+        Debris:AddItem(orb, 4)
     end
     local function _spawnOrb(isSpawned: boolean?)
         local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
@@ -35,8 +37,6 @@ local function orbSpawnHandler(state: boolean)
             local orb
             if class == "Alchemist" then
                 orb = orbAttack["AlchemistOrb" .. random(1, 3)]:Clone() :: Model
-            elseif class == "Archer" then
-                orb = if random(1, 2) == 1 then orbAttack.ArcherOrb:Clone() else orbAttack.ArrowOrb:Clone()
             else
                 orb = orbAttack[class .. "Orb"]:Clone() :: Model
             end
@@ -53,15 +53,19 @@ local function orbSpawnHandler(state: boolean)
         end
     end
 
-    if state and char:GetAttribute("InCombat") then
-        for _ = 1, char:GetAttribute("OrbSpawnAmount") do
-            _spawnOrb()
-        end
+    if state then
+        local spawnTime = char:GetAttribute("OrbSpawnTime") :: number
+
+		stopSpawn = Clock(spawnTime, function()
+			if char:GetAttribute("OrbSpawnTime") then _spawnOrb() end
+		end)
+	else
+		if stopSpawn then stopSpawn() end
+
+        stopSpawn = nil
 	end
 end
 
 Fusion.Hydrate(char)({
-    [Fusion.AttributeChange("AttackingTime")] = function(newState: boolean)
-        orbSpawnHandler(newState)
-    end
+    [Fusion.AttributeChange("OrbAttackingTime")] = orbSpawnHandler
 })

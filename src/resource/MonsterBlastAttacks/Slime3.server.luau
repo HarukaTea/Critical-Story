@@ -23,6 +23,9 @@ for i = 1,2 do
 			local blast = model.Projectile.Value:Clone() :: Model
 			blast.Owner.Value = model.Owner.Value
 			blast:PivotTo(cfNew(post, post + child.CFrame.LookVector))
+
+			if model:HasTag("TurnBase") then blast:AddTag("TurnBase") end
+
 			blast.Parent = char.Holder.Value
 
 			for _, descendant in blast:GetDescendants() do

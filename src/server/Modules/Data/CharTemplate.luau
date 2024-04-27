@@ -4,21 +4,25 @@
 
 return {
     --- Stats
-    ATKDMG = 0,
+    MinDMG = 5,
+    MaxDMG = 15,
+    Magic = 10,
     TP = 0,
     Shield = 0,
     MaxShield = 5,
     Defense = 0,
-    OrbSpawnAmount = 2,
+    OrbSpawnTime = 10,
 
     --- States
     InCombat = false,
-    AttackingTime = false,
+    OrbAttackingTime = false,
 
     --- Buffes
     HealthBuff = 0,
     JumpBuff = 0,
-    ATKDMGBuff = 0,
+    MinDMGBuff = 0,
+    MaxDMGBuff = 0,
+    MagicBuff = 0,
     ShieldBuff = 0,
     SpeedBuff = 0,
     RestoreBuff = 10,

@@ -60,6 +60,7 @@ local function StatBar(id: string, self: table): Frame
 			Components.UIStroke({
 				Thickness = 2.5,
 				Enabled = true,
+
 				Transparency = Tween(Computed(function(use)
 					return use(STROKES_TRANS[id])
 				end), AssetBook.TweenInfos.twiceHalf)
@@ -90,7 +91,7 @@ local function StatBar(id: string, self: table): Frame
 				ZIndex = 2,
 
 				[OnEvent("MouseEnter")] = function()
-					STROKES_TRANS[id]:set(0)
+					STROKES_TRANS[id]:set(0.3)
 				end,
 				[OnEvent("MouseLeave")] = function()
 					STROKES_TRANS[id]:set(1)

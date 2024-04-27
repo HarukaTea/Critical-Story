@@ -60,25 +60,22 @@ return function(plr: Player)
 						Name = "List",
 						ClipsDescendants = true,
 						AnchorPoint = v2New(),
-						Position = Fusion.Tween(Computed(function(use)
-							return if use(self.isOpen) then fromScale(0.87, 0) else fromScale(1.2, 0)
-						end), AssetBook.TweenInfos.half),
 						Size = fromScale(0.118, 3),
 						ZIndex = 2,
 						ScrollingDirection = Enum.ScrollingDirection.Y,
+
+						Position = Fusion.Tween(Computed(function(use)
+							return if use(self.isOpen) then fromScale(0.87, 0) else fromScale(1.2, 0)
+						end), AssetBook.TweenInfos.half),
 						CanvasSize = Computed(function(use)
-							if use(self.absContentSize) > use(self.absSize) then
-								return fromOffset(0, use(self.absContentSize))
-							else
-								return fromOffset(0, 0)
-							end
+							return if use(self.absContentSize) > use(self.absSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
 						end),
 						ScrollingEnabled = Computed(function(use)
 							return if use(self.absContentSize) > use(self.absSize) then true else false
 						end),
 
 						[Fusion.Ref] = self.list,
-						[Fusion.OnChange("AbsoluteSize")] = function(newSize)
+						[Fusion.OnChange("AbsoluteSize")] = function(newSize: Vector2)
 							self.absSize:set(newSize.Y)
 						end,
 

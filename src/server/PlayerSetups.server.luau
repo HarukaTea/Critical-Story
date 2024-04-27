@@ -203,7 +203,7 @@ local function clear(plr: Player)
 	--- check if player is combating
 	Spawn(function()
 		for _, monster in workspace.Monsters:GetDescendants() do
-			if monster:GetAttribute("IsEnemy") then
+			if monster:HasTag("Monster") then
 				if monster.TargetingList:FindFirstChild(plr.Name) then
 					monster.TargetingList[plr.Name]:Destroy()
 

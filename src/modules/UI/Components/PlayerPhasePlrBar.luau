@@ -14,7 +14,6 @@ local Children, Tween, Computed, New, OnEvent, Value =
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
-local fontFromName = Font.fromName
 local fromRGB = Color3.fromRGB
 local udimNew = UDim.new
 local clamp = math.clamp
@@ -89,7 +88,6 @@ local function PlayerPhasePlrBar(char: Model, self: table) : Frame
                         Position = fromScale(0.117, 0.1),
                         Size = fromScale(0.634, 0.35),
                         Text = plr.DisplayName,
-                        FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                         TextXAlignment = Enum.TextXAlignment.Right,
                         TextColor3 = AssetBook.ClassInfo[plr:GetAttribute("Class")].Color
                     }),
@@ -108,6 +106,9 @@ local function PlayerPhasePlrBar(char: Model, self: table) : Frame
 
                             elseif nextAction == "Attack" then
                                 return AssetBook.ClassInfo[plr:GetAttribute("Class")].Image
+
+                            elseif nextAction == "Items" then
+                                return AssetBook.Items.ItemImages[plr:GetAttribute("NextItem")]
 
                             else
                                 return AssetBook.ActionPanelIcons[nextAction]
@@ -147,8 +148,8 @@ local function PlayerPhasePlrBar(char: Model, self: table) : Frame
                     Fusion.New("Frame")({
                         Name = "HP",
                         BackgroundColor3 = fromRGB(),
-                        Position = fromScale(0.12, 0.55),
-                        Size = fromScale(0.625, 0.3),
+                        Position = fromScale(0.12, 0.53),
+                        Size = fromScale(0.625, 0.35),
 
                         [Children] = {
                             Components.RoundUICorner(),
@@ -178,7 +179,6 @@ local function PlayerPhasePlrBar(char: Model, self: table) : Frame
                                 Name = "Stat",
                                 Size = fromScale(1, 1),
                                 ZIndex = 2,
-                                FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Right,
                                 Text = Computed(function(use)
@@ -194,7 +194,6 @@ local function PlayerPhasePlrBar(char: Model, self: table) : Frame
                                 Text = "HP",
                                 Size = fromScale(1, 1),
                                 ZIndex = 2,
-                                FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Left,
 

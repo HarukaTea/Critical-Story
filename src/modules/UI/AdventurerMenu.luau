@@ -33,6 +33,7 @@ return function(plr: Player)
 	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
 	self.UI = Fusion.Value()
+	self.chosenFilter = Fusion.Value("Character")
 
 	Components.ScreenGui({
 		Name = "AdventurerMenu",
@@ -65,7 +66,7 @@ return function(plr: Player)
 			}),
 		},
 	})
-	repeat wait() until plr.PlayerGui:WaitForChild("Backpack")
+	repeat wait() until plr.PlayerGui:WaitForChild("Backpack", 999)
 
 	--// Action bindings
 	local function _openMenu(_, inputState: Enum.UserInputState)

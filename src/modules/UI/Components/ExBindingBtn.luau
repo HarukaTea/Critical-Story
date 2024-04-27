@@ -34,6 +34,7 @@ local function ExCharButton(id: string, self: table): Frame
 			Position = fromScale(0.65, 0),
 			Size = fromScale(0.4, 0.4),
 			ZIndex = 3,
+
 			Visible = Computed(function(use)
 				return if use(self.playerData.LvPoints) > 0 then true else false
 			end),
@@ -64,8 +65,9 @@ local function ExCharButton(id: string, self: table): Frame
 		[Children] = {
 			Components.RoundUICorner(),
 			Components.UIStroke({
-				Thickness = 3,
+				Thickness = 2.7,
 				Enabled = true,
+
 				Transparency = Fusion.Tween(Computed(function(use)
 					return use(STROKES_TRANS[id])
 				end), AssetBook.TweenInfos.twiceHalf)
@@ -82,7 +84,7 @@ local function ExCharButton(id: string, self: table): Frame
 				ZIndex = 3,
 
 				[OnEvent("MouseEnter")] = function()
-					STROKES_TRANS[id]:set(0)
+					STROKES_TRANS[id]:set(0.3)
 				end,
 				[OnEvent("MouseLeave")] = function()
 					STROKES_TRANS[id]:set(1)

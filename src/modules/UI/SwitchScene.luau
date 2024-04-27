@@ -16,16 +16,16 @@ local ud2New = UDim2.new
 local fromOffset, fromScale = UDim2.fromOffset, UDim2.fromScale
 local v2New = Vector2.new
 local wait = task.wait
+local fromRGB = Color3.fromRGB
 
 return function (plr: Player)
     local bgPos = Value(fromScale(1.7, 1.7))
-	local isSwitching = Value(false)
 
 	local char = plr.Character or plr.CharacterAdded:Wait()
 
 	local function createBackendFrame(props: table)
 		local defaultProps = {
-			BackgroundColor3 = Color3.fromRGB(),
+			BackgroundColor3 = fromRGB(),
 			ZIndex = 20,
 		}
 		for i, v in pairs(props) do defaultProps[i] = v end
@@ -48,9 +48,6 @@ return function (plr: Player)
 				Size = Fusion.Tween(Fusion.Computed(function(use)
                     return use(bgPos)
                 end), AssetBook.TweenInfos.half),
-				Visible = Fusion.Computed(function(use)
-					return use(isSwitching)
-				end),
 
 				[Children] = {
 					createBackendFrame({
@@ -93,16 +90,10 @@ return function (plr: Player)
 
     --// Connections
     local function switching(duration: number)
-        if Fusion.peek(isSwitching) then return end
-
-        isSwitching:set(true)
         bgPos:set(fromScale(0, 0))
 
         wait(duration)
         bgPos:set(fromScale(1.7, 1.7))
-
-		wait(0.5)
-		isSwitching:set(false)
     end
     Events.SwitchScene:Connect(switching)
     Signals.SwitchScene:Connect(switching)

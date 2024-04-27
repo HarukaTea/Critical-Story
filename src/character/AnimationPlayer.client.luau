@@ -10,6 +10,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local char = script.Parent :: Model
 local humanoid = char.Humanoid :: Humanoid
 local animator = humanoid.Animator :: Animator
+
 local animations = RepS.Package.Animations :: Folder
 
 local anims = {
@@ -26,10 +27,7 @@ local anims = {
 	StrikerAnim1 = animator:LoadAnimation(animations.StrikerAttack),
 	AlchemistAnim2 = animator:LoadAnimation(animations.AlchemistAttack),
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
-	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2),
-
-	FireStaffAnim1 = animator:LoadAnimation(animations.WizardAttack),
-	FireStaffAnim2 = animator:LoadAnimation(animations.WizardAttack2),
+	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2)
 }
 -- Prevent animation duplication, but re-edit the table will cause table rehash?
 anims.RogueAnim1 = anims.WarriorAnim1
@@ -43,6 +41,8 @@ anims.FireStaffAnim2 = anims.WizardAnim2
 
 --// Connections
 local function playAnim(anim: string)
+	if not anims[anim] then return end
+
 	anims[anim]:Play()
 end
 Events.PlayAnimation:Connect(playAnim)

@@ -104,25 +104,25 @@ end
 --[[
 	Equip cosmetics, just like equip weapons, you can pass a cosmetic to force equip
 ]]
-function ServerUtil:EquipCosmetics(char: Model, forceCosmetic: string?)
+function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
 	local plr = Players:GetPlayerFromCharacter(char)
-	local cosmetic = forceCosmetic or plr:GetAttribute("Cosmetic")
+	local class = forceArmor or plr:GetAttribute("Class")
 
     if char.Humanoid.Health > 0 then
         if char:FindFirstChild("Armor") then char.Armor:Destroy() end
 		for _, child in char:GetChildren() do
-			if child:GetAttribute("Weapon") then child:Destroy() end
+			if child:HasTag("Weapon") then child:Destroy() end
 		end
 
-		local armor = RepS.Package.Items.Cosmetics[cosmetic]:Clone() :: Model
+		local armor = RepS.Package.Armors[class]:Clone() :: Model
         local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg" }
 
         --- wait character fully loads
         for _, part in equipList do char:WaitForChild(part, 999) end
 
 		--- equip armor
-        for _, part in equipList do
-            for _, child in armor[part]:GetChildren() do
+		local function _equipArmorPart(part: string)
+			for _, child in armor[part]:GetChildren() do
                 if child.Name ~= "Middle" then
                     local weldC = instanceNew("WeldConstraint")
                     weldC.Part0 = child.Parent.Middle
@@ -132,22 +132,34 @@ function ServerUtil:EquipCosmetics(char: Model, forceCosmetic: string?)
             end
 
             local weld = instanceNew("Weld")
-            weld.Part0 = char:FindFirstChild(part)
+            weld.Part0 = char:FindFirstChild(if part == "Extra" then "Torso" else part)
             weld.Part1 = armor[part].Middle
             weld.Parent = armor
+		end
+        for _, part in equipList do
+			if not armor:FindFirstChild(part) then continue end
+
+            _equipArmorPart(part)
         end
 
-        armor.Name = "Armor"
+		--- equip weapon
+		local function _weldWeapon(weapon: string, part: string)
+			if not armor:FindFirstChild(weapon) then return end
+
+			local realWeapon = armor[weapon]:Clone() :: Model
+			ServerUtil:WeldPart(char[part.." Arm"], realWeapon)
+
+			realWeapon:AddTag("Weapon")
+			realWeapon.Parent = char
+		end
+		_weldWeapon("HandleLeft", "Left")
+		_weldWeapon("HandleRight", "Right")
+
+		-- equip extra
+		if armor:FindFirstChild("Extra") then _equipArmorPart("Extra") end
+
+		armor.Name = "Armor"
         armor.Parent = char
-
-		local leftWeapon = armor.WeaponLeft:Clone() :: Model
-		local rightWeapon = armor.WeaponRight:Clone() :: Model
-
-		ServerUtil:WeldPart(char["Left Arm"], leftWeapon)
-		ServerUtil:WeldPart(char["Right Arm"], rightWeapon)
-
-		leftWeapon.Parent = char
-		rightWeapon.Parent = char
     end
 end
 
@@ -171,7 +183,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", floor(level ^ 2.2) + 99)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2.2) + 49)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
 	monster:SetAttribute("EXP", (floor(level ^ 1.25) + 25) * if workspace:GetAttribute("2XEXPEvent") then 2 else 1)
 	monster:SetAttribute("Damage", 5 * level)
@@ -214,7 +226,16 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 
 	monster.Holder.Value = folder
 	monster.MonsterHP.Disabled = false
-	monster.Attack.Disabled = false
+
+	if not monster:GetAttribute("SubMonster") then
+		local cageArea = RepS.Package.Unloads.CombatCage:Clone() :: Model
+		cageArea:PivotTo(monster.Parent.CFrame)
+		cageArea.Parent = workspace.MapComponents.CageFolders
+
+		monster.CageHolder.Value = cageArea
+	else
+		monster.CageHolder.Value = monster.Parent.Parent:FindFirstChildOfClass("Model").CageHolder.Value
+	end
 end
 
 --[[
@@ -691,6 +712,18 @@ function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
 end
 
 --[[
+	Get touching parts includes non-collide parts
+]]
+function ServerUtil:GetTouchingParts(part: BasePart | UnionOperation) : table
+	local connection = part.Touched:Connect(function() end)
+	local touchingParts = part:GetTouchingParts()
+
+	connection:Disconnect()
+
+	return touchingParts
+end
+
+--[[
 	Connects to an exist mob when combat ends
 ]]
 function ServerUtil:ConnectMob(locator: BasePart)
@@ -725,7 +758,7 @@ function ServerUtil:ConnectMob(locator: BasePart)
 			end
 
 			for _, player in combatPlrs do
-				local charStats = player.Character.CharStats
+				local charStats = player.Character.CharStats :: Folder
 
 				--- player finished combat
 				if not charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue") then
@@ -750,6 +783,7 @@ function ServerUtil:ConnectMob(locator: BasePart)
 					ServerUtil:ShowText(player.Character, "+" .. floor(totalEXP / 5) .. " RP", fromRGB(0, 255, 255))
 
 					player.Character:SetAttribute("InCombat", false)
+					player.Character:SetAttribute("OrbAttackingTime", false)
 					charStats.TargetMonster.Value = nil
 
 					for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
@@ -793,6 +827,36 @@ function ServerUtil:ConnectMob(locator: BasePart)
 		end
 	end
 	locator.CombatEnd.Event:Connect(combatEnds)
+end
+
+
+--[[
+	Quickly sort all players, like UIListLayout
+]]
+function ServerUtil:SortPlayers(players: table, monster: Model, cage: Model)
+	for index, plr: Player in players do
+		if not plr then continue end
+		if not plr.Character then continue end
+		if not plr.Character.PrimaryPart then continue end
+		
+		local char = plr.Character
+
+		char:PivotTo(cage["Player"..index].CFrame)
+		char.Humanoid.AutoRotate = false
+		char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.Parent.Position)
+	end
+end
+
+--[[
+	Quickly sort all monsters
+]]
+function ServerUtil:SortMonsters(monsters: table, cage: Model)
+	for index, monster: Model in monsters do
+		if not monster then continue end
+		if not monster.PrimaryPart then continue end
+
+		monster:PivotTo(cage["Monster"..index].CFrame)
+	end
 end
 
 return ServerUtil

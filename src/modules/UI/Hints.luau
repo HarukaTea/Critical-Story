@@ -4,10 +4,12 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children, New = Fusion.Children, Fusion.New
 
@@ -18,6 +20,7 @@ local wait = task.wait
 local v2New, udNew = Vector2.new, UDim.new
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local insert, remove, tFind = table.insert, table.remove, table.find
+local fontFromName = Font.fromName
 
 return function(plr: Player)
 	local self = setmetatable({}, Hints)
@@ -45,15 +48,28 @@ return function(plr: Player)
 					}),
 					New("UIPadding")({ PaddingTop = udNew(0, 10) }),
 
-					Fusion.ForValues(self.hintsList, function(use, text: string)
+					Fusion.ForValues(self.hintsList, function(_, text: string)
+						local overallTrans = Fusion.Value(0)
+						Spawn(function()
+							wait(2.7)
+							overallTrans:set(1)
+						end)
+
 						return Components.TextButton({
 							Name = "Hint",
 							AnchorPoint = v2New(0.5, 0.5),
 							AutomaticSize = Enum.AutomaticSize.X,
 							Size = fromOffset(0, 27),
 							Text = text,
-							FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
+							FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
 							TextScaled = false,
+
+							BackgroundTransparency = Fusion.Tween(Fusion.Computed(function(use)
+								return use(overallTrans)
+							end), AssetBook.TweenInfos.twiceHalf),
+							TextTransparency = Fusion.Tween(Fusion.Computed(function(use)
+								return use(overallTrans)
+							end), AssetBook.TweenInfos.twiceHalf),
 
 							[Children] = {
 								New("UICorner")({ CornerRadius = udNew(0.25, 0) }),

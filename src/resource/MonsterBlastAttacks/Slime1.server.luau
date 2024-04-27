@@ -11,6 +11,9 @@ wait(0.5)
 local blast = model.Projectile.Value:Clone() :: Model
 blast.Owner.Value = model.Owner.Value
 blast:PivotTo(model.Base.CFrame)
+
+if model:HasTag("TurnBase") then blast:AddTag("TurnBase") end
+
 blast.Parent = char.Holder.Value
 
 for _, child in blast:GetDescendants() do

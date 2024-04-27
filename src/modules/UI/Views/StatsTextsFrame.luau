@@ -24,10 +24,10 @@ local function StatImage(id: string, self: table) : ImageLabel
                 return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 
             elseif id == "Gold" then
-                return "rbxassetid://16654275243"
+                return AssetBook.Items.ItemImages.Gold
 
             elseif id == "RP" then
-                return "rbxassetid://16002068286"
+                return AssetBook.Items.ItemImages.RP
             end
         end),
         Size = fromScale(1, 1),
@@ -41,12 +41,20 @@ local function StatText(id: string, self: table) : TextLabel
     local char = self.char :: Model
 
     self.charDMGStats = {
-        ATKDMG = Value(char:GetAttribute("ATKDMG")),
+        MinDMG = Value(char:GetAttribute("MinDMG")),
+        MaxDMG = Value(char:GetAttribute("MaxDMG")),
+        Magic = Value(char:GetAttribute("Magic")),
     }
     local charDMGStats = self.charDMGStats
     Fusion.Hydrate(char)({
-        [AttributeChange("ATKDMG")] = function(newDMG: number)
-            charDMGStats.ATKDMG:set(newDMG)
+        [AttributeChange("MinDMG")] = function(newDMG: number)
+            charDMGStats.MinDMG:set(newDMG)
+        end,
+        [AttributeChange("MaxDMG")] = function(newDMG: number)
+            charDMGStats.MaxDMG:set(newDMG)
+        end,
+        [AttributeChange("Magic")] = function(newMagic: number)
+            charDMGStats.MinDMG:set(newMagic)
         end,
     })
 
@@ -56,7 +64,11 @@ local function StatText(id: string, self: table) : TextLabel
         Size = fromScale(0, 1),
         Text = Fusion.Computed(function(use)
             if id == "ClassATK" then
-                return use(self.charDMGStats.ATKDMG)
+                if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
+                    return use(charDMGStats.MinDMG).."-"..use(charDMGStats.MaxDMG)
+                else
+                    return use(charDMGStats.Magic)
+                end
 
             elseif id == "Gold" then
                 return use(self.playerData.Gold)

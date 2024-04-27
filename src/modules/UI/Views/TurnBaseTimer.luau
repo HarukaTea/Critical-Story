@@ -22,19 +22,22 @@ local wait, spawn, cancel = task.wait, task.spawn, task.cancel
 local fromRGB = Color3.fromRGB
 
 local function TurnBaseTimer(self: table) : Frame
-    self.timerStrokeTrans = Value(1)
     self.timerPos = Value(ud2New(0.5, 0, -1, -50))
     self.timerTime = Value(15)
 
-    local blacklist = { "Mob", "Ally" }
+    local blacklist = { "Mob", "Ally", "Execution" }
     local countdownThread: thread = nil
     local function newPhaseStarted(phase: string)
         if tFind(blacklist, phase) then
             self.timerPos:set(ud2New(0.5, 0, -1, -50))
+            self.panelPos:set(fromScale(0.5, 5))
+            self.transHPBarSize:set(fromScale(0, 0.875))
+
+            if countdownThread then cancel(countdownThread) end
             return
         end
 
-        self.timerTime:set(if phase == "Execution" then 6 else 15)
+        self.timerTime:set(15)
         self.timerPos:set(ud2New(0.5, 0, 0.5, -50))
 
         if countdownThread then cancel(countdownThread) end
@@ -63,12 +66,7 @@ local function TurnBaseTimer(self: table) : Frame
             Components.UIStroke({
                 Enabled = true,
                 Thickness = 2.7,
-
-                Transparency = Tween(Computed(function(use)
-                    return use(self.timerStrokeTrans)
-                end), AssetBook.TweenInfos.half)
             }),
-
             Components.TextLabel({
                 Name = "Time",
                 Size = fromScale(1, 1),
@@ -86,15 +84,6 @@ local function TurnBaseTimer(self: table) : Frame
                         PaddingTop = udNew(0.05, 0)
                     })
                 }
-            }),
-
-            Components.HoverImageButton({
-                [Fusion.OnEvent("MouseEnter")] = function()
-                    self.timerStrokeTrans:set(0)
-                end,
-                [Fusion.OnEvent("MouseLeave")] = function()
-                    self.timerStrokeTrans:set(1)
-                end
             })
         }
     })

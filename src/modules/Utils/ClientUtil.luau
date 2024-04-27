@@ -119,6 +119,18 @@ function ClientUtil:FreezePlayerControls(action: string)
 end
 
 --[[
+	Get touching parts includes non-collide parts
+]]
+function ClientUtil:GetTouchingParts(part: BasePart | UnionOperation) : table
+	local connection = part.Touched:Connect(function() end)
+	local touchingParts = part:GetTouchingParts()
+
+	connection:Disconnect()
+
+	return touchingParts
+end
+
+--[[
     Common functions for menu and backpack UI
 ]]
 function ClientUtil:OpenUI(plr: Player, targetUI: string)

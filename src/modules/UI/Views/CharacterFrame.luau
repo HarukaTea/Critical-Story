@@ -59,13 +59,16 @@ local function CharacterFrame(self: table): Frame
 	self.playerData = {
 		Levels = Value(plr:GetAttribute("Levels")),
 		LvPoints = Value(plr:GetAttribute("LvPoints")),
-		ATK = Value(plr:GetAttribute("ATKPoints")),
+		DMG = Value(plr:GetAttribute("DMGPoints")),
+		Magic = Value(plr:GetAttribute("MagicPoints")),
 		Health = Value(plr:GetAttribute("HealthPoints")),
 		Shield = Value(plr:GetAttribute("ShieldPoints")),
 		Gold = Value(plr:GetAttribute("Gold"))
 	}
 	self.charData = {
-		ATK = Value(char:GetAttribute("ATKDMG")),
+		MinDMG = Value(char:GetAttribute("MinDMG")),
+		MaxDMG = Value(char:GetAttribute("MaxDMG")),
+		Magic = Value(char:GetAttribute("Magic")),
 		Shield = Value(char:GetAttribute("MaxShield")),
 		Health = Value(char.Humanoid.MaxHealth)
 	}
@@ -78,8 +81,11 @@ local function CharacterFrame(self: table): Frame
 		[AttributeChange("LvPoints")] = function(point: number)
 			playerData.LvPoints:set(point)
 		end,
-		[AttributeChange("ATKPoints")] = function(point: number)
-			playerData.ATK:set(point)
+		[AttributeChange("DMGPoints")] = function(point: number)
+			playerData.DMG:set(point)
+		end,
+		[AttributeChange("MagicPoints")] = function(point: number)
+			playerData.Magic:set(point)
 		end,
 		[AttributeChange("HealthPoints")] = function(point: number)
 			playerData.Health:set(point)
@@ -92,8 +98,14 @@ local function CharacterFrame(self: table): Frame
 		end
 	})
 	Hydrate(char)({
-		[AttributeChange("ATKDMG")] = function(dmg: number)
-			charData.ATK:set(dmg)
+		[AttributeChange("MinDMG")] = function(dmg: number)
+			charData.MinDMG:set(dmg)
+		end,
+		[AttributeChange("MaxDMG")] = function(dmg: number)
+			charData.MaxDMG:set(dmg)
+		end,
+		[AttributeChange("Magic")] = function(magic: number)
+			charData.Magic:set(magic)
 		end,
 		[AttributeChange("MaxShield")] = function(shield: number)
 			charData.Shield:set(shield)
@@ -140,6 +152,8 @@ local function CharacterFrame(self: table): Frame
 					LinePart(fromScale(0.355, 0.17), "X", fromRGB(85, 255, 0), "Line"),
 					LinePart(fromScale(0.417, 0.813), "XY", fromRGB(255, 255, 0), "Up"),
 					LinePart(fromScale(0.352, 0.892), "X", fromRGB(255, 255, 0), "Line"),
+					LinePart(fromScale(0.369, 0.524), "XY", fromRGB(170, 170, 255), "Up"),
+					LinePart(fromScale(0.305, 0.603), "X", fromRGB(170, 170, 255), "Line"),
 					LinePart(fromScale(0.507, 0.023), "XY", fromRGB(255, 85, 0), "Up"),
 					LinePart(fromScale(0.556, -0.057), "X", fromRGB(255, 85, 0), "Line"),
 				},
@@ -148,7 +162,8 @@ local function CharacterFrame(self: table): Frame
 				Name = "PointSection",
 
 				[Children] = {
-					PointsButton("ATK", "Right", self),
+					PointsButton("DMG", "Right", self),
+					PointsButton("Magic", "Left", self),
 					PointsButton("Health", "Left", self),
 					PointsButton("Shield", "Left", self),
 				},

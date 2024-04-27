@@ -16,6 +16,8 @@ local udNew = UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local wait = task.wait
+local upper = string.upper
+local tFind = table.find
 
 local COLORS = {
 	Passive = fromRGB(40, 98, 3),
@@ -26,6 +28,7 @@ local COLORS = {
 	Pin = fromRGB(93, 47, 140),
 }
 local VISIBLES = { Equip = true, Pin = true }
+local BLACKLIST = { "Equip", "Pin" }
 
 local clickCD = false
 
@@ -89,17 +92,22 @@ local function _onClick(id: string, self: table)
 end
 
 local function FilterButton(id: string, self: table): TextButton
-	self.chosenFilter = Fusion.Value("All")
-
 	return Components.TextButton({
 		Name = id,
 		BackgroundColor3 = COLORS[id],
-		Text = id,
+		Text = upper(id),
 		Size = fromScale(0.116, 1),
 		Visible = if VISIBLES[id] then false else true,
 
 		[Fusion.Children] = {
 			Fusion.New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
+			Components.UIStroke({
+				Thickness = 3,
+
+				Enabled = Fusion.Computed(function(use)
+					return if use(self.chosenFilter) == id and not tFind(BLACKLIST, id) then true else false
+				end)
+			})
 		},
 		[Fusion.OnEvent("MouseButton1Click")] = function()
 			_onClick(id, self)

@@ -79,6 +79,7 @@ local function MobPhase(self: table) : Frame
     return Components.Frame({
         Name = "MobPhase",
         AnchorPoint = v2New(),
+		ZIndex = 2,
 
         Position = Fusion.Tween(Fusion.Computed(function(use)
 			return use(self.monsterHPPos)
