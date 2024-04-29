@@ -16,7 +16,7 @@ local rad = math.rad
 local wait = task.wait
 
 local function worldAnims()
-    for _, child in map:GetDescendants() do
+    for _, child: Instance in map:GetDescendants() do
         if child.Name == "Wings" and child.Parent.Name == "Windmill" then
 			Clock(0.01, function()
 				if not char then return end
@@ -28,7 +28,7 @@ local function worldAnims()
 
         elseif child.Name == "Sky Galleon" then
             Spawn(function()
-                while wait(0.01) do
+                while wait() do
 					if not char then continue end
 					if not char.PrimaryPart then continue end
 					if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 256 then continue end

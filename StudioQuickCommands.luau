@@ -8,6 +8,17 @@ for _, child in workspace:GetDescendants() do
     end
 end
 
+for _, child in workspace.MonsterModels:GetDescendants() do
+    if child:IsA("BasePart") then
+        if child.Name ~= "HumanoidRootPart" then child.CanCollide = false end
+    end
+end
+for _, child in workspace.MonsterModels:GetDescendants() do
+    if child:IsA("BillboardGui") then
+        child:Destroy()
+    end
+end
+
 for _, child in workspace.Maps:GetChildren() do
     if child:IsA("Model") then
         local folder = Instance.new("Folder")

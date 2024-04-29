@@ -8,7 +8,7 @@ local Guard = require(RepS.Modules.Packages.Guard)
 
 local stringCheck = Guard.Check(Guard.String)
 
-return function (_, plr, class)
+return function (_, plr: Player, class: string)
     local classPass, classWant = stringCheck(class)
 
     if not classPass then

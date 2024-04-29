@@ -3,12 +3,14 @@
 --!native
 
 local RepS = game:GetService("ReplicatedStorage")
-local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
+
+local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
 
 local Value = Fusion.Value
 
@@ -67,7 +69,7 @@ local function PassiveSlot(id: string, self: table): Frame
 				end),
 			}),
 			Components.HoverImageButton({
-				Visible = if UIS.TouchEnabled then false else true,
+				Visible = if isMobile then false else true,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
 					STROKES_TRANS[id]:set(0.3)

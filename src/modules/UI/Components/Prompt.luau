@@ -3,11 +3,13 @@
 --!native
 
 local RepS = game:GetService("ReplicatedStorage")
-local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+
+local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -44,7 +46,7 @@ local function Prompt(prompt: ProximityPrompt, index: number) : Frame
                 Position = fromScale(-0.22, 0),
                 Size = fromScale(0.17, 1),
                 Text = "E",
-                Visible = if index == 1 and not UIS.TouchEnabled then true else false,
+                Visible = if index == 1 and not isMobile then true else false,
 
                 [Fusion.Children] = {
                     Components.TextUIStroke({ Thickness = 4 })

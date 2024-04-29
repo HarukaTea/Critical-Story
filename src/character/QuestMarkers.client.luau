@@ -9,7 +9,6 @@ local RS = game:GetService("RunService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Bin = require(RepS.Modules.Packages.Bin)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
@@ -24,11 +23,11 @@ local clear = table.clear
 local floor = math.floor
 local wait = task.wait
 
-local markers = {}
+local markers = {} :: { BasePart }
 local quests = plr:WaitForChild("Quests", 999) :: Folder
 
 local function __distanceCheck()
-	for _, marker: Part in markers do
+	for _, marker: BasePart in markers do
 		local magnitude = floor((marker:GetAttribute("Location") - char.PrimaryPart.Position).Magnitude)
 
 		marker.TargetUI.Distance.Text = magnitude.."M"
@@ -36,10 +35,10 @@ local function __distanceCheck()
 end
 local function targetCurrentQuest()
 	wait()
-	for _, child in camera:GetChildren() do
+	for _, child: Instance in camera:GetChildren() do
 		if child.Name == "QuestMarker" then child:Destroy() end
 	end
-	for _, child in mapComponents.NPCs:GetDescendants() do
+	for _, child: Instance in mapComponents.NPCs:GetDescendants() do
 		if child.Name == "QuestIndicator" then child:Destroy() end
 	end
 	clear(markers)
@@ -49,7 +48,7 @@ local function targetCurrentQuest()
 
         if realQuest.Hint == v3Zero then continue end
 
-        local marker = RepS.Package.Unloads.QuestMarker:Clone() :: Part
+        local marker = RepS.Package.Unloads.QuestMarker:Clone() :: BasePart
         marker:SetAttribute("Location", realQuest.Hint)
 		marker.CFrame = cfNew(realQuest.Hint)
 		marker.TargetUI.Distance.TextColor3 = AssetBook.QuestColor[quest.Name]
@@ -65,7 +64,7 @@ local function targetCurrentQuest()
 		end
     end
 end
-Spawn(targetCurrentQuest)
+targetCurrentQuest()
 
 Add(quests.ChildAdded:Connect(targetCurrentQuest))
 Add(quests.ChildRemoved:Connect(targetCurrentQuest))

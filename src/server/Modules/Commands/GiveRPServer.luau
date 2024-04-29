@@ -9,7 +9,7 @@ local Guard = require(RepS.Modules.Packages.Guard)
 
 local numberCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
 
-return function (_, plr, rep)
+return function (_, plr: Player, rep: number)
     local repPass, repWant = numberCheck(rep)
 
     if not repPass then

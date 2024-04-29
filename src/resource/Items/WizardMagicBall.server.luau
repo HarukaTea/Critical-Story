@@ -49,7 +49,7 @@ while wait(0.01) do
 		if (magicBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			SkillUtil:MagicVFX(plr, monster)
+			SkillUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			magicBall.CFrame = monster.PrimaryPart.CFrame

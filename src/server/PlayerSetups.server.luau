@@ -47,7 +47,7 @@ local function _saveData(plr: Player, ds: any)
 	local pinned = {}
 	local quests, townQuests = {}, {}
 
-	for index, item in plr.Inventory:GetChildren() do
+	for index: number, item: number in plr.Inventory:GetChildren() do
 		if item.Value <= 0 then continue end
 
 		inventory[item.Name] = item.Value
@@ -55,7 +55,7 @@ local function _saveData(plr: Player, ds: any)
 		if item:GetAttribute("Pinned") then pinned[index] = item.Name end
 		if item:GetAttribute("Equipped") then equipped[item.Name] = item:GetAttribute("Slot") end
 	end
-	for _, quest in plr.Quests:GetChildren() do
+	for _, quest: IntConstrainedValue in plr.Quests:GetChildren() do
 		if quest.Name == "Town" then
 			townQuests[#townQuests + 1] = quest.Value
 			continue
@@ -104,7 +104,7 @@ local function setup(plr: Player)
 
 	---// Load stats
 	local blackList = { "LastLocation" } --- deprecated data but stored in the same table
-	for attr, val in data.Stats do
+	for attr: string, val: any in data.Stats do
 		if tFind(blackList, attr) then continue end
 
 		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
@@ -127,7 +127,7 @@ local function setup(plr: Player)
 		intValue.Value = val
 		intValue.Parent = questsData
 	end
-	for questType, questId in data.Quests do
+	for questType: string, questId: number in data.Quests do
 		if questType == "Town" then
 			for _, townQuest: number in questId do _createQuestVal("Town", townQuest) end
 			continue
@@ -155,20 +155,20 @@ local function setup(plr: Player)
 			end
 		end
 	end
-	for item, slot in data.EquippedItems do
+	for item: string, slot: string in data.EquippedItems do
 		if AssetBook.Items.ItemName[item] and backpackData:FindFirstChild(item) then
 			backpackData[item]:SetAttribute("Equipped", true)
 			backpackData[item]:SetAttribute("Slot", slot)
 		end
 	end
-	for _, item in data.PinnedItems do
+	for _, item: string in data.PinnedItems do
 		if AssetBook.Items.ItemName[item] and backpackData:FindFirstChild(item) then
 			backpackData[item]:SetAttribute("Pinned", true)
 		end
 	end
 
 	--// Load settings
-	for setting, val in data.Settings do
+	for setting: string, val: any in data.Settings do
 		plr:SetAttribute(setting, val)
 
 		Fusion.Hydrate(plr)({
@@ -202,8 +202,10 @@ local function clear(plr: Player)
 
 	--- check if player is combating
 	Spawn(function()
-		for _, monster in workspace.Monsters:GetDescendants() do
-			if monster:HasTag("Monster") then
+		for _, monster: Instance in workspace.Monsters:GetDescendants() do
+			if monster:HasTag("Monster") and monster.PrimaryPart then
+				if not monster:FindFirstChild("TargetingList") then continue end
+
 				if monster.TargetingList:FindFirstChild(plr.Name) then
 					monster.TargetingList[plr.Name]:Destroy()
 
@@ -215,11 +217,7 @@ local function clear(plr: Player)
 end
 
 --- in case player joined before server starts
-for _, plr in Players:GetPlayers() do
-	Spawn(function()
-		setup(plr)
-	end)
-end
+for _, plr in Players:GetPlayers() do Spawn(setup, plr) end
 
 --// Connections
 local function _playerAdded(plr: Player)

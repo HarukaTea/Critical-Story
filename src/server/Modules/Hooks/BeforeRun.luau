@@ -4,7 +4,7 @@
 
 local isMainGame = if game.PlaceId == 12343565896 then true else false
 
-return function (registry)
+return function (registry: table)
     registry:RegisterHook("BeforeRun", function(context)
         local testerRank = if isMainGame then 124 else 1
 

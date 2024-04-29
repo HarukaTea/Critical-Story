@@ -2,6 +2,10 @@
 --!optimize 2
 --!native
 
+local RepS = game:GetService("ReplicatedStorage")
+
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+
 return {
     Name = "setclass",
     Aliases = {"class"},
@@ -11,12 +15,11 @@ return {
         {
             Type = "player",
             Name = "player",
-            Description = "The player you wish to set"
+            Description = "The player who will be set"
         },
-        function(context)
+        function(context: table)
             return {
-                Type = context.Cmdr.Util.MakeEnumType("PlayerClassType",
-                { "Warrior", "Archer", "Wizard", "Knight", "Rogue", "Repeater", "Striker", "Alchemist", "Illusionist" }),
+                Type = context.Cmdr.Util.MakeEnumType("PlayerClassType", AssetBook.Classes),
                 Name = "class",
                 Description = "The class you wish to get"
             }

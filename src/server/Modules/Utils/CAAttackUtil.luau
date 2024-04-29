@@ -45,13 +45,10 @@ function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, f
 
 		local criEff = RepS.Package.Effects.CriticalHitEffect:Clone() :: ParticleEmitter
 		criEff.Parent = monster.PrimaryPart
+        Debris:AddItem(criEff, 1)
 
         Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Critical)
 		ServerUtil:ShowText(char, "CRITICAL!", fromRGB(230, 241, 3))
-
-		wait(0.3)
-		criEff.Enabled = false
-		Debris:AddItem(criEff, 1)
 	end
 
 	criChance:Destroy()
@@ -64,6 +61,7 @@ end
 ]]
 function CAAttackUtil:DealDMG(plr: Player, monster: Model, dmg: number)
     ServerUtil:ShowNumber(monster, dmg, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
+
     HarukaLib:Add(monster, "Health", -dmg)
 
     CAAttackUtil:CriticalHit(plr, monster, dmg)
@@ -84,11 +82,6 @@ function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 		comboEff.Parent = monster.PrimaryPart
 		Debris:AddItem(comboEff, 1)
 
-        Spawn(function()
-            wait(0.4)
-			comboEff.Enabled = false
-		end)
-
         CAAttackUtil:DealDMG(plr, monster, finalDamage)
 	else
 		CAAttackUtil:DealDMG(plr, monster, baseDamage)
@@ -102,17 +95,17 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
 
     local arrow = RepS.Package.PlayerAttacks.ArrowOrb:Clone() :: Model
     arrow.Owner.Value = char
-    arrow:PivotTo(ServerUtil:GenerateOrbPos(monster, plr.Character))
-    arrow:SetAttribute("OrbLifeTime", 8)
+    arrow:PivotTo(ServerUtil:GenerateOrbPos(monster))
+    arrow:SetAttribute("OrbLifeTime", 4)
     arrow.Parent = workspace.MapComponents.OrbFolders[plr.Name]
-    Debris:AddItem(arrow, 8)
+    Debris:AddItem(arrow, arrow:GetAttribute("OrbLifeTime"))
 
     if char:GetAttribute("Arrows") > 0 then
         --- bow dmg
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
         --- arrow dmg
-        for i = char:GetAttribute("Arrows"), 1, -1 do
+        for _ = char:GetAttribute("Arrows"), 1, -1 do
             if monster:GetAttribute("Health") <= 0 then break end
 
             HarukaLib:Add(char, "Arrows", -1)
@@ -131,17 +124,24 @@ function CAAttackUtil.ArcherArrow(plr: Player)
 
     HarukaLib:Add(char, "Arrows", 1)
 
-    if char:GetAttribute("Arrows") > 10 then
-        char:SetAttribute("Arrows", 10)
-    end
+    if char:GetAttribute("Arrows") > 10 then char:SetAttribute("Arrows", 10) end
 end
 
 function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
-    HarukaLib:Add(plr.Character, "TP", 35)
+    local char = plr.Character
+    local magicDmg = char:GetAttribute("Magic")
 
-    CAAttackUtil:DealDMG(plr, monster, baseDamage)
+    HarukaLib:Add(char, "WizardCasted", 35)
+    CAAttackUtil:DealDMG(plr, monster, magicDmg)
 
-    SkillUtil:RestoreTPByOrb(plr)
+    if char:GetAttribute("WizardCasted") >= 100 then
+        char:SetAttribute("WizardCasted", 0)
+
+        Events.PlayAnimation:Fire(plr, "MagicCasted2")
+        RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
+    end
+
+    SkillUtil:RestoreManaByOrb(plr)
 end
 
 function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
@@ -150,9 +150,7 @@ function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
     HarukaLib:Add(char, "Guard", 15)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    if char:GetAttribute("Guard") > 100 then
-        char:SetAttribute("Guard", 100)
-    end
+    if char:GetAttribute("Guard") > 100 then char:SetAttribute("Guard", 100) end
 
     SkillUtil:RestoreTPByOrb(plr)
 end
@@ -163,9 +161,7 @@ function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
     HarukaLib:Add(char, "RogueCritical", 10)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    if char:GetAttribute("RogueCritical") > 100 then
-        char:SetAttribute("RogueCritical", 100)
-    end
+    if char:GetAttribute("RogueCritical") > 100 then char:SetAttribute("RogueCritical", 100) end
 
     --- extra critical hit roll cuz it's rogue class
     local result = CAAttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCritical"))
@@ -183,31 +179,28 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         repeaterOrb.Owner.Value = plr.Character
         repeaterOrb:PivotTo(pos)
         repeaterOrb:SetAttribute("RepeaterSpawned", true)
-        repeaterOrb:SetAttribute("OrbLifeTime", 5)
+        repeaterOrb:SetAttribute("OrbLifeTime", 4)
         repeaterOrb.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+        Debris:AddItem(repeaterOrb, repeaterOrb:GetAttribute("OrbLifeTime"))
 
-        Debris:AddItem(repeaterOrb, 5)
+        local laser = instanceNew("Part")
+        laser.Material = Enum.Material.Neon
+        laser.CanCollide = false
+        laser.CanTouch = false
+        laser.CanQuery = false
+        laser.Anchored = true
+        laser.Transparency = 0
+        laser.Color = fromRGB(9, 137, 207)
+        laser.Size = v3New(0.5, 0.5, (orb.Base.CFrame.Position - repeaterOrb.Base.CFrame.Position).Magnitude)
+        laser.CFrame = cfNew((orb.Base.CFrame.Position + repeaterOrb.Base.CFrame.Position) / 2, orb.Base.CFrame.Position)
+        laser.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+        Debris:AddItem(laser, 1)
 
-        Spawn(function()
-            local laser = instanceNew("Part")
-            laser.Material = Enum.Material.Neon
-            laser.CanCollide = false
-            laser.CanTouch = false
-            laser.CanQuery = false
-            laser.Anchored = true
-            laser.Transparency = 0
-            laser.Color = fromRGB(9, 137, 207)
-            laser.Size = v3New(0.5, 0.5, (orb.Base.CFrame.Position - repeaterOrb.Base.CFrame.Position).Magnitude)
-            laser.CFrame = cfNew((orb.Base.CFrame.Position + repeaterOrb.Base.CFrame.Position) / 2, orb.Base.CFrame.Position)
-            laser.Parent = workspace.MapComponents.OrbFolders[plr.Name]
-
-            Debris:AddItem(laser, 1)
-
-            Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
-        end)
+        Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
     end
 
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
+
     SkillUtil:RestoreTPByOrb(plr)
 end
 

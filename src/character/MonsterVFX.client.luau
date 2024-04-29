@@ -3,10 +3,12 @@
 --!native
 
 local CS = game:GetService("CollectionService")
+local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
 local wait = task.wait
 local sinh, random = math.sinh, math.random
@@ -33,10 +35,7 @@ local function spikeRain(blast: Model)
 	blast.Spike:Play()
 	blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, 30, 0))
 
-	for _ = 1, 30 do
-		blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, -1, 0))
-		wait(0.01)
-	end
+	SuperTween.new(blast, AssetBook.TweenInfos.half, { Pivot = blast.PrimaryPart.CFrame * cfNew(0, -30, 0) }):Play()
 end
 
 local function wolfBite(blast: Model)
@@ -46,18 +45,15 @@ local function wolfBite(blast: Model)
 	TS:Create(blast.Fang2.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 
 	wait(0.5)
-	for _ = 1, 2 do
-		blast.Fang1:PivotTo(blast.Fang1.Base.CFrame * cfNew(0, 0, -3))
-		blast.Fang2:PivotTo(blast.Fang2.Base.CFrame * cfNew(0, 0, -3))
-
-		wait(0.01)
-	end
+	SuperTween.new(blast.Fang1, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang1.Base.CFrame * cfNew(0, 0, -6) }):Play()
+	SuperTween.new(blast.Fang2, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang2.Base.CFrame * cfNew(0, 0, -6) }):Play()
 end
 
 
 --// Slimes
 local function slimeShot(blast: Model, char: Model)
 	blast.Shot.Part.Color = blast:GetAttribute("SlimeColor")
+	Debris:AddItem(blast.Shot, 0.2)
 
 	TS:Create(blast.Base, AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
 
@@ -70,12 +66,7 @@ local function slimeShot(blast: Model, char: Model)
 	blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(angle,0,0))
 
 	local rotatingangle = angle * 2 /10
-	for _ = 1, 10 do
-		wait(0.01)
-		blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(-rotatingangle,0,0))
-	end
-
-	blast.Shot:Destroy()
+	SuperTween.new(blast.Shot, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Shot.Base.CFrame * cfAngles(-rotatingangle * 10, 0, 0) }):Play()
 end
 
 local function slimeWave(blast: Model)
@@ -161,7 +152,7 @@ local function vfxHandler(blast: Model | BasePart)
 	local style = blast.Name
 
 	if not blast:IsDescendantOf(workspace) then return end
-	blast:WaitForChild("Owner")
+	blast:WaitForChild("Owner", 999)
 
 	---// most errors here are unnecessary to fix, so just ignore them
 	pcall(function()

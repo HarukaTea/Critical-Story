@@ -20,16 +20,14 @@ local fromRGB = Color3.fromRGB
 local function setup()
 	musics.Overworld:Play()
 
-	for _, effect in camera:GetChildren() do
+	for _, effect: Instance in camera:GetChildren() do
 		if effect:IsA("BlurEffect") or effect:IsA("ColorCorrectionEffect") then effect:Destroy() end
 	end
-	for _, prompt in mapComponents:GetDescendants() do
+	for _, prompt: Instance in mapComponents:GetDescendants() do
 		if prompt:IsA("ProximityPrompt") and prompt.Name ~= "Chest" then prompt.Enabled = true end
 	end
 
 	effects.UIBlur:Clone().Parent = camera
-	effects.WaterColor:Clone().Parent = camera
-	effects.WaterBlur:Clone().Parent = camera
 
 	Lighting.ColorShift_Top = fromRGB(220, 255, 255)
 	Lighting.ColorShift_Bottom = fromRGB(220, 255, 255)
@@ -43,12 +41,14 @@ local function onDied()
 
 	musics.SFXs.Dead:Play()
 
-	for _, prompt in mapComponents:GetDescendants() do
+	for _, prompt: Instance in mapComponents:GetDescendants() do
 		if prompt:IsA("ProximityPrompt") and prompt.Name ~= "Chest" then prompt.Enabled = false end
 	end
-	for _, sound in musics:GetChildren() do
+	for _, sound: Sound in musics:GetChildren() do
 		if sound:IsA("Sound") then sound:Stop() end
 	end
+
+	workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
 
 	effects.DeathBlur:Clone().Parent = camera
 

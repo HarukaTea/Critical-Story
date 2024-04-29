@@ -8,11 +8,10 @@ local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local wait = task.wait
 local ceil, floor = math.ceil, math.floor
 local fromRGB = Color3.fromRGB
+local v3New = Vector3.new
 
 local SkillUtil = {}
 
@@ -22,7 +21,7 @@ local SkillUtil = {}
 function SkillUtil:RestoreTPByOrb(plr: Player)
 	local char = plr.Character
 
-	local currentTP = char:GetAttribute("TP")
+	local currentTP = char:GetAttribute("TP") :: number
 	if currentTP >= 100 then return end
 
 	HarukaLib:Add(char, "TP", ceil(100 * (char:GetAttribute("RestoreBuff") / 100)))
@@ -30,11 +29,6 @@ function SkillUtil:RestoreTPByOrb(plr: Player)
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
 	Debris:AddItem(restoreEff, 1)
-
-	Spawn(function()
-		wait(0.4)
-		restoreEff.Enabled = false
-	end)
 end
 
 --[[
@@ -48,36 +42,19 @@ function SkillUtil:RestoreTP(plr: Player, restoreVal: number)
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
 	Debris:AddItem(restoreEff, 1)
-
-	Spawn(function()
-		wait(0.4)
-		restoreEff.Enabled = false
-	end)
 end
 
 --[[
 	Mahoushoujiu bruh, I guess so, the power of magic is great
 ]]
-function SkillUtil:MagicVFX(plr: Player, monster: Model)
+function SkillUtil:MagicVFX(monster: Model)
 	local eff = RepS.Package.MagicAssets.Ignited:Clone() :: Part
 	eff.CFrame = monster.PrimaryPart.CFrame
 	eff.Transparency = 0
 	eff.Parent = workspace
 	Debris:AddItem(eff, 0.25)
 
-	Events.ClientTween:Fires({ eff }, { Size = Vector3.one * 24, Transparency = 1 }, "twiceHalf")
-end
-
---[[
-	Check if the mana is enough for the active item requirement
-]]
-function SkillUtil:ManaCheck(plr: Player, req: number) : boolean
-	if plr.Character:GetAttribute("Mana") < req then
-		return false
-	end
-
-	HarukaLib:Add(plr.Character, "Mana", -req)
-	return true
+	Events.ClientTween:Fires({ eff }, { Size = v3New(1, 1, 1) * 24, Transparency = 1 }, "twiceHalf")
 end
 
 --[[
@@ -93,11 +70,6 @@ function SkillUtil:Heal(plr: Player, healPower: number)
 	local healEff = RepS.Package.Effects.HealEffect:Clone() :: ParticleEmitter
 	healEff.Parent = char.PrimaryPart
 	Debris:AddItem(healEff, 1)
-
-	Spawn(function()
-		wait(0.4)
-		healEff.Enabled = false
-	end)
 end
 
 --[[

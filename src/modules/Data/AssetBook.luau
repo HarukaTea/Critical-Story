@@ -59,6 +59,11 @@ assets.ActionPanelIcons = {
     Skills = "rbxassetid://2034172262",
     Defend = "rbxassetid://4601012009"
 }
+assets.Classes = {
+    "Warrior", "Archer", "Wizard",
+    "Knight", "Rogue", "Repeater",
+    "Striker", "Alchemist", "Illuionist"
+}
 assets.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
@@ -105,6 +110,19 @@ assets.ClassInfo = {
 		Color = fromRGB(0, 255, 252),
         Type = "Magic"
 	}
+}
+assets.MonsterIds = {
+    SpikeFox = "Spike Fox",
+    SpikeWolf = "Spike Wolf",
+    ThornWolf = "Thorn Wolf",
+    NeedleWolf = "Needle Wolf",
+    LavaWolf = "Lava Wolf",
+
+    GreenSlime = "Green Slime",
+    BlueSlime = "Blue Slime",
+    LapisSlime = "Lapis Slime",
+    PurpleSlime = "Purple Slime",
+    RockSlime = "Rock Slime"
 }
 assets.MonsterAvatars = {
 	["Spike Fox"] = "rbxassetid://13886503379",

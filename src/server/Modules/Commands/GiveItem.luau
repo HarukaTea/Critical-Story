@@ -11,17 +11,17 @@ return {
         {
             Type = "player",
             Name = "player",
-            Description = "The player you wish to give"
+            Description = "The player who recieve this item"
         },
         {
             Type = "string",
             Name = "item",
-            Description = "The item id of item, for example: HuntingDagger"
+            Description = "The item id of item, NOT the item name"
         },
         {
             Type = "number",
             Name = "amount",
-            Description = "The amount of this gift",
+            Description = "The amount of this item",
             Default = 1
         }
     }

@@ -12,7 +12,7 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local stringCheck = Guard.Check(Guard.String)
 local numberCheck = Guard.Check(Guard.NumberMinMax(0, 9999))
 
-return function (_, plr, item, amount)
+return function (_, plr: Player, item: string, amount: number)
     local itemPass, itemName = stringCheck(item)
     local amountPass, amountWanted = numberCheck(amount)
 
@@ -27,7 +27,7 @@ return function (_, plr, item, amount)
         return "There is no item named "..itemName..", are you sure you typed correctly?"
 
     elseif itemName == "all" then
-        for everyItem, _ in AssetBook.Items.ItemName do
+        for everyItem: string, _ in AssetBook.Items.ItemName do
             ServerUtil:GiveItem(plr, everyItem, 1)
         end
 

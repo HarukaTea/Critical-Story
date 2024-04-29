@@ -50,7 +50,7 @@ return function(plr: Player)
 			Components.Frame({
 				Name = "Top",
 				AnchorPoint = v2New(),
-				Position = fromOffset(0, 20),
+				Position = fromOffset(0, 44),
 				Size = fromScale(1, 0.1),
 
 				[Children] = {

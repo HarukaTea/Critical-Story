@@ -11,7 +11,7 @@ return {
     Shield = 0,
     MaxShield = 5,
     Defense = 0,
-    OrbSpawnTime = 10,
+    OrbSpawnTime = 6,
 
     --- States
     InCombat = false,

@@ -94,9 +94,6 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
     elseif item == "MountainKingClown" then
         HarukaLib:Add(char, "MaxDMGBuff", 125)
 
-    elseif item == "MilkPillow" then
-        HarukaLib:Add(char, "MaxDMGBuff", 9999)
-
     elseif item == "NorthernHalberd" then
         HarukaLib:Add(char, "MaxDMGBuff", 125)
         HarukaLib:Add(char, "MinDMGBuff", 100)
@@ -132,7 +129,7 @@ end
     Unequip a passive by clear all passive, and re-equip the rest
 ]]
 function PassiveUtil:ClearAllPassives(char: Model)
-    for attribute, _ in char:GetAttributes() do
+    for attribute: string, _ in char:GetAttributes() do
         if find(attribute, "Buff") then
             char:SetAttribute(attribute, 0)
 
@@ -145,13 +142,13 @@ function PassiveUtil:ClearAllPassives(char: Model)
             if attribute == "CriChance" then char:SetAttribute(attribute, 1) end
         end
     end
-    for attribute, _ in char.CharStats.ExtraOrbs:GetAttributes() do
+    for attribute: string, _ in char.CharStats.ExtraOrbs:GetAttributes() do
         char:SetAttribute(attribute, nil)
     end
     char.CharStats.ExtraOrbs:ClearAllChildren()
 
     --- re-equip
-    for attibute, value in char.CharStats.Items:GetAttributes() do
+    for attibute: string, value: any in char.CharStats.Items:GetAttributes() do
         if find(attibute, "_PASSIVE") then
             if value == false then
                 char.CharStats.Items:SetAttribute(attibute, nil)
@@ -160,6 +157,7 @@ function PassiveUtil:ClearAllPassives(char: Model)
 
             local start = find(attibute, "_PASSIVE")
             local realItemName = sub(attibute, 1, start - 1)
+
             PassiveUtil:EquipPassive(realItemName, char)
         end
     end

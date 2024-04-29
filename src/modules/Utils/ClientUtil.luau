@@ -48,25 +48,43 @@ function ClientUtil:ClassHitVFX(monster: Model, char: Model)
     hitEff.Effect.Image.Rotation = random(1, 360)
     if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
     hitEff.Parent = workspace
-
-    Debris:AddItem(hitEff, 5)
-    Debris:AddItem(hitEff.Particle, 2)
-
-    Spawn(function()
-        wait(0.2)
-        hitEff.Particle.Enabled = false
-    end)
+    Debris:AddItem(hitEff, 1)
 
     TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
     TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
 end
 
 --[[
+    Hit by monsters
+]]
+function ClientUtil:CharOnHit(char: Model)
+    Spawn(function()
+        local hitEff = RepS.Package.Effects.HitEffect:Clone() :: BasePart
+        hitEff.CFrame = char.Torso.CFrame
+        hitEff.Effect.Image.Rotation = random(1, 360)
+        if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
+        hitEff.Parent = char
+        Debris:AddItem(hitEff, 1)
+
+        TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
+        TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
+    end)
+
+    for _ = 1, 5 do
+        ClientUtil:SetCharTrans(0.5, char)
+        wait(0.05)
+
+        ClientUtil:SetCharTrans(0, char)
+        wait(0.05)
+    end
+end
+
+--[[
     Character was hit by mobs
 ]]
 function ClientUtil:SetCharTrans(trans: number, char: Model)
-    for _, child in char:GetChildren() do
-		if child:IsA("Part") and child.Name ~= "HumanoidRootPart" then child.Transparency = trans end
+    for _, child: Instance in char:GetChildren() do
+		if child:IsA("Part") and child ~= char.PrimaryPart then child.Transparency = trans end
 		if child:IsA("Model") then
 			for _, descendant in child:GetChildren() do
 				if descendant.Name == "Part" then descendant.Transparency = trans end
@@ -82,13 +100,13 @@ end
 function ClientUtil:GetKeyStoryLocations() : table
     local pos = {}
 
-    for _, child in workspace:WaitForChild("MapComponents").NPCs:GetChildren() do
+    for _, child: Model in workspace:WaitForChild("MapComponents").NPCs:GetChildren() do
         pos[child.Name] = child.PrimaryPart.Position
     end
-    for _, child in workspace.MapComponents.Statues:GetChildren() do
+    for _, child: Model in workspace.MapComponents.Statues:GetChildren() do
         pos[child.Name] = child.PrimaryPart.Position
     end
-    for _, child in workspace:GetDescendants() do
+    for _, child: Instance in workspace:WaitForChild("Maps"):GetDescendants() do
         if sFind(child.Name, "StoryLocator") then
             local map, locator = child.Parent.Name, child.Name
 
@@ -116,18 +134,6 @@ function ClientUtil:FreezePlayerControls(action: string)
 
         CAS:UnbindAction("FreezeControl")
     end
-end
-
---[[
-	Get touching parts includes non-collide parts
-]]
-function ClientUtil:GetTouchingParts(part: BasePart | UnionOperation) : table
-	local connection = part.Touched:Connect(function() end)
-	local touchingParts = part:GetTouchingParts()
-
-	connection:Disconnect()
-
-	return touchingParts
 end
 
 --[[

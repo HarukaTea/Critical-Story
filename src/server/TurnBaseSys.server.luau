@@ -247,7 +247,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 
 	local monster = char.CharStats.TargetMonster.Value :: Model
 	local class = orb:GetAttribute("Style") :: string
-	local dmgType = if orb:GetAttribute("IsNotDMG") then "DMG" else AssetBook.ClassInfo[class].Type
+	local dmgType = if orb:GetAttribute("DMGType") then orb:GetAttribute("DMGType") else AssetBook.ClassInfo[class].Type
 	local baseDamage = 0
 	if dmgType == "DMG" then
 		local minDMG: number, maxDMG: number = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")

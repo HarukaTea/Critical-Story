@@ -2,6 +2,7 @@
 --!optimize 2
 --!native
 
+local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
@@ -35,79 +36,6 @@ local instanceNew = Instance.new
 
 repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 
---// Connections
-local function onDead()
-    Empty()
-
-    if char.PrimaryPart then plr:SetAttribute("LastLeave", char.PrimaryPart.Position) end
-    char:SetAttribute("InCombat", false)
-
-    for _, monster in char.CharStats.TargetMonsters:GetChildren() do
-        if not monster.Value then continue end
-        if not monster.Value:FindFirstChild("TargetingList") then continue end
-        if not monster.Value.TargetingList:FindFirstChild(char.Name) then continue end
-
-        monster.Value.TargetingList[char.Name]:Destroy()
-    end
-    for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
-        if orbFolder.Name == char.Name then orbFolder:Destroy() end
-    end
-end
-humanoid.Died:Once(onDead)
-
-local function tpCheck(tp: number)
-    if tp > 100 then char:SetAttribute("TP", 100) end
-end
-local function shieldCheck(shield: number)
-    local maxShield = char:GetAttribute("MaxShield")
-
-    if shield > 0 and isBroken then isBroken = false end
-    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
-
-    if shield == 0 and not isBroken then
-        isBroken = true
-
-        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
-    end
-end
-
-local function updateMinDMG()
-    char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
-end
-local function updateMaxDMG()
-    char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
-end
-local function updateMagic()
-    char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
-end
-local function updateShield()
-    char:SetAttribute("MaxShield", 5 * plr:GetAttribute("ShieldPoints") + 5 + char:GetAttribute("ShieldBuff"))
-    char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
-end
-local function updateHP()
-    humanoid.MaxHealth = 30 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
-    humanoid.Health = humanoid.MaxHealth
-end
-local function updateSpeed(speed: number)
-    humanoid.WalkSpeed = 30 + speed
-end
-local function updateJump(jump: number)
-    humanoid.JumpPower = 50 + jump
-end
-local function levelReqCheck()
-    local level = plr:GetAttribute("Levels") :: number
-
-    if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 60 then
-        if lvUpCD then return end
-
-        lvUpCD = true
-        Signals.LevelUp:Fire(plr)
-
-        wait(1)
-        lvUpCD = false
-    end
-end
-
 local function setup()
     char.PrimaryPart = char.Humanoid.RootPart
 
@@ -121,7 +49,7 @@ local function setup()
     local function _createStats()
         local charStats = _createFolder("CharStats", char)
 
-        for i, v in ATTRIBUTES do
+        for i: string, v: any in ATTRIBUTES do
             char:SetAttribute(i, v)
         end
         local objValue = instanceNew("ObjectValue")
@@ -138,7 +66,6 @@ local function setup()
 
     ServerUtil:SetCollisionGroup(char, "Player")
 
-    humanoid.BreakJointsOnDeath = false
     Add(Clock(1, function()
         HarukaLib:Add(plr, "PlayTime", 1)
     end))
@@ -197,15 +124,97 @@ local function classAttributesSetup()
 end
 Spawn(classAttributesSetup)
 
+--// Connections
+local function onDead()
+    Empty()
+
+    if char.PrimaryPart then
+        plr:SetAttribute("LastLeave", char.PrimaryPart.Position)
+
+        local defeatedEff = RepS.Package.Effects.DefeatedEffect:Clone()
+        defeatedEff.CFrame = char.PrimaryPart.CFrame
+        defeatedEff.Parent = char
+        Debris:AddItem(defeatedEff, 1)
+    end
+    char:SetAttribute("InCombat", false)
+
+    for _, monsterSymbol: ObjectValue in char.CharStats.TargetMonsters:GetChildren() do
+        local monster = monsterSymbol.Value :: Model?
+
+        if not monster then continue end
+        if not monster:FindFirstChild("TargetingList") then continue end
+        if not monster.TargetingList:FindFirstChild(char.Name) then continue end
+
+        monster.TargetingList[char.Name]:Destroy()
+    end
+    for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
+        if orbFolder.Name == char.Name then orbFolder:Destroy() end
+    end
+end
+humanoid.Died:Once(onDead)
+
+local function tpCheck(tp: number)
+    if tp > 100 then char:SetAttribute("TP", 100) end
+end
+local function shieldCheck(shield: number)
+    local maxShield = char:GetAttribute("MaxShield") :: number
+
+    if shield > 0 and isBroken then isBroken = false end
+    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
+
+    if shield <= 0 and not isBroken then
+        isBroken = true
+
+        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
+    end
+end
+
+local function updateMinDMG()
+    char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
+end
+local function updateMaxDMG()
+    char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+end
+local function updateMagic()
+    char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
+end
+local function updateShield()
+    char:SetAttribute("MaxShield", 5 * plr:GetAttribute("ShieldPoints") + 5 + char:GetAttribute("ShieldBuff"))
+    char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
+end
+local function updateHP()
+    humanoid.MaxHealth = 30 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
+    humanoid.Health = humanoid.MaxHealth
+end
+local function updateSpeed(speed: number)
+    humanoid.WalkSpeed = 30 + speed
+end
+local function updateJump(jump: number)
+    humanoid.JumpPower = 50 + jump
+end
+local function levelReqCheck()
+    local level = plr:GetAttribute("Levels") :: number
+
+    if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 60 then
+        if lvUpCD then return end
+
+        lvUpCD = true
+        Signals.LevelUp:Fire(plr)
+
+        wait(1)
+        lvUpCD = false
+    end
+end
+
 --// Setups
-updateMinDMG()
-updateMaxDMG()
-updateMagic()
-updateShield()
-updateHP()
-updateSpeed(0)
-updateJump(0)
-levelReqCheck()
+Spawn(updateMinDMG)
+Spawn(updateMaxDMG)
+Spawn(updateMagic)
+Spawn(updateShield)
+Spawn(updateHP)
+Spawn(updateSpeed, 0)
+Spawn(updateJump, 0)
+Spawn(levelReqCheck)
 
 Fusion.Hydrate(plr)({
     [AttributeChange("DMGPoints")] = function()

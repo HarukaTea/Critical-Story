@@ -27,7 +27,7 @@ local function orbSpawnHandler(state: boolean)
         orb:SetAttribute("OrbLifeTime", 4)
         orb.Parent = orbFolders[char.Name]
 
-        Debris:AddItem(orb, 4)
+        Debris:AddItem(orb, orb:GetAttribute("OrbLifeTime"))
     end
     local function _spawnOrb(isSpawned: boolean?)
         local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
@@ -44,7 +44,7 @@ local function orbSpawnHandler(state: boolean)
 
             --- extra orbs from items
             if not isSpawned then
-                for attr, val in char.CharStats.ExtraOrbs:GetAttributes() do
+                for attr: string, val: any in char.CharStats.ExtraOrbs:GetAttributes() do
                     if not val then continue end
 
                     _placeOrb(orbAttack[attr]:Clone(), ServerUtil:GenerateOrbPos(monster.Value))
@@ -57,7 +57,7 @@ local function orbSpawnHandler(state: boolean)
         local spawnTime = char:GetAttribute("OrbSpawnTime") :: number
 
 		stopSpawn = Clock(spawnTime, function()
-			if char:GetAttribute("OrbSpawnTime") then _spawnOrb() end
+			if char:GetAttribute("OrbAttackingTime") and char:GetAttribute("InCombat") then _spawnOrb() end
 		end)
 	else
 		if stopSpawn then stopSpawn() end

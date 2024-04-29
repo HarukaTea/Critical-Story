@@ -52,7 +52,7 @@ while wait(0.01) do
 			hit = true
 
 			SkillUtil:Burn(plr, monster, 4)
-			SkillUtil:MagicVFX(plr, monster)
+			SkillUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			fireBall.Spirit.Enabled = false

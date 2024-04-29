@@ -44,7 +44,7 @@ end
 Spawn(collisionRegister)
 
 local function cmdrRegister()
-	Cmdr:RegisterDefaultCommands({ "DefaultAdmin" })
+	Cmdr:RegisterDefaultCommands({ "DefaultAdmin", "Help" })
 	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
 	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
 end
@@ -52,27 +52,25 @@ Spawn(cmdrRegister)
 
 local function mainSetup()
 	--- clear extra events
-	for _, mapPart in workspace:GetDescendants() do
+	for _, mapPart: Instance in workspace:GetDescendants() do
 		if mapPart:IsA("BasePart") then
-			if mapPart:HasTag("Water") then continue end
-
 			mapPart.CanTouch = false
 			mapPart.Locked = true
 		end
 	end
-	for _, link in RepS:GetDescendants() do
+	for _, link: Instance in RepS:GetDescendants() do
 		if link:IsA("PackageLink") then link:Destroy() end
 	end
 
 	--- npc setups
-	for _, npc in workspace.MapComponents.NPCs:GetChildren() do
+	for _, npc: Model in workspace.MapComponents.NPCs:GetChildren() do
 		npc.Humanoid.Animator:LoadAnimation(package.Animations.NPCIdle):Play()
 	end
 
 	--- sound setups
 	RepS.Package.Unloads.Musics.Parent = SoundService
 	RepS.Package.Unloads.SFXs.Parent = SoundService
-	for _, sound in package.Sounds:GetChildren() do
+	for _, sound: Sound in package.Sounds:GetChildren() do
 		if sound.Name == "SFXs" then
 			for _, sfx in sound:GetChildren() do sfx.SoundGroup = SoundService.SFXs end
 		else
@@ -80,23 +78,23 @@ local function mainSetup()
 		end
 	end
 	package.Sounds.Parent = workspace
-	for _, child in package.MonsterAttacks:GetDescendants() do
+	for _, child: Instance in package.MonsterAttacks:GetDescendants() do
 		if child:IsA("Sound") then child.SoundGroup = SoundService.SFXs end
 	end
 
 	--- zone setups
 	SS.Package.Zones.Parent = workspace.MapComponents
-	for _, zone in workspace.MapComponents.Zones:GetChildren() do zone.Transparency = 1 end
+	for _, zone: BasePart in workspace.MapComponents.Zones:GetChildren() do zone.Transparency = 1 end
 
 	--- monster setups
-	for _, child in resources.MonsterAttacks:GetChildren() do
+	for _, child: Script in resources.MonsterAttacks:GetChildren() do
 		if package.MonsterModels:FindFirstChild(child.Name) then
 			child.Parent = package.MonsterModels[child.Name]
 			child.Name = "Attack"
 			child.Disabled = true
 		end
 	end
-	for _, child in package.MonsterModels:GetChildren() do
+	for _, child: Model in package.MonsterModels:GetChildren() do
 		local targetingList = instanceNew("Folder")
 		targetingList.Name = "TargetingList"
 		targetingList.Parent = child
@@ -117,12 +115,12 @@ local function mainSetup()
 		cageHolder.Name = "CageHolder"
 		cageHolder.Parent = child
 	end
-	for _, child in package.MonsterAttacks:GetDescendants() do
+	for _, child: Model in package.MonsterAttacks:GetDescendants() do
 		if resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
 			resources.MonsterBlastAttacks[child.Name].Parent = child
 		end
 	end
-	for _, locator in workspace.Monsters:GetDescendants() do
+	for _, locator: Instance in workspace.Monsters:GetDescendants() do
 		if locator:HasTag("MonsterLocation") then
 			RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
 
@@ -132,7 +130,7 @@ local function mainSetup()
 	end
 
 	--- player attacks setups
-	for _, child in package.PlayerAttacks:GetChildren() do
+	for _, child: Model in package.PlayerAttacks:GetChildren() do
 		resources.Unloads.OrbAnim:Clone().Parent = child
 	end
 	resources.Unloads.BorderColorTween:Clone().Parent = package.Unloads.CombatBorder.Border
@@ -167,10 +165,8 @@ local function mainSetup()
 
 	--- join friend in titlescreen return info
 	local function _returnFriends(message: table)
-		for _, player in Players:GetPlayers() do
-			if player.UserId == message.Data then
-				MS:PublishAsync("JoinFriendCheck", game.JobId)
-			end
+		for _, player: Player in Players:GetPlayers() do
+			if player.UserId == message.Data then MS:PublishAsync("JoinFriendCheck", game.JobId) end
 		end
 	end
 	MS:SubscribeAsync("ReturnFriendLocation", _returnFriends)
@@ -187,9 +183,7 @@ local function mainSetup()
 			accessCode = upper(accessCode)
 
 			MS:SubscribeAsync("ReturnAllPrivateServers", function(message)
-				if message.Data == accessCode then
-					MS:PublishAsync("JoinPrivateCheck", { accessCode, code })
-				end
+				if message.Data == accessCode then MS:PublishAsync("JoinPrivateCheck", { accessCode, code }) end
 			end)
 
 			package.PrivateServerId.Value = accessCode

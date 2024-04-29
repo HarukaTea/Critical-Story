@@ -2,7 +2,12 @@
 --!optimize 2
 --!native
 
-local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
+local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
+
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
 local model = script.Parent :: Model
 local orbLifeTime = model:GetAttribute("OrbLifeTime") - 0.8
@@ -10,26 +15,18 @@ local orbLifeTime = model:GetAttribute("OrbLifeTime") - 0.8
 local wait = task.wait
 local nsNew = NumberSequence.new
 
-ServerUtil:WeldPart(model.Base, model, "Orb")
+ServerUtil:WeldPart(model.Middle, model)
 
-model.Base.Beam1.Transparency = nsNew(1, 1)
-model.Base.Beam2.Transparency = nsNew(1, 1)
+model.Middle.Beam1.Transparency = nsNew(1, 1)
+model.Middle.Beam2.Transparency = nsNew(1, 1)
 model.Part.Transparency = 1
 
-for i = 1, 10 do
-	model.Base.Beam1.Transparency = nsNew((1 - (0.2 * i)), 1)
-	model.Base.Beam2.Transparency = nsNew((1 - (0.2 * i)), 1)
-	model.Part.Transparency -= 0.1
-
-	wait(0.02)
-end
+SuperTween.new(model.Middle.Beam1, AssetBook.TweenInfos.half, { Transparency = nsNew(-1, 1) }):Play()
+SuperTween.new(model.Middle.Beam2, AssetBook.TweenInfos.half, { Transparency = nsNew(-1, 1) }):Play()
+SuperTween.new(model.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 
 wait(orbLifeTime)
 
-for i = 10, 1, -1 do
-	model.Base.Beam1.Transparency = nsNew((1 - (0.2 * i)), 1)
-	model.Base.Beam2.Transparency = nsNew((1 - (0.2 * i)), 1)
-	model.Part.Transparency += 0.1
-
-	wait(0.02)
-end
+SuperTween.new(model.Middle.Beam1, AssetBook.TweenInfos.half, { Transparency = nsNew(1, 1) }):Play()
+SuperTween.new(model.Middle.Beam2, AssetBook.TweenInfos.half, { Transparency = nsNew(1, 1) }):Play()
+SuperTween.new(model.Part, AssetBook.TweenInfos.half, { Transparency = 1 }):Play()

@@ -39,7 +39,7 @@ local function setup()
 	for _, folder: Folder in mapComponents.CageFolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
-	local monsters = {}
+	local monsters = {} :: { Model }
 	for _, monster: Model in monsterLocations:GetDescendants() do
 		if monster:HasTag("Monster") and not monster:GetAttribute("SubMonster") then monsters[#monsters + 1] = monster end
 	end
@@ -48,7 +48,7 @@ local function setup()
 		if tFind(monsters, monster) then
 			remove(monsters, tFind(monsters, monster))
 		else
-			monsters[#monsters + 1] = monster
+			if not monster:GetAttribute("SubMonster") then monsters[#monsters + 1] = monster end
 		end
 	end
 	CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
@@ -60,7 +60,10 @@ local function setup()
 		if encounterCD then return end
 
         for _, monster: Model in monsters do
-            if monster.PrimaryPart and monster:GetAttribute("InCombat") == false then
+            if monster.PrimaryPart
+				and monster:GetAttribute("InCombat") == false
+				and not monster:GetAttribute("SubMonster") then
+
                 if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 22 then
 					encounterCD = true
 
@@ -179,9 +182,6 @@ local function onTouched(hit: BasePart)
 		if not damagePart:FindFirstChild("Owner") then return end
 		if not char.PrimaryPart then return end
 
-		damagePart:RemoveTag("MonsterDMG")
-		damagePart:Destroy()
-
 		dmgTouchCD = true
 		Spawn(function()
 			wait(0.55)
@@ -192,13 +192,10 @@ local function onTouched(hit: BasePart)
 
 		Events.CharTakeDMG:Fire(damagePart)
 
-		for _ = 1, 5 do
-			ClientUtil:SetCharTrans(0.5, char)
-			wait(0.05)
+		damagePart:RemoveTag("MonsterDMG")
+		damagePart:Destroy()
 
-			ClientUtil:SetCharTrans(0, char)
-			wait(0.05)
-		end
+		ClientUtil:CharOnHit(char)
 	end
 end
 local function combatHolderHandler(folder: Folder)

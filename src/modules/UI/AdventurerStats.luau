@@ -4,12 +4,12 @@
 
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
-local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Bin = require(RepS.Modules.Packages.Bin)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
+local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
@@ -242,7 +242,9 @@ return function(plr: Player)
 	end
 	_autoEquipItems()
 	local function moveUpJumpBtn()
-		if UIS.TouchEnabled then
+		local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
+
+		if isMobile then
 			local touchGui = plr.PlayerGui:WaitForChild("TouchGui", 999) :: ScreenGui
 
 			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).AnchorPoint = v2New(0.82, 0.8)

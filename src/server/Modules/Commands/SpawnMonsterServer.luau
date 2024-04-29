@@ -5,40 +5,58 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Guard = require(RepS.Modules.Packages.Guard)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local cfNew = CFrame.new
+local wait = task.wait
 
 local levelCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
-local amountCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
+local amountCheck = Guard.Check(Guard.NumberMinMax(-1, 99999999))
 
-return function (context, level, amount)
+return function (context: table, monster: string, level: number, amount: number)
     local levelPass, levelWant = levelCheck(level)
     local amountPass, amountWant = amountCheck(amount)
 
     if not levelPass or not amountPass then
         return "I guess you typed incorrectly..."
     end
-
+    if not AssetBook.MonsterIds[monster] then
+        return "Are you sure there is a monster called "..monster.."?"
+    end
     if levelWant > 950 then
         return "Nah are you sure you can beat monsters that above level 950?"
     end
+    if amountWant > 4 then
+        return "Nah "..(amountWant + 1).." monsters will explode the server!"
+    end
 
-    local locator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: BasePart
+    local worldMonster = workspace.Monsters:FindFirstChild(AssetBook.MonsterIds[monster], true) :: BasePart
+    worldMonster = worldMonster:FindFirstChildWhichIsA("Model", true)
+
+    local locator = worldMonster.Parent:Clone() :: BasePart
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
     locator:SetAttribute("CantRespawn", true)
+    locator:SetAttribute("SubMonster", nil)
     locator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
     locator.Parent = workspace.Monsters
 
     RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
 
-    ServerUtil:SetupMonster(locator, levelWant)
+    local spawnedMonster = ServerUtil:SetupMonster(locator, levelWant)
     ServerUtil:ConnectMob(locator)
 
+    spawnedMonster:SetAttribute("InCombat", true)
+    Spawn(function()
+        wait(2)
+        spawnedMonster:SetAttribute("InCombat", false)
+    end)
+
     for _ = 1, amount do
-        local subLocator = workspace.Monsters["Initus Bay"]["Spike Fox"]:Clone() :: BasePart
+        local subLocator = worldMonster.Parent:Clone() :: BasePart
 
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)
@@ -53,5 +71,5 @@ return function (context, level, amount)
         ServerUtil:ConnectMob(subLocator)
     end
 
-    return "Level "..levelWant.." Spike Fox x"..amountWant.." Spawned"
+    return "Level "..levelWant.." "..AssetBook.MonsterIds[monster].." x"..amountWant.." spawned"
 end

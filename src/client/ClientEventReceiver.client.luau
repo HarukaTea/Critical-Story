@@ -10,6 +10,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Events = require(RepS.Modules.Data.Events)
 local Signals = require(RepS.Modules.Data.Signals)
+local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
 local plr = Players.LocalPlayer
 
@@ -22,7 +23,7 @@ local v3New = Vector3.new
 	Play the sound when server requests, usually used for
 	client-only SFXs
 ]]
-local function playSound(sound: Sound | string, pos: number)
+local function playSound(sound: Sound | string, pos: number?)
 	if sound == "StopAll" then
 		for _, music: Sound in workspace.Sounds:GetChildren() do
 			if music:IsA("Sound") then music:Stop() end
@@ -30,7 +31,7 @@ local function playSound(sound: Sound | string, pos: number)
 		return
 	end
 	if sound.Playing then
-		local newSound = sound:Clone()
+		local newSound = sound:Clone() :: Sound
 		newSound.PlayOnRemove = true
 		newSound.TimePosition = if pos then pos else 0
 		newSound.Parent = workspace
@@ -56,7 +57,7 @@ local function clientTweenPlayer(objs: table, goal: table, style: string)
 		if not obj then continue end
 		if not obj.Parent then continue end
 
-		TS:Create(obj, style, goal):Play()
+		SuperTween.new(obj, style, goal):Play()
 	end
 end
 Events.ClientTween:Connect(clientTweenPlayer)
@@ -68,10 +69,7 @@ Events.ClientTween:Connect(clientTweenPlayer)
 local function vfxChestUnlock(chest: Model)
 	workspace.Sounds.SFXs.ChestOpened:Play()
 
-	for _ = 1, 5 do
-		wait(0.01)
-		chest.Top:PivotTo(chest.Top.PrimaryPart.CFrame * cfAngles(rad(10), 0, 0))
-	end
+	SuperTween.new(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) }):Play()
 end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
 

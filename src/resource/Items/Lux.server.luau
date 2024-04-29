@@ -49,7 +49,7 @@ while wait() do
 		if (luxBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			SkillUtil:MagicVFX(plr, monster)
+			SkillUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			local eff = RepS.Package.MagicAssets.Lux.Flashed:Clone() :: BasePart

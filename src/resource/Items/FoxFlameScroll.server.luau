@@ -51,7 +51,7 @@ while wait() do
 			hit = true
 
 			SkillUtil:Burn(plr, monster, 6)
-			SkillUtil:MagicVFX(plr, monster)
+			SkillUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			local eff = RepS.Package.MagicAssets.FoxFlameScroll.FoxBlast:Clone() :: BasePart

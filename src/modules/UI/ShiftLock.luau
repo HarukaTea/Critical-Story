@@ -4,10 +4,12 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
+local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+
+local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
 
 local MobileShiftLock = {}
 MobileShiftLock.__index = MobileShiftLock
@@ -50,17 +52,17 @@ function MobileShiftLock:EnableShiftLock()
 end
 
 return function(plr: Player)
-	if not UIS.TouchEnabled then return end
+	if not isMobile then return end
 
 	local self = setmetatable({}, MobileShiftLock)
 
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	self.rsConnection, self.enabled = nil, false
-	self.UI, self.shiftLockLabel = Fusion.Value(), Fusion.Value()
+	self.shiftLockLabel = Fusion.Value()
 	self.ON_ICON, self.OFF_ICON = "rbxasset://textures/ui/mouseLock_on.png", "rbxasset://textures/ui/mouseLock_off.png"
 
-	Fusion.New("ScreenGui")({
+	local UI = Fusion.New("ScreenGui")({
 		Name = "MobileShiftLock",
 		ScreenInsets = Enum.ScreenInsets.None,
 		DisplayOrder = 10,
@@ -96,7 +98,7 @@ return function(plr: Player)
 	local function clearGarbage()
 		self:SetLockState("Off")
 
-		Fusion.peek(self.UI):Destroy()
+		UI:Destroy()
 	end
 	self.char.Humanoid.Died:Once(clearGarbage)
 end

@@ -40,7 +40,7 @@ local function questDataSetup()
         wait()
         local questName = quest.Name..quest.Value
 
-        for _, child in char.CharStats.Quests:GetChildren() do
+        for _, child: Script in char.CharStats.Quests:GetChildren() do
             if sFind(child.Name, questName) then child:Destroy() end
         end
     end

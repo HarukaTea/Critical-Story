@@ -29,31 +29,28 @@ local ServerUtil = {}
 --[[
 	SuperWeld actually, a simple function to create weld between two parts
 ]]
-function ServerUtil:WeldPart(part: Part, welded: Model, style: string?)
-	local finalWeld = if style == "Orb" then welded.Base else welded.Middle
-
+function ServerUtil:WeldPart(part: Part, welded: Model)
 	local C = welded:GetChildren()
 	for i = 1, #C do
 		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") then
 			local W = instanceNew("Weld")
-			W.Part0 = finalWeld
+			W.Part0 = welded.Middle
 			W.Part1 = C[i]
-			local CJ = cfNew(finalWeld.Position)
-			W.C0 = finalWeld.CFrame:Inverse() * CJ
+			local CJ = cfNew(welded.Middle.Position)
+			W.C0 = welded.Middle.CFrame:Inverse() * CJ
 			W.C1 = C[i].CFrame:Inverse() * CJ
-			W.Parent = finalWeld
+			W.Parent = welded.Middle
 		end
 		local Y = instanceNew("Weld")
 		Y.Part0 = part
-		Y.Part1 = finalWeld
+		Y.Part1 = welded.Middle
 		Y.C0 = cfNew(v3New())
 		Y.Parent = Y.Part0
 	end
+
 	local h = welded:GetChildren()
 	for _, child in h do
-		if child:IsA("BasePart") or child:IsA("UnionOperation") then
-			child.Anchored = false
-		end
+		if child:IsA("BasePart") or child:IsA("UnionOperation") then child.Anchored = false end
 	end
 end
 
@@ -62,42 +59,29 @@ end
 ]]
 function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local plr = Players:GetPlayerFromCharacter(char)
-	local class = forceClass or plr:GetAttribute("Class")
+	local class = forceClass or plr:GetAttribute("Class") :: string
+	local styleFolder = RepS.Package.StyleWeapons[class] :: Folder
 
-	for _, child in char:GetChildren() do
+	for _, child: Instance in char:GetChildren() do
 		if sFind(child.Name, "Weapon") then child:Destroy() end
 	end
 
-	if char:GetAttribute("InCombat") == false then
-		if class == "Alchemist" then
-			local model = RepS.Package.StyleWeapons.Alchemist.WeaponEquipped:Clone() :: Model
-			local model2 = RepS.Package.StyleWeapons.Alchemist.WeaponEquipped2:Clone() :: Model
+	local function _equipWeapon(weapon: Model, defaultPart: string)
+		local weldPos = if weapon:GetAttribute("Position") then weapon:GetAttribute("Position") else defaultPart
 
-			ServerUtil:WeldPart(char["Right Arm"], model)
-			ServerUtil:WeldPart(char["Left Arm"], model2)
+		ServerUtil:WeldPart(char[weldPos], weapon)
 
-			model.Parent = char
-			model2.Parent = char
-		else
-			local model = RepS.Package.StyleWeapons[class].WeaponUnequip:Clone() :: Model
+		weapon.Parent = char
+	end
+	if char:GetAttribute("InCombat") == false then --- in case nil
+		_equipWeapon(styleFolder.WeaponUnequip:Clone(), "Torso")
 
-			ServerUtil:WeldPart(char.Torso, model)
-
-			model.Parent = char
-		end
+		if styleFolder:FindFirstChild("WeaponUnequip2") then _equipWeapon(styleFolder.WeaponUnequip2:Clone(), "Torso") end
 
 	elseif char:GetAttribute("InCombat") then
-		local weapon = RepS.Package.StyleWeapons[class].WeaponEquipped:Clone() :: Model
+		_equipWeapon(styleFolder.WeaponEquipped:Clone(), "Right Arm")
 
-        ServerUtil:WeldPart(char["Right Arm"], weapon)
-        weapon.Parent = char
-
-        if class == "Repeater" or class == "Alchemist" then
-            local weapon2 = RepS.Package.StyleWeapons[class].WeaponEquipped2:Clone() :: Model
-            ServerUtil:WeldPart(char["Left Arm"], weapon2)
-
-            weapon2.Parent = char
-        end
+        if styleFolder:FindFirstChild("WeaponEquipped2") then _equipWeapon(styleFolder.WeaponEquipped2:Clone(), "Right Arm") end
 	end
 end
 
@@ -106,11 +90,11 @@ end
 ]]
 function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
 	local plr = Players:GetPlayerFromCharacter(char)
-	local class = forceArmor or plr:GetAttribute("Class")
+	local class = forceArmor or plr:GetAttribute("Class") :: string
 
     if char.Humanoid.Health > 0 then
         if char:FindFirstChild("Armor") then char.Armor:Destroy() end
-		for _, child in char:GetChildren() do
+		for _, child: Instance in char:GetChildren() do
 			if child:HasTag("Weapon") then child:Destroy() end
 		end
 
@@ -118,11 +102,11 @@ function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
         local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg" }
 
         --- wait character fully loads
-        for _, part in equipList do char:WaitForChild(part, 999) end
+        for _, part: string in equipList do char:WaitForChild(part, 999) end
 
 		--- equip armor
 		local function _equipArmorPart(part: string)
-			for _, child in armor[part]:GetChildren() do
+			for _, child: BasePart in armor[part]:GetChildren() do
                 if child.Name ~= "Middle" then
                     local weldC = instanceNew("WeldConstraint")
                     weldC.Part0 = child.Parent.Middle
@@ -136,7 +120,7 @@ function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
             weld.Part1 = armor[part].Middle
             weld.Parent = armor
 		end
-        for _, part in equipList do
+        for _, part: string in equipList do
 			if not armor:FindFirstChild(part) then continue end
 
             _equipArmorPart(part)
@@ -170,16 +154,17 @@ end
 function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	if not RepS.Package.MonsterModels:FindFirstChild(locator.Name) then return end
 
-	local level = forceLevel or locator:GetAttribute("Levels")
+	local level = forceLevel or locator:GetAttribute("Levels") :: number
 	local monster = RepS.Package.MonsterModels[locator.Name]:Clone() :: Model
 	monster:PivotTo(cfNew(locator.Position) * cfAngles(0, rad(random(1, 360)), 0))
 	monster:SetAttribute("Levels", level)
-	monster.Head.TierDisplay.Text.Text = monster.Name
-	monster.Head.TierDisplay.Level.Text = "Level " .. level
-	monster.Head.TierDisplay.Enabled = true
 
-	if locator:GetAttribute("SubMonster") then
-		monster.Head.TierDisplay.Enabled = false
+	if not locator:GetAttribute("SubMonster") then
+		local tierDisplay = RepS.Package.Effects.TierDisplay:Clone() :: BillboardGui
+		tierDisplay.Monster.Text = monster.Name
+		tierDisplay.Levels.Text = "Level "..level
+		tierDisplay.Parent = monster.Head
+	else
 		monster:SetAttribute("SubMonster", true)
 	end
 
@@ -189,7 +174,12 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	monster:SetAttribute("Damage", 5 * level)
 	monster:SetAttribute("InCombat", false)
 
-	for _, child in monster:GetChildren() do
+	local numberDisplay = RepS.Package.Effects.Display:Clone() :: BillboardGui
+	numberDisplay.Number.Text = monster:GetAttribute("MaxHealth")
+	numberDisplay.Enabled = false
+	numberDisplay.Parent = monster.Head
+
+	for _, child: Instance in monster:GetChildren() do
 		if child:IsA("Part") and monster:FindFirstChild(child.Name .. "Model") then
 			ServerUtil:WeldPart(child, monster[child.Name .. "Model"])
 		end
@@ -210,9 +200,8 @@ end
 ]]
 function ServerUtil:MonsterActivateCombat(monster: Model)
 	monster:SetAttribute("InCombat", true)
-	monster.Head.TierDisplay.Enabled = false
+	if not monster:GetAttribute("SubMonster") then monster.Head.TierDisplay.Enabled = false end
 	monster.Head.Display.Enabled = true
-	monster.Head.Display.Number.Text = monster:GetAttribute("MaxHealth")
 
 	local folder = instanceNew("Folder")
 	folder.Name = monster.Name
@@ -244,8 +233,8 @@ end
 	You can make it not respawn after defeated, like story monsters
 ]]
 function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespawn: boolean?)
-	local respawnLocatorTip = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
-	local locator = monster.Parent
+	local respawnLocatorTip: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+	local locator = monster.Parent :: BasePart
 
 	wait(1)
 	if monster.Holder.Value then monster.Holder.Value:Destroy() end
@@ -253,13 +242,7 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	local defeatedEffect = RepS.Package.Effects.DefeatedEffect:Clone() :: Part
 	defeatedEffect.Position = deadPos
 	defeatedEffect.Parent = workspace
-
 	Debris:AddItem(defeatedEffect, 1)
-
-	Spawn(function()
-		wait(0.3)
-		defeatedEffect.Particle.Enabled = false
-	end)
 
 	if not allowRespawn or locator:GetAttribute("CantRespawn") then
 		monster:Destroy()
@@ -269,7 +252,7 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	--- multi-combat mechanic
 	local waitingLocators = {}
 	if monster.WaitingList:FindFirstChildOfClass("ObjectValue") then
-		for _, waitingMonster in monster.WaitingList:GetChildren() do
+		for _, waitingMonster: ObjectValue in monster.WaitingList:GetChildren() do
 			insert(waitingLocators, waitingMonster.Value)
 		end
 	end
@@ -284,7 +267,7 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 
 	wait(13)
 	ServerUtil:SetupMonster(locator)
-	for _, waitingLocator in waitingLocators do
+	for _, waitingLocator: BasePart in waitingLocators do
 		ServerUtil:SetupMonster(waitingLocator)
 	end
 end
@@ -314,7 +297,7 @@ function ServerUtil:FindAllIgnoreParts() : table
 	local ignore = {}
 
 	for _, child in workspace.Monsters:GetDescendants() do
-		if child:HasTag("Monster") then insert(ignore, child) end
+		if child:HasTag("Monster") and child.PrimaryPart then insert(ignore, child) end
 	end
 	for _, plr in Players:GetPlayers() do
 		if plr.Character then insert(ignore, plr.Character) end
@@ -395,10 +378,7 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 		encounterHighlight.Adornee = char
 		Debris:AddItem(encounterHighlight, 2)
 
-		Spawn(function()
-			wait(1)
-			Events.ClientTween:Fires({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
-		end)
+		Events.ClientTween:Fires({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
 	end
 end
 
@@ -420,7 +400,7 @@ function ServerUtil:ShowNumber(target: Model, number: number, color: Color3?, si
 	end
 
 	eff.Display.Text.Text = if number == 0 then "Miss" else number
-	eff.CFrame = target.PrimaryPart.CFrame * cfNew(random(-5, 5), random(0, 4), random(-5, 5))
+	eff.CFrame = target.PrimaryPart.CFrame * cfNew(random(-5, 5), random(0, 2), random(-5, 5))
 	eff.Parent = workspace
 
 	Debris:AddItem(eff, 2)
@@ -430,10 +410,13 @@ end
 	Pop up the text which you give, around the part in workspace
 ]]
 function ServerUtil:ShowText(char: Model, info: string, color: Color3)
+	if not char then return end
+	if not char.PrimaryPart then return end
+
 	local eff = RepS.Package.Effects.Text:Clone() :: Part
 	eff.Display.Text.Text = info
 	eff.Display.Text.TextColor3 = color
-	eff.CFrame = char.PrimaryPart.CFrame * cfNew(0, random(-5, 5), 0)
+	eff.CFrame = char.PrimaryPart.CFrame * cfNew(random(-5, 5), random(0, 2), random(-5, 5))
 	eff.Parent = workspace
 
 	Debris:AddItem(eff, 2)
@@ -458,7 +441,7 @@ end
 	Give items to player, used by materials or tester commands
 ]]
 function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
-	local inventoryFolder = plr.Inventory
+	local inventoryFolder = plr.Inventory :: Folder
 
 	if inventoryFolder:FindFirstChild(item) then
 		inventoryFolder[item].Value += amount
@@ -572,11 +555,9 @@ end
 	A simple function to set a part's collision group
 ]]
 function ServerUtil:SetCollisionGroup(object: Instance, group: string)
-	if object:IsA("BasePart") then
-		object.CollisionGroup = group
-	end
+	if object:IsA("BasePart") then object.CollisionGroup = group end
 
-	for _, child in object:GetChildren() do
+	for _, child: Instance in object:GetChildren() do
 		ServerUtil:SetCollisionGroup(child, group)
 	end
 end
@@ -628,7 +609,7 @@ function ServerUtil:RagdollNPC(npc: Model)
 		wc.Parent = rp
 		rp.Parent = part
 	end
-	for _, child in npc:GetDescendants() do
+	for _, child: Instance in npc:GetDescendants() do
 		if child:IsA("Motor6D") then
 			if not ATTACHMENT_CFRAMES[child.Name] then return end
 
@@ -669,7 +650,7 @@ function ServerUtil:GettingUpNPC(char: Model)
 		["RagdollConstraint"] = true,
 		["ColliderPart"] = true,
 	}
-	for _, child in char:GetDescendants() do
+	for _, child: Instance in char:GetDescendants() do
 		if ragdollInstanceNames[child.Name] then child:Destroy() end
 		if child:IsA("Motor6D") then child.Enabled = true end
 	end
@@ -681,7 +662,7 @@ end
 	Reward the quest awards
 ]]
 function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Player)
-	for reward, val in StoryBook[series][questId].Rewards do
+	for reward: string, val: number in StoryBook[series][questId].Rewards do
 		HarukaLib:Add(plr, reward, val)
 
 		ServerUtil:ShowText(plr.Character, "+"..val.." "..reward, fromRGB(212, 255, 0))
@@ -697,7 +678,7 @@ function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
 	local lastLocation = plr:GetAttribute("LastLeave") :: Vector3
 	local lastDeath = if lastLocation and lastLocation ~= v3New() then lastLocation else char.PrimaryPart.Position
 	local spawnPoint, distance = nil, 9999999999
-	for _, child in workspace.Maps:GetDescendants() do
+	for _, child: Instance in workspace.Maps:GetDescendants() do
 		if child.Name == "SpawnPoint" then
 			local tDistance = (child.Position - lastDeath).Magnitude
 
@@ -712,18 +693,6 @@ function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
 end
 
 --[[
-	Get touching parts includes non-collide parts
-]]
-function ServerUtil:GetTouchingParts(part: BasePart | UnionOperation) : table
-	local connection = part.Touched:Connect(function() end)
-	local touchingParts = part:GetTouchingParts()
-
-	connection:Disconnect()
-
-	return touchingParts
-end
-
---[[
 	Connects to an exist mob when combat ends
 ]]
 function ServerUtil:ConnectMob(locator: BasePart)
@@ -732,7 +701,7 @@ function ServerUtil:ConnectMob(locator: BasePart)
 
 		monster.Attack.Disabled = true
 
-		local attackFolder = monster.Holder.Value
+		local attackFolder = monster.Holder.Value :: Folder?
 		local continueCombatCheck = false
 
 		--- another issue, don't change this else it will bug
@@ -753,22 +722,23 @@ function ServerUtil:ConnectMob(locator: BasePart)
 				end
 				attack:RemoveTag("MonsterDMG")
 			end
-			for _, player in combatPlrs do
+			for _, player: Player in combatPlrs do
 				Events.ClientTween:Fire(player, attacks, { Transparency = 1 }, "one")
 			end
 
-			for _, player in combatPlrs do
-				local charStats = player.Character.CharStats :: Folder
+			for _, player: Player in combatPlrs do
+				local char = player.Character
+				local charStats = char.CharStats :: Folder
 
 				--- player finished combat
 				if not charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue") then
 					local beatList = { monster }
-					for _, otherMonster in monster.WaitingList:GetChildren() do
+					for _, otherMonster: ObjectValue in monster.WaitingList:GetChildren() do
 						insert(beatList, otherMonster)
 					end
 
 					local totalEXP = 0
-					for _, defeated in beatList do
+					for _, defeated: Model in beatList do
 						totalEXP += defeated:GetAttribute("EXP")
 
 						ServerUtil:GiveDrop(player, RepS.Package.MonsterModels[defeated.Name])
@@ -778,15 +748,15 @@ function ServerUtil:ConnectMob(locator: BasePart)
 					HarukaLib:Add(player, "Gold", floor(totalEXP / 1.5))
 					HarukaLib:Add(player, "RP", floor(totalEXP / 5))
 
-					ServerUtil:ShowText(player.Character, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
-					ServerUtil:ShowText(player.Character, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))
-					ServerUtil:ShowText(player.Character, "+" .. floor(totalEXP / 5) .. " RP", fromRGB(0, 255, 255))
+					ServerUtil:ShowText(char, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
+					ServerUtil:ShowText(char, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))
+					ServerUtil:ShowText(char, "+" .. floor(totalEXP / 5) .. " RP", fromRGB(0, 255, 255))
 
-					player.Character:SetAttribute("InCombat", false)
-					player.Character:SetAttribute("OrbAttackingTime", false)
+					char:SetAttribute("InCombat", false)
+					char:SetAttribute("OrbAttackingTime", false)
 					charStats.TargetMonster.Value = nil
 
-					for _, orbFolder in workspace.MapComponents.OrbFolders:GetChildren() do
+					for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
 						if orbFolder.Name == player.Name then orbFolder:Destroy() end
 					end
 
@@ -797,15 +767,15 @@ function ServerUtil:ConnectMob(locator: BasePart)
 				charStats.TargetMonster.Value = charStats.TargetMonsters:FindFirstChildOfClass("ObjectValue").Value
 			end
 
-			local realLocator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
-			for _, child in realLocator:GetDescendants() do
+			local realLocator: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+			for _, child: Instance in realLocator:GetDescendants() do
 				if child:HasTag("Monster")
 					and child ~= monster
-					and child:GetAttribute("InCombat") == true
+					and child:GetAttribute("InCombat")
 					and child:GetAttribute("Health") > 0 then
 
-					if child:FindFirstChild("TargetingList") and
-						child.TargetingList:FindFirstChildOfClass("ObjectValue") then
+					if child:FindFirstChild("TargetingList")
+						and child.TargetingList:FindFirstChildOfClass("ObjectValue") then
 
 						continueCombatCheck = true
 
@@ -815,7 +785,7 @@ function ServerUtil:ConnectMob(locator: BasePart)
 						locatorSymbol:SetAttribute("EXP", monster:GetAttribute("EXP"))
 						locatorSymbol.Parent = child.WaitingList
 
-						for _, pastWaiting in monster.WaitingList:GetChildren() do
+						for _, pastWaiting: ObjectValue in monster.WaitingList:GetChildren() do
 							pastWaiting.Parent = child.WaitingList
 						end
 						break
@@ -838,7 +808,7 @@ function ServerUtil:SortPlayers(players: table, monster: Model, cage: Model)
 		if not plr then continue end
 		if not plr.Character then continue end
 		if not plr.Character.PrimaryPart then continue end
-		
+
 		local char = plr.Character
 
 		char:PivotTo(cage["Player"..index].CFrame)

@@ -3,15 +3,15 @@
 --!native
 
 return {
-    Name = "setgold",
+    Name = "givegold",
     Aliases = {"gold"},
-    Description = "Set the gold amount to which you given.",
+    Description = "Give the gold to which you given.",
     Group = "Testers",
     Args = {
         {
             Type = "player",
             Name = "player",
-            Description = "The player you wish to set"
+            Description = "The player you want to give"
         },
         {
             Type = "number",

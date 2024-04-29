@@ -16,11 +16,9 @@ local cfAngles = CFrame.Angles
 local tFind, remove = table.find, table.remove
 
 --- add all mobs
-local monsters = {}
-for _, monster in workspace:WaitForChild("Monsters"):GetDescendants() do
-    if monster:HasTag("Monster") then
-        monsters[#monsters + 1] = monster
-    end
+local monsters = {} :: { Model }
+for _, monster: Model in workspace:WaitForChild("Monsters"):GetDescendants() do
+    if monster:HasTag("Monster") then monsters[#monsters + 1] = monster end
 end
 local function _handleMonster(monster: Model)
     wait()
@@ -34,7 +32,7 @@ CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
 CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
 Clock(1.5, function()
-    for _, monster in monsters do
+    for _, monster: Model in monsters do
         if monster.PrimaryPart and not monster:GetAttribute("InCombat") then
             if (char.PrimaryPart.Position - monster.PrimaryPart.Position).Magnitude <= 159.9 then
                 Spawn(function()

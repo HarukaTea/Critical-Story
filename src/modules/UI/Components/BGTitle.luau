@@ -14,7 +14,6 @@ local New, Children, OnEvent, Value, Tween, Computed =
 local color3New, ud2New, udNew = Color3.new, UDim2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local upper = string.upper
 
 local function TitleFrame(id: string, self: table): Frame
 	local BG_COLOR = { Menu = Value(fromRGB(30, 30, 30)), Backpack = Value(fromRGB(30, 30, 30)) }
@@ -60,7 +59,7 @@ local function TitleFrame(id: string, self: table): Frame
 			Components.TextLabel({
 				Position = fromScale(0.063, 0.195),
 				Size = fromScale(0.7, 0.6),
-				Text = upper(id),
+				Text = id,
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}),
 			Components.TextButton({

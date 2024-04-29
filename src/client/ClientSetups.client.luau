@@ -6,15 +6,16 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
 local Cmdr = require(RepS:WaitForChild("CmdrClient"))
 
 local plr = Players.LocalPlayer
 
-local wait = task.wait
 local cfAngles = CFrame.Angles
 local rad = math.rad
 
@@ -29,12 +30,7 @@ local function openAcquiredChests()
             chest:SetAttribute("Opened", true)
             chest.Giver.Chest.Enabled = false
 
-            Spawn(function()
-                for _ = 1, 5 do
-                    wait(0.01)
-                    chest.Top:PivotTo(chest.Top.PrimaryPart.CFrame * cfAngles(rad(10), 0, 0))
-                end
-            end)
+            SuperTween.new(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) }):Play()
         end
     end
 end

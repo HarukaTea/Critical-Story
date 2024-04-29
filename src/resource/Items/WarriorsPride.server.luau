@@ -51,7 +51,7 @@ while wait() do
 		if (pride.Position - monster.PrimaryPart.Position).Magnitude <= 3 then
 			hit = true
 
-			SkillUtil:MagicVFX(plr, monster)
+			SkillUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			pride:Destroy()
