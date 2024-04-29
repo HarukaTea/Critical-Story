@@ -29,13 +29,15 @@ local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
-local Children, New, Value, AttributeChange, Tween, Computed, peek =
+local Children, New, Value, AttributeChange, Tween, Computed, Hydrate, OnChange, peek =
 	Fusion.Children,
 	Fusion.New,
 	Fusion.Value,
 	Fusion.AttributeChange,
 	Fusion.Tween,
 	Fusion.Computed,
+	Fusion.Hydrate,
+	Fusion.OnChange,
 	Fusion.peek
 
 local AdventurerStats = {}
@@ -92,6 +94,9 @@ return function(plr: Player)
 	}
 	self.shadowTrans = Value(1)
 	self.Add, self.Empty = Bin()
+
+	self.version, self.privateId, self.serverLocation =
+		Value(RepS.Package.Version.Value), Value(RepS.Package.PrivateServerId.Value), Value(RepS.Package.ServerLocation.Value)
 
 	Components.ScreenGui({
 		Name = "AdventurerStats",
@@ -158,9 +163,10 @@ return function(plr: Player)
 						FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
 						TextTransparency = 0.5,
 						TextXAlignment = Enum.TextXAlignment.Left,
-						Text = RepS.Package.ServerLocation.Value
-							.." "..RepS.Package.PrivateServerId.Value
-							.." v"..RepS.Package.Version.Value,
+
+						Text = Computed(function(use)
+							return use(self.serverLocation).." "..use(self.privateId).." v"..use(self.version)
+						end),
 
 						[Children] = {
 							New("UIPadding")({ PaddingLeft = udNew(0.01, 0) }),
@@ -260,12 +266,12 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	Fusion.Hydrate(self.humanoid)({
+	Hydrate(self.humanoid)({
 		[Fusion.OnEvent("Touched")] = function(hit)
 			if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
 		end
 	})
-	Fusion.Hydrate(plr)({
+	Hydrate(plr)({
 		[AttributeChange("EXP")] = function(exp: number)
 			playerData.EXP[1]:set(exp)
 			playerData.EXP[2]:set(floor(peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
@@ -285,6 +291,21 @@ return function(plr: Player)
 		end,
 		[AttributeChange("LvPoints")] = function(lvPoints: number)
 			playerData.LvPoints:set(lvPoints)
+		end
+	})
+	Hydrate(RepS.Package.ServerLocation)({
+		[OnChange("Value")] = function(newLocation: string)
+			self.serverLocation:set(newLocation)
+		end
+	})
+	Hydrate(RepS.Package.PrivateServerId)({
+		[OnChange("Value")] = function(newId: string)
+			self.privateId:set(newId)
+		end
+	})
+	Hydrate(RepS.Package.Version)({
+		[OnChange("Value")] = function(newVersion: string)
+			self.version:set(newVersion)
 		end
 	})
 

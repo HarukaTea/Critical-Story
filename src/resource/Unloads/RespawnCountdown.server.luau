@@ -2,7 +2,7 @@
 --!optimize 2
 --!native
 
-local respawnTimer = script.Parent
+local respawnTimer = script.Parent :: BasePart
 
 local wait = task.wait
 

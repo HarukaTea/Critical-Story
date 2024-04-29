@@ -74,6 +74,7 @@ local function TurnBaseSkillPanel(self: table) : ScrollingFrame
             Fusion.New("UIListLayout")({
                 Padding = udNew(0, 8),
                 SortOrder = Enum.SortOrder.LayoutOrder,
+                VerticalAlignment = Enum.VerticalAlignment.Bottom,
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
 
                 [Fusion.OnChange("AbsoluteContentSize")] = function(newSize: Vector2)

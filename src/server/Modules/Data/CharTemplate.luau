@@ -12,6 +12,7 @@ return {
     MaxShield = 5,
     Defense = 0,
     OrbSpawnTime = 6,
+    OrbLifeTime = 15,
 
     --- States
     InCombat = false,

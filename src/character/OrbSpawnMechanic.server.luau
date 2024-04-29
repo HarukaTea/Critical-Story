@@ -24,7 +24,7 @@ local function orbSpawnHandler(state: boolean)
     local function _placeOrb(orb: Model, pos: CFrame)
         orb.Owner.Value = char
         orb:PivotTo(pos)
-        orb:SetAttribute("OrbLifeTime", 4)
+        orb:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
         orb.Parent = orbFolders[char.Name]
 
         Debris:AddItem(orb, orb:GetAttribute("OrbLifeTime"))

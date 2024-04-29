@@ -231,11 +231,16 @@ Fusion.Hydrate(plr)({
 })
 Fusion.Hydrate(char)({
     [AttributeChange("TP")] = tpCheck,
+    [AttributeChange("Shield")] = shieldCheck,
+
+    [AttributeChange("MinDMGBuff")] = updateMinDMG,
+    [AttributeChange("MaxDMGBuff")] = updateMaxDMG,
+    [AttributeChange("MagicBuff")] = updateMagic,
     [AttributeChange("ShieldBuff")] = updateShield,
     [AttributeChange("HealthBuff")] = updateHP,
     [AttributeChange("SpeedBuff")] = updateSpeed,
     [AttributeChange("JumpBuff")] = updateJump,
-    [AttributeChange("Shield")] = shieldCheck,
+
     [AttributeChange("InCombat")] = function()
         ServerUtil:EquipWeapon(char)
     end

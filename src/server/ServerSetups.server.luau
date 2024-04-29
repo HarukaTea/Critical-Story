@@ -197,21 +197,25 @@ local function mainSetup()
 	local function _serverLocationDetection()
 		if RS:IsStudio() then return end
 
-		local serverInfo = HttpService:GetAsync("https://ipapi.co/json", true)
+		local success = pcall(function()
+			local serverInfo = HttpService:GetAsync("https://ipapi.co/json", true)
 
-		if serverInfo then
-			local realInfo = HttpService:JSONDecode(serverInfo)
-			local serverLocation = realInfo.country
+			if serverInfo then
+				local realInfo = HttpService:JSONDecode(serverInfo)
+				local serverLocation = realInfo.country
 
-			if serverLocation then
-				RepS.Package.ServerLocation.Value = serverLocation
+				if serverLocation then
+					RepS.Package.ServerLocation.Value = serverLocation
 
-				print("Server Location: "..serverLocation)
-			else
-				warn("Fetched IP data, but is empty")
+					print("Server Location: "..serverLocation)
+				end
 			end
-		else
-			warn("Failed to fetch IP data")
+		end)
+
+		if not success then
+			warn("Failed to fetch Server Location.")
+
+			RepS.Package.ServerLocation.Value = "Unknown"
 		end
 	end
 	Spawn(_serverLocationDetection)

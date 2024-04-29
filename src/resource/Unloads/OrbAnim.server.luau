@@ -6,15 +6,24 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Clock = require(RepS.Modules.Packages.Clock)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
 local model = script.Parent :: Model
-local orbLifeTime = model:GetAttribute("OrbLifeTime") - 0.8
+local orbLifeTime = model:GetAttribute("OrbLifeTime")
 
 local wait = task.wait
 local nsNew = NumberSequence.new
 
+--// Despawn
+Clock(1, function()
+    orbLifeTime -= 1
+
+    if orbLifeTime <= 1 then model:SetAttribute("Despawn", true) end
+end)
+
+--// Main
 ServerUtil:WeldPart(model.Middle, model)
 
 model.Middle.Beam1.Transparency = nsNew(1, 1)
@@ -25,7 +34,7 @@ SuperTween.new(model.Middle.Beam1, AssetBook.TweenInfos.half, { Transparency = n
 SuperTween.new(model.Middle.Beam2, AssetBook.TweenInfos.half, { Transparency = nsNew(-1, 1) }):Play()
 SuperTween.new(model.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 
-wait(orbLifeTime)
+repeat wait() until model:GetAttribute("Despawn")
 
 SuperTween.new(model.Middle.Beam1, AssetBook.TweenInfos.half, { Transparency = nsNew(1, 1) }):Play()
 SuperTween.new(model.Middle.Beam2, AssetBook.TweenInfos.half, { Transparency = nsNew(1, 1) }):Play()

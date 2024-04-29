@@ -18,8 +18,7 @@ local FilterButton = require(RepS.Modules.UI.Components.FilterButtonBackpack)
 
 local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
 
-local Children, Computed, Value, OnChange, OnEvent, peek =
-	Fusion.Children, Fusion.Computed, Fusion.Value, Fusion.OnChange, Fusion.OnEvent, Fusion.peek
+local Children, Value = Fusion.Children, Fusion.Value
 
 local Backpack = {}
 Backpack.__index = Backpack
@@ -27,68 +26,7 @@ Backpack.__index = Backpack
 local wait = task.wait
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local sFind = string.find
 local fontFromName = Font.fromName
-
---[[
-	Deselect all items, and hide the item description
-]]
-function Backpack:DeselectAll()
-	for _, element in peek(self.itemFrame):GetChildren() do
-		element:SetAttribute("Selected", nil)
-		if element:IsA("ImageButton") then
-			element.UIStroke.Enabled = false
-		end
-	end
-
-	local itemDescFrame = peek(self.itemDescFrame)
-	itemDescFrame.HorizonLine.Visible = false
-	itemDescFrame.ItemName.Text = ""
-	itemDescFrame.ItemType.Text = ""
-	itemDescFrame.ItemTier.Text = ""
-	itemDescFrame.ItemStats.Text = ""
-	itemDescFrame.ItemDesc.Text = ""
-
-	peek(self.btnsFrame.Right).Equip.Visible = false
-	peek(self.btnsFrame.Right).Pin.Visible = false
-end
-
---[[
-	Check if the slot is equipped, and return free slot if has
-]]
-function Backpack:CheckSlot(type: string) : string
-	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
-
-	for _, element in classFrame:GetDescendants() do
-		if sFind(element.Name, type) then
-			if not element:GetAttribute("Equipped") then
-				return element.Name
-			end
-		end
-	end
-
-	return "Full"
-end
-
---[[
-	Check if it's already equipped, more like a sanity check
-]]
-function Backpack:CheckSameItem(item: string, type: string) : (string, string?)
-	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
-
-	local check, sameSlot = false, nil
-	for _, element in classFrame:GetDescendants() do
-		if sFind(element.Name, type) and element:GetAttribute("ItemEquipped") == item then
-			check = true
-			sameSlot = element.Name
-		end
-	end
-	if not check then
-		return "None"
-	else
-		return "Exist", sameSlot
-	end
-end
 
 return function(plr: Player)
 	local self = setmetatable({}, Backpack)
@@ -100,16 +38,16 @@ return function(plr: Player)
 
 	self.inventory = plr:WaitForChild("Inventory", 999)
 
-	self.UI, self.itemFrame, self.itemDescFrame = Value(), Value(), Value()
-	self.items, self.noItemsShow = Value(self.inventory:GetChildren()), Value(true)
+	self.itemFrame = Value()
+	self.items = Value(self.inventory:GetChildren())
+	self.noItemsShow = Value(if Fusion.peek(self.items)[1] then false else true)
 	self.chosenFilter = Value("All")
 
-	Components.ScreenGui({
+	local UI = Components.ScreenGui({
 		Name = "Backpack",
 		Parent = self.plrGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
-		[Fusion.Ref] = self.UI,
 
 		[Children] = {
 			Components.Frame({
@@ -150,7 +88,7 @@ return function(plr: Player)
 						ImageColor3 = fromRGB(129, 129, 129),
 						ImageTransparency = 0.8,
 
-						Visible = Computed(function(use)
+						Visible = Fusion.Computed(function(use)
 							return use(self.noItemsShow)
 						end),
 
@@ -173,6 +111,7 @@ return function(plr: Player)
 			Components.Frame({
 				Name = "Shadow",
 				BackgroundTransparency = 0.15,
+				ZIndex = 0,
 				Visible = false,
 			}),
 		},
@@ -188,23 +127,12 @@ return function(plr: Player)
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
 
 	---// listening events
-	Fusion.Hydrate(workspace.CurrentCamera)({
-		[OnChange("ViewportSize")] = function(newSize: Vector2)
-			self.absSize:set({
-				newSize.X * 0.71,
-				newSize.Y * 0.662,
-			})
-			self.absCellPadding:set({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
-			self.absCellSize:set(peek(self.absSize)[1] / 15.58)
-			self.absTextSize:set(peek(self.absSize)[2] * 0.345 / 4.66)
-		end,
-	})
 	Fusion.Hydrate(self.inventory)({
-		[OnEvent("ChildAdded")] = function()
+		[Fusion.OnEvent("ChildAdded")] = function()
 			wait()
 			self.items:set(self.inventory:GetChildren())
 		end,
-		[OnEvent("ChildRemoved")] = function()
+		[Fusion.OnEvent("ChildRemoved")] = function()
 			if not plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
 
 			wait()
@@ -216,8 +144,10 @@ return function(plr: Player)
 	local function _clearGarbage()
 		CAS:UnbindAction("OpenBackpack")
 
-		peek(self.UI):Destroy()
+		UI:Destroy()
 		plr:SetAttribute("CurrentMenu", "None")
+
+		self.itemSlotClicked:Destroy()
 	end
 	char.Humanoid.Died:Once(_clearGarbage)
 end

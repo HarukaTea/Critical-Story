@@ -21,6 +21,7 @@ local wait, cancel, spawn = task.wait, task.cancel, task.spawn
 local function TextStroke(self: table)
     return Components.TextUIStroke({
         Thickness = 2,
+
         Transparency = Tween(Computed(function(use)
             return use(self.locationInfo.OverallStrokeTrans)
         end), AssetBook.TweenInfos.half)
@@ -62,8 +63,8 @@ local function LocationTitleFrame(self: table) : Frame
                 end
             end)
 
-			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
+			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
 
 			wait(0.3)

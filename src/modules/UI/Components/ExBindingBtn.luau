@@ -6,11 +6,11 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local OnEvent, Children, Computed, peek =
-	Fusion.OnEvent, Fusion.Children, Fusion.Computed, Fusion.peek
+local OnEvent, Children, Computed = Fusion.OnEvent, Fusion.Children, Fusion.Computed
 
 local color3New = Color3.new
 local fromScale = UDim2.fromScale
@@ -21,7 +21,6 @@ local fontFromEnum = Font.fromEnum
 local POSITIONS = { Menu = fromScale(0.355, 0), Backpack = fromScale(0.71, 0) }
 local ICON_COLORS = { Menu = color3New(1, 1, 1), Backpack = fromRGB(148, 148, 148) }
 local KEYS = { Menu = "C", Backpack = "B" }
-local OPENS = { Menu = "AdventurerMenu", Backpack = "Backpack" }
 local STROKES_TRANS = { Menu = Fusion.Value(1), Backpack = Fusion.Value(1) }
 
 local function ExCharButton(id: string, self: table): Frame
@@ -75,7 +74,7 @@ local function ExCharButton(id: string, self: table): Frame
 			Components.HoverImageButton({
 				Image = Computed(function(use)
 					if id == "Backpack" then
-						return "rbxassetid://2970814599"
+						return AssetBook.Items.ItemImages.Backpack
 					else
 						return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 					end
@@ -90,23 +89,7 @@ local function ExCharButton(id: string, self: table): Frame
 					STROKES_TRANS[id]:set(1)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					local plrGui = self.plrGui :: PlayerGui
-
-					peek(self.UI).Enabled = false
-					self.plr:SetAttribute("CurrentMenu", id)
-					plrGui[OPENS[id]].Shadow.Visible = true
-					plrGui[OPENS[id]].BG.Visible = true
-					plrGui.PlayerList.Enabled = false
-					workspace.CurrentCamera.UIBlur.Enabled = true
-
-					if id == "Menu" then
-						workspace.Sounds.SFXs.MapOpen:Play()
-
-					elseif id == "Backpack" then
-						workspace.Sounds.SFXs.Equip:Play()
-					end
-
-					Signals.ExCategoryOpened:Fire()
+					ClientUtil:OpenUI(self.plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
 				end,
 			}),
 			Components.TextLabel({

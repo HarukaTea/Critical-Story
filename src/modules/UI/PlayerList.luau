@@ -32,25 +32,24 @@ return function(plr: Player)
 	local self = setmetatable({}, PlayerList)
 	self.plrGui = plr.PlayerGui
 
-	self.UI, self.list, self.desc = Value(), Value(), Value()
+	self.list, self.desc = Value(), Value()
 	self.absSize, self.absContentSize = Value(90), Value(30)
 	self.players = Value({})
 	self.isOpen = Value(true)
 
 	local char = plr.Character or plr.CharacterAdded:Wait()
 
-	Components.ScreenGui({
+	local UI = Components.ScreenGui({
 		Name = "PlayerList",
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 		Parent = self.plrGui,
-		[Fusion.Ref] = self.UI,
 
 		[Children] = {
 			Components.Frame({
 				Name = "Top",
 				AnchorPoint = v2New(),
-				Position = fromOffset(0, 44),
+				Position = fromOffset(0, 30),
 				Size = fromScale(1, 0.1),
 
 				[Children] = {
@@ -65,7 +64,7 @@ return function(plr: Player)
 						ScrollingDirection = Enum.ScrollingDirection.Y,
 
 						Position = Fusion.Tween(Computed(function(use)
-							return if use(self.isOpen) then fromScale(0.87, 0) else fromScale(1.2, 0)
+							return if use(self.isOpen) then fromScale(0.875, 0) else fromScale(1.2, 0)
 						end), AssetBook.TweenInfos.half),
 						CanvasSize = Computed(function(use)
 							return if use(self.absContentSize) > use(self.absSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
@@ -95,7 +94,7 @@ return function(plr: Player)
 					}),
 					Components.HoverImageButton({
 						AnchorPoint = v2New(),
-						Position = fromScale(0.87, 0),
+						Position = fromScale(0.875, 0),
 
 						Size = Computed(function(use)
 							return ud2New(0.118, 0, 0, min(use(self.absSize), use(self.absContentSize)))
@@ -112,7 +111,7 @@ return function(plr: Player)
 								end
 							end
 
-							peek(self.desc).Visible = false
+							self.playerDescVisible:set(false)
 						end,
 					}),
 
@@ -152,7 +151,7 @@ return function(plr: Player)
 	})
 
 	local function _onDead()
-		peek(self.UI):Destroy()
+		UI:Destroy()
 
 		CAS:UnbindAction("TogglePlayerList")
 	end

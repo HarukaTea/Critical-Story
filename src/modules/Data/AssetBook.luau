@@ -553,6 +553,7 @@ assets.Items = {
 
         Gold = "rbxassetid://16654275243",
         RP = "rbxassetid://16002068286",
+        Backpack = "rbxassetid://2970814599",
 
         HealthyApple = "rbxassetid://1637563032",
         GoldenApple = "rbxassetid://2970814988",

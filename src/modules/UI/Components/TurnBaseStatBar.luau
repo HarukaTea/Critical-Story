@@ -87,7 +87,7 @@ local function TurnBaseStatBar(id: string, self: table) : Frame
 				ZIndex = 2,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
-					STROKES_TRANS[id]:set(0)
+					STROKES_TRANS[id]:set(0.3)
 				end,
 				[Fusion.OnEvent("MouseLeave")] = function()
 					STROKES_TRANS[id]:set(1)

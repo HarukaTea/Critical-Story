@@ -5,117 +5,15 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, New, Value, AttributeChange, Tween, Computed, OnEvent, peek =
-	Fusion.Children,
-	Fusion.New,
-	Fusion.Value,
-	Fusion.AttributeChange,
-	Fusion.Tween,
-	Fusion.Computed,
-	Fusion.OnEvent,
-	Fusion.peek
+local OptionToggleBtn = require(RepS.Modules.UI.Components.OptionToggleBtn)
 
-local v2New = Vector2.new
+local Value, AttributeChange = Fusion.Value, Fusion.AttributeChange
+
 local fromScale = UDim2.fromScale
-local fromRGB = Color3.fromRGB
 local clear = table.clear
-local sFind, sub = string.find, string.sub
-
-local TEXTS = {
-	Musics = "Musics",
-	SFXs = "Sound Effects",
-	PublicCombat = "Public Combat Mode",
-	PotatoMode = "Low Detail Mode",
-	PlayerList = "Player List",
-}
-
-local function OptionFrame(id: string, self: table) : Frame
-	local stroke_trans = Fusion.Value(1)
-
-	return Components.Frame {
-		Name = id,
-
-		[Children] = {
-			Components.TextLabel({
-				Name = "Title",
-				Size = fromScale(0.65, 1),
-				Text = TEXTS[id],
-				TextXAlignment = Enum.TextXAlignment.Left
-			}),
-			Components.HoverImageButton({
-				Name = "SwitchBG",
-				BackgroundTransparency = 0,
-				AnchorPoint = v2New(),
-				Position = fromScale(0.7, 0),
-				Size = fromScale(0.2, 1),
-
-				[OnEvent("MouseEnter")] = function()
-					stroke_trans:set(0)
-				end,
-				[OnEvent("MouseLeave")] = function()
-					stroke_trans:set(1)
-				end,
-				[OnEvent("MouseButton1Click")] = function()
-					local plr = self.plr :: Player
-
-					if peek(self.playerSettings[id]) then
-						workspace.Sounds.SFXs.SwitchOff:Play()
-					else
-						workspace.Sounds.SFXs.SwitchOn:Play()
-					end
-
-					Events.ChangePlayerSetting:Fire(id)
-
-					--// Local
-					if sFind(id, "Combat") then
-						local mode = sub(id, 1, sFind(id, "Combat") - 1)
-
-						if plr:GetAttribute("CombatMode") == mode then
-							plr:SetAttribute("CombatMode", "Solo")
-							return
-						end
-
-						plr:SetAttribute("CombatMode", mode)
-						return
-					end
-
-					plr:SetAttribute(id, not plr:GetAttribute(id))
-				end,
-
-				[Children] = {
-					Components.RoundUICorner(),
-					Components.UIStroke({
-						Thickness = 3,
-						Enabled = true,
-						Transparency = Tween(Computed(function(use)
-							return use(stroke_trans)
-						end), AssetBook.TweenInfos.twiceHalf)
-					})
-				}
-			}),
-			Components.Frame({
-				Name = "Switch",
-				BackgroundTransparency = 0,
-				AnchorPoint = v2New(),
-				Size = fromScale(0.1, 1),
-
-				BackgroundColor3 = Tween(Computed(function(use)
-					return if use(self.playerSettings[id]) then fromRGB(80, 161, 118) else fromRGB(214, 71, 107)
-				end), AssetBook.TweenInfos.threeHalf),
-				Position = Tween(Computed(function(use)
-					return if use(self.playerSettings[id]) then fromScale(0.8, 0) else fromScale(0.7, 0)
-				end), AssetBook.TweenInfos.twiceHalf),
-
-				[Children] = { Components.RoundUICorner() }
-			})
-		}
-	}
-end
 
 local function SettingsFrame(self: table): Frame
 	self.playerSettings = {
@@ -172,19 +70,19 @@ local function SettingsFrame(self: table): Frame
 		Size = fromScale(0.944, 0.627),
 		Visible = false,
 
-		[Children] = {
-			New("UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
-			New("UIGridLayout")({
+		[Fusion.Children] = {
+			Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+			Fusion.New("UIGridLayout")({
 				CellPadding = fromScale(0.1, 0.1),
 				CellSize = fromScale(0.4, 0.09),
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
 
-			OptionFrame("Musics", self),
-			OptionFrame("SFXs", self),
-			OptionFrame("PublicCombat", self),
-			OptionFrame("PotatoMode", self),
-			OptionFrame("PlayerList", self),
+			OptionToggleBtn("Musics", self),
+			OptionToggleBtn("SFXs", self),
+			OptionToggleBtn("PublicCombat", self),
+			OptionToggleBtn("PotatoMode", self),
+			OptionToggleBtn("PlayerList", self),
 		},
 	})
 end

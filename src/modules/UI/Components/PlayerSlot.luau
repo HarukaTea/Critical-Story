@@ -9,7 +9,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local New, Children, peek = Fusion.New, Fusion.Children, Fusion.peek
+local New, Children, Computed, peek = Fusion.New, Fusion.Children, Fusion.Computed, Fusion.peek
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
@@ -17,10 +17,15 @@ local fromRGB = Color3.fromRGB
 local sFind, format, match = string.find, string.format, string.match
 
 local function PlayerSlot(self: table, player: Player): Frame
-	local class = Fusion.Value("Warrior")
+	local class = Fusion.Value(player:GetAttribute("Class"))
+	local role = Fusion.Value(player:GetAttribute("Role"))
+
 	Fusion.Hydrate(player)({
 		[Fusion.AttributeChange("Class")] = function(newClass: string)
 			class:set(newClass)
+		end,
+		[Fusion.AttributeChange("Role")] = function(newRole: string)
+			role:set(newRole)
 		end
 	})
 
@@ -39,9 +44,9 @@ local function PlayerSlot(self: table, player: Player): Frame
 				BackgroundColor3 = color3New(),
 				Position = fromScale(0.055, 0.5),
 				Size = fromScale(0.13, 0.665),
+
 				Image = Fusion.Computed(function(use)
-					local realClass = use(class)
-					return if AssetBook.ClassInfo[realClass] then AssetBook.ClassInfo[realClass].Image else ""
+					return AssetBook.ClassInfo[use(class)].Image
 				end),
 
 				[Children] = { Components.RoundUICorner() },
@@ -52,7 +57,10 @@ local function PlayerSlot(self: table, player: Player): Frame
 				Size = fromScale(0.721, 1),
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Text = player.DisplayName,
-				TextColor3 = if player:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1),
+
+				TextColor3 = Computed(function(use)
+					return if use(role) ~= "" then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+				end),
 
 				[Children] = {
 					New("UIPadding")({
@@ -67,7 +75,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 				[Fusion.OnEvent("MouseEnter")] = function()
 					local list, desc = Fusion.peek(self.list) :: Frame, Fusion.peek(self.desc) :: Frame
 
-					for _, element in list:GetChildren() do
+					for _, element: Frame in list:GetChildren() do
 						if element:IsA("Frame") then
 							local roleColor = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
 
@@ -75,39 +83,35 @@ local function PlayerSlot(self: table, player: Player): Frame
 							element.PlayerName.TextColor3 = roleColor
 						end
 					end
-					for _, element in desc:GetChildren() do
-						if sFind(element.Name, "Slot") then
-							element.Image = AssetBook.Items.ItemImages.Null
-						end
+					for _, element: ImageLabel in desc:GetChildren() do
+						if sFind(element.Name, "Slot") then element.Image = AssetBook.Items.ItemImages.Null end
 					end
 
 					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
 					list[player.Name].PlayerName.TextColor3 = color3New()
 
-					desc.Role.Text = ""
-					desc.DisplayName.Text = player.DisplayName
-					desc.UserName.Text = "@" .. player.Name
-					desc.Class.Image = AssetBook.ClassInfo[peek(class)].Image
-					desc.Level.Text = "Lv."
+					self.displayName:set(player.DisplayName)
+					self.userName:set("@" .. player.Name)
+					self.classImage:set(AssetBook.ClassInfo[peek(class)].Image)
+					self.level:set("Lv."
 						.. player:GetAttribute("Levels")
 						.. " - "
 						.. format("%.1f", player:GetAttribute("PlayTime") / 3600)
-						.. " Hours"
-
-					if player:GetAttribute("Role") then
-						desc.Role.Text = "- " .. player:GetAttribute("Role") .. " -"
-					end
+						.. " Hours")
+					self.role:set(if player:GetAttribute("Role") then "- " .. player:GetAttribute("Role") .. " -" else "")
+					self.playerDescBGSize:set(if player:GetAttribute("Role") then fromScale(1, 0.86) else fromScale(1, 0.77))
 
 					local items = player:WaitForChild("Inventory", 999) :: Folder
 
-					for _, item in items:GetChildren() do
+					for _, item: IntValue in items:GetChildren() do
 						if AssetBook.Items.ItemType[item.Name] == "Passive" and item:GetAttribute("Equipped") then
 							local index = tonumber(match(item:GetAttribute("Slot"), "%d"))
 
 							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
 						end
 					end
-					desc.Visible = true
+
+					self.playerDescVisible:set(true)
 				end,
 			}),
 		},

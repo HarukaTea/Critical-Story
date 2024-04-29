@@ -76,6 +76,7 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
             Fusion.New("UIListLayout")({
                 Padding = udNew(0, 8),
                 SortOrder = Enum.SortOrder.LayoutOrder,
+                VerticalAlignment = Enum.VerticalAlignment.Bottom,
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
 
                 [Fusion.OnChange("AbsoluteContentSize")] = function(newSize: Vector2)
@@ -152,7 +153,11 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
                         })
                     }
                 })
-            end, Fusion.cleanup)
+            end, Fusion.cleanup),
+            Components.Frame({
+                Name = "PaddingBottom",
+                Size = fromScale(0.95, 0.01)
+            }),
         }
     })
 end

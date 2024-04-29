@@ -96,7 +96,7 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
     local arrow = RepS.Package.PlayerAttacks.ArrowOrb:Clone() :: Model
     arrow.Owner.Value = char
     arrow:PivotTo(ServerUtil:GenerateOrbPos(monster))
-    arrow:SetAttribute("OrbLifeTime", 4)
+    arrow:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
     arrow.Parent = workspace.MapComponents.OrbFolders[plr.Name]
     Debris:AddItem(arrow, arrow:GetAttribute("OrbLifeTime"))
 
@@ -179,7 +179,7 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         repeaterOrb.Owner.Value = plr.Character
         repeaterOrb:PivotTo(pos)
         repeaterOrb:SetAttribute("RepeaterSpawned", true)
-        repeaterOrb:SetAttribute("OrbLifeTime", 4)
+        repeaterOrb:SetAttribute("OrbLifeTime", plr.Character:GetAttribute("OrbLifeTime"))
         repeaterOrb.Parent = workspace.MapComponents.OrbFolders[plr.Name]
         Debris:AddItem(repeaterOrb, repeaterOrb:GetAttribute("OrbLifeTime"))
 

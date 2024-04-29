@@ -8,7 +8,7 @@ local udNew = UDim.new
 local fromScale = UDim2.fromScale
 
 local function FilterBG(direction: "Left" | "Right", btns: table, self: table): Frame
-	self.btnsFrame = { Left = Fusion.Value(), Right = Fusion.Value() }
+	if not self.btnsFrame then self.btnsFrame = { Left = Fusion.Value(), Right = Fusion.Value() } end
 
 	return Fusion.New("Frame")({
 		Name = "Bottom" .. direction,
@@ -21,7 +21,7 @@ local function FilterBG(direction: "Left" | "Right", btns: table, self: table): 
 			Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 48.504 }),
 			Fusion.New("UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = udNew(0.011, 0),
+				Padding = udNew(0.012, 0),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				HorizontalAlignment = if direction == "Right"
 					then Enum.HorizontalAlignment.Right

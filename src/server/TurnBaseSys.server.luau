@@ -162,6 +162,12 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 			Events.ClientTween:Fire(plr, attacks, { Transparency = 1 }, "one")
 
 			plr.Character:SetAttribute("OrbAttackingTime", false)
+
+			if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then continue end
+
+			for _, orb: Model in workspace.MapComponents.OrbFolders[plr.Name]:GetChildren() do
+				if orb and orb.PrimaryPart then orb:SetAttribute("Despawn", true) end
+			end
 		end
 
 		turnBaseCombatRound(locator:FindFirstChildWhichIsA("Model", true))

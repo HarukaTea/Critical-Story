@@ -19,9 +19,6 @@ local POSITIONS = {
 	fromScale(0.28, 0.558),
 	fromScale(0.516, 0.558),
 	fromScale(0.753, 0.558),
-	fromScale(0.164, 0.721),
-	fromScale(0.401, 0.721),
-	fromScale(0.637, 0.721),
 }
 
 local function Slot(id: string): ImageLabel

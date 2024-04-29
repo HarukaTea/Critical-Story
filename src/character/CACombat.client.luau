@@ -55,7 +55,7 @@ local function setup()
 	CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
 	--- detect mobs when player is near them
-    return Clock(0.3, function()
+    return Clock(0.15, function()
 		if isInCombat then return end
 		if encounterCD then return end
 
@@ -191,9 +191,6 @@ local function onTouched(hit: BasePart)
 		if char:GetAttribute("Shield") > 0 then sfxs.ShieldAbsorb:Play() end
 
 		Events.CharTakeDMG:Fire(damagePart)
-
-		damagePart:RemoveTag("MonsterDMG")
-		damagePart:Destroy()
 
 		ClientUtil:CharOnHit(char)
 	end

@@ -9,19 +9,32 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local PlayerItemSlot = require(RepS.Modules.UI.Components.PlayerItemSlot)
 
-local New, Children = Fusion.New, Fusion.Children
+local New, Children, Value, Computed = Fusion.New, Fusion.Children, Fusion.Value, Fusion.Computed
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
 local function PlayerDescFrame(self: table) : Frame
+    self.playerDescVisible = Value(false)
+    self.playerDescBGSize = Value(fromScale(1, 0.86))
+
+    self.classImage = Value("")
+    self.displayName = Value("")
+    self.userName = Value("")
+    self.level = Value("")
+    self.role = Value("")
+
     return Components.Frame({
         Name = "Desc",
         AnchorPoint = v2New(),
-        Position = fromScale(0.71, 0),
+        Position = fromScale(0.715, 0),
         Size = fromScale(0.15, 4.5),
-        Visible = false,
+
+        Visible = Fusion.Computed(function(use)
+            return use(self.playerDescVisible)
+        end),
+
         [Fusion.Ref] = self.desc,
 
         [Children] = {
@@ -29,9 +42,12 @@ local function PlayerDescFrame(self: table) : Frame
                 Name = "BG",
                 AnchorPoint = v2New(),
                 Position = fromScale(0, 0),
-                Size = fromScale(1, 0.86),
                 BackgroundTransparency = 0.1,
                 ZIndex = 0,
+
+                Size = Fusion.Computed(function(use)
+                    return use(self.playerDescBGSize)
+                end),
 
                 [Children] = {
                     New("UICorner")({ CornerRadius = udNew(0.03, 0) }),
@@ -43,6 +59,10 @@ local function PlayerDescFrame(self: table) : Frame
                 Position = fromScale(0.05, 0.055),
                 Size = fromScale(0.205, 0.175),
 
+                Image = Computed(function(use)
+                    return use(self.classImage)
+                end),
+
                 [Children] = { Components.RoundUICorner() },
             }),
             Components.TextLabel({
@@ -50,6 +70,10 @@ local function PlayerDescFrame(self: table) : Frame
                 Position = fromScale(0.3, 0.05),
                 Size = fromScale(0.63, 0.095),
                 TextXAlignment = Enum.TextXAlignment.Left,
+
+                Text = Computed(function(use)
+                    return use(self.displayName)
+                end)
             }),
             Components.TextLabel({
                 Name = "UserName",
@@ -57,12 +81,20 @@ local function PlayerDescFrame(self: table) : Frame
                 Size = fromScale(0.63, 0.06),
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextColor3 = fromRGB(193, 193, 193),
+
+                Text = Computed(function(use)
+                    return use(self.userName)
+                end)
             }),
             Components.TextLabel({
                 Name = "Level",
                 Position = fromScale(0.06, 0.245),
                 Size = fromScale(0.866, 0.077),
                 TextColor3 = fromRGB(255, 255, 0),
+
+                Text = Computed(function(use)
+                    return use(self.level)
+                end)
             }),
             New("Frame")({
                 Name = "HorizonLine",
@@ -85,6 +117,10 @@ local function PlayerDescFrame(self: table) : Frame
                 Position = fromScale(0.06, 0.751),
                 Size = fromScale(0.865, 0.06),
                 TextTransparency = 0.2,
+
+                Text = Computed(function(use)
+                    return use(self.role)
+                end)
             }),
         },
     })

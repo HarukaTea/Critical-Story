@@ -4,6 +4,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -40,20 +41,23 @@ local function _onClick(id: string, self: table)
 end
 
 local function FilterButton(id: string, self: table): TextButton
+	if not self.chosenFilter then self.chosenFilter = Fusion.Value("Character") end
+
 	return Components.TextButton({
 		Name = id,
 		BackgroundColor3 = COLORS[id],
 		Text = upper(id),
-		Size = fromScale(0.116, 1),
+		Size = fromScale(0.14, 1),
 
 		[Fusion.Children] = {
 			Fusion.New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
 			Components.UIStroke({
 				Thickness = 3,
+				Enabled = true,
 
-				Enabled = Fusion.Computed(function(use)
-					return if use(self.chosenFilter) == id then true else false
-				end)
+				Transparency = Fusion.Tween(Fusion.Computed(function(use)
+					return if use(self.chosenFilter) == id then 0.3 else 1
+				end), AssetBook.TweenInfos.twiceHalf)
 			})
 		},
 		[Fusion.OnEvent("MouseButton1Click")] = function()

@@ -22,20 +22,18 @@ AdventurerMenu.__index = AdventurerMenu
 local wait = task.wait
 
 return function(plr: Player)
-	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
-
 	local self = setmetatable({}, AdventurerMenu)
 
 	self.plr = plr
 	self.plrGui = plr.PlayerGui
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
+	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
 	self.UI = Fusion.Value()
-	self.chosenFilter = Fusion.Value("Character")
 
-	Components.ScreenGui({
+	local UI = Components.ScreenGui({
 		Name = "AdventurerMenu",
 		Parent = plr.PlayerGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
@@ -62,6 +60,7 @@ return function(plr: Player)
 			Components.Frame({
 				Name = "Shadow",
 				BackgroundTransparency = 0.15,
+				ZIndex = 0,
 				Visible = false,
 			}),
 		},
@@ -80,7 +79,7 @@ return function(plr: Player)
 	local function _clearGarbage()
 		CAS:UnbindAction("OpenMenu")
 
-		Fusion.peek(self.UI):Destroy()
+		UI:Destroy()
 		plr:SetAttribute("CurrentMenu", "None")
 	end
 	self.char.Humanoid.Died:Once(_clearGarbage)

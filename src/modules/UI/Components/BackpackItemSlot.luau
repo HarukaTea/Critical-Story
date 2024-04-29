@@ -19,9 +19,9 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 	local amount = Value(item.Value)
 	local equipped = Value(item:GetAttribute("Equipped"))
 	local pinned = Value(item:GetAttribute("Pinned"))
+	local isSelecting = Value(false)
 
-	local stroke_trans = Value(1)
-
+	--// Connections
 	Fusion.Hydrate(item)({
 		[Fusion.OnChange("Value")] = function(newAmount: number)
 			amount:set(newAmount)
@@ -37,6 +37,9 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			peek(self.btnsFrame.Right).Pin.Text = if state then "UNPIN" else "PIN"
 		end
 	})
+	self.itemSlotClicked:Connect(function()
+		isSelecting:set(false)
+	end)
 
 	item = item.Name
 	return Components.HoverImageButton({
@@ -49,8 +52,9 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			Components.UIStroke({
 				Thickness = 3,
 				Enabled = true,
+
 				Transparency = Fusion.Tween(Computed(function(use)
-					return use(stroke_trans)
+					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.TextLabel({
@@ -62,6 +66,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 				Size = fromScale(0.5, 0.5),
 				ZIndex = 2,
 				Text = "E",
+
 				Visible = Computed(function(use)
 					return use(equipped)
 				end),
@@ -80,10 +85,9 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 				Size = fromScale(0.5, 0.5),
 				ZIndex = 3,
 				Text = "P",
+
 				Visible = Computed(function(use)
-					if not use(equipped) then
-						return use(pinned)
-					end
+					if not use(equipped) then return use(pinned) end
 				end),
 
 				[Children] = {
@@ -97,52 +101,43 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 				Size = fromScale(1, 0.35),
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
+
 				Text = Computed(function(use)
 					local itemAmount = use(amount) :: number
 
-					if itemAmount == 1 or itemAmount == 0 then
-						return ""
-					else
-						return "x"..itemAmount
-					end
+					return if itemAmount <= 1 then "" else "x"..itemAmount
 				end),
 			}),
 		},
 		[OnEvent("MouseEnter")] = function()
-			stroke_trans:set(0)
-			peek(self.itemFrame)[item].UIStroke.Enabled = true
+			isSelecting:set(true)
 		end,
 		[OnEvent("MouseLeave")] = function()
-			stroke_trans:set(if peek(self.itemFrame)[item]:GetAttribute("Selected")
-				then 0
-				else 1)
+			isSelecting:set(if peek(self.itemFrame)[item]:GetAttribute("Selected")
+				then true
+				else false)
 		end,
 		[OnEvent("MouseButton1Click")] = function()
-			local itemFrame, itemDescFrame, btnsFrame =
-				peek(self.itemFrame) :: Frame, peek(self.itemDescFrame) :: Frame, peek(self.btnsFrame.Right) :: Frame
+			local itemFrame, btnsFrame = peek(self.itemFrame) :: Frame, peek(self.btnsFrame.Right) :: Frame
 
-			if itemFrame[item]:GetAttribute("Selected") then
-				self:DeselectAll()
-				return
-			end
+			self:DeselectAll()
+			if itemFrame[item]:GetAttribute("Selected") then return end
 
-			self:DeselectAll(self)
+			self.itemSlotClicked:Fire()
 
 			itemFrame[item]:SetAttribute("Selected", true)
-			itemFrame[item].UIStroke.Enabled = true
-			stroke_trans:set(0)
+			isSelecting:set(true)
 
 			local itemType = AssetBook.Items.ItemType[item]
 
-			itemDescFrame.HorizonLine.Visible = true
-			itemDescFrame.ItemName.Text = AssetBook.Items.ItemName[item]
-			itemDescFrame.ItemType.Text = itemType
-			itemDescFrame.ItemTier.Text = AssetBook.Items.ItemTier[item]
-			itemDescFrame.ItemStats.Text = AssetBook.Items.ItemStat[item]
-			itemDescFrame.ItemDesc.Text = AssetBook.Items.ItemDesc[item]
-
-			itemDescFrame.ItemType.TextColor3 = AssetBook.TypeColor[itemType]
-			itemDescFrame.ItemTier.TextColor3 = AssetBook.TierColor[AssetBook.Items.ItemTier[item]]
+			self.horizonLineVisible:set(true)
+			self.itemName:set(AssetBook.Items.ItemName[item])
+			self.itemType:set(itemType)
+			self.itemTypeColor:set(AssetBook.TypeColor[itemType])
+			self.itemTier:set(AssetBook.Items.ItemTier[item])
+			self.itemTierColor:set(AssetBook.TierColor[AssetBook.Items.ItemTier[item]])
+			self.itemStats:set(AssetBook.Items.ItemStat[item])
+			self.itemDesc:set(AssetBook.Items.ItemDesc[item])
 
 			btnsFrame.Equip.Visible = if itemType ~= "Material" then true else false
 			btnsFrame.Equip.Text = if peek(equipped) then "UNEQUIP" else "EQUIP"

@@ -173,8 +173,9 @@ local function CharacterFrame(self: table): Frame
 				Position = fromScale(0.61, 1.013),
 				Size = fromScale(0.374, 0.08),
 				TextXAlignment = Enum.TextXAlignment.Right,
+				RichText = true,
 				Text = Computed(function(use)
-					return "SKILL POINTS LEFT: "..use(playerData.LvPoints)
+					return [[SKILL POINTS LEFT:  <font color="#f6e58d">]]..use(playerData.LvPoints).."</font>"
 				end)
 			}),
 			Components.TextButton({
@@ -226,13 +227,19 @@ local function CharacterFrame(self: table): Frame
 				Position = fromScale(0.752, -0.106),
 				Size = fromScale(0.146, 0.1),
 				FontFace = Font.fromName("TitilliumWeb", Enum.FontWeight.Bold),
-				TextColor3 = fromRGB(255, 255, 0),
 				TextXAlignment = Enum.TextXAlignment.Left,
+
 				Text = Computed(function(use)
 					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 
 					return "COST: "..HarukaLib:NumberConvert(cost, "%.1f").." GOLD"
 				end),
+				TextColor3 = Tween(Computed(function(use)
+					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
+					local have = use(playerData.Gold)
+
+					return if cost > have then fromRGB(255, 0, 0) else fromRGB(255, 255, 0)
+				end), AssetBook.TweenInfos.twiceHalf)
 			})
 		},
 	})

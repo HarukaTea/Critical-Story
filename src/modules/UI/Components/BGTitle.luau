@@ -6,6 +6,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local New, Children, OnEvent, Value, Tween, Computed =
@@ -20,13 +21,14 @@ local function TitleFrame(id: string, self: table): Frame
 	local CONTENT_COLOR = { Menu = Value(fromRGB(255, 255, 255)), Backpack = Value(fromRGB(255, 255, 255)) }
 
 	local plr = self.plr :: Player
+	local playerClass: string
 
 	if id == "Menu" then
-		self.playerClass = Value(plr:GetAttribute("Class"))
+		playerClass = Value(plr:GetAttribute("Class"))
 
 		Fusion.Hydrate(plr)({
 			[Fusion.AttributeChange("Class")] = function(newClass: string)
-				self.playerClass:set(newClass)
+				playerClass:set(newClass)
 			end
 		})
 	end
@@ -43,10 +45,10 @@ local function TitleFrame(id: string, self: table): Frame
 				Name = "Icon",
 				Image = Computed(function(use)
 					if id == "Menu" then
-						return AssetBook.ClassInfo[use(self.playerClass)].Image
+						return AssetBook.ClassInfo[use(playerClass)].Image
 
 					elseif id == "Backpack" then
-						return "rbxassetid://2970814599"
+						return AssetBook.Items.ItemImages.Backpack
 					end
 				end),
 				ImageColor3 = id == "Backpack" and fromRGB(148, 148, 148) or color3New(1, 1, 1),
@@ -66,6 +68,7 @@ local function TitleFrame(id: string, self: table): Frame
 				Position = fromScale(0.948, 0.066),
 				Size = fromScale(0.04, 1),
 				Text = "X",
+
 				TextColor3 = Tween(Computed(function(use)
 					return use(CONTENT_COLOR[id])
 				end), AssetBook.TweenInfos.twiceHalf),
@@ -78,6 +81,7 @@ local function TitleFrame(id: string, self: table): Frame
 					Components.UIStroke({
 						Thickness = 3,
 						Enabled = true,
+
 						Color = Tween(Computed(function(use)
 							return use(CONTENT_COLOR[id])
 						end), AssetBook.TweenInfos.twiceHalf)
@@ -93,15 +97,7 @@ local function TitleFrame(id: string, self: table): Frame
 					BG_COLOR[id]:set(fromRGB())
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					local plrGui = self.plrGui :: PlayerGui
-
-					Fusion.peek(self.UI).BG.Visible = false
-					Fusion.peek(self.UI).Shadow.Visible = false
-
-					self.plr:SetAttribute("CurrentMenu", "None")
-					plrGui.AdventurerStats.Enabled = true
-					plrGui.PlayerList.Enabled = true
-					workspace.CurrentCamera.UIBlur.Enabled = false
+					ClientUtil:OpenUI(plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
 				end,
 			}),
 		},

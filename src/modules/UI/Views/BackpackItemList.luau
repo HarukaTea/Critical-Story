@@ -7,10 +7,11 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Signal = require(RepS.Modules.Packages.Signal)
 
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 
-local Computed, Value, peek = Fusion.Computed, Fusion.Value, Fusion.peek
+local Computed, Value, OnChange, peek = Fusion.Computed, Fusion.Value, Fusion.OnChange, Fusion.peek
 
 local Backpack = {}
 Backpack.__index = Backpack
@@ -24,20 +25,47 @@ local function BackpackItemList(self: table) : ScrollingFrame
 
     self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })
 	self.absCellPadding = Value({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
-	self.absCellSize, self.absTextSize = Value(peek(self.absSize)[1] / 15.58), Value(peek(self.absSize)[2] * 0.345 / 4.66)
+	self.absCellSize = Value(peek(self.absSize)[1] / 15.58)
 	self.absScrollSize, self.absContentSize = Value(90), Value(30)
+
+    self.itemSlotClicked = Signal()
+
+    Fusion.Hydrate(workspace.CurrentCamera)({
+		[OnChange("ViewportSize")] = function(newSize: Vector2)
+			self.absSize:set({
+				newSize.X * 0.71,
+				newSize.Y * 0.662,
+			})
+			self.absCellPadding:set({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
+			self.absCellSize:set(peek(self.absSize)[1] / 15.58)
+		end,
+	})
+
+    --[[
+        Deselect all items, and hide the item description
+    ]]
+    function self:DeselectAll()
+        for _, element: ImageButton in peek(self.itemFrame):GetChildren() do
+            element:SetAttribute("Selected", nil)
+        end
+
+        self.horizonLineVisible:set(false)
+        self.itemName:set("")
+        self.itemType:set("")
+        self.itemTier:set("")
+        self.itemStats:set("")
+        self.itemDesc:set("")
+
+        peek(self.btnsFrame.Right).Equip.Visible = false
+        peek(self.btnsFrame.Right).Pin.Visible = false
+    end
 
     return Components.ScrollingFrame({
         Name = "Items",
         Size = fromScale(0.99, 0.93),
-        ScrollBarThickness = 6,
         ScrollingDirection = Enum.ScrollingDirection.Y,
         CanvasSize = Computed(function(use)
-            if use(self.absContentSize) > use(self.absScrollSize) then
-                return fromOffset(0, use(self.absContentSize))
-            else
-                return fromOffset(0, 0)
-            end
+            return if use(self.absContentSize) > use(self.absScrollSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
         end),
         ScrollingEnabled = Computed(function(use)
             return if use(self.absContentSize) > use(self.absScrollSize) then true else false
