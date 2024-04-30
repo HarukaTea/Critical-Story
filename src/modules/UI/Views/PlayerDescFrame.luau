@@ -4,16 +4,40 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-
-local PlayerItemSlot = require(RepS.Modules.UI.Components.PlayerItemSlot)
 
 local New, Children, Value, Computed = Fusion.New, Fusion.Children, Fusion.Value, Fusion.Computed
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
+
+local function PlayerItemSlot(id: string): ImageLabel
+    local POSITIONS = {
+        fromScale(0.164, 0.391),
+        fromScale(0.401, 0.391),
+        fromScale(0.637, 0.391),
+        fromScale(0.048, 0.558),
+        fromScale(0.28, 0.558),
+        fromScale(0.516, 0.558),
+        fromScale(0.753, 0.558),
+    }
+
+	return New("ImageLabel")({
+		Name = "Slot" .. id,
+		BackgroundColor3 = color3New(),
+		Position = POSITIONS[id],
+		Size = fromScale(0.19, 0.165),
+		Image = AssetBook.Items.ItemImages.Null,
+
+		[Children] = {
+			Components.RoundUICorner(),
+			Components.UIStroke({ Thickness = 3 }),
+		},
+	})
+end
 
 local function PlayerDescFrame(self: table) : Frame
     self.playerDescVisible = Value(false)

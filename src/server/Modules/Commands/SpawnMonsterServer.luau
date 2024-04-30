@@ -47,7 +47,7 @@ return function (context: table, monster: string, level: number, amount: number)
     RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
 
     local spawnedMonster = ServerUtil:SetupMonster(locator, levelWant)
-    ServerUtil:ConnectMob(locator)
+    RepS.Resources.Unloads.CombatEnds:Clone().Parent = spawnedMonster
 
     spawnedMonster:SetAttribute("InCombat", true)
     Spawn(function()
@@ -67,8 +67,8 @@ return function (context: table, monster: string, level: number, amount: number)
 
         RepS.Package.Unloads.CombatEnd:Clone().Parent = subLocator
 
-        ServerUtil:SetupMonster(subLocator, levelWant)
-        ServerUtil:ConnectMob(subLocator)
+        local spawnSubMonster = ServerUtil:SetupMonster(subLocator, levelWant)
+        RepS.Resources.Unloads.CombatEnds:Clone().Parent = spawnSubMonster
     end
 
     return "Level "..levelWant.." "..AssetBook.MonsterIds[monster].." x"..amountWant.." spawned"

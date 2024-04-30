@@ -26,6 +26,7 @@ local function OptionFrame(option: string, icon: string, self: table, index: num
     return Components.Frame({
         BackgroundTransparency = 0,
         Size = fromScale(0.9, 0.27),
+
         BackgroundColor3 = Tween(Computed(function(use)
             return use(bgColor)
         end), AssetBook.TweenInfos.threeHalf),
@@ -62,6 +63,7 @@ local function OptionFrame(option: string, icon: string, self: table, index: num
                 Position = fromScale(0.026, 0.5),
                 Size = fromScale(0.072, 0.8),
                 Image = AssetBook.ChatIcons[icon],
+
                 ImageColor3 = Tween(Computed(function(use)
                     return use(contentColor)
                 end), AssetBook.TweenInfos.threeHalf)
@@ -71,6 +73,7 @@ local function OptionFrame(option: string, icon: string, self: table, index: num
                 Position = fromScale(0.528, 0.5),
                 Size = fromScale(0.8, 0.7),
                 Text = option,
+
                 TextColor3 = Tween(Computed(function(use)
                     return use(contentColor)
                 end), AssetBook.TweenInfos.threeHalf)

@@ -25,6 +25,7 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
     self.inventory = self.plr:WaitForChild("Inventory", 999)
     self.itemPanelAbsContentSize, self.itemPanelAbsSize = Value(0), Value(0)
     self.items = Value({})
+    self.itemPanelVisible = Value(false)
 
     local function _handleItems()
         wait()
@@ -52,7 +53,6 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
 		end,
 	})
 
-
     return Components.ScrollingFrame({
         Name = "ItemPanel",
         ClipsDescendants = true,
@@ -61,6 +61,9 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
         Size = fromScale(0.173, 3),
         ScrollingDirection = Enum.ScrollingDirection.Y,
 
+        Visible = Computed(function(use)
+            return use(self.itemPanelVisible)
+        end),
         CanvasSize = Computed(function(use)
             return if use(self.itemPanelAbsContentSize) > use(self.itemPanelAbsSize) then fromOffset(0, use(self.itemPanelAbsContentSize) + 20) else fromOffset(0, 0)
         end),

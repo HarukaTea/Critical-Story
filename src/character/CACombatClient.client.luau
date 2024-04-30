@@ -211,6 +211,15 @@ local function orbFolderHandler(folder: Folder)
 
 	if folder.Name ~= char.Name then folder:Destroy() end
 end
+local function cageHolderHandler(cage: Model)
+	local owner = cage:WaitForChild("Owner")
+	repeat wait() until owner.Value
+
+	local monster = owner.Value :: Model
+	if not monster then cage:Destroy() return end
+	if not monster:FindFirstChild("TargetingList") then cage:Destroy() return end
+	if not monster.TargetingList:FindFirstChild(char.Name) then cage:Destroy() end
+end
 
 --// Connection setups
 Fusion.Hydrate(char)({
@@ -226,6 +235,7 @@ Fusion.Hydrate(char)({
 humanoid.Touched:Connect(onTouched)
 CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler)
 CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler)
+CS:GetInstanceAddedSignal("TurnBaseCage"):Connect(cageHolderHandler)
 
 --// Setup
 local stopDetecting = setup()

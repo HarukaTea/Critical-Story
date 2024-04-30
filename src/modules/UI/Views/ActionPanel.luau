@@ -21,32 +21,6 @@ local fromScale = UDim2.fromScale
 local tFind = table.find
 local fromRGB = Color3.fromRGB
 
-local function ImageBG(direction: string) : Frame
-    local POS = {
-        Center = fromScale(0.5, -0.2),
-        Left = fromScale(1.1, -1.5),
-        Right = fromScale(-0.1, -1.5)
-    }
-
-    return Components.Frame({
-        Name = "ImageBG-"..direction,
-        AnchorPoint = v2New(0.5, 0),
-        Position = POS[direction],
-        Size = fromScale(0.51, 12.9),
-        BackgroundTransparency = 0,
-        BackgroundColor3 = fromRGB(40, 40, 40),
-        ZIndex = 0,
-
-        [Children] = {
-            Components.RoundUICorner(),
-            Components.UIStroke({
-                Enabled = true,
-                Thickness = 2.5
-            })
-        }
-    })
-end
-
 local function ActionPanel(self: table) : Frame
     self.panelPos = Fusion.Value(fromScale(0.5, 5))
     self.actionClickCD = false
@@ -68,9 +42,23 @@ local function ActionPanel(self: table) : Frame
         end), AssetBook.TweenInfos.half),
 
         [Children] = {
-            ImageBG("Center"),
-            ImageBG("Left"),
-            ImageBG("Right"),
+            Components.Frame({
+                Name = "ImageBGCenter",
+                AnchorPoint = v2New(0.5, 0),
+                Position = fromScale(0.5, -0.2),
+                Size = fromScale(0.51, 12.9),
+                BackgroundTransparency = 0,
+                BackgroundColor3 = fromRGB(40, 40, 40),
+                ZIndex = 0,
+
+                [Children] = {
+                    Components.RoundUICorner(),
+                    Components.UIStroke({
+                        Enabled = true,
+                        Thickness = 2.5
+                    })
+                }
+            }),
 
             TurnBaseItemPanel(self),
 			TurnBaseSkillPanel(self),
@@ -91,7 +79,9 @@ local function ActionPanel(self: table) : Frame
                     }),
 
                     TurnBaseAction("Attack", self),
-                    TurnBaseAction("Defend", self)
+                    TurnBaseAction("Defend", self),
+                    TurnBaseAction("Items", self),
+                    TurnBaseAction("Skills", self)
                 }
             })
         }

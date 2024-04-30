@@ -10,15 +10,14 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local peek = Fusion.peek
+local Value, Computed, peek = Fusion.Value, Fusion.Computed, Fusion.peek
 
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local wait = task.wait
-local upper = string.upper
 local tFind = table.find
-local sFind = string.find
+local sFind, upper = string.find, string.upper
 
 local COLORS = {
 	Passive = fromRGB(40, 98, 3),
@@ -66,12 +65,34 @@ local function _findItem(itemFrame: Frame) : string
 	return item
 end
 
-local function FilterButton(id: string, self: table): TextButton
+local function FilterButtonBackpack(id: string, self: table): TextButton
+	if not self.filterInfo then
+		self.filterInfo = {
+			Equip = {
+				Visible = Value(false),
+				Text = Value("EQUIP")
+			},
+			Pin = {
+				Visible = Value(false),
+				Text = Value("PIN"),
+				Size = Value(fromScale(0.116, 1))
+			},
+		}
+	end
+
 	return Components.TextButton({
 		Name = id,
 		BackgroundColor3 = COLORS[id],
-		Text = upper(id),
-		Size = fromScale(0.116, 1),
+
+		Text = Computed(function(use)
+			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Text) else upper(id)
+		end),
+		Visible = Computed(function(use)
+			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Visible) else true
+		end),
+		Size = Computed(function(use)
+			return if tFind(BLACKLIST, id) then if id == "Equip" then fromScale(0.116, 1) else use(self.filterInfo.Pin.Size) else fromScale(0.12, 1)
+		end),
 
 		[Fusion.Children] = {
 			Fusion.New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
@@ -79,7 +100,7 @@ local function FilterButton(id: string, self: table): TextButton
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(Fusion.Computed(function(use)
+				Transparency = Fusion.Tween(Computed(function(use)
 					return if use(self.chosenFilter) == id and not tFind(BLACKLIST, id) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			})
@@ -129,4 +150,4 @@ local function FilterButton(id: string, self: table): TextButton
 	})
 end
 
-return FilterButton
+return FilterButtonBackpack

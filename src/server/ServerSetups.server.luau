@@ -124,8 +124,8 @@ local function mainSetup()
 		if locator:HasTag("MonsterLocation") then
 			RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
 
-			ServerUtil:SetupMonster(locator)
-			ServerUtil:ConnectMob(locator)
+			local monster = ServerUtil:SetupMonster(locator)
+			resources.Unloads.CombatEnds:Clone().Parent = monster
 		end
 	end
 

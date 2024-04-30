@@ -71,6 +71,10 @@ return function(plr: Player)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
 
+							[Fusion.OnEvent("MouseButton1Click")] = function()
+								overallTrans:set(1)
+							end,
+
 							[Children] = {
 								New("UICorner")({ CornerRadius = udNew(0.25, 0) }),
 								New("UIPadding")({

@@ -16,13 +16,12 @@ local color3New, ud2New, udNew = Color3.new, UDim2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local function TitleFrame(id: string, self: table): Frame
-	local BG_COLOR = { Menu = Value(fromRGB(30, 30, 30)), Backpack = Value(fromRGB(30, 30, 30)) }
-	local CONTENT_COLOR = { Menu = Value(fromRGB(255, 255, 255)), Backpack = Value(fromRGB(255, 255, 255)) }
-
+local function BGTitle(id: string, self: table): Frame
+	local bgColor = Value(fromRGB(30, 30, 30))
+	local contentColor = Value(fromRGB(255, 255, 255))
 	local plr = self.plr :: Player
-	local playerClass: string
 
+	local playerClass
 	if id == "Menu" then
 		playerClass = Value(plr:GetAttribute("Class"))
 
@@ -70,10 +69,10 @@ local function TitleFrame(id: string, self: table): Frame
 				Text = "X",
 
 				TextColor3 = Tween(Computed(function(use)
-					return use(CONTENT_COLOR[id])
+					return use(contentColor)
 				end), AssetBook.TweenInfos.twiceHalf),
 				BackgroundColor3 = Tween(Computed(function(use)
-					return use(BG_COLOR[id])
+					return use(bgColor)
 				end), AssetBook.TweenInfos.twiceHalf),
 
 				[Children] = {
@@ -83,18 +82,18 @@ local function TitleFrame(id: string, self: table): Frame
 						Enabled = true,
 
 						Color = Tween(Computed(function(use)
-							return use(CONTENT_COLOR[id])
+							return use(contentColor)
 						end), AssetBook.TweenInfos.twiceHalf)
 					}),
 				},
 
 				[OnEvent("MouseEnter")] = function()
-					CONTENT_COLOR[id]:set(fromRGB())
-					BG_COLOR[id]:set(fromRGB(255, 255, 255))
+					contentColor:set(fromRGB())
+					bgColor:set(fromRGB(255, 255, 255))
 				end,
 				[OnEvent("MouseLeave")] = function()
-					CONTENT_COLOR[id]:set(fromRGB(255, 255, 255))
-					BG_COLOR[id]:set(fromRGB())
+					contentColor:set(fromRGB(255, 255, 255))
+					bgColor:set(fromRGB())
 				end,
 				[OnEvent("MouseButton1Click")] = function()
 					ClientUtil:OpenUI(plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
@@ -104,4 +103,4 @@ local function TitleFrame(id: string, self: table): Frame
 	})
 end
 
-return TitleFrame
+return BGTitle

@@ -67,7 +67,6 @@ return function(plr: Player)
 		ScreenInsets = Enum.ScreenInsets.None,
 		DisplayOrder = 10,
 		Parent = plr.PlayerGui,
-		[Fusion.Ref] = self.UI,
 
 		[Fusion.Children] = {
 			Components.Frame({

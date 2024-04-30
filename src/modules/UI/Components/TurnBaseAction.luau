@@ -9,8 +9,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local OnEvent, Computed, Value =
-    Fusion.OnEvent, Fusion.Computed, Fusion.Value
+local OnEvent, Computed, Value = Fusion.OnEvent, Fusion.Computed, Fusion.Value
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -20,10 +19,7 @@ local udNew = UDim.new
 local wait = task.wait
 
 local function TurnBaseAction(id: string, self: table) : Frame
-    local IS_SELECTED = {
-        Attack = Value(false),
-        Defend = Value(false)
-    }
+    local isSelecting = Value(false)
 
     local function _hidePanel()
         self.panelPos:set(fromScale(0.5, 5))
@@ -32,7 +28,7 @@ local function TurnBaseAction(id: string, self: table) : Frame
     return Components.Frame({
         Name = id,
         BackgroundColor3 = Computed(function(use)
-            return if use(IS_SELECTED[id]) then fromRGB(255, 255, 255) else fromRGB()
+            return if use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
         end),
         BackgroundTransparency = 0,
 
@@ -41,31 +37,39 @@ local function TurnBaseAction(id: string, self: table) : Frame
             Components.UIStroke({
                 Enabled = true,
 
-                Thickness = Fusion.Tween(Computed(function(use)
-                    return if use(IS_SELECTED[id]) then 4 else 3
-                end), AssetBook.TweenInfos.half),
+                Thickness = Computed(function(use)
+                    return if use(isSelecting) then 4 else 3
+                end),
                 Color = Computed(function(use)
-                    return if use(IS_SELECTED[id]) then fromRGB() else fromRGB(255, 255, 255)
+                    return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
             }),
             Components.HoverImageButton({
                 [OnEvent("MouseEnter")] = function()
-                    IS_SELECTED[id]:set(true)
+                    isSelecting:set(true)
                 end,
                 [OnEvent("MouseLeave")] = function()
-                    IS_SELECTED[id]:set(false)
+                    isSelecting:set(false)
                 end,
                 [OnEvent("MouseButton1Click")] = function()
                     if self.plr:GetAttribute("NextAction") ~= "" then return end
                     if self.actionClickCD then return end
 
-                    self.actionClickCD = true
+                    if id == "Items" then
+                        self.itemPanelVisible:set(not Fusion.peek(self.itemPanelVisible))
 
-                    _hidePanel()
-                    Events.NextActionRequest:Fire(id)
+                    elseif id == "Skills" then
+                        self.skillPanelVisible:set(not Fusion.peek(self.skillPanelVisible))
 
-                    wait(1)
-                    self.actionClickCD = false
+                    else
+                        self.actionClickCD = true
+
+                        _hidePanel()
+                        Events.NextActionRequest:Fire(id)
+
+                        wait(1)
+                        self.actionClickCD = false
+                    end
                 end
             }),
             Components.ImageLabel({
@@ -73,10 +77,10 @@ local function TurnBaseAction(id: string, self: table) : Frame
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0.1),
                 Size = fromScale(0.5, 0.5),
-
                 Image = AssetBook.ActionPanelIcons[id],
+
                 ImageColor3 = Computed(function(use)
-                    return if use(IS_SELECTED[id]) then fromRGB() else fromRGB(255, 255, 255)
+                    return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
             }),
             Components.TextLabel({
@@ -85,8 +89,9 @@ local function TurnBaseAction(id: string, self: table) : Frame
                 Position = fromScale(0.5, 0.6),
                 Size = fromScale(0.9, 0.3),
                 Text = upper(id),
+
                 TextColor3 = Computed(function(use)
-                    return if use(IS_SELECTED[id]) then fromRGB() else fromRGB(255, 255, 255)
+                    return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
             })
         }

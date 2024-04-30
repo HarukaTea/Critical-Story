@@ -36,7 +36,6 @@ local function PlayerSlot(self: table, player: Player): Frame
 
 		[Children] = {
 			New("UIAspectRatioConstraint")({ AspectRatio = 4.993 }),
-
 			New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
 			New("ImageLabel")({
 				Name = "Class",

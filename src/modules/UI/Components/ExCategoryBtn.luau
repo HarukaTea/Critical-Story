@@ -18,12 +18,9 @@ local fromRGB = Color3.fromRGB
 local udNew = UDim.new
 local fontFromEnum = Font.fromEnum
 
-local POSITIONS = { Menu = fromScale(0.355, 0), Backpack = fromScale(0.71, 0) }
-local ICON_COLORS = { Menu = color3New(1, 1, 1), Backpack = fromRGB(148, 148, 148) }
-local KEYS = { Menu = "C", Backpack = "B" }
-local STROKES_TRANS = { Menu = Fusion.Value(1), Backpack = Fusion.Value(1) }
+local function ExCategoryBtn(id: string, self: table): Frame
+	local isSelecting = Fusion.Value(false)
 
-local function ExCharButton(id: string, self: table): Frame
 	local children: ImageLabel?
 	if id == "Menu" then
 		children = Components.ImageLabel({
@@ -51,14 +48,14 @@ local function ExCharButton(id: string, self: table): Frame
 	end
 
 	local function exCategoryOpened()
-		STROKES_TRANS[id]:set(1)
+		isSelecting:set(false)
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
 	return Fusion.New("Frame")({
 		Name = id,
 		BackgroundColor3 = color3New(),
-		Position = POSITIONS[id],
+		Position = if id == "Menu" then fromScale(0.355, 0) else fromScale(0.71, 0),
 		Size = fromScale(0.281, 0.658),
 
 		[Children] = {
@@ -68,7 +65,7 @@ local function ExCharButton(id: string, self: table): Frame
 				Enabled = true,
 
 				Transparency = Fusion.Tween(Computed(function(use)
-					return use(STROKES_TRANS[id])
+					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.HoverImageButton({
@@ -79,14 +76,14 @@ local function ExCharButton(id: string, self: table): Frame
 						return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 					end
 				end),
-				ImageColor3 = ICON_COLORS[id],
+				ImageColor3 = if id == "Menu" then color3New(1, 1, 1) else fromRGB(148, 148, 148),
 				ZIndex = 3,
 
 				[OnEvent("MouseEnter")] = function()
-					STROKES_TRANS[id]:set(0.3)
+					isSelecting:set(true)
 				end,
 				[OnEvent("MouseLeave")] = function()
-					STROKES_TRANS[id]:set(1)
+					isSelecting:set(false)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
 					ClientUtil:OpenUI(self.plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
@@ -100,7 +97,7 @@ local function ExCharButton(id: string, self: table): Frame
 				Size = fromScale(0.361, 0.362),
 				ZIndex = 4,
 				TextStrokeTransparency = 0,
-				Text = KEYS[id],
+				Text = if id == "Menu" then "C" else "B",
 
 				[Children] = { Fusion.New("UICorner")({ CornerRadius = udNew(0.3, 0) })},
 			}),
@@ -110,4 +107,4 @@ local function ExCharButton(id: string, self: table): Frame
 	})
 end
 
-return ExCharButton
+return ExCategoryBtn

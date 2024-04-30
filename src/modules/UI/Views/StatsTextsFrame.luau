@@ -8,18 +8,23 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, New, Value, AttributeChange =
-    Fusion.Children, Fusion.New, Fusion.Value, Fusion.AttributeChange
+local Children, Value, AttributeChange, Computed =
+    Fusion.Children, Fusion.Value, Fusion.AttributeChange, Fusion.Computed
 
 local v2New = Vector2.new
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
 
 local function StatImage(id: string, self: table) : ImageLabel
+    local isSelecting = Value(false)
+
     return Components.ImageLabel({
         Name = id.."Image",
         BackgroundTransparency = 0,
-        Image = Fusion.Computed(function(use)
+        Size = fromScale(1, 1),
+        SizeConstraint = Enum.SizeConstraint.RelativeYY,
+
+        Image = Computed(function(use)
             if id == "ClassATK" then
                 return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 
@@ -30,10 +35,26 @@ local function StatImage(id: string, self: table) : ImageLabel
                 return AssetBook.Items.ItemImages.RP
             end
         end),
-        Size = fromScale(1, 1),
-        SizeConstraint = Enum.SizeConstraint.RelativeYY,
 
-        [Children] = { Components.RoundUICorner() }
+        [Children] = {
+            Components.RoundUICorner(),
+            Components.UIStroke({
+                Enabled = true,
+                Thickness = 2.5,
+
+                Transparency = Fusion.Tween(Computed(function(use)
+                    return if use(isSelecting) then 0.3 else 1
+                end), AssetBook.TweenInfos.twiceHalf)
+            }),
+            Components.HoverImageButton({
+                [Fusion.OnEvent("MouseEnter")] = function()
+                    isSelecting:set(true)
+                end,
+                [Fusion.OnEvent("MouseLeave")] = function()
+                    isSelecting:set(false)
+                end,
+            })
+        }
     })
 end
 
@@ -62,7 +83,7 @@ local function StatText(id: string, self: table) : TextLabel
         Name = id.."Text",
         AutomaticSize = Enum.AutomaticSize.X,
         Size = fromScale(0, 1),
-        Text = Fusion.Computed(function(use)
+        Text = Computed(function(use)
             if id == "ClassATK" then
                 if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
                     return use(charDMGStats.MinDMG).."-"..use(charDMGStats.MaxDMG)
@@ -92,7 +113,7 @@ local function StatsTextsFrame(self: table) : Frame
         Size = fromScale(1, 0.5),
 
         [Children] = {
-            New("UIListLayout")({
+            Fusion.New("UIListLayout")({
                 Padding = udNew(0.01, 0),
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
                 FillDirection = Enum.FillDirection.Horizontal,

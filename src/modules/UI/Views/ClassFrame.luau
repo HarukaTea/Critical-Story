@@ -9,7 +9,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local ExBindingBtn = require(RepS.Modules.UI.Components.ExBindingBtn)
+local ExCategoryBtn = require(RepS.Modules.UI.Components.ExCategoryBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
 
 local Children, Value, peek = Fusion.Children, Fusion.Value, Fusion.peek
@@ -79,8 +79,8 @@ local function ClassFrame(self: table) : Frame
                 Size = fromScale(0.15, 1.5),
 
                 [Children] = {
-                    ExBindingBtn("Menu", self),
-                    ExBindingBtn("Backpack", self)
+                    ExCategoryBtn("Menu", self),
+                    ExCategoryBtn("Backpack", self)
                 }
             }),
             Components.Frame({

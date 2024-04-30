@@ -17,32 +17,25 @@ local Value = Fusion.Value
 local color3New = Color3.new
 local fromScale = UDim2.fromScale
 
-local POSITIONS = {
-	fromScale(0, 0),
-	fromScale(0.355, 0),
-	fromScale(0.71, 0),
-	fromScale(0, -0.8),
-	fromScale(0.355, -0.8)
-}
-local STROKES_TRANS = {
-	Value(1),
-	Value(1),
-	Value(1),
-	Value(1),
-	Value(1),
-}
-
 local function PassiveSlot(id: string, self: table): Frame
+	local positions = {
+		fromScale(0, 0),
+		fromScale(0.355, 0),
+		fromScale(0.71, 0),
+		fromScale(0, -0.8),
+		fromScale(0.355, -0.8)
+	}
+	local isSelecting = Value(false)
 
 	local function exCategoryOpened()
-		STROKES_TRANS[id]:set(1)
+		isSelecting:set(false)
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
 	return Fusion.New("Frame")({
 		Name = "Passive" .. id,
 		BackgroundColor3 = color3New(),
-		Position = POSITIONS[id],
+		Position = positions[id],
 		Size = fromScale(0.281, 0.658),
 
 		[Fusion.Children] = {
@@ -52,7 +45,7 @@ local function PassiveSlot(id: string, self: table): Frame
 				Enabled = true,
 
 				Transparency = Fusion.Tween(Fusion.Computed(function(use)
-					return use(STROKES_TRANS[id])
+					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.ImageLabel({
@@ -61,21 +54,17 @@ local function PassiveSlot(id: string, self: table): Frame
 				Image = Fusion.Computed(function(use)
 					local item = use(self.passiveIconList[id]) :: string
 
-					if AssetBook.Items.ItemImages[item] then
-						return AssetBook.Items.ItemImages[item]
-					else
-						return AssetBook.Items.ItemImages.Unknown
-					end
+					return if AssetBook.Items.ItemImages[item] then AssetBook.Items.ItemImages[item] else AssetBook.Items.ItemImages.Null
 				end),
 			}),
 			Components.HoverImageButton({
 				Visible = if isMobile then false else true,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
-					STROKES_TRANS[id]:set(0.3)
+					isSelecting:set(true)
 				end,
 				[Fusion.OnEvent("MouseLeave")] = function()
-					STROKES_TRANS[id]:set(1)
+					isSelecting:set(false)
 				end,
 			}),
 		},

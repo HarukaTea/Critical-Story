@@ -66,13 +66,12 @@ local function LocationTitleFrame(self: table) : Frame
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
+            locationInfo.Name:set(AssetBook.LocationInfo.Name[location])
+			locationInfo.Desc:set(AssetBook.LocationInfo.Desc[location])
 
 			wait(0.3)
 			locationInfo.OverallStrokeTrans:set(0.3)
 			locationInfo.OverallTrans:set(0)
-
-			locationInfo.Name:set(AssetBook.LocationInfo.Name[location])
-			locationInfo.Desc:set(AssetBook.LocationInfo.Desc[location])
 
 			wait(0.1)
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.two)

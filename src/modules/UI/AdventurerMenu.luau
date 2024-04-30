@@ -54,7 +54,7 @@ return function(plr: Player)
 					BottomBtns("Left", {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
-					}, self),
+					}),
 				}
 			}),
 			Components.Frame({

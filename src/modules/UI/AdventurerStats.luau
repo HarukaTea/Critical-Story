@@ -4,6 +4,7 @@
 
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
+local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Bin = require(RepS.Modules.Packages.Bin)
@@ -65,7 +66,7 @@ return function(plr: Player)
 	self.charData = self.char:WaitForChild("CharStats", 999)
 	self.humanoid = self.char.Humanoid
 
-	self.UI, self.classInfo, self.skillInfo, self.classFrame = Value(), Value(), Value(), Value()
+	self.UI, self.skillInfo, self.classFrame = Value(), Value(), Value()
 
 	self.playerData = {
 		EXP = {
@@ -78,13 +79,6 @@ return function(plr: Player)
 		RP = Value(HarukaLib:NumberConvert(plr:GetAttribute("RP"), "%.1f")),
 		LvPoints = Value(plr:GetAttribute("LvPoints"))
 	}
-	self.charClassInfo = {
-		Warrior = { Val = Value(0), UI = Value() },
-		Archer = { Val = Value(0), UI = Value() },
-		Wizard = { Val = Value(0), UI = Value() },
-		Knight = { Val = Value(0), UI = Value() },
-		Rogue = { Val = Value(0), UI = Value() }
-	}
 	self.charStatsDict = {
 		HP = { Value(self.char.Humanoid.Health), Value(self.char.Humanoid.MaxHealth) },
 
@@ -94,6 +88,15 @@ return function(plr: Player)
 	}
 	self.shadowTrans = Value(1)
 	self.Add, self.Empty = Bin()
+
+	self.charClassInfo = {
+		Warrior = Value(0),
+		Archer = Value(0),
+		Wizard = Value(0),
+		Knight = Value(0),
+		Rogue = Value(0)
+	}
+	local charClassInfo = self.charClassInfo
 
 	self.version, self.privateId, self.serverLocation =
 		Value(RepS.Package.Version.Value), Value(RepS.Package.PrivateServerId.Value), Value(RepS.Package.ServerLocation.Value)
@@ -208,6 +211,7 @@ return function(plr: Player)
 
 					CombatStyle(self, "Warrior"),
 					CombatStyle(self, "Archer"),
+					CombatStyle(self, "Wizard"),
 					CombatStyle(self, "Knight"),
 					CombatStyle(self, "Rogue"),
 				}
@@ -235,8 +239,10 @@ return function(plr: Player)
 			Events.ChangeMobTarget:Fire(monsters[self.nowMobIndex].Value)
 		end
 	end
-	CAS:BindAction("ChangeMobTarget", _changeMobTarget, false, Enum.KeyCode.LeftAlt)
-	CAS:BindAction("ChangeMobTarget2", _changeMobTarget, false, Enum.KeyCode.RightAlt)
+	CAS:BindAction("ChangeMobTargetLAlt", _changeMobTarget, false, Enum.KeyCode.LeftAlt)
+	CAS:BindAction("ChangeMobTargetRAlt", _changeMobTarget, false, Enum.KeyCode.RightAlt)
+	CAS:BindAction("ChangeMobTargetLCtrl", _changeMobTarget, false, Enum.KeyCode.LeftControl)
+	CAS:BindAction("ChangeMobTargetRCtrl", _changeMobTarget, false, Enum.KeyCode.RightControl)
 
 	--- Setups
 	local function _autoEquipItems()
@@ -293,6 +299,31 @@ return function(plr: Player)
 			playerData.LvPoints:set(lvPoints)
 		end
 	})
+	Hydrate(self.char)({
+		[AttributeChange("Combo")] = function(combo: number)
+			charClassInfo.Warrior:set(combo)
+
+            if combo <= 0 then return end
+            wait(0.2)
+            TS:Create(Fusion.peek(self.UI).CenterBG.WarriorStyle.BarBG.TweenBar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
+		end,
+		[AttributeChange("Arrows")] = function(arrows: number)
+			charClassInfo.Archer:set(arrows)
+		end,
+		[AttributeChange("WizardCasted")] = function(casted: number)
+			charClassInfo.Wizard:set(casted)
+		end,
+		[AttributeChange("Guard")] = function(guarded: number)
+			charClassInfo.Knight:set(guarded)
+		end,
+		[AttributeChange("RogueCritical")] = function(criChance: number)
+			charClassInfo.Rogue:set(criChance)
+		end,
+
+		[AttributeChange("InCombat")] = function(newState: boolean)
+			self.charStatsDict.IsInCombat:set(newState)
+		end
+	})
 	Hydrate(RepS.Package.ServerLocation)({
 		[OnChange("Value")] = function(newLocation: string)
 			self.serverLocation:set(newLocation)
@@ -314,8 +345,10 @@ return function(plr: Player)
 
 		ClientUtil:FreezePlayerControls("Unfreeze")
 
-		CAS:UnbindAction("ChangeMobTarget")
-		CAS:UnbindAction("ChangeMobTarget2")
+		CAS:UnbindAction("ChangeMobTargetLAlt")
+		CAS:UnbindAction("ChangeMobTargetRAlt")
+		CAS:UnbindAction("ChangeMobTargetLCtrl")
+		CAS:UnbindAction("ChangeMobTargetRCtrl")
 
 		Events.EquipItems:DisconnectAll()
 		Events.RefreshBackpack:DisconnectAll()

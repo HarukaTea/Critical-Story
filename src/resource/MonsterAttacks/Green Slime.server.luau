@@ -43,8 +43,8 @@ local function slimeWave(target: Model)
 	blast.Parent = char.Holder.Value
 end
 
-local function attackingCA()
-	wait(1)
+local function attacking()
+	wait(0.5)
 	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
 		local list = char.TargetingList:GetChildren()
 		local target = list[random(1, #list)] :: ObjectValue
@@ -70,11 +70,11 @@ local function attackingCA()
 		elseif style == 2 then
 			for _ = 1, random(1, 3) do
 				slimeWave(target.Value)
-				wait(0.8)
+				wait(0.5)
 			end
 		end
 
-		attackingCA()
+		attacking()
 	end
 end
-attackingCA()
+attacking()

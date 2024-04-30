@@ -17,8 +17,8 @@ local TurnBaseTimer = require(RepS.Modules.UI.Views.TurnBaseTimer)
 
 local TurnBaseStatBar = require(RepS.Modules.UI.Components.TurnBaseStatBar)
 
-local Children, New, Tween, Computed, Value =
-	Fusion.Children, Fusion.New, Fusion.Tween, Fusion.Computed, Fusion.Value
+local Children, New, Tween, Computed, Value, AttributeChange =
+	Fusion.Children, Fusion.New, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.AttributeChange
 
 local TurnBaseUI = {}
 TurnBaseUI.__index = TurnBaseUI
@@ -46,13 +46,28 @@ return function (plr: Player)
 	self.attackingTimeBar = Value(fromScale(1, 1))
 	self.attackingTimeTweenInfo = Value(AssetBook.TweenInfos.fourHalf)
 
+	local char = self.char
+	self.charStatsDict = {
+		Shield = Value(char:GetAttribute("Shield")),
+		MaxShield = Value(char:GetAttribute("MaxShield")),
+		TP = Value(char:GetAttribute("TP"))
+	}
 	Fusion.Hydrate(self.char)({
-		[Fusion.AttributeChange("InCombat")] = function(newState: boolean)
+		[AttributeChange("InCombat")] = function(newState: boolean)
 			self.isInCombat:set(newState)
 		end,
-		[Fusion.AttributeChange("OrbAttackingTime")] = function(newState: boolean)
+		[AttributeChange("OrbAttackingTime")] = function(newState: boolean)
 			self.attackingTimeTweenInfo:set(if newState then AssetBook.TweenInfos.fifteen else AssetBook.TweenInfos.fourHalf)
 			self.attackingTimeBar:set(if newState then fromScale(0, 1) else fromScale(1, 1))
+		end,
+		[AttributeChange("Shield")] = function(newShield: number)
+			self.charStatsDict.Shield:set(newShield)
+		end,
+		[AttributeChange("MaxShield")] = function(newShield: number)
+			self.charStatsDict.MaxShield:set(newShield)
+		end,
+		[AttributeChange("TP")] = function(newTP: number)
+			self.charStatsDict.TP:set(newTP)
 		end
 	})
 

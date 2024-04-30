@@ -29,12 +29,12 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 		[Fusion.AttributeChange("Equipped")] = function(state: boolean)
 			equipped:set(state)
 
-			peek(self.btnsFrame.Right).Equip.Text = if state then "UNEQUIP" else "EQUIP"
+			self.filterInfo.Equip.Text:set(if state then "UNEQUIP" else "EQUIP")
 		end,
 		[Fusion.AttributeChange("Pinned")] = function(state: boolean)
 			pinned:set(state)
 
-			peek(self.btnsFrame.Right).Pin.Text = if state then "UNPIN" else "PIN"
+			self.filterInfo.Pin.Text:set(if state then "UNPIN" else "PIN")
 		end
 	})
 	self.itemSlotClicked:Connect(function()
@@ -118,7 +118,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 				else false)
 		end,
 		[OnEvent("MouseButton1Click")] = function()
-			local itemFrame, btnsFrame = peek(self.itemFrame) :: Frame, peek(self.btnsFrame.Right) :: Frame
+			local itemFrame = peek(self.itemFrame) :: Frame
 
 			self:DeselectAll()
 			if itemFrame[item]:GetAttribute("Selected") then return end
@@ -129,7 +129,6 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			isSelecting:set(true)
 
 			local itemType = AssetBook.Items.ItemType[item]
-
 			self.horizonLineVisible:set(true)
 			self.itemName:set(AssetBook.Items.ItemName[item])
 			self.itemType:set(itemType)
@@ -139,13 +138,12 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			self.itemStats:set(AssetBook.Items.ItemStat[item])
 			self.itemDesc:set(AssetBook.Items.ItemDesc[item])
 
-			btnsFrame.Equip.Visible = if itemType ~= "Material" then true else false
-			btnsFrame.Equip.Text = if peek(equipped) then "UNEQUIP" else "EQUIP"
-			btnsFrame.Pin.Visible = true
-			btnsFrame.Pin.Text = if peek(pinned) then "UNPIN" else "PIN"
-			btnsFrame.Pin.Size = if btnsFrame.Equip.Visible
-				then fromScale(0.116, 1)
-				else fromScale(0.237, 1)
+			local filterInfo = self.filterInfo :: table
+			filterInfo.Equip.Visible:set(if itemType ~= "Material" then true else false)
+			filterInfo.Equip.Text:set(if peek(equipped) then "UNEQUIP" else "EQUIP")
+			filterInfo.Pin.Visible:set(true)
+			filterInfo.Pin.Text:set(if peek(pinned) then "UNPIN" else "PIN")
+			filterInfo.Pin.Size:set(if peek(filterInfo.Equip.Visible) then fromScale(0.116, 1) else fromScale(0.237, 1))
 		end,
 	})
 end

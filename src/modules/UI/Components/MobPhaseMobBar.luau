@@ -122,12 +122,12 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                         [OnEvent("MouseButton1Click")] = function()
 							workspace.Sounds.SFXs.SelectionConfirmed:Play()
 
-                            local monsterSymbols = self.charData.TargetMonsters:GetChildren()
+                            local monsterSymbols = self.charData.TargetMonsters:GetChildren() :: table
 							local monsters = {}
                             if #monsterSymbols > 1 then
                                 Events.ChangeMobTarget:Fire(mob)
 
-                                for _, child in ipairs(monsterSymbols) do
+                                for _, child: ObjectValue in ipairs(monsterSymbols) do
                                     if child.Value then insert(monsters, child.Value) end
                                 end
                                 if #monsters > 0 then

@@ -37,10 +37,11 @@ local function ItemBar(info: table): Frame
 			Components.Frame({
 				BackgroundTransparency = 0.2,
 				AnchorPoint = v2New(),
+				Size = fromScale(0.2, 1),
+
 				Position = Fusion.Tween(Fusion.Computed(function(use)
 					return use(info.Position)
 				end), AssetBook.TweenInfos.twiceHalfOne),
-				Size = fromScale(0.2, 1),
 
 				[Children] = {
 					Components.RoundUICorner(),

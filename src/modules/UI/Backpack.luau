@@ -61,11 +61,11 @@ return function(plr: Player)
 						FilterButton("Passive", self),
 						FilterButton("Active", self),
 						FilterButton("Others", self),
-					}, self),
+					}),
 					BottomBtns("Right", {
 						FilterButton("Equip", self),
 						FilterButton("Pin", self),
-					}, self),
+					}),
 
 					Components.Frame({
 						Name = "ItemBG",

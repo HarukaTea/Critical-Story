@@ -56,8 +56,8 @@ local function BackpackItemList(self: table) : ScrollingFrame
         self.itemStats:set("")
         self.itemDesc:set("")
 
-        peek(self.btnsFrame.Right).Equip.Visible = false
-        peek(self.btnsFrame.Right).Pin.Visible = false
+        self.filterInfo.Equip.Visible:set(false)
+        self.filterInfo.Pin.Visible:set(false)
     end
 
     return Components.ScrollingFrame({

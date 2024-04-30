@@ -54,10 +54,7 @@ end
 local function spikeRain(target: Model)
 	lookAt(target)
 
-	local rangePos = ServerUtil:FindPartOnRay(
-		target.PrimaryPart.Position + v3New(random(-15, 15), 10, random(-15, 15)),
-		{ target, char }
-	)
+	local rangePos = ServerUtil:FindPartOnRay(target.PrimaryPart.Position + v3New(random(-15, 15), 10, random(-15, 15)))
 
 	local rangeTip = RepS.Package.MonsterAttacks.Wolf.SpikeWolf2Range:Clone() :: Part
 	rangeTip.Position = rangePos
@@ -67,10 +64,7 @@ local function spikeRain(target: Model)
 	Debris:AddItem(rangeTip, 1)
 
 	for _ = 1, random(5, 6) do
-		local post = ServerUtil:FindPartOnRay(
-			rangePos + v3New(random(-15, 15), 10, random(-15, 15)),
-			{ target, char, rangeTip }
-		)
+		local post = ServerUtil:FindPartOnRay(rangePos + v3New(random(-15, 15), 10, random(-15, 15)))
 
 		local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolfSpike2:Clone() :: Model
 		blast:PivotTo(cfNew(post, post + blast.Base.CFrame.LookVector))
@@ -121,6 +115,4 @@ local function attacking()
 		attacking()
 	end
 end
-
-wait(0.5)
 attacking()

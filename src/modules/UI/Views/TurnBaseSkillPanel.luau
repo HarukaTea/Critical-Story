@@ -24,6 +24,7 @@ local wait = task.wait
 local function TurnBaseSkillPanel(self: table) : ScrollingFrame
     self.skillPanelAbsContentSize, self.skillPanelAbsSize = Value(0), Value(0)
     self.skills = Value({})
+    self.skillPanelVisible = Value(false)
 
     local function _handleSkills()
         wait()
@@ -59,6 +60,9 @@ local function TurnBaseSkillPanel(self: table) : ScrollingFrame
         Size = fromScale(0.173, 3),
         ScrollingDirection = Enum.ScrollingDirection.Y,
 
+        Visible = Computed(function(use)
+            return use(self.skillPanelVisible)
+        end),
         CanvasSize = Computed(function(use)
             return if use(self.skillPanelAbsContentSize) > use(self.skillPanelAbsSize) then fromOffset(0, use(self.skillPanelAbsContentSize) + 20) else fromOffset(0, 0)
         end),

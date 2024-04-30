@@ -19,26 +19,25 @@ local fromRGB = Color3.fromRGB
 local upper = string.upper
 local fontFromName = Font.fromName
 
-local COLORS = {
-	DMG = fromRGB(255, 0, 0),
-	Magic = fromRGB(170, 170, 255),
-	Health = fromRGB(85, 255, 0),
-	Shield = fromRGB(255, 255, 0),
-}
-local POS = {
-	DMG = fromScale(0.721, 0.566),
-	Magic = fromScale(0.106, 0.556),
-	Health = fromScale(0.162, 0.125),
-	Shield = fromScale(0.162, 0.847),
-}
-local POINTS = {
-	DMG = "DMGPoints",
-	Magic = "MagicPoints",
-	Health = "HealthPoints",
-	Shield = "ShieldPoints",
-}
-
 local function PointsButton(id: string, direction: string, self: table): Frame
+	local COLORS = {
+		DMG = fromRGB(255, 0, 0),
+		Magic = fromRGB(170, 170, 255),
+		Health = fromRGB(85, 255, 0),
+		Shield = fromRGB(255, 255, 0),
+	}
+	local POS = {
+		DMG = fromScale(0.721, 0.566),
+		Magic = fromScale(0.106, 0.556),
+		Health = fromScale(0.162, 0.125),
+		Shield = fromScale(0.162, 0.847),
+	}
+	local POINTS = {
+		DMG = "DMGPoints",
+		Magic = "MagicPoints",
+		Health = "HealthPoints",
+		Shield = "ShieldPoints",
+	}
 	local bgColors = { Value(fromRGB(30, 30, 30)), Value(fromRGB(30, 30, 30)) }
 	local contentColors = { Value(fromRGB(255, 255, 255)), Value(fromRGB(255, 255, 255)) }
 
@@ -55,6 +54,7 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 				FontFace = fontFromName("TitilliumWeb", Enum.FontWeight.Bold),
 				TextXAlignment = if direction == "Left" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				TextColor3 = COLORS[id],
+
                 Text = Computed(function(use)
 					if id ~= "DMG" then
 						return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
