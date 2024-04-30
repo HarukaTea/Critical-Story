@@ -10,22 +10,15 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local OptionToggleBtn = require(RepS.Modules.UI.Components.OptionToggleBtn)
 
-local Value, AttributeChange = Fusion.Value, Fusion.AttributeChange
+local AttributeChange = Fusion.AttributeChange
 
 local fromScale = UDim2.fromScale
 local clear = table.clear
 
 local function SettingsFrame(self: table): Frame
-	self.playerSettings = {
-		Musics = Value(true),
-		SFXs = Value(true),
-		PublicCombat = Value(false),
-		PotatoMode = Value(false),
-		PlayerList = Value(true),
-	}
-	self.potatoStoreParts = {}
+	local potatoStoreParts = {}
+	local playerSettings = self.playerSettings :: table
 
-	local playerSettings = self.playerSettings
 	Fusion.Hydrate(self.plr)({
 		[AttributeChange("CombatMode")] = function(style: string)
 			playerSettings.PublicCombat:set(style == "Public")
@@ -44,16 +37,17 @@ local function SettingsFrame(self: table): Frame
 			playerSettings.PotatoMode:set(state)
 
 			if state == false then
-				for part, material in self.potatoStoreParts do
+				for part: BasePart, material: Enum.Material in potatoStoreParts do
 					if part.Parent then part.Material = material end
 				end
 
-				clear(self.potatoStoreParts)
+				clear(potatoStoreParts)
 
 			elseif state then
-				for _, child in workspace.Maps:GetDescendants() do
-					if child:IsA("BasePart") then
-						self.potatoStoreParts[child] = child.Material
+				for _, child: Instance in workspace.Maps:GetDescendants() do
+					if child:IsA("BasePart") or child:IsA("UnionOperation") then
+						potatoStoreParts[child] = child.Material
+
 						child.Material = Enum.Material.Plastic
 					end
 				end

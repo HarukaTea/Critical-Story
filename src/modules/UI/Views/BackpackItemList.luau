@@ -7,29 +7,16 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local Signal = require(RepS.Modules.Packages.Signal)
 
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 
-local Computed, Value, OnChange, peek = Fusion.Computed, Fusion.Value, Fusion.OnChange, Fusion.peek
-
-local Backpack = {}
-Backpack.__index = Backpack
+local Computed, OnChange, peek = Fusion.Computed, Fusion.OnChange, Fusion.peek
 
 local tFind = table.find
 local wait = task.wait
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 
 local function BackpackItemList(self: table) : ScrollingFrame
-    local camVPSize = workspace.CurrentCamera.ViewportSize
-
-    self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })
-	self.absCellPadding = Value({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
-	self.absCellSize = Value(peek(self.absSize)[1] / 15.58)
-	self.absScrollSize, self.absContentSize = Value(90), Value(30)
-
-    self.itemSlotClicked = Signal()
-
     Fusion.Hydrate(workspace.CurrentCamera)({
 		[OnChange("ViewportSize")] = function(newSize: Vector2)
 			self.absSize:set({
@@ -40,25 +27,6 @@ local function BackpackItemList(self: table) : ScrollingFrame
 			self.absCellSize:set(peek(self.absSize)[1] / 15.58)
 		end,
 	})
-
-    --[[
-        Deselect all items, and hide the item description
-    ]]
-    function self:DeselectAll()
-        for _, element: ImageButton in peek(self.itemFrame):GetChildren() do
-            element:SetAttribute("Selected", nil)
-        end
-
-        self.horizonLineVisible:set(false)
-        self.itemName:set("")
-        self.itemType:set("")
-        self.itemTier:set("")
-        self.itemStats:set("")
-        self.itemDesc:set("")
-
-        self.filterInfo.Equip.Visible:set(false)
-        self.filterInfo.Pin.Visible:set(false)
-    end
 
     return Components.ScrollingFrame({
         Name = "Items",

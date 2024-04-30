@@ -11,14 +11,17 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
+local Pinia = require(RepS.Modules.UI.Pinia.PlayerListPinia)
 
 local PlayerDescFrame = require(RepS.Modules.UI.Views.PlayerDescFrame)
 
-local Children, Value, Computed, peek = Fusion.Children, Fusion.Value, Fusion.Computed, Fusion.peek
+local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
+
+local Children, Computed, peek = Fusion.Children, Fusion.Computed, Fusion.peek
 
 local PlayerList = {}
 PlayerList.__index = PlayerList
+PlayerList.__type = "PlayerList"
 
 local wait = task.wait
 local color3New, v2New, udNew, ud2New = Color3.new, Vector2.new, UDim.new, UDim2.new
@@ -27,23 +30,19 @@ local fromRGB = Color3.fromRGB
 local min = math.min
 
 return function(plr: Player)
-	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
-
 	local self = setmetatable({}, PlayerList)
-	self.plrGui = plr.PlayerGui
-
-	self.list, self.desc = Value(), Value()
-	self.absSize, self.absContentSize = Value(90), Value(30)
-	self.players = Value({})
-	self.isOpen = Value(true)
-
 	local char = plr.Character or plr.CharacterAdded:Wait()
+
+	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
+	repeat wait() until char:GetAttribute("CharDataLoaded")
+
+	Pinia(self)
 
 	local UI = Components.ScreenGui({
 		Name = "PlayerList",
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
-		Parent = self.plrGui,
+		Parent = plr.PlayerGui,
 
 		[Children] = {
 			Components.Frame({

@@ -13,20 +13,12 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local Children, Computed, Value, OnEvent, OnChange =
 	Fusion.Children, Fusion.Computed, Fusion.Value, Fusion.OnEvent, Fusion.OnChange
 
-local TurnBaseUI = {}
-TurnBaseUI.__index = TurnBaseUI
-
 local v2New = Vector2.new
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local udNew = UDim.new
 local wait = task.wait
 
 local function TurnBaseItemPanel(self: table) : ScrollingFrame
-    self.inventory = self.plr:WaitForChild("Inventory", 999)
-    self.itemPanelAbsContentSize, self.itemPanelAbsSize = Value(0), Value(0)
-    self.items = Value({})
-    self.itemPanelVisible = Value(false)
-
     local function _handleItems()
         wait()
         local items = self.inventory:GetChildren()

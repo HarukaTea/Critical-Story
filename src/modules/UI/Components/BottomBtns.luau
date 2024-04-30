@@ -2,7 +2,9 @@
 --!optimize 2
 --!native
 
-local Fusion = require(game:GetService("ReplicatedStorage").Modules.Packages.Fusion)
+local RepS = game:GetService("ReplicatedStorage")
+
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local New = Fusion.New
 

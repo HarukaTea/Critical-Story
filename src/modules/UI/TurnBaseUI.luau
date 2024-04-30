@@ -9,23 +9,26 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
+local Pinia = require(RepS.Modules.UI.Pinia.TurnBaseUIPinia)
+
 local ActionPanel = require(RepS.Modules.UI.Views.ActionPanel)
 local MobPhase = require(RepS.Modules.UI.Views.MobPhase)
 local PlayerPhase = require(RepS.Modules.UI.Views.PlayerPhase)
 local PhaseShower = require(RepS.Modules.UI.Views.PhaseShower)
-local TurnBaseTimer = require(RepS.Modules.UI.Views.TurnBaseTimer)
 
+local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local TurnBaseStatBar = require(RepS.Modules.UI.Components.TurnBaseStatBar)
 
-local Children, New, Tween, Computed, Value, AttributeChange =
-	Fusion.Children, Fusion.New, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.AttributeChange
+local Children, New, Tween, Computed, AttributeChange =
+	Fusion.Children, Fusion.New, Fusion.Tween, Fusion.Computed, Fusion.AttributeChange
 
 local TurnBaseUI = {}
 TurnBaseUI.__index = TurnBaseUI
+TurnBaseUI.__type = "TurnBaseUI"
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
-local udNew, ud2New = UDim.new, UDim2.new
+local udNew = UDim.new
 local fromRGB = Color3.fromRGB
 local wait = task.wait
 
@@ -39,19 +42,8 @@ return function (plr: Player)
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
-	self.isInCombat = Value(self.char:GetAttribute("InCombat"))
+	Pinia(self)
 
-	self.transHPBarSize = Value(fromScale(0, 0.875))
-
-	self.attackingTimeBar = Value(fromScale(1, 1))
-	self.attackingTimeTweenInfo = Value(AssetBook.TweenInfos.fourHalf)
-
-	local char = self.char
-	self.charStatsDict = {
-		Shield = Value(char:GetAttribute("Shield")),
-		MaxShield = Value(char:GetAttribute("MaxShield")),
-		TP = Value(char:GetAttribute("TP"))
-	}
 	Fusion.Hydrate(self.char)({
 		[AttributeChange("InCombat")] = function(newState: boolean)
 			self.isInCombat:set(newState)
@@ -145,6 +137,9 @@ return function (plr: Player)
 							})
 						}
 					}),
+
+					BottomProgressBar("MonsterPhase", self),
+					BottomProgressBar("PlayerPhase", self)
                 }
             }),
 			Components.Frame({
@@ -154,18 +149,6 @@ return function (plr: Player)
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					PhaseShower(self)
-				}
-			}),
-			Components.Frame({
-				Name = "TopBG",
-				AnchorPoint = v2New(0.5, 0),
-				Position = ud2New(0.5, 0, 0, 58),
-				Size = fromScale(1, 0.1),
-
-				[Children] = {
-					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
-
-					TurnBaseTimer(self)
 				}
 			})
         }

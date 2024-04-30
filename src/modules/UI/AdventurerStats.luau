@@ -7,7 +7,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Bin = require(RepS.Modules.Packages.Bin)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
@@ -16,6 +15,8 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+
+local Pinia = require(RepS.Modules.UI.Pinia.AdventurerStatsPinia)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
 local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
@@ -27,31 +28,28 @@ local PlayerEffectsFrame = require(RepS.Modules.UI.Views.PlayerEffectsFrame)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
+local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
-local Children, New, Value, AttributeChange, Tween, Computed, Hydrate, OnChange, peek =
+local Children, New, AttributeChange, Computed, Hydrate, OnChange =
 	Fusion.Children,
 	Fusion.New,
-	Fusion.Value,
 	Fusion.AttributeChange,
-	Fusion.Tween,
 	Fusion.Computed,
 	Fusion.Hydrate,
-	Fusion.OnChange,
-	Fusion.peek
+	Fusion.OnChange
 
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
+AdventurerStats.__type = "AdventuerStats"
 
 local wait = task.wait
-local floor, clamp = math.floor, math.clamp
+local floor = math.floor
 local v2New, udNew, ud2New = Vector2.new, UDim.new, UDim2.new
 local fromScale = UDim2.fromScale
-local fromRGB = Color3.fromRGB
 
 return function(plr: Player)
-	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 	repeat wait() until plr.PlayerGui:WaitForChild("Backpack", 999)
 
 	local self = setmetatable({}, AdventurerStats)
@@ -60,48 +58,12 @@ return function(plr: Player)
 	self.plrGui = plr.PlayerGui
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
+	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
-	self.inventory = plr:WaitForChild("Inventory", 999)
-	self.charData = self.char:WaitForChild("CharStats", 999)
-	self.humanoid = self.char.Humanoid
+	Pinia(self)
 
-	self.UI, self.skillInfo, self.classFrame = Value(), Value(), Value()
-
-	self.playerData = {
-		EXP = {
-			Value(plr:GetAttribute("EXP")),
-			Value(floor(plr:GetAttribute("Levels") ^ 1.85) + 60),
-		},
-		Class = Value(plr:GetAttribute("Class")),
-		Levels = Value(plr:GetAttribute("Levels")),
-		Gold = Value(HarukaLib:NumberConvert(plr:GetAttribute("Gold"), "%.1f")),
-		RP = Value(HarukaLib:NumberConvert(plr:GetAttribute("RP"), "%.1f")),
-		LvPoints = Value(plr:GetAttribute("LvPoints"))
-	}
-	self.charStatsDict = {
-		HP = { Value(self.char.Humanoid.Health), Value(self.char.Humanoid.MaxHealth) },
-
-		MonsterAmount = Value({}),
-		IsInCombat = Value(false),
-		EffectsList = Value({}),
-	}
-	self.shadowTrans = Value(1)
-	self.Add, self.Empty = Bin()
-
-	self.charClassInfo = {
-		Warrior = Value(0),
-		Archer = Value(0),
-		Wizard = Value(0),
-		Knight = Value(0),
-		Rogue = Value(0)
-	}
-	local charClassInfo = self.charClassInfo
-
-	self.version, self.privateId, self.serverLocation =
-		Value(RepS.Package.Version.Value), Value(RepS.Package.PrivateServerId.Value), Value(RepS.Package.ServerLocation.Value)
-
-	Components.ScreenGui({
+	local UI = Components.ScreenGui({
 		Name = "AdventurerStats",
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 2,
@@ -118,31 +80,15 @@ return function(plr: Player)
 				Visible = Computed(function(use)
 					return not use(self.charStatsDict.IsInCombat)
 				end),
-				Position = Tween(Computed(function(use)
+				Position = Fusion.Tween(Computed(function(use)
 					return if use(self.charStatsDict.IsInCombat) then fromScale(0.5, 3) else fromScale(0.5, 1)
 				end), AssetBook.TweenInfos.twiceHalfOne),
 
 				[Children] = {
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
-					New("Frame")({
-						Name = "EXPBar",
-						BackgroundColor3 = fromRGB(30, 30, 30),
-						Position = fromScale(0, 0.8),
-						Size = fromScale(1, 0.1),
 
-						[Children] = {
-							New("Frame")({
-								Name = "Bar",
-								BackgroundColor3 = fromRGB(217, 193, 144),
-								BackgroundTransparency = 0.2,
-								Size = Tween(Computed(function(use)
-									local x = clamp(use(self.playerData.EXP[1]) / use(self.playerData.EXP[2]), 0, 1)
+					BottomProgressBar("EXP", self),
 
-									return fromScale(x, 1)
-								end), AssetBook.TweenInfos.halfBack),
-							}),
-						},
-					}),
 					Components.Frame({
 						Name = "StatsFrame",
 						AnchorPoint = v2New(0.5, 0),
@@ -218,7 +164,7 @@ return function(plr: Player)
 			}),
 			Components.Frame({
 				Name = "Shadow",
-				BackgroundTransparency = Tween(Computed(function(use)
+				BackgroundTransparency = Fusion.Tween(Computed(function(use)
 					return use(self.shadowTrans)
 				end), AssetBook.TweenInfos.twiceHalf),
 			})
@@ -252,7 +198,7 @@ return function(plr: Player)
 			end
 		end
 	end
-	_autoEquipItems()
+	Spawn(_autoEquipItems)
 	local function moveUpJumpBtn()
 		local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
 
@@ -268,7 +214,7 @@ return function(plr: Player)
 		local region = HarukaLib:IsInRegion(self.char.PrimaryPart.Position, workspace:WaitForChild("MapComponents").Zones:GetChildren())
 		if region then self.char:SetAttribute("CurrentRegion", region.Name) end
 	end
-	charCurrentZone()
+	Spawn(charCurrentZone)
 
 	---// Listening events
 	local playerData = self.playerData
@@ -280,7 +226,7 @@ return function(plr: Player)
 	Hydrate(plr)({
 		[AttributeChange("EXP")] = function(exp: number)
 			playerData.EXP[1]:set(exp)
-			playerData.EXP[2]:set(floor(peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
+			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
 		end,
 		[AttributeChange("Levels")] = function(level: number)
 			playerData.Levels:set(level)
@@ -299,6 +245,7 @@ return function(plr: Player)
 			playerData.LvPoints:set(lvPoints)
 		end
 	})
+	local charClassInfo = self.charClassInfo
 	Hydrate(self.char)({
 		[AttributeChange("Combo")] = function(combo: number)
 			charClassInfo.Warrior:set(combo)
@@ -341,7 +288,7 @@ return function(plr: Player)
 	})
 
 	local function _clearGarbage()
-		peek(self.UI):Destroy()
+		UI:Destroy()
 
 		ClientUtil:FreezePlayerControls("Unfreeze")
 

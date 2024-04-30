@@ -16,24 +16,15 @@ local fromRGB = Color3.fromRGB
 local tFind = table.find
 local upper = string.upper
 
-local function _closeOther(self: table, id: string)
-	local mainFrames = { "BottomLeft", "BottomRight", "Top" }
-	for _, frame in peek(self.UI).BG:GetChildren() do
-		if frame:IsA("Frame") and not tFind(mainFrames, frame.Name) then
-			frame.Visible = false
-		end
-	end
-
-	peek(self.UI).BG[id].Visible = true
-end
-
 local function FilterButtonMenu(id: string, self: table): TextButton
 	local COLORS = {
 		Character = fromRGB(172, 113, 86),
 		Settings = fromRGB(53, 107, 79),
-	}
 
-	if not self.chosenFilter then self.chosenFilter = Fusion.Value("Character") end
+		--//TODO: New UIs
+		--Donation = ?
+		--Party = ?
+	}
 
 	return Components.TextButton({
 		Name = id,
@@ -55,7 +46,12 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 		[Fusion.OnEvent("MouseButton1Click")] = function()
 			self.chosenFilter:set(id)
 
-			_closeOther(self, id)
+			local mainFrames = { "BottomLeft", "BottomRight", "Top" }
+			for _, frame: Frame in peek(self.UI).BG:GetChildren() do
+				if frame:IsA("Frame") and not tFind(mainFrames, frame.Name) then frame.Visible = false end
+			end
+
+			peek(self.UI).BG[id].Visible = true
 		end,
 	})
 end

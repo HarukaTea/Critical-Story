@@ -17,7 +17,7 @@ local TypeWriter = require(RepS.Modules.Packages.TypeWriter)
 
 local OptionFrame = require(RepS.Modules.UI.Components.OptionFrame)
 
-local Computed, Value = Fusion.Computed, Fusion.Value
+local Computed = Fusion.Computed
 
 local udNew =  UDim.new
 local fromScale = UDim2.fromScale
@@ -27,13 +27,6 @@ local tFind, insert = table.find, table.insert
 local match, sFind = string.match, string.find
 
 local function ChatFrame(self: table) : Frame
-    self.chatDialogueAbsSize = Value(24)
-    self.chatText = Value("")
-    self.chatSpeaker = Value("")
-    self.chatChoices = Value({})
-    self.triangleVisible = Value(true)
-    self.isChatting = Value(false)
-
     local originDialoguesChatting = nil
     local dialoguesChatting = nil
     local dialogueIndexChatting = 1

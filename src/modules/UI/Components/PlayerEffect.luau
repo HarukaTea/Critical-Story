@@ -70,13 +70,20 @@ local function ProgressCircle(direction: string, effect: string, info: table) : 
 	})
 end
 
-local function PlayerEffect(effect: string, info: table) : ImageLabel
+local function PlayerEffect(effect: Script) : ImageLabel
+    local info = {
+        Name = effect.Name,
+        Script = effect,
+        Duration = Fusion.Value(effect:GetAttribute("Duration")),
+        Power = effect:GetAttribute("Power")
+    }
+
     return Components.ImageLabel({
-        Name = effect,
+        Name = info.Name,
         BackgroundTransparency = 0,
         Size = fromScale(1, 1),
         SizeConstraint = Enum.SizeConstraint.RelativeYY,
-        Image = AssetBook.BuffImages[effect],
+        Image = AssetBook.BuffImages[info.Name],
 
         [Children] = {
             Components.RoundUICorner(),
@@ -98,8 +105,8 @@ local function PlayerEffect(effect: string, info: table) : ImageLabel
                 }
             }),
 
-            ProgressCircle("Left", effect, info),
-            ProgressCircle("Right", effect, info)
+            ProgressCircle("Left", info.Name, info),
+            ProgressCircle("Right", info.Name, info)
         }
     })
 end

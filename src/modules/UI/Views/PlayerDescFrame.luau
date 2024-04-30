@@ -8,7 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local New, Children, Value, Computed = Fusion.New, Fusion.Children, Fusion.Value, Fusion.Computed
+local New, Children, Computed = Fusion.New, Fusion.Children, Fusion.Computed
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
@@ -40,15 +40,6 @@ local function PlayerItemSlot(id: string): ImageLabel
 end
 
 local function PlayerDescFrame(self: table) : Frame
-    self.playerDescVisible = Value(false)
-    self.playerDescBGSize = Value(fromScale(1, 0.86))
-
-    self.classImage = Value("")
-    self.displayName = Value("")
-    self.userName = Value("")
-    self.level = Value("")
-    self.role = Value("")
-
     return Components.Frame({
         Name = "Desc",
         AnchorPoint = v2New(),

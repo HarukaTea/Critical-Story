@@ -9,6 +9,8 @@ local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
+local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
+
 local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonMenu)
@@ -18,6 +20,7 @@ local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
 
 local AdventurerMenu = {}
 AdventurerMenu.__index = AdventurerMenu
+AdventurerMenu.__type = "AdventurerMenu"
 
 local wait = task.wait
 
@@ -31,7 +34,7 @@ return function(plr: Player)
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
-	self.UI = Fusion.Value()
+	Pinia(self) --// Create a storage
 
 	local UI = Components.ScreenGui({
 		Name = "AdventurerMenu",

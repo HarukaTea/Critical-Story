@@ -19,8 +19,6 @@ local insert, tFind, remove = table.insert, table.find, table.remove
     TODO: multi-prompt actions
 ]]
 local function PromptsFrame(self: table) : Frame
-    self.promptsList = Fusion.Value({})
-
     local function _addPrompt(prompt: ProximityPrompt)
 		local nowPrompts = Fusion.peek(self.promptsList)
 
@@ -57,7 +55,7 @@ local function PromptsFrame(self: table) : Frame
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 HorizontalAlignment = Enum.HorizontalAlignment.Center
             }),
-            Fusion.ForValues(self.promptsList, function(use, prompt: ProximityPrompt)
+            Fusion.ForValues(self.promptsList, function(_, prompt: ProximityPrompt)
                 return Prompt(prompt, 1)
             end, Fusion.cleanup)
         },

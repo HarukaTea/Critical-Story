@@ -10,6 +10,8 @@ local ClientUtil =require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
+local Pinia = require(RepS.Modules.UI.Pinia.BackpackPinia)
+
 local BackpackItemList = require(RepS.Modules.UI.Views.BackpackItemList)
 
 local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
@@ -18,10 +20,11 @@ local FilterButton = require(RepS.Modules.UI.Components.FilterButtonBackpack)
 
 local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
 
-local Children, Value = Fusion.Children, Fusion.Value
+local Children = Fusion.Children
 
 local Backpack = {}
 Backpack.__index = Backpack
+Backpack.__type = "Backpack"
 
 local wait = task.wait
 local fromScale = UDim2.fromScale
@@ -34,14 +37,11 @@ return function(plr: Player)
 	self.plr = plr
 	self.plrGui = plr.PlayerGui
 	self.char = plr.Character or plr.CharacterAdded:Wait()
-	local char = self.char
 
-	self.inventory = plr:WaitForChild("Inventory", 999)
+	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
+	repeat wait() until self.char:GetAttribute("CharDataLoaded")
 
-	self.itemFrame = Value()
-	self.items = Value(self.inventory:GetChildren())
-	self.noItemsShow = Value(if Fusion.peek(self.items)[1] then false else true)
-	self.chosenFilter = Value("All")
+	Pinia(self)
 
 	local UI = Components.ScreenGui({
 		Name = "Backpack",
@@ -149,5 +149,5 @@ return function(plr: Player)
 
 		self.itemSlotClicked:Destroy()
 	end
-	char.Humanoid.Died:Once(_clearGarbage)
+	self.char.Humanoid.Died:Once(_clearGarbage)
 end

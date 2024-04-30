@@ -4,7 +4,6 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -12,16 +11,13 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local ItemBar = require(RepS.Modules.UI.Components.ItemBar)
 
-local Children, New, Value = Fusion.Children, Fusion.New, Fusion.Value
+local Children, New = Fusion.Children, Fusion.New
 
 local udNew = UDim.new
-local fromScale = UDim2.fromScale
 local insert, tFind, remove = table.insert, table.find, table.remove
 local wait = task.wait
 
 local function ItemAcquiredFrame(self: table): Frame
-	self.newAddedItems = Value({})
-
 	local function _giveDrop(item: string)
 		local nowAdded = Fusion.peek(self.newAddedItems)
 
@@ -47,15 +43,8 @@ local function ItemAcquiredFrame(self: table): Frame
 				Padding = udNew(0.15, 0),
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
 			}),
-			Fusion.ForValues(self.newAddedItems, function(use, item: string)
-				local info = {
-					Icon = AssetBook.Items.ItemImages[item],
-					Name = AssetBook.Items.ItemName[item],
-					TierColor = AssetBook.TierColor[AssetBook.Items.ItemTier[item]],
-					Position = Value(fromScale(1.2, 0))
-				}
-
-				return ItemBar(info)
+			Fusion.ForValues(self.newAddedItems, function(_, item: string)
+				return ItemBar(item)
 			end, Fusion.cleanup),
 		},
 	})

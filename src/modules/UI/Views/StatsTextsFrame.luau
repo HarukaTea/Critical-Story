@@ -60,13 +60,8 @@ end
 
 local function StatText(id: string, self: table) : TextLabel
     local char = self.char :: Model
-
-    self.charDMGStats = {
-        MinDMG = Value(char:GetAttribute("MinDMG")),
-        MaxDMG = Value(char:GetAttribute("MaxDMG")),
-        Magic = Value(char:GetAttribute("Magic")),
-    }
     local charDMGStats = self.charDMGStats
+
     Fusion.Hydrate(char)({
         [AttributeChange("MinDMG")] = function(newDMG: number)
             charDMGStats.MinDMG:set(newDMG)

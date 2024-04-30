@@ -10,10 +10,7 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local New, Tween, Computed, Value = Fusion.New, Fusion.Tween, Fusion.Computed, Fusion.Value
-
-local TurnBaseUI = {}
-TurnBaseUI.__index = TurnBaseUI
+local New, Tween, Computed = Fusion.New, Fusion.Tween, Fusion.Computed
 
 local fromScale = UDim2.fromScale
 local udNew = UDim.new
@@ -22,9 +19,6 @@ local wait = task.wait
 local tFind = table.find
 
 local function PhaseShower(self: table) : Frame
-    self.currentPhase = Value("Player")
-	self.phasePos = { Value(fromScale(-0.2, 0)), Value(fromScale(1.2, 0.9)) }
-	self.phaseTrans = Value(1)
 	local phaseInfo = {
 		Player = {
 			Color = fromRGB(85, 255, 255),

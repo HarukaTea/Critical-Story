@@ -10,7 +10,7 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local Value, Computed, peek = Fusion.Value, Fusion.Computed, Fusion.peek
+local Computed, peek = Fusion.Computed, Fusion.peek
 
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
@@ -66,20 +66,6 @@ local function _findItem(itemFrame: Frame) : string
 end
 
 local function FilterButtonBackpack(id: string, self: table): TextButton
-	if not self.filterInfo then
-		self.filterInfo = {
-			Equip = {
-				Visible = Value(false),
-				Text = Value("EQUIP")
-			},
-			Pin = {
-				Visible = Value(false),
-				Text = Value("PIN"),
-				Size = Value(fromScale(0.116, 1))
-			},
-		}
-	end
-
 	return Components.TextButton({
 		Name = id,
 		BackgroundColor3 = COLORS[id],

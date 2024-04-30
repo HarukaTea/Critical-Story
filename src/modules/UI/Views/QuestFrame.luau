@@ -14,9 +14,8 @@ local udNew = UDim.new
 local wait = task.wait
 
 local function QuestFrame(self: table) : Frame
-    local quests = self.plr:WaitForChild("Quests") :: Folder
+    local quests = self.plr:WaitForChild("Quests", 999) :: Folder
 
-    self.quests = Fusion.Value(quests:GetChildren())
     local function _changeQuests()
         wait()
         self.quests:set(quests:GetChildren())
@@ -34,7 +33,7 @@ local function QuestFrame(self: table) : Frame
                 Padding = udNew(0.5, 0),
                 VerticalAlignment = Enum.VerticalAlignment.Bottom
             }),
-            Fusion.ForValues(self.quests, function(use, quest: IntValue)
+            Fusion.ForValues(self.quests, function(_, quest: IntValue)
                 return QuestBar(quest)
             end, Fusion.cleanup)
         }

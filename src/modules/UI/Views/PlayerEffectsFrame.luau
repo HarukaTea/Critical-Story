@@ -37,14 +37,8 @@ local function PlayerEffectsFrame(self: table) : Frame
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
                 FillDirection = Enum.FillDirection.Horizontal
             }),
-            Fusion.ForValues(self.charStatsDict.EffectsList, function(use, effect: Script)
-                local effectInfo = {
-                    Script = effect,
-                    Duration = Fusion.Value(effect:GetAttribute("Duration")),
-                    Power = effect:GetAttribute("Power")
-                }
-
-                return PlayerEffect(effect.Name, effectInfo)
+            Fusion.ForValues(self.charStatsDict.EffectsList, function(_, effect: Script)
+                return PlayerEffect(effect)
             end, Fusion.cleanup)
         }
     })

@@ -11,7 +11,7 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local Children, Tween, Computed, Value = Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value
+local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -29,16 +29,6 @@ local function TextStroke(self: table)
 end
 
 local function LocationTitleFrame(self: table) : Frame
-    self.locationInfo = {
-		Thread = nil,
-		Name = Value(""),
-		Desc = Value(""),
-		Shown = Value(false),
-		OverallTrans = Value(1),
-		OverallStrokeTrans = Value(1),
-		HorizonLineSize = Value(fromScale(0.25, 0.07)),
-        HorizonLineTweenInfo = Value(AssetBook.TweenInfos.two)
-	}
     local function _showCurrentLocation(location: string)
         if not location or location == "" then return end
 		local locationInfo = self.locationInfo

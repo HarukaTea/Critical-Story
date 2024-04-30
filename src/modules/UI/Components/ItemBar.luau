@@ -16,7 +16,15 @@ local v2New = Vector2.new
 local wait = task.wait
 local fromRGB = Color3.fromRGB
 
-local function ItemBar(info: table): Frame
+local function ItemBar(item: string): Frame
+	local info = {
+		Icon = AssetBook.Items.ItemImages[item],
+		Name = AssetBook.Items.ItemName[item],
+		TierColor = AssetBook.TierColor[AssetBook.Items.ItemTier[item]],
+		Position = Fusion.Value(fromScale(1.2, 0))
+	}
+	local isSelecting = Fusion.Value(false)
+
 	Spawn(function()
 		wait(0.75)
 		workspace.Sounds.SFXs.ItemAcquired:Play()
@@ -27,7 +35,6 @@ local function ItemBar(info: table): Frame
 		wait(3.2)
 		info.Position:set(fromScale(1.2, 0))
 	end)
-	local isSelecting = Fusion.Value(false)
 
 	return Components.Frame({
 		Name = "Acquired",

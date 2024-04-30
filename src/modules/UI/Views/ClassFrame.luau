@@ -12,15 +12,13 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local ExCategoryBtn = require(RepS.Modules.UI.Components.ExCategoryBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
 
-local Children, Value, peek = Fusion.Children, Fusion.Value, Fusion.peek
+local Children, peek = Fusion.Children, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local sFind, match = string.find, string.match
 
 local function ClassFrame(self: table) : Frame
-    self.passiveIconList = { Value("Null"), Value("Null"), Value("Null"), Value("Null"), Value("Null"), Value("Null") }
-
     local function _equipItem(type: string, slot: string, item: string)
 		local itemSlot = peek(self.classFrame):FindFirstChild(slot, true)
         if not itemSlot then return end

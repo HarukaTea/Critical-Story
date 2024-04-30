@@ -10,8 +10,6 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local Children, Value = Fusion.Children, Fusion.Value
-
 local ud2New = UDim2.new
 local fromOffset, fromScale = UDim2.fromOffset, UDim2.fromScale
 local v2New = Vector2.new
@@ -19,7 +17,7 @@ local wait = task.wait
 local fromRGB = Color3.fromRGB
 
 return function (plr: Player)
-    local bgPos = Value(fromScale(1.7, 1.7))
+    local bgPos = Fusion.Value(fromScale(1.7, 1.7))
 
 	local char = plr.Character or plr.CharacterAdded:Wait()
 
@@ -37,7 +35,7 @@ return function (plr: Player)
 		DisplayOrder = 100,
 		Parent = plr.PlayerGui,
 
-		[Children] = {
+		[Fusion.Children] = {
 			Components.ImageLabel({
 				AnchorPoint = v2New(0.5, 0.5),
 				Position = fromScale(0.5, 0.5),
@@ -49,7 +47,7 @@ return function (plr: Player)
                     return use(bgPos)
                 end), AssetBook.TweenInfos.half),
 
-				[Children] = {
+				[Fusion.Children] = {
 					createBackendFrame({
 						Position = fromOffset(-2, -4998),
 						Size = ud2New(1, 4, 0, 5000),

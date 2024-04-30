@@ -19,10 +19,6 @@ local wait = task.wait
 local insert, remove, tFind = table.insert, table.remove, table.find
 
 local function PlayerPhase(self: table) : Frame
-    self.playersInCombat = Value({})
-    self.playersListPos = Value(fromScale(-0.015, -0.5))
-    self.targetingMob = Value(self.charData.TargetMonster.Value)
-
     local function _addPlr(char: ObjectValue)
 		wait()
         local nowPlayers = peek(self.playersInCombat)

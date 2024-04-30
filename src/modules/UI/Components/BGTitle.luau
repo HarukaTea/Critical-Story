@@ -21,7 +21,7 @@ local function BGTitle(id: string, self: table): Frame
 	local contentColor = Value(fromRGB(255, 255, 255))
 	local plr = self.plr :: Player
 
-	local playerClass
+	local playerClass = nil
 	if id == "Menu" then
 		playerClass = Value(plr:GetAttribute("Class"))
 

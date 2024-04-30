@@ -22,9 +22,6 @@ local tFind = table.find
 local fromRGB = Color3.fromRGB
 
 local function ActionPanel(self: table) : Frame
-    self.panelPos = Fusion.Value(fromScale(0.5, 5))
-    self.actionClickCD = false
-
     local whitelist = { "Combat", "Player" }
     local function _showPanel(phase: string)
         if not tFind(whitelist, phase) then return end

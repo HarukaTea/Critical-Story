@@ -16,15 +16,14 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local sFind, sub = string.find, string.sub
 
-local TEXTS = {
-	Musics = "Musics",
-	SFXs = "Sound Effects",
-	PublicCombat = "Public Combat Mode",
-	PotatoMode = "Low Detail Mode",
-	PlayerList = "Player List",
-}
-
 local function OptionToggleBtn(id: string, self: table) : Frame
+	local TEXTS = {
+		Musics = "Musics",
+		SFXs = "Sound Effects",
+		PublicCombat = "Public Combat Mode",
+		PotatoMode = "Low Detail Mode",
+		PlayerList = "Player List",
+	}
     local isSelecting = Fusion.Value(false)
 
     return Components.Frame({

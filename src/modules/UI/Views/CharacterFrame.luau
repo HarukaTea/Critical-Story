@@ -13,10 +13,9 @@ local Signals = require(RepS.Modules.Data.Signals)
 
 local PointsButton = require(RepS.Modules.UI.Components.PointsButton)
 
-local Children, New, Value, AttributeChange, Hydrate, Tween, Computed, OnEvent, peek =
+local Children, New, AttributeChange, Hydrate, Tween, Computed, OnEvent, peek =
 	Fusion.Children,
 	Fusion.New,
-	Fusion.Value,
 	Fusion.AttributeChange,
 	Fusion.Hydrate,
 	Fusion.Tween,
@@ -56,22 +55,6 @@ end
 
 local function CharacterFrame(self: table): Frame
 	local plr, char = self.plr :: Player, self.char :: Model
-	self.playerData = {
-		Levels = Value(plr:GetAttribute("Levels")),
-		LvPoints = Value(plr:GetAttribute("LvPoints")),
-		DMG = Value(plr:GetAttribute("DMGPoints")),
-		Magic = Value(plr:GetAttribute("MagicPoints")),
-		Health = Value(plr:GetAttribute("HealthPoints")),
-		Shield = Value(plr:GetAttribute("ShieldPoints")),
-		Gold = Value(plr:GetAttribute("Gold"))
-	}
-	self.charData = {
-		MinDMG = Value(char:GetAttribute("MinDMG")),
-		MaxDMG = Value(char:GetAttribute("MaxDMG")),
-		Magic = Value(char:GetAttribute("Magic")),
-		Shield = Value(char:GetAttribute("MaxShield")),
-		Health = Value(char.Humanoid.MaxHealth)
-	}
 	local playerData, charData = self.playerData, self.charData
 
 	Hydrate(plr)({
@@ -117,8 +100,8 @@ local function CharacterFrame(self: table): Frame
 		end
 	})
 
-	local bgColor = Value(fromRGB(30, 30, 30))
-	local contentColor = Value(fromRGB(255, 255, 255))
+	local bgColor = Fusion.Value(fromRGB(30, 30, 30))
+	local contentColor = Fusion.Value(fromRGB(255, 255, 255))
 
 	return Components.Frame({
 		Name = "Character",

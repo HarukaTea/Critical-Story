@@ -8,20 +8,13 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, New, Value, Computed, Tween =
-	Fusion.Children, Fusion.New, Fusion.Value, Fusion.Computed, Fusion.Tween
+local Children, New, Computed, Tween =
+	Fusion.Children, Fusion.New, Fusion.Computed, Fusion.Tween
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
-local fromRGB = Color3.fromRGB
 
 local function ItemDescFrame(self: table): Frame
-	self.absStatSize = Value(0)
-	self.itemName, self.itemType, self.itemTier, self.itemStats, self.itemDesc =
-		Value(""), Value(""), Value(""), Value(""), Value("")
-	self.horizonLineVisible = Value(false)
-	self.itemTypeColor, self.itemTierColor = Value(fromRGB()), Value(fromRGB())
-
 	return Components.Frame({
 		Name = "Desc",
 		Position = fromScale(0.853, 0.572),

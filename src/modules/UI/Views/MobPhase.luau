@@ -19,9 +19,6 @@ local wait, cancel, spawn = task.wait, task.cancel, task.spawn
 local insert, remove, tFind = table.insert, table.remove, table.find
 
 local function MobPhase(self: table) : Frame
-    self.targetingMobs = Value({})
-    self.monsterHPPos, self.monsterTargetingPos = Value(fromScale(0.3, -0.5)), Value(fromScale(-0.2, 0.5))
-
     local function _addMonster(monster: ObjectValue)
 		wait()
 		local nowMonsters = peek(self.targetingMobs)
