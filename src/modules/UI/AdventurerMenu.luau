@@ -11,8 +11,8 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
 
-local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
-local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
+local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
+local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonMenu)
 
 local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
@@ -53,8 +53,8 @@ return function(plr: Player)
 					CharacterFrame(self),
 					SettingsFrame(self),
 
-					BGTitle("Menu", self),
-					BottomBtns("Left", {
+					ExCategoryTitle("Menu", self),
+					ExCategoryBottomBtns("Left", {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
 					}),

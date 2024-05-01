@@ -2,9 +2,7 @@
 --!optimize 2
 --!native
 
-local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
-local UIS = game:GetService("UserInputService")
 
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
@@ -15,7 +13,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 local TypeWriter = require(RepS.Modules.Packages.TypeWriter)
 
-local OptionFrame = require(RepS.Modules.UI.Components.OptionFrame)
+local ChatOption = require(RepS.Modules.UI.Components.ChatOption)
 
 local Computed = Fusion.Computed
 
@@ -265,7 +263,7 @@ local function ChatFrame(self: table) : Frame
                         HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         VerticalAlignment = Enum.VerticalAlignment.Bottom
                     }),
-                    Fusion.ForValues(self.chatChoices, function(use, option)
+                    Fusion.ForValues(self.chatChoices, function(_, option: string)
                         local way = "Chat"
                         if sFind(option, "EXIT") then way = "Exit" end
                         if sFind(option, "BUY") then way = "Buy" end
@@ -273,7 +271,7 @@ local function ChatFrame(self: table) : Frame
                         if sFind(option, "QUEST") then way = "Quest" end
                         local index = tFind(Fusion.peek(self.chatChoices), option)
 
-                        return OptionFrame(option, way, self, index)
+                        return ChatOption(option, way, self, index)
                     end, Fusion.cleanup)
                 }
             })

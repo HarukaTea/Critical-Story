@@ -4,6 +4,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local Value = Fusion.Value
@@ -20,6 +21,9 @@ local function TurnBaseUIPinia(self: table)
 		MaxShield = Value(char:GetAttribute("MaxShield")),
 		TP = Value(char:GetAttribute("TP"))
 	}
+
+    self.phaseBarProgress = Value(fromScale(0, 1))
+    self.phaseBarTweenInfo = Value(AssetBook.TweenInfos.fourHalf)
 
     self.panelPos = Value(fromScale(0.5, 5))
     self.actionClickCD = false

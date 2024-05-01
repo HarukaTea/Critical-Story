@@ -14,7 +14,7 @@ local udNew =  UDim.new
 local fromScale = UDim2.fromScale
 local wait = task.wait
 
-local function PlayerEffectsFrame(self: table) : Frame
+local function PlayerEffectsList(self: table) : Frame
     local function _setEffectsChildren()
 		wait()
 		self.charStatsDict.EffectsList:set(self.charData.EffectsList:GetChildren())
@@ -44,4 +44,4 @@ local function PlayerEffectsFrame(self: table) : Frame
     })
 end
 
-return PlayerEffectsFrame
+return PlayerEffectsList

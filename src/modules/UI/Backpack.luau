@@ -14,8 +14,8 @@ local Pinia = require(RepS.Modules.UI.Pinia.BackpackPinia)
 
 local BackpackItemList = require(RepS.Modules.UI.Views.BackpackItemList)
 
-local BGTitle = require(RepS.Modules.UI.Components.BGTitle)
-local BottomBtns = require(RepS.Modules.UI.Components.BottomBtns)
+local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
+local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonBackpack)
 
 local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
@@ -56,13 +56,13 @@ return function(plr: Player)
 				ZIndex = 2,
 
 				[Children] = {
-					BGTitle("Backpack", self),
-					BottomBtns("Left", {
+					ExCategoryTitle("Backpack", self),
+					ExCategoryBottomBtns("Left", {
 						FilterButton("Passive", self),
 						FilterButton("Active", self),
 						FilterButton("Others", self),
 					}),
-					BottomBtns("Right", {
+					ExCategoryBottomBtns("Right", {
 						FilterButton("Equip", self),
 						FilterButton("Pin", self),
 					}),

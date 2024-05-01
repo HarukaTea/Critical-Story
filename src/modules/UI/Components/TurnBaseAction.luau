@@ -21,10 +21,6 @@ local wait = task.wait
 local function TurnBaseAction(id: string, self: table) : Frame
     local isSelecting = Value(false)
 
-    local function _hidePanel()
-        self.panelPos:set(fromScale(0.5, 5))
-        self.transHPBarSize:set(fromScale(0, 0.875))
-    end
     return Components.Frame({
         Name = id,
         BackgroundColor3 = Computed(function(use)
@@ -63,8 +59,9 @@ local function TurnBaseAction(id: string, self: table) : Frame
 
                     else
                         self.actionClickCD = true
+                        self.panelPos:set(fromScale(0.5, 5))
+                        self.transHPBarSize:set(fromScale(0, 0.875))
 
-                        _hidePanel()
                         Events.NextActionRequest:Fire(id)
 
                         wait(1)

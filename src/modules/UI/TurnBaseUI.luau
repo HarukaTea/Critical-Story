@@ -11,10 +11,10 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local Pinia = require(RepS.Modules.UI.Pinia.TurnBaseUIPinia)
 
-local ActionPanel = require(RepS.Modules.UI.Views.ActionPanel)
-local MobPhase = require(RepS.Modules.UI.Views.MobPhase)
-local PlayerPhase = require(RepS.Modules.UI.Views.PlayerPhase)
-local PhaseShower = require(RepS.Modules.UI.Views.PhaseShower)
+local TurnBaseActionPanel = require(RepS.Modules.UI.Views.TurnBaseActionPanel)
+local TurnBaseMonsterList = require(RepS.Modules.UI.Views.TurnBaseMonsterList)
+local TurnBasePlayerList = require(RepS.Modules.UI.Views.TurnBasePlayerList)
+local TurnBasePhaseShower = require(RepS.Modules.UI.Views.TurnBasePhaseShower)
 
 local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local TurnBaseStatBar = require(RepS.Modules.UI.Components.TurnBaseStatBar)
@@ -29,7 +29,6 @@ TurnBaseUI.__type = "TurnBaseUI"
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local udNew = UDim.new
-local fromRGB = Color3.fromRGB
 local wait = task.wait
 
 return function (plr: Player)
@@ -44,22 +43,19 @@ return function (plr: Player)
 
 	Pinia(self)
 
+	local charStatsDict = self.charStatsDict :: table
 	Fusion.Hydrate(self.char)({
 		[AttributeChange("InCombat")] = function(newState: boolean)
 			self.isInCombat:set(newState)
 		end,
-		[AttributeChange("OrbAttackingTime")] = function(newState: boolean)
-			self.attackingTimeTweenInfo:set(if newState then AssetBook.TweenInfos.fifteen else AssetBook.TweenInfos.fourHalf)
-			self.attackingTimeBar:set(if newState then fromScale(0, 1) else fromScale(1, 1))
-		end,
 		[AttributeChange("Shield")] = function(newShield: number)
-			self.charStatsDict.Shield:set(newShield)
+			charStatsDict.Shield:set(newShield)
 		end,
 		[AttributeChange("MaxShield")] = function(newShield: number)
-			self.charStatsDict.MaxShield:set(newShield)
+			charStatsDict.MaxShield:set(newShield)
 		end,
 		[AttributeChange("TP")] = function(newTP: number)
-			self.charStatsDict.TP:set(newTP)
+			charStatsDict.TP:set(newTP)
 		end
 	})
 
@@ -85,9 +81,9 @@ return function (plr: Player)
                 [Children] = {
                     New("UIAspectRatioConstraint")({ AspectRatio = 25.146 }),
 
-                    ActionPanel(self),
-                    MobPhase(self),
-                    PlayerPhase(self),
+                    TurnBaseActionPanel(self),
+                    TurnBaseMonsterList(self),
+                    TurnBasePlayerList(self),
 
                     Components.Frame({
 						Name = "StatsFrame",
@@ -115,31 +111,8 @@ return function (plr: Player)
 							TurnBaseStatBar("TP", self)
 						},
 					}),
-					New("Frame")({
-						Name = "MobAttackingTimeBar",
-						BackgroundColor3 = fromRGB(30, 30, 30),
-						Position = fromScale(0, 0.8),
-						Size = fromScale(1, 0.1),
-						ZIndex = 2,
 
-						Visible = Computed(function(use)
-							return use(self.attackingTimeTweenInfo).Time == 15
-						end),
-
-						[Children] = {
-							New("Frame")({
-								Name = "Bar",
-								BackgroundTransparency = 0.4,
-
-								Size = Tween(Computed(function(use)
-									return use(self.attackingTimeBar)
-								end), self.attackingTimeTweenInfo)
-							})
-						}
-					}),
-
-					BottomProgressBar("MonsterPhase", self),
-					BottomProgressBar("PlayerPhase", self)
+					BottomProgressBar("PhaseTimer", self)
                 }
             }),
 			Components.Frame({
@@ -148,7 +121,7 @@ return function (plr: Player)
 				[Children] = {
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
-					PhaseShower(self)
+					TurnBasePhaseShower(self)
 				}
 			})
         }

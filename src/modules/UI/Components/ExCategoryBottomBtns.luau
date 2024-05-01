@@ -11,7 +11,7 @@ local New = Fusion.New
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
 
-local function BottomBtns(direction: "Left" | "Right", btns: table): Frame
+local function ExCategoryBottomBtns(direction: "Left" | "Right", btns: table): Frame
 	return New("Frame")({
 		Name = "Bottom" .. direction,
 		BackgroundTransparency = 1,
@@ -34,4 +34,4 @@ local function BottomBtns(direction: "Left" | "Right", btns: table): Frame
 	})
 end
 
-return BottomBtns
+return ExCategoryBottomBtns

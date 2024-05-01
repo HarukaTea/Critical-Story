@@ -18,7 +18,7 @@ local fromRGB = Color3.fromRGB
 local udNew = UDim.new
 local fontFromEnum = Font.fromEnum
 
-local function ExCategoryBtn(id: string, self: table): Frame
+local function ExCategoryOpenBtn(id: string, self: table): Frame
 	local isSelecting = Fusion.Value(false)
 
 	local children: ImageLabel?
@@ -107,4 +107,4 @@ local function ExCategoryBtn(id: string, self: table): Frame
 	})
 end
 
-return ExCategoryBtn
+return ExCategoryOpenBtn

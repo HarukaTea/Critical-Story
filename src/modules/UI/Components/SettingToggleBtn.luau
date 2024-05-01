@@ -16,7 +16,7 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local sFind, sub = string.find, string.sub
 
-local function OptionToggleBtn(id: string, self: table) : Frame
+local function SettingToggleBtn(id: string, self: table) : Frame
 	local TEXTS = {
 		Musics = "Musics",
 		SFXs = "Sound Effects",
@@ -104,4 +104,4 @@ local function OptionToggleBtn(id: string, self: table) : Frame
 	})
 end
 
-return OptionToggleBtn
+return SettingToggleBtn

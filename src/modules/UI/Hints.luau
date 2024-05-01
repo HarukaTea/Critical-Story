@@ -96,13 +96,7 @@ return function(plr: Player)
 		insert(past, text)
 
 		self.hintsList:set(past)
-
-		if envir == "Error" then
-			workspace.Sounds.SFXs.Error:Play()
-
-		elseif envir == "Hint" then
-			workspace.Sounds.SFXs.NewInfo:Play()
-		end
+		workspace.Sounds.SFXs[if envir == "Hint" then "NewInfo" else "Error"]:Play()
 
 		wait(3)
 		local now = Fusion.peek(self.hintsList)

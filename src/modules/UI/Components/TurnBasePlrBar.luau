@@ -18,7 +18,7 @@ local fromRGB = Color3.fromRGB
 local udimNew = UDim.new
 local clamp = math.clamp
 
-local function PlayerPhasePlrBar(char: Model, self: table) : Frame
+local function TurnBasePlrBar(char: Model, self: table) : Frame
     local plr = Players:GetPlayerFromCharacter(char)
     local info = {
         isSelecting = Value(false),
@@ -209,4 +209,4 @@ local function PlayerPhasePlrBar(char: Model, self: table) : Frame
     })
 end
 
-return PlayerPhasePlrBar
+return TurnBasePlrBar

@@ -24,21 +24,15 @@ local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
-local PlayerEffectsFrame = require(RepS.Modules.UI.Views.PlayerEffectsFrame)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
 local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
-local CombatStyle = require(RepS.Modules.UI.Components.CombatStyle)
+local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
 local Children, New, AttributeChange, Computed, Hydrate, OnChange =
-	Fusion.Children,
-	Fusion.New,
-	Fusion.AttributeChange,
-	Fusion.Computed,
-	Fusion.Hydrate,
-	Fusion.OnChange
+	Fusion.Children, Fusion.New, Fusion.AttributeChange, Fusion.Computed, Fusion.Hydrate, Fusion.OnChange
 
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
@@ -126,7 +120,6 @@ return function(plr: Player)
 					ClassFrame(self),
 					ChatFrame(self),
 					StatsTextsFrame(self),
-					PlayerEffectsFrame(self)
 				},
 			}),
 			Components.Frame({
@@ -155,11 +148,11 @@ return function(plr: Player)
 					ItemAcquiredFrame(self),
 					QuestFrame(self),
 
-					CombatStyle(self, "Warrior"),
-					CombatStyle(self, "Archer"),
-					CombatStyle(self, "Wizard"),
-					CombatStyle(self, "Knight"),
-					CombatStyle(self, "Rogue"),
+					ClassAbilityIndicator(self, "Warrior"),
+					ClassAbilityIndicator(self, "Archer"),
+					ClassAbilityIndicator(self, "Wizard"),
+					ClassAbilityIndicator(self, "Knight"),
+					ClassAbilityIndicator(self, "Rogue"),
 				}
 			}),
 			Components.Frame({

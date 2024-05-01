@@ -19,7 +19,7 @@ local fromRGB = Color3.fromRGB
 local upper = string.upper
 local fontFromName = Font.fromName
 
-local function PointsButton(id: string, direction: string, self: table): Frame
+local function CharPointsBtn(id: string, direction: string, self: table): Frame
 	local COLORS = {
 		DMG = fromRGB(255, 0, 0),
 		Magic = fromRGB(170, 170, 255),
@@ -161,4 +161,4 @@ local function PointsButton(id: string, direction: string, self: table): Frame
 	})
 end
 
-return PointsButton
+return CharPointsBtn

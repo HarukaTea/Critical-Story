@@ -14,7 +14,7 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local clamp = math.clamp
 
-local function CombatStyle(self: table, class: string) : Frame
+local function ClassAbilityIndicator(self: table, class: string) : Frame
     local charClassInfo = self.charClassInfo :: table
 
     return Components.Frame({
@@ -105,4 +105,4 @@ local function CombatStyle(self: table, class: string) : Frame
     })
 end
 
-return CombatStyle
+return ClassAbilityIndicator

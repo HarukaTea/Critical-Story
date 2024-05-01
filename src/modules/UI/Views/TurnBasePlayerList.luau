@@ -8,9 +8,9 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local PlayerPhasePlrBar = require(RepS.Modules.UI.Components.PlayerPhasePlrBar)
+local TurnBasePlrBar = require(RepS.Modules.UI.Components.TurnBasePlrBar)
 
-local Children, Value, Hydrate, peek = Fusion.Children, Fusion.Value, Fusion.Hydrate, Fusion.peek
+local Children, Hydrate, peek = Fusion.Children, Fusion.Hydrate, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -18,7 +18,7 @@ local udNew = UDim.new
 local wait = task.wait
 local insert, remove, tFind = table.insert, table.remove, table.find
 
-local function PlayerPhase(self: table) : Frame
+local function TurnBasePlayerList(self: table) : Frame
     local function _addPlr(char: ObjectValue)
 		wait()
         local nowPlayers = peek(self.playersInCombat)
@@ -92,10 +92,10 @@ local function PlayerPhase(self: table) : Frame
             }),
 
             Fusion.ForValues(self.playersInCombat, function(_, char: ObjectValue)
-                return PlayerPhasePlrBar(char.Value, self)
+                return TurnBasePlrBar(char.Value, self)
             end, Fusion.cleanup)
         }
     })
 end
 
-return PlayerPhase
+return TurnBasePlayerList

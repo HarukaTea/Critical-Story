@@ -9,12 +9,9 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local tFind = table.find
 local clamp = math.clamp
 
 local function BottomProgressBar(id: string, self: table) : Frame
-    local whiteList = { "EXP", "PlayerPhase" }
-
     return Fusion.New("Frame")({
         Name = id.."Bar",
         BackgroundColor3 = fromRGB(30, 30, 30),
@@ -22,20 +19,11 @@ local function BottomProgressBar(id: string, self: table) : Frame
         Size = fromScale(1, 0.1),
         ZIndex = 2,
 
-        Visible = Fusion.Computed(function(use)
-            if id == "EXP" then
-                return true
-
-            elseif id == "MonsterPhase" then
-                return use(self.phase)
-            end
-        end),
-
         [Fusion.Children] = {
             Fusion.New("Frame")({
                 Name = "Bar",
                 BackgroundTransparency = 0.4,
-                BackgroundColor3 = if tFind(whiteList, id) then fromRGB(217, 193, 144) else fromRGB(255, 255, 255),
+                BackgroundColor3 = if id == "EXP" then fromRGB(217, 193, 144) else fromRGB(255, 255, 255),
 
                 Size = Fusion.Tween(Fusion.Computed(function(use)
                     if id == "EXP" then

@@ -8,7 +8,7 @@ local SoundService = game:GetService("SoundService")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local OptionToggleBtn = require(RepS.Modules.UI.Components.OptionToggleBtn)
+local SettingToggleBtn = require(RepS.Modules.UI.Components.SettingToggleBtn)
 
 local AttributeChange = Fusion.AttributeChange
 
@@ -72,11 +72,11 @@ local function SettingsFrame(self: table): Frame
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
 
-			OptionToggleBtn("Musics", self),
-			OptionToggleBtn("SFXs", self),
-			OptionToggleBtn("PublicCombat", self),
-			OptionToggleBtn("PotatoMode", self),
-			OptionToggleBtn("PlayerList", self),
+			SettingToggleBtn("Musics", self),
+			SettingToggleBtn("SFXs", self),
+			SettingToggleBtn("PublicCombat", self),
+			SettingToggleBtn("PotatoMode", self),
+			SettingToggleBtn("PlayerList", self),
 		},
 	})
 end

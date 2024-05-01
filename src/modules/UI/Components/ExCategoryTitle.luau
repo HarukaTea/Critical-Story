@@ -16,7 +16,7 @@ local color3New, ud2New, udNew = Color3.new, UDim2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local function BGTitle(id: string, self: table): Frame
+local function ExCategoryTitle(id: string, self: table): Frame
 	local bgColor = Value(fromRGB(30, 30, 30))
 	local contentColor = Value(fromRGB(255, 255, 255))
 	local plr = self.plr :: Player
@@ -103,4 +103,4 @@ local function BGTitle(id: string, self: table): Frame
 	})
 end
 
-return BGTitle
+return ExCategoryTitle

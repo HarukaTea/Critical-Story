@@ -21,10 +21,14 @@ local fromScale = UDim2.fromScale
 local tFind = table.find
 local fromRGB = Color3.fromRGB
 
-local function ActionPanel(self: table) : Frame
+local function TurnBaseActionPanel(self: table) : Frame
     local whitelist = { "Combat", "Player" }
     local function _showPanel(phase: string)
-        if not tFind(whitelist, phase) then return end
+        if not tFind(whitelist, phase) then
+            self.panelPos:set(fromScale(0.5, 5))
+            self.transHPBarSize:set(fromScale(0, 0.875))
+            return
+        end
 
         self.panelPos:set(fromScale(0.5, 0.5))
         self.transHPBarSize:set(fromScale(0.14, 0.875))
@@ -85,4 +89,4 @@ local function ActionPanel(self: table) : Frame
     })
 end
 
-return ActionPanel
+return TurnBaseActionPanel

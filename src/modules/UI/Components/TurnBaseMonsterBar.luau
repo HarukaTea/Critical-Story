@@ -20,23 +20,23 @@ local udimNew = UDim.new
 local insert, tFind = table.insert, table.find
 local clamp = math.clamp
 
-local function MobPhaseMobBar(mob: Model, self: table) : Frame
+local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
     local info = {
         innerPos = Value(fromScale(0.82, 0)),
         isSelecting = Value(false),
 
-        Targeting = Value(if self.charData.TargetMonster.Value == mob then true else false),
-        HP = Value(mob:GetAttribute("Health")),
-        MaxHP = Value(mob:GetAttribute("MaxHealth"))
+        Targeting = Value(if self.charData.TargetMonster.Value == monster then true else false),
+        HP = Value(monster:GetAttribute("Health")),
+        MaxHP = Value(monster:GetAttribute("MaxHealth"))
     }
     Fusion.Hydrate(self.charData.TargetMonster)({
 		[Fusion.OnChange("Value")] = function(newTarget: Model?)
 			if not newTarget then return end
 
-			info.Targeting:set(mob == newTarget)
+			info.Targeting:set(monster == newTarget)
 		end
 	})
-	Fusion.Hydrate(mob)({
+	Fusion.Hydrate(monster)({
 		[Fusion.AttributeChange("Health")] = function(hp: number)
 			info.HP:set(hp)
 
@@ -48,11 +48,11 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
 	})
 
     return Components.Frame({
-        Name = mob.Name,
+        Name = monster.Name,
 
         [Children] = {
             Components.Frame({
-                Name = "Mob",
+                Name = "Monster",
                 AnchorPoint = v2New(),
                 BackgroundTransparency = 0,
                 Size = fromScale(0.18, 1),
@@ -73,7 +73,7 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                     }),
                     Components.ImageLabel({
                         Name = "MobAvatar",
-                        Image = AssetBook.MonsterAvatars[mob.Name],
+                        Image = AssetBook.MonsterAvatars[monster.Name],
                         Size = fromScale(1, 1),
                         SizeConstraint = Enum.SizeConstraint.RelativeYY,
                         BackgroundTransparency = 0,
@@ -84,14 +84,14 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                         Name = "MobName",
                         Position = fromScale(0.253, 0.1),
                         Size = fromScale(0.627, 0.35),
-                        Text = mob.Name,
+                        Text = monster.Name,
                         TextXAlignment = Enum.TextXAlignment.Left
                     }),
                     Components.TextLabel({
                         Name = "MobLvl",
                         Position = fromScale(0.253, 0.1),
                         Size = fromScale(0.627, 0.35),
-                        Text = "Lv."..mob:GetAttribute("Levels"),
+                        Text = "Lv."..monster:GetAttribute("Levels"),
                         TextColor3 = fromRGB(234, 234, 117),
                         TextXAlignment = Enum.TextXAlignment.Right
                     }),
@@ -125,13 +125,13 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
                             local monsterSymbols = self.charData.TargetMonsters:GetChildren() :: table
 							local monsters = {}
                             if #monsterSymbols > 1 then
-                                Events.ChangeMobTarget:Fire(mob)
+                                Events.ChangeMobTarget:Fire(monster)
 
                                 for _, child: ObjectValue in ipairs(monsterSymbols) do
                                     if child.Value then insert(monsters, child.Value) end
                                 end
                                 if #monsters > 0 then
-                                    local index = tFind(monsters, mob)
+                                    local index = tFind(monsters, monster)
                                     if index then self.nowMobIndex = index end
                                 end
                             end
@@ -202,4 +202,4 @@ local function MobPhaseMobBar(mob: Model, self: table) : Frame
     })
 end
 
-return MobPhaseMobBar
+return TurnBaseMonsterBar

@@ -58,8 +58,6 @@ return function(plr: Player)
 
 	--// Setups
 	for _, element in plrGui:GetDescendants() do
-		if element:IsA("UIStroke") then
-			CS:AddTag(element, "ScreenStroke")
-		end
+		if element:IsA("UIStroke") then CS:AddTag(element, "ScreenStroke") end
 	end
 end

@@ -18,7 +18,7 @@ local fromRGB = Color3.fromRGB
 local wait = task.wait
 local tFind = table.find
 
-local function PhaseShower(self: table) : Frame
+local function TurnBasePhaseShower(self: table) : Frame
 	local phaseInfo = {
 		Player = {
 			Color = fromRGB(85, 255, 255),
@@ -41,6 +41,14 @@ local function PhaseShower(self: table) : Frame
     local blacklist = { "Execution" }
     local function enteringNewPhase(phase: string)
         if tFind(blacklist, phase) then return end
+
+        self.phaseBarTweenInfo:set(AssetBook.TweenInfos.fourHalf)
+        self.phaseBarProgress:set(fromScale(1, 1))
+        Spawn(function()
+            wait(0.05)
+            self.phaseBarTweenInfo:set(AssetBook.TweenInfos.fifteen)
+            self.phaseBarProgress:set(fromScale(0, 1))
+        end)
 
 		self.currentPhase:set(phase)
 		self.phaseTrans:set(0)
@@ -115,4 +123,4 @@ local function PhaseShower(self: table) : Frame
     })
 end
 
-return PhaseShower
+return TurnBasePhaseShower

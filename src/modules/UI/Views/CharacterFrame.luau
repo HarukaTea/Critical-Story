@@ -11,7 +11,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local PointsButton = require(RepS.Modules.UI.Components.PointsButton)
+local CharPointsBtn = require(RepS.Modules.UI.Components.CharPointsBtn)
 
 local Children, New, AttributeChange, Hydrate, Tween, Computed, OnEvent, peek =
 	Fusion.Children,
@@ -145,10 +145,10 @@ local function CharacterFrame(self: table): Frame
 				Name = "PointSection",
 
 				[Children] = {
-					PointsButton("DMG", "Right", self),
-					PointsButton("Magic", "Left", self),
-					PointsButton("Health", "Left", self),
-					PointsButton("Shield", "Left", self),
+					CharPointsBtn("DMG", "Right", self),
+					CharPointsBtn("Magic", "Left", self),
+					CharPointsBtn("Health", "Left", self),
+					CharPointsBtn("Shield", "Left", self),
 				},
 			}),
 			Components.TextLabel({

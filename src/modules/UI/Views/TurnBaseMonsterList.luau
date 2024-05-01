@@ -8,9 +8,9 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local MobPhaseMobBar = require(RepS.Modules.UI.Components.MobPhaseMobBar)
+local TurnBaseMonsterBar = require(RepS.Modules.UI.Components.TurnBaseMonsterBar)
 
-local Children, Value, peek = Fusion.Children, Fusion.Value, Fusion.peek
+local Children, peek = Fusion.Children, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -18,7 +18,7 @@ local udNew = UDim.new
 local wait, cancel, spawn = task.wait, task.cancel, task.spawn
 local insert, remove, tFind = table.insert, table.remove, table.find
 
-local function MobPhase(self: table) : Frame
+local function TurnBaseMonsterList(self: table) : Frame
     local function _addMonster(monster: ObjectValue)
 		wait()
 		local nowMonsters = peek(self.targetingMobs)
@@ -91,10 +91,10 @@ local function MobPhase(self: table) : Frame
             }),
 
             Fusion.ForValues(self.targetingMobs, function(_, mob: ObjectValue)
-                return MobPhaseMobBar(mob.Value, self)
+                return TurnBaseMonsterBar(mob.Value, self)
             end, Fusion.cleanup)
         }
     })
 end
 
-return MobPhase
+return TurnBaseMonsterList

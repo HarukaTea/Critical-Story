@@ -17,7 +17,7 @@ local fromRGB = Color3.fromRGB
 local v2New = Vector2.new
 local sub = string.sub
 
-local function OptionFrame(option: string, icon: string, self: table, index: number) : Frame
+local function ChatOption(option: string, icon: string, self: table, index: number) : Frame
     local bgColor = Fusion.Value(fromRGB(30, 30, 30))
     local contentColor = Fusion.Value(fromRGB(255, 255, 255))
 
@@ -82,4 +82,4 @@ local function OptionFrame(option: string, icon: string, self: table, index: num
     })
 end
 
-return OptionFrame
+return ChatOption
