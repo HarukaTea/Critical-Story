@@ -93,7 +93,7 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 
 						Events.AddPoints:Fire(POINTS[id], 1)
 					else
-						Signals.CreateHint:Fire("You don't have enough skill points!", "Error")
+						Signals.CreateHint:Fire("You don't have enough skill points!")
 					end
 				end,
 
@@ -140,7 +140,7 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 
 						Events.AddPoints:Fire(POINTS[id], 10)
 					else
-						Signals.CreateHint:Fire("You don't have enough skill points!", "Error")
+						Signals.CreateHint:Fire("You don't have enough skill points!")
 					end
 				end,
 

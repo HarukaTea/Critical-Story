@@ -32,10 +32,8 @@ local function TurnBaseAction(id: string, self: table) : Frame
             Fusion.New("UICorner")({ CornerRadius = udNew(0.1, 0) }),
             Components.UIStroke({
                 Enabled = true,
+                Thickness = 3.5,
 
-                Thickness = Computed(function(use)
-                    return if use(isSelecting) then 4 else 3
-                end),
                 Color = Computed(function(use)
                     return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
@@ -59,6 +57,7 @@ local function TurnBaseAction(id: string, self: table) : Frame
 
                     else
                         self.actionClickCD = true
+
                         self.panelPos:set(fromScale(0.5, 5))
                         self.transHPBarSize:set(fromScale(0, 0.875))
 

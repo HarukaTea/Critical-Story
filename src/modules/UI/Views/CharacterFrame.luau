@@ -187,7 +187,7 @@ local function CharacterFrame(self: table): Frame
 					if peek(playerData.Gold) >= cost and cost ~= 0 then
 						Events.AddPoints:Fire("Reset")
 					elseif cost > 0 then
-						Signals.CreateHint:Fire("You don't have enough gold to reset!", "Error")
+						Signals.CreateHint:Fire("You don't have enough gold to reset!")
 					end
 				end,
 

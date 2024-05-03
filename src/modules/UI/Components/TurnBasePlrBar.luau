@@ -8,6 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local Children, Tween, Computed, New, OnEvent, Value =
     Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.New, Fusion.OnEvent, Fusion.Value
@@ -102,13 +103,13 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                             local nextAction = use(info.NextAction)
 
                             if nextAction == "" or nextAction == nil then
-                                return AssetBook.Items.ItemImages.Null
+                                return ItemBook.ItemImagesEx.Null
 
                             elseif nextAction == "Attack" then
                                 return AssetBook.ClassInfo[plr:GetAttribute("Class")].Image
 
                             elseif nextAction == "Items" then
-                                return AssetBook.Items.ItemImages[plr:GetAttribute("NextItem")]
+                                return ItemBook:FindItem(plr:GetAttribute("NextItem")).Icon
 
                             else
                                 return AssetBook.ActionPanelIcons[nextAction]

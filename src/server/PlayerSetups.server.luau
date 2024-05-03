@@ -6,8 +6,8 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
@@ -16,7 +16,7 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 local AttributeChange = Fusion.AttributeChange
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
-local DS1, DS2, DS3 = "CS_AS01_T1", "CS_AS01_T1_S1", "CS_AS01_T1_S3"
+local DS1, DS2, DS3 = "CS_AS02_T1", "CS_AS02_T1_S2", "CS_AS02_T1_S3"
 
 local newInstance = Instance.new
 local wait = task.wait
@@ -43,31 +43,29 @@ local function _saveData(plr: Player, ds: any)
 	if not data then return end
 
 	local inventory = {}
-	local equipped = {}
-	local pinned = {}
 	local quests, townQuests = {}, {}
 
-	for index: number, item: number in plr.Inventory:GetChildren() do
+	for _, item: IntValue in plr.Inventory:GetChildren() do
 		if item.Value <= 0 then continue end
 
-		inventory[item.Name] = item.Value
-
-		if item:GetAttribute("Pinned") then pinned[index] = item.Name end
-		if item:GetAttribute("Equipped") then equipped[item.Name] = item:GetAttribute("Slot") end
+		local info = {
+			Amount = item.Value,
+			Equipped = item:GetAttribute("Equipped") or false,
+			Pinned = item:GetAttribute("Pinned") or false,
+			Slot = item:GetAttribute("Slot") or "None"
+		}
+		inventory[item.Name] = info
 	end
 	for _, quest: IntConstrainedValue in plr.Quests:GetChildren() do
 		if quest.Name == "Town" then
 			townQuests[#townQuests + 1] = quest.Value
-			continue
+		else
+			quests[quest.Name] = quest.Value
 		end
-
-		quests[quest.Name] = quest.Value
 	end
 	quests.Town = townQuests
 
 	data.Inventory = inventory
-	data.EquippedItems = equipped
-	data.PinnedItems = pinned
 	data.Quests = quests
 end
 
@@ -84,7 +82,7 @@ local function setup(plr: Player)
 		ds = SuphiDataStore.new(DS1, plr.UserId)
 	end
 
-	local function stateChanged(state: boolean, datastore: any)
+	local function stateChanged(_, datastore: any)
 		while datastore.State == false do
 			if datastore:Open(TEMPLATE) ~= "Success" then wait(6) end
 		end
@@ -137,34 +135,19 @@ local function setup(plr: Player)
 	end
 
 	--// Load items
-	local function _createItemVal(name: string, maxVal: number, val: number)
-		local intValue = newInstance("IntConstrainedValue")
-		intValue.Name = name
-		intValue.MaxValue = maxVal
-		intValue.Value = val
-		intValue.Parent = backpackData
-	end
-	for index: string, amount: number in data.Inventory do
-		if AssetBook.Items.ItemName[index] then
-			local itemType = AssetBook.Items.ItemType[index]
+	for index: string, info: table in data.Inventory do
+		if not ItemBook:IsItemExist(index) then continue end
 
-			if not AssetBook.Items.IsSkill[index] and (itemType == "Active" or itemType == "Material") then
-				_createItemVal(index, 9999, amount)
-			else
-				_createItemVal(index, 1, amount)
-			end
+		local intValue = newInstance("IntConstrainedValue")
+		intValue.Name = index
+		intValue.MaxValue = ItemBook:FindItem(index).MaxAmount
+		intValue.Value = info.Amount
+		if info.Equipped then
+			intValue:SetAttribute("Equipped", true)
+			intValue:SetAttribute("Slot", info.Slot)
 		end
-	end
-	for item: string, slot: string in data.EquippedItems do
-		if AssetBook.Items.ItemName[item] and backpackData:FindFirstChild(item) then
-			backpackData[item]:SetAttribute("Equipped", true)
-			backpackData[item]:SetAttribute("Slot", slot)
-		end
-	end
-	for _, item: string in data.PinnedItems do
-		if AssetBook.Items.ItemName[item] and backpackData:FindFirstChild(item) then
-			backpackData[item]:SetAttribute("Pinned", true)
-		end
+		if info.Pinned then intValue:SetAttribute("Pinned", true) end
+		intValue.Parent = backpackData
 	end
 
 	--// Load settings

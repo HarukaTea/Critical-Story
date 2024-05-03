@@ -8,6 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local New, Children, Computed, peek = Fusion.New, Fusion.Children, Fusion.Computed, Fusion.peek
 
@@ -83,7 +84,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 						end
 					end
 					for _, element: ImageLabel in desc:GetChildren() do
-						if sFind(element.Name, "Slot") then element.Image = AssetBook.Items.ItemImages.Null end
+						if sFind(element.Name, "Slot") then element.Image = ItemBook.ItemImagesEx.Null end
 					end
 
 					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
@@ -103,10 +104,12 @@ local function PlayerSlot(self: table, player: Player): Frame
 					local items = player:WaitForChild("Inventory", 999) :: Folder
 
 					for _, item: IntValue in items:GetChildren() do
-						if AssetBook.Items.ItemType[item.Name] == "Passive" and item:GetAttribute("Equipped") then
+						local itemInfo = ItemBook:FindItem(item)
+
+						if itemInfo.Type == "Passive" and item:GetAttribute("Equipped") then
 							local index = tonumber(match(item:GetAttribute("Slot"), "%d"))
 
-							desc["Slot"..index].Image = AssetBook.Items.ItemImages[item.Name]
+							desc["Slot"..index].Image = itemInfo.Icon
 						end
 					end
 

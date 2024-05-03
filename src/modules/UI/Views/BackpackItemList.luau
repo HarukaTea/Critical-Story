@@ -4,9 +4,9 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 
@@ -70,18 +70,12 @@ local function BackpackItemList(self: table) : ScrollingFrame
                 end,
             }),
             Fusion.ForValues(self.items, function(use, item: IntValue)
-                if use(self.chosenFilter) == "All" then
-                    return BackpackItemSlot(item, self)
+                if use(self.chosenFilter) == "Others" then
+                    local filter = { "Material", "Cosmetic", "Quest" }
+                    if tFind(filter, ItemBook:FindItem(item).Type) then return BackpackItemSlot(item, self) end
 
-                elseif use(self.chosenFilter) == "Others" then
-                    local filter = { "Material", "Cosmetic", "Companion" }
-                    if tFind(filter, AssetBook.Items.ItemType[item.Name]) then
-                        return BackpackItemSlot(item, self)
-                    end
                 else
-                    if AssetBook.Items.ItemType[item.Name] == use(self.chosenFilter) then
-                        return BackpackItemSlot(item, self)
-                    end
+                    if ItemBook:FindItem(item).Type == use(self.chosenFilter) then return BackpackItemSlot(item, self) end
                 end
             end, Fusion.cleanup),
         },

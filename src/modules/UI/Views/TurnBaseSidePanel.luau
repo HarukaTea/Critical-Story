@@ -5,10 +5,10 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local Children, Computed, Value, OnEvent, OnChange =
 	Fusion.Children, Fusion.Computed, Fusion.Value, Fusion.OnEvent, Fusion.OnChange
@@ -18,53 +18,61 @@ local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local udNew = UDim.new
 local wait = task.wait
 
-local function TurnBaseItemPanel(self: table) : ScrollingFrame
-    local function _handleItems()
-        wait()
-        local items = self.inventory:GetChildren()
-        local realItems = {}
+local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
+    if id == "Items" then
+        local function _handleItems()
+            wait()
+            local items = self.inventory:GetChildren()
+            local realItems, realSkills = {}, {}
 
-        for _, item: IntValue in items do
-            if not AssetBook.Items.IsSkill[item.Name]
-                and AssetBook.Items.ItemType[item.Name] == "Active"
-                and item.Value > 0 then
+            for _, item: IntValue in items do
+                local itemInfo = ItemBook:FindItem(item)
 
-                realItems[#realItems + 1] = item.Name
+                if itemInfo.Type == "Active" and item.Value > 0 then
+                    if not itemInfo.IsSkill then
+                        realItems[#realItems + 1] = item.Name
+                    else
+                        realSkills[#realSkills + 1] = item.Name
+                    end
+                end
             end
+
+            self.items:set(realItems)
+            self.skills:set(realSkills)
         end
 
-        self.items:set(realItems)
+        _handleItems()
+        Fusion.Hydrate(self.inventory)({
+            [OnEvent("ChildAdded")] = _handleItems,
+            [OnEvent("ChildRemoved")] = function()
+                if not self.plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
+
+                _handleItems()
+            end,
+        })
     end
-    _handleItems()
-    Fusion.Hydrate(self.inventory)({
-		[OnEvent("ChildAdded")] = _handleItems,
-		[OnEvent("ChildRemoved")] = function()
-			if not self.plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
 
-			_handleItems()
-		end,
-	})
-
+    local index = if id == "Items" then 1 else 2
     return Components.ScrollingFrame({
-        Name = "ItemPanel",
+        Name = id.."SidePanel",
         ClipsDescendants = true,
         AnchorPoint = v2New(0.5, 0),
-        Position = fromScale(0.332, -3.2),
+        Position = fromScale(if id == "Items" then 0.332 else 0.668, -3.2),
         Size = fromScale(0.173, 3),
         ScrollingDirection = Enum.ScrollingDirection.Y,
 
         Visible = Computed(function(use)
-            return use(self.itemPanelVisible)
+            return if id == "Items" then use(self.itemPanelVisible) else use(self.skillPanelVisible)
         end),
         CanvasSize = Computed(function(use)
-            return if use(self.itemPanelAbsContentSize) > use(self.itemPanelAbsSize) then fromOffset(0, use(self.itemPanelAbsContentSize) + 20) else fromOffset(0, 0)
+            return if use(self.sidePanelAbsContentSize[index]) > use(self.sidePanelAbsSize[index]) then fromOffset(0, use(self.sidePanelAbsContentSize[index])) else fromOffset(0, 0)
         end),
         ScrollingEnabled = Computed(function(use)
-            return if use(self.itemPanelAbsContentSize) > use(self.itemPanelAbsSize) then true else false
+            return if use(self.sidePanelAbsContentSize[index]) > use(self.sidePanelAbsSize[index]) then true else false
         end),
 
         [Fusion.OnChange("AbsoluteSize")] = function(newSize: Vector2)
-            self.itemPanelAbsSize:set(newSize.Y)
+            self.sidePanelAbsSize[index]:set(newSize.Y)
         end,
 
         [Children] = {
@@ -75,22 +83,26 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
 
                 [Fusion.OnChange("AbsoluteContentSize")] = function(newSize: Vector2)
-                    self.itemPanelAbsContentSize:set(newSize.Y)
+                    self.sidePanelAbsContentSize[index]:set(newSize.Y)
                 end
             }),
             Components.Frame({
-                Name = "PaddingTop",
+                Name = "PaddingBottom",
                 Size = fromScale(0.95, 0.01)
             }),
-            Fusion.ForValues(self.items, function(_, item: string)
+            Fusion.ForValues(if id == "Items" then self.items else self.skills, function(_, item: string)
                 local isSelecting = Value(false)
-                local itemAmount = Value(self.inventory[item].Value)
 
-                Fusion.Hydrate(self.inventory[item])({
-                    [OnChange("Value")] = function(newAmount: number)
-                        itemAmount:set(newAmount)
-                    end
-                })
+                local itemAmount
+                if id == "Items" then
+                    itemAmount = Value(self.inventory[item].Value)
+
+                    Fusion.Hydrate(self.inventory[item])({
+                        [OnChange("Value")] = function(newAmount: number)
+                            itemAmount:set(newAmount)
+                        end
+                    })
+                end
 
                 return Components.Frame({
                     Name = item,
@@ -110,18 +122,24 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
                             Name = "Icon",
                             Size = fromScale(1, 1),
                             SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                            Image = AssetBook.Items.ItemImages[item],
+                            Image = ItemBook:FindItem(item).Icon,
 
                             [Children] = { Components.RoundUICorner() }
                         }),
                         Components.TextLabel({
                             Name = "Item",
                             AnchorPoint = v2New(0, 0.5),
-                            Position = fromScale(0.228, 0.5),
+                            Position = fromScale(0.2, 0.5),
                             Size = fromScale(0.712, 0.6),
-                            RichText = true,
+                            RichText = if id == "Items" then true else false,
                             Text = Computed(function(use)
-                                return AssetBook.Items.ItemName[item]..[[  <font color="#f1c40f">x]]..use(itemAmount).."</font>"
+                                local itemInfo = ItemBook:FindItem(item)
+
+                                if id == "Items" then
+                                    return itemInfo.Name..[[  <font color="#f1c40f">x]]..use(itemAmount).."</font>"
+                                else
+                                    return itemInfo.Name
+                                end
                             end),
                             TextXAlignment = Enum.TextXAlignment.Left
                         }),
@@ -150,11 +168,11 @@ local function TurnBaseItemPanel(self: table) : ScrollingFrame
                 })
             end, Fusion.cleanup),
             Components.Frame({
-                Name = "PaddingBottom",
+                Name = "PaddingTop",
                 Size = fromScale(0.95, 0.01)
             }),
         }
     })
 end
 
-return TurnBaseItemPanel
+return TurnBaseSidePanel

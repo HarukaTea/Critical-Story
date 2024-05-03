@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local Children, Value, AttributeChange, Computed =
     Fusion.Children, Fusion.Value, Fusion.AttributeChange, Fusion.Computed
@@ -29,10 +30,10 @@ local function StatImage(id: string, self: table) : ImageLabel
                 return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 
             elseif id == "Gold" then
-                return AssetBook.Items.ItemImages.Gold
+                return ItemBook.ItemImagesEx.Gold
 
             elseif id == "RP" then
-                return AssetBook.Items.ItemImages.RP
+                return ItemBook.ItemImagesEx.RP
             end
         end),
 
@@ -73,6 +74,7 @@ local function StatText(id: string, self: table) : TextLabel
             charDMGStats.MinDMG:set(newMagic)
         end,
     })
+    charDMGStats.MinDMG:set(char:GetAttribute("MinDMG"), true) --// This often doesn't work when joined the game
 
     return Components.TextLabel({
         Name = id.."Text",

@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
@@ -54,7 +55,7 @@ local function PassiveSlot(id: string, self: table): Frame
 				Image = Fusion.Computed(function(use)
 					local item = use(self.passiveIconList[id]) :: string
 
-					return if AssetBook.Items.ItemImages[item] then AssetBook.Items.ItemImages[item] else AssetBook.Items.ItemImages.Null
+					return if item == "Null" then ItemBook.ItemImagesEx.Null else ItemBook:FindItem(item).Icon
 				end),
 			}),
 			Components.HoverImageButton({

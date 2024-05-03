@@ -4,9 +4,9 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local New, Children, Computed = Fusion.New, Fusion.Children, Fusion.Computed
 
@@ -30,7 +30,7 @@ local function PlayerItemSlot(id: string): ImageLabel
 		BackgroundColor3 = color3New(),
 		Position = POSITIONS[id],
 		Size = fromScale(0.19, 0.165),
-		Image = AssetBook.Items.ItemImages.Null,
+		Image = ItemBook.ItemImagesEx.Null,
 
 		[Children] = {
 			Components.RoundUICorner(),

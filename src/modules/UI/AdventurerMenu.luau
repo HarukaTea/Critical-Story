@@ -78,6 +78,16 @@ return function(plr: Player)
 	end
 	CAS:BindAction("OpenMenu", _openMenu, false, Enum.KeyCode.C)
 
+	--// Connections
+	local function checkIfOpened()
+		if UI.BG.Visible then ClientUtil:OpenUI(plr, "AdventurerMenu", true) end
+	end
+	Fusion.Hydrate(self.char)({
+		[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+			if state then checkIfOpened() end
+		end
+	})
+
 	--// Clear
 	local function _clearGarbage()
 		CAS:UnbindAction("OpenMenu")

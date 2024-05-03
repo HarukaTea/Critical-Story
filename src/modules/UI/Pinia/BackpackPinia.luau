@@ -21,7 +21,7 @@ local function BackpackPinia(self: table)
 
 	self.items = Value(self.inventory:GetChildren())
 	self.noItemsShow = Value(if Fusion.peek(self.items)[1] then false else true)
-	self.chosenFilter = Value("All")
+	self.chosenFilter = Value("Passive")
 
     local camVPSize = workspace.CurrentCamera.ViewportSize
 

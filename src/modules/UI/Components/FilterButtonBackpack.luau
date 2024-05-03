@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local Computed, peek = Fusion.Computed, Fusion.peek
@@ -93,22 +94,25 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 		},
 		[Fusion.OnEvent("MouseButton1Click")] = function()
 			if self.equipClickCD then return end
-
-			if peek(self.chosenFilter) == id then
-				self.chosenFilter:set("All")
-				return
-			end
+			if peek(self.chosenFilter) == id then return end
 
 			if id == "Equip" then
 				local item = _findItem(peek(self.itemFrame))
-				local itemType = AssetBook.Items.ItemType[item]
+				local itemInfo = ItemBook:FindItem(item)
+				local itemType = itemInfo.Type :: string
 				if item == "None" or not itemType then return end
+
+				--- actives
+				if itemType == "Active" and not itemInfo.IsSkill then
+					Events.UseItem:Fire(item)
+					return
+				end
 
 				--- equip
 				local slot = _checkSlot(self, itemType)
 				local checkSame, sameSlot = _checkSameItem(self, item, itemType)
 
-				if slot == "Full" and checkSame == "None" then Signals.CreateHint:Fire("Not enough space to equip!", "Error") return end
+				if slot == "Full" and checkSame == "None" then Signals.CreateHint:Fire("Not enough space to equip!") return end
 				if slot ~= "Full" and checkSame == "None" then
 					Events.EquipItems:Fire(itemType, slot, item)
 

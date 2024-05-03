@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local OnEvent, Children, Computed = Fusion.OnEvent, Fusion.Children, Fusion.Computed
@@ -71,7 +72,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 			Components.HoverImageButton({
 				Image = Computed(function(use)
 					if id == "Backpack" then
-						return AssetBook.Items.ItemImages.Backpack
+						return ItemBook.ItemImagesEx.Backpack
 					else
 						return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 					end

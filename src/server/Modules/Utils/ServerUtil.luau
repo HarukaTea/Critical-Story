@@ -7,9 +7,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -450,22 +450,11 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 		inventoryFolder[item].Value += amount
 
 	else
-		local itemType = AssetBook.Items.ItemType[item]
-
-		if not AssetBook.Items.IsSkill[item] and (itemType == "Active" or itemType == "Material") then
-			local intValue = instanceNew("IntConstrainedValue")
-			intValue.Name = item
-			intValue.MaxValue = 9999
-			intValue.Value = amount
-			intValue.Parent = inventoryFolder
-
-		else
-			local intValue = instanceNew("IntConstrainedValue")
-			intValue.Name = item
-			intValue.MaxValue = 1
-			intValue.Value = amount
-			intValue.Parent = inventoryFolder
-		end
+		local intValue = instanceNew("IntConstrainedValue")
+		intValue.Name = item
+		intValue.MaxValue = ItemBook:FindItem(item).MaxAmount
+		intValue.Value = amount
+		intValue.Parent = inventoryFolder
 	end
 
 	Events.GiveDrop:Fire(plr, item)
@@ -490,7 +479,7 @@ end
 --[[
 	A list of checks before using a skill, then we cast it
 ]]
-function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, script: Script, classUnique: boolean?) : boolean
+function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, script: Script) : boolean
 	local char = plr.Character
 	local monster =  char.CharStats.TargetMonster.Value :: Model
 
@@ -522,8 +511,8 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 
 	Debris:AddItem(script, attributes.CD)
 
-	if not classUnique then
-		ServerUtil:RefreshBackpack(plr, item, attributes.CD, if AssetBook.Items.IsSkill[item] then true else false)
+	if not attributes.CLASS_UNIQUE then
+		ServerUtil:RefreshBackpack(plr, item, attributes.CD, ItemBook:FindItem(item).IsSkill)
 	end
 
 	return true

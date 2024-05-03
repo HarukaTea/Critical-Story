@@ -139,13 +139,13 @@ end
 --[[
     Common functions for menu and backpack UI
 ]]
-function ClientUtil:OpenUI(plr: Player, targetUI: string)
+function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
     if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
     if not plr.Character then return end
 
     --// In combat check
-    if plr.Character:GetAttribute("InCombat") then
-        Signals.CreateHint:Fire("You can't open it in combat!", "Error")
+    if plr.Character:GetAttribute("InCombat") and not isForce then
+        Signals.CreateHint:Fire("You can't open it in combat!")
         return
     end
 

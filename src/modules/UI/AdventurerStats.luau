@@ -13,6 +13,7 @@ local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
@@ -187,7 +188,7 @@ return function(plr: Player)
 	local function _autoEquipItems()
 		for _, item in self.inventory:GetChildren() do
 			if item.Value > 0 and item:GetAttribute("Equipped") then
-				Events.EquipItems:Fire(AssetBook.Items.ItemType[item.Name], item:GetAttribute("Slot"), item.Name)
+				Events.EquipItems:Fire(ItemBook:FindItem(item).Type, item:GetAttribute("Slot"), item.Name)
 			end
 		end
 	end
@@ -244,8 +245,11 @@ return function(plr: Player)
 			charClassInfo.Warrior:set(combo)
 
             if combo <= 0 then return end
+
+			local bar = Fusion.peek(self.UI).CenterBG.WarriorStyle.BarBG.TweenBar :: Frame
+			TS:Create(bar, AssetBook.TweenInfos.twiceHalf, { Size = fromScale(1, 1) }):Play()
             wait(0.2)
-            TS:Create(Fusion.peek(self.UI).CenterBG.WarriorStyle.BarBG.TweenBar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
+            TS:Create(bar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
 		end,
 		[AttributeChange("Arrows")] = function(arrows: number)
 			charClassInfo.Archer:set(arrows)

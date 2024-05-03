@@ -6,19 +6,19 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 
-local story = {}
+local StoryBook = {}
 
 local v3New = Vector3.new
 
 local pos = ClientUtil:GetKeyStoryLocations()
 
-story.Main = {
+StoryBook.Main = {
     {
         Name = "The Beginning", -- 1
         Target = "Talk to Cyalm",
         Desc = "",
         NPC = "Cyalm",
-        Hint = if pos.Cyalm then pos.Cyalm else v3New(),
+        Hint = v3New(),
 
         Rewards = {
             EXP = 20,
@@ -125,7 +125,7 @@ story.Main = {
     },
 }
 
-story.Side = {
+StoryBook.Side = {
     {
         Name = "New Critical Power",
         Target = "Get Archer class from its statue",
@@ -142,7 +142,7 @@ story.Side = {
     }
 }
 
-story.Town = {
+StoryBook.Town = {
     {
         Name = "Fox Hunt",
         Target = "Get 6 Spiky Fur",
@@ -168,15 +168,4 @@ story.Town = {
     }
 }
 
-story.NPCs = {
-    Cyalm = "Cyalm",
-    Milk = "Milk",
-    Firefly = "Firefly",
-    Hehe = "Hehe",
-
-    FChenP = "FChenP",
-    Xiaotie = "Xiaotie",
-    hnxtwyz = "hnxtwyz"
-}
-
-return story
+return StoryBook

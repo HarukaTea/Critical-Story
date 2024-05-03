@@ -4,12 +4,12 @@
 
 return {
     --- Stats
-    MinDMG = 5,
-    MaxDMG = 15,
-    Magic = 10,
+    MinDMG = 0,
+    MaxDMG = 0,
+    Magic = 0,
     TP = 0,
     Shield = 0,
-    MaxShield = 5,
+    MaxShield = 1,
     Defense = 0,
     OrbSpawnTime = 6,
     OrbLifeTime = 15,

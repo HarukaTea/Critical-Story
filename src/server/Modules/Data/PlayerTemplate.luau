@@ -22,9 +22,6 @@ return {
 	},
 
 	Inventory = {},
-	EquippedItems = {},
-	PinnedItems = {},
-
 	Quests = {
 		Main = 1,
 		Town = {}

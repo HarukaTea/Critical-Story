@@ -12,8 +12,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local Pinia = require(RepS.Modules.UI.Pinia.TurnBaseUIPinia)
 
 local TurnBaseActionPanel = require(RepS.Modules.UI.Views.TurnBaseActionPanel)
-local TurnBaseMonsterList = require(RepS.Modules.UI.Views.TurnBaseMonsterList)
-local TurnBasePlayerList = require(RepS.Modules.UI.Views.TurnBasePlayerList)
+local TurnBaseSideList = require(RepS.Modules.UI.Views.TurnBaseSideList)
 local TurnBasePhaseShower = require(RepS.Modules.UI.Views.TurnBasePhaseShower)
 
 local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
@@ -82,8 +81,9 @@ return function (plr: Player)
                     New("UIAspectRatioConstraint")({ AspectRatio = 25.146 }),
 
                     TurnBaseActionPanel(self),
-                    TurnBaseMonsterList(self),
-                    TurnBasePlayerList(self),
+
+					TurnBaseSideList("Monster", self),
+					TurnBaseSideList("Player", self),
 
                     Components.Frame({
 						Name = "StatsFrame",

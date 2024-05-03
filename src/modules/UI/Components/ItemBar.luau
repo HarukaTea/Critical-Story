@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children = Fusion.Children
@@ -17,10 +18,11 @@ local wait = task.wait
 local fromRGB = Color3.fromRGB
 
 local function ItemBar(item: string): Frame
+	local itemInfo = ItemBook:FindItem(item)
 	local info = {
-		Icon = AssetBook.Items.ItemImages[item],
-		Name = AssetBook.Items.ItemName[item],
-		TierColor = AssetBook.TierColor[AssetBook.Items.ItemTier[item]],
+		Icon = itemInfo.Icon,
+		Name = itemInfo.Name,
+		TierColor = AssetBook.TierColor[itemInfo.Tier],
 		Position = Fusion.Value(fromScale(1.2, 0))
 	}
 	local isSelecting = Fusion.Value(false)

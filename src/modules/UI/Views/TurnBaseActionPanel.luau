@@ -9,8 +9,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local TurnBaseItemPanel = require(RepS.Modules.UI.Views.TurnBaseItemPanel)
-local TurnBaseSkillPanel = require(RepS.Modules.UI.Views.TurnBaseSkillPanel)
+local TurnBaseSidePanel = require(RepS.Modules.UI.Views.TurnBaseSidePanel)
 
 local TurnBaseAction = require(RepS.Modules.UI.Components.TurnBaseAction)
 
@@ -27,6 +26,8 @@ local function TurnBaseActionPanel(self: table) : Frame
         if not tFind(whitelist, phase) then
             self.panelPos:set(fromScale(0.5, 5))
             self.transHPBarSize:set(fromScale(0, 0.875))
+            self.itemPanelVisible:set(false)
+            self.skillPanelVisible:set(false)
             return
         end
 
@@ -61,8 +62,8 @@ local function TurnBaseActionPanel(self: table) : Frame
                 }
             }),
 
-            TurnBaseItemPanel(self),
-			TurnBaseSkillPanel(self),
+            TurnBaseSidePanel("Items", self),
+			TurnBaseSidePanel("Skills", self),
 
             Components.Frame({
                 Name = "Actions",

@@ -6,7 +6,7 @@ local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local ClientUtil =require(RepS.Modules.Utils.ClientUtil)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -138,6 +138,16 @@ return function(plr: Player)
 			wait()
 			self.items:set(self.inventory:GetChildren())
 		end,
+	})
+
+	--// Connections
+	local function checkIfOpened()
+		if UI.BG.Visible then ClientUtil:OpenUI(plr, "Backpack", true) end
+	end
+	Fusion.Hydrate(self.char)({
+		[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+			if state then checkIfOpened() end
+		end
 	})
 
 	--// Clear

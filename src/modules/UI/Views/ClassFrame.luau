@@ -4,10 +4,10 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local ExCategoryOpenBtn = require(RepS.Modules.UI.Components.ExCategoryOpenBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
@@ -49,7 +49,7 @@ local function ClassFrame(self: table) : Frame
 		end
 
 		for _, item in inventory:GetChildren() do
-			if item.Value > 0 and AssetBook.Items.ItemType[item.Name] == "Passive" and item:GetAttribute("Equipped") then
+			if item.Value > 0 and ItemBook:FindItem(item).Type == "Passive" and item:GetAttribute("Equipped") then
 				local slot = item:GetAttribute("Slot")
 				local itemSlot = classFrame:FindFirstChild(slot, true)
                 if not itemSlot then continue end

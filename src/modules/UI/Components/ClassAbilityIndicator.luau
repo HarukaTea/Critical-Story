@@ -54,9 +54,7 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                         end),
                         Size = Fusion.Tween(Computed(function(use)
                             if class == "Warrior" then
-                                if use(charClassInfo.Warrior) <= 0 then return fromScale(0, 1) end
-
-                                return fromScale(1, 1)
+                                return fromScale(0, 1)
 
                             elseif class == "Archer" then
                                 local x = clamp(use(charClassInfo.Archer) / 10, 0, 1)

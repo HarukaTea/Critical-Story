@@ -35,6 +35,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		end
 
 		--// Player phase
+		monster = locator:FindFirstChildWhichIsA("Model", true)
 		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
 			if not plr then continue end
 
@@ -44,6 +45,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		ServerUtil:SortPlayers(ServerUtil:GetPlayersByMonster(monster), monster, cage)
 
 		wait(2)
+		monster = locator:FindFirstChildWhichIsA("Model", true)
 		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
 			if not plr then continue end
 
@@ -59,6 +61,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		local function _playerAllDoneCheck() : boolean
 			local check = true
 
+			monster = locator:FindFirstChildWhichIsA("Model", true)
 			for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
 				if not plr then continue end
 				if plr:GetAttribute("NextAction") == "" then check = false break end
@@ -69,6 +72,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		repeat wait(1) maxTimeOut -= 1 until _playerAllDoneCheck() or maxTimeOut <= 0
 
 		--// Player execution phase
+		monster = locator:FindFirstChildWhichIsA("Model", true)
 		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
 			if not plr then continue end
 
@@ -100,6 +104,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 
 		wait(2)
 		--// Mob phase
+		monster = locator:FindFirstChildWhichIsA("Model", true)
 		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
 			if not plr then continue end
 
@@ -145,6 +150,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		end
 		ServerUtil:SortMonsters(mobs, cage)
 
+		monster = locator:FindFirstChildWhichIsA("Model", true)
 		for _, plr in ServerUtil:GetPlayersByMonster(monster) do
 			if not plr then continue end
 
@@ -160,7 +166,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 			end
 		end
 
-		turnBaseCombatRound(locator:FindFirstChildWhichIsA("Model", true))
+		turnBaseCombatRound(monster)
 	--end)
 end
 

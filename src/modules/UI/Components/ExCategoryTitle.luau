@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local New, Children, OnEvent, Value, Tween, Computed =
 	Fusion.New, Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Tween, Fusion.Computed
@@ -47,7 +48,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 						return AssetBook.ClassInfo[use(playerClass)].Image
 
 					elseif id == "Backpack" then
-						return AssetBook.Items.ItemImages.Backpack
+						return ItemBook.ItemImagesEx.Backpack
 					end
 				end),
 				ImageColor3 = id == "Backpack" and fromRGB(148, 148, 148) or color3New(1, 1, 1),

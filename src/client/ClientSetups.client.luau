@@ -59,7 +59,7 @@ Spawn(dayNightCycle)
 
 local function cmdrRegister()
     Cmdr:SetActivationKeys({ Enum.KeyCode.Quote })
-    Cmdr:SetPlaceName("CStory-0.8-Test")
+    Cmdr:SetPlaceName("CStory-0.8")
 
     plr.Chatted:Connect(function(msg)
         if msg == "!cmds" then Cmdr:Show() end

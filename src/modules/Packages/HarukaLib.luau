@@ -5,7 +5,7 @@
 local HarukaLib = {}
 
 local floor, log10, abs = math.floor, math.log10, math.abs
-local format = string.format
+local format, gsub = string.format, string.gsub
 local cfNew, v3New, fromRGB = CFrame.new, Vector3.new, Color3.fromRGB
 local unpack = table.unpack
 
@@ -57,6 +57,25 @@ function HarukaLib:IsInRegion(position: Vector3, regions: table) : BasePart
 	end
 
 	return region
+end
+
+--[[
+	Richtextify my self-created text format
+]]
+function HarukaLib:RichTextify(text: string) : string
+	local colorList = {
+		["<blue>"] = [[<font color="#3498db">]],
+		["<purple>"] = [[<font color="#9b59b6">]],
+		["<red>"] = [[<font color="#ff6b81">]],
+		["<orange>"] = [[<font color="#ffa502">]],
+		["<yellow>"] = [[<font color="#fff100">]],
+	}
+
+	for oriTag, rbxColorTag in colorList do
+		text = gsub(text, oriTag, rbxColorTag)
+	end
+
+	return text
 end
 
 --[[

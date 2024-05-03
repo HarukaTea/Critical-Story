@@ -30,19 +30,17 @@ local function TurnBaseUIPinia(self: table)
     self.transHPBarSize = Value(fromScale(0, 0.875))
 
     self.inventory = self.plr:WaitForChild("Inventory", 999)
-    self.itemPanelAbsContentSize, self.itemPanelAbsSize = Value(0), Value(0)
+
+    self.sidePanelAbsContentSize, self.sidePanelAbsSize = { Value(0), Value(0) }, { Value(0), Value(0) }
     self.items = Value({})
     self.itemPanelVisible = Value(false)
-
-    self.skillPanelAbsContentSize, self.skillPanelAbsSize = Value(0), Value(0)
     self.skills = Value({})
     self.skillPanelVisible = Value(false)
 
     self.targetingMobs = Value({})
-    self.monsterHPPos, self.monsterTargetingPos = Value(fromScale(0.3, -0.5)), Value(fromScale(-0.2, 0.5))
+    self.monsterTargetingPos = Value(fromScale(-0.2, 0.5))
 
     self.playersInCombat = Value({})
-    self.playersListPos = Value(fromScale(-0.015, -0.5))
     self.targetingMob = Value(self.charData.TargetMonster.Value)
 
     self.currentPhase = Value("Player")

@@ -7,6 +7,8 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local Children, OnEvent, Value, Computed, peek =
 	Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Computed, Fusion.peek
@@ -14,6 +16,7 @@ local Children, OnEvent, Value, Computed, peek =
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
+local tFind = table.find
 
 local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageButton
 	local amount = Value(item.Value)
@@ -42,10 +45,11 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 	end)
 
 	item = item.Name
+	local itemInfo = ItemBook:FindItem(item)
 	return Components.HoverImageButton({
 		Name = item,
 		BackgroundTransparency = 0,
-		Image = AssetBook.Items.ItemImages[item],
+		Image = itemInfo.Icon,
 
 		[Children] = {
 			Components.RoundUICorner(),
@@ -128,19 +132,27 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			itemFrame[item]:SetAttribute("Selected", true)
 			isSelecting:set(true)
 
-			local itemType = AssetBook.Items.ItemType[item]
+			local itemType = itemInfo.ItemType
 			self.horizonLineVisible:set(true)
-			self.itemName:set(AssetBook.Items.ItemName[item])
+			self.itemName:set(itemInfo.Name)
 			self.itemType:set(itemType)
 			self.itemTypeColor:set(AssetBook.TypeColor[itemType])
-			self.itemTier:set(AssetBook.Items.ItemTier[item])
-			self.itemTierColor:set(AssetBook.TierColor[AssetBook.Items.ItemTier[item]])
-			self.itemStats:set(AssetBook.Items.ItemStat[item])
-			self.itemDesc:set(AssetBook.Items.ItemDesc[item])
+			self.itemTier:set(itemInfo.Tier)
+			self.itemTierColor:set(AssetBook.TierColor[peek(self.itemTier)])
+			self.itemStats:set(HarukaLib:RichTextify(itemInfo.Stat))
+			self.itemDesc:set(itemInfo.Desc)
 
 			local filterInfo = self.filterInfo :: table
-			filterInfo.Equip.Visible:set(if itemType ~= "Material" then true else false)
+			local blacklist = { "Active", "Material" }
+
+			filterInfo.Equip.Visible:set(if not tFind(blacklist, itemType) then true else false)
 			filterInfo.Equip.Text:set(if peek(equipped) then "UNEQUIP" else "EQUIP")
+
+			if itemType == "Active" and not itemInfo.IsSkill then
+				filterInfo.Equip.Visible:set(true)
+				filterInfo.Equip.Text:set("USE")
+			end
+
 			filterInfo.Pin.Visible:set(true)
 			filterInfo.Pin.Text:set(if peek(pinned) then "UNPIN" else "PIN")
 			filterInfo.Pin.Size:set(if peek(filterInfo.Equip.Visible) then fromScale(0.116, 1) else fromScale(0.237, 1))

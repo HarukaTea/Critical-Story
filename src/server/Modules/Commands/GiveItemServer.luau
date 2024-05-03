@@ -5,7 +5,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Guard = require(RepS.Modules.Packages.Guard)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -23,12 +23,12 @@ return function (_, plr: Player, item: string, amount: number)
         return "Wrong amount!"
     end
 
-    if not AssetBook.Items.ItemName[itemName] and itemName ~= "all" then
+    if not ItemBook:IsItemExist(itemName) and itemName ~= "all" then
         return "There is no item named "..itemName..", are you sure you typed correctly?"
 
     elseif itemName == "all" then
-        for everyItem: string, _ in AssetBook.Items.ItemName do
-            ServerUtil:GiveItem(plr, everyItem, 1)
+        for _, everyItem: table in ItemBook.Items do
+            ServerUtil:GiveItem(plr, everyItem.ItemId, everyItem.MaxAmount)
         end
 
         return "Gived all items to "..plr.DisplayName
