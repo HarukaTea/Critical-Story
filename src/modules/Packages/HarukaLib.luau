@@ -64,11 +64,12 @@ end
 ]]
 function HarukaLib:RichTextify(text: string) : string
 	local colorList = {
-		["<blue>"] = [[<font color="#3498db">]],
-		["<purple>"] = [[<font color="#9b59b6">]],
-		["<red>"] = [[<font color="#ff6b81">]],
+		["<blue>"] = [[<font color="#70a1ff">]],
+		["<purple>"] = [[<font color="#5352ed">]],
+		["<red>"] = [[<font color="#ff4757">]],
 		["<orange>"] = [[<font color="#ffa502">]],
-		["<yellow>"] = [[<font color="#fff100">]],
+		["<yellow>"] = [[<font color="#ffda79">]],
+		["<green>"] = [[<font color="#7bed9f">]],
 	}
 
 	for oriTag, rbxColorTag in colorList do

@@ -10,6 +10,7 @@ local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Promise = require(RepS.Modules.Packages.Promise)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
@@ -30,7 +31,6 @@ local wait = task.wait
 local newInstance = Instance.new
 local v3New = Vector3.new
 local tFind, remove = table.find, table.remove
-
 
 --// Pre-functions
 local function setup()
@@ -60,7 +60,7 @@ local function setup()
 		if encounterCD then return end
 
         for _, monster: Model in monsters do
-            if monster.PrimaryPart
+            if monster and monster.PrimaryPart and char.PrimaryPart
 				and monster:GetAttribute("InCombat") == false
 				and not monster:GetAttribute("SubMonster") then
 
@@ -97,7 +97,6 @@ local function startCombat(monster: Model)
 	musics.Combat:Play()
 end
 local function endCombat()
-	--- checks
 	if not isInCombat then return end
 	if char:FindFirstChild("CombatBorder") then char.CombatBorder:Destroy() end
 
@@ -109,22 +108,20 @@ local function endCombat()
 
 	--- sound actions
 	for _, sound: Sound in workspace.Sounds:GetChildren() do
-		if sound:IsA("Sound") and sound.Name ~= "Overworld" and sound.IsPlaying then
-			sound:Stop()
-		end
+		if sound:IsA("Sound") and sound.Name ~= "Overworld" then sound:Stop() end
 	end
 	if humanoid.Health <= 0 then
 		sfxs.Sad:Play()
 		return
 	end
-
 	sfxs.CombatEnded:Play()
 
 	wait(2)
 	musics.Overworld:Play()
 end
 local function onTouched(hit: BasePart)
-	if not hit or not hit.Parent then return end
+	if not hit then return end
+	if not hit.Parent then return end
 
 	if hit.Parent:HasTag("Orb") then
 		local orb = hit.Parent :: Model
@@ -132,13 +129,17 @@ local function onTouched(hit: BasePart)
 
 		--- checks
 		if orbTouchCD then return end
-		if not orb:FindFirstChild("Owner") then return end
-		if orb.Owner.Value ~= char then return end
-		if not char.PrimaryPart then return end
-		if not orb.PrimaryPart then return end
-		if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
-		if not char.CharStats.TargetMonster.Value then return end
-		if not HRP then return end
+
+		local check = true
+		Promise.new(function(resolve)
+			if orb.Owner.Value ~= char then resolve(false) end
+			if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then resolve(false) end
+		end):andThen(function(result)
+			check = result
+		end):catch(function()
+			check = false
+		end)
+		if not check then return end
 
 		orbTouchCD = true
 		humanoid.Jump = true
@@ -179,8 +180,6 @@ local function onTouched(hit: BasePart)
 
 		--- checks
 		if dmgTouchCD then return end
-		if not damagePart:FindFirstChild("Owner") then return end
-		if not char.PrimaryPart then return end
 
 		dmgTouchCD = true
 		Spawn(function()
@@ -195,14 +194,19 @@ local function onTouched(hit: BasePart)
 		ClientUtil:CharOnHit(char)
 	end
 end
+
+local function _destroyInCombat(monster: Model, obj: Instance)
+	local success = pcall(function()
+		if not monster.TargetingList:FindFirstChild(char.Name) then obj:Destroy() end
+	end)
+
+	if not success then obj:Destroy() end
+end
 local function combatHolderHandler(folder: Folder)
 	local owner = folder:WaitForChild("Owner") :: ObjectValue
 	repeat wait() until owner.Value
 
-	local monster = owner.Value :: Model
-	if not monster then folder:Destroy() return end
-	if not monster:FindFirstChild("TargetingList") then folder:Destroy() return end
-	if not monster.TargetingList:FindFirstChild(char.Name) then folder:Destroy() end
+	_destroyInCombat(owner.Value, folder)
 end
 local function orbFolderHandler(folder: Folder)
 	--- the purpose is to yield enough time, cuz `wait()` is not long
@@ -215,10 +219,7 @@ local function cageHolderHandler(cage: Model)
 	local owner = cage:WaitForChild("Owner")
 	repeat wait() until owner.Value
 
-	local monster = owner.Value :: Model
-	if not monster then cage:Destroy() return end
-	if not monster:FindFirstChild("TargetingList") then cage:Destroy() return end
-	if not monster.TargetingList:FindFirstChild(char.Name) then cage:Destroy() end
+	_destroyInCombat(owner.Value, cage)
 end
 
 --// Connection setups

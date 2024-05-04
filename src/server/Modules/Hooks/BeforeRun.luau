@@ -11,6 +11,9 @@ return function (registry: table)
         if context.Group == "Testers" and context.Executor:GetAttribute("Rank") <= testerRank then
             return "No permission for that!"
 
+        elseif context.Group == "Moderators" and context.Executor:GetAttribute("Rank") < 124 then
+            return "No permission for that!"
+
         elseif context.Group == "DefaultAdmin" and context.Executor:GetAttribute("Rank") < 255 then
             return "No permission for that!"
         end

@@ -109,7 +109,7 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                                 return AssetBook.ClassInfo[plr:GetAttribute("Class")].Image
 
                             elseif nextAction == "Items" then
-                                return ItemBook:FindItem(plr:GetAttribute("NextItem")).Icon
+                                return "rbxassetid://"..ItemBook:FindItem(plr:GetAttribute("NextItem")).Icon
 
                             else
                                 return AssetBook.ActionPanelIcons[nextAction]

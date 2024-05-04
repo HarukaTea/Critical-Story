@@ -5,11 +5,12 @@
 local ClientProcess = {}
 
 local RunService = game:GetService("RunService")
+local RepS = game:GetService("ReplicatedStorage")
 local Util = script.Parent.Parent.Util
 
 local Type = require(script.Parent.Parent.Type)
 local Event = require(script.Parent.Parent.Event)
-local Spawn = require(script.Parent.Parent.Parent.Parent.Spawn)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 local Key = require(Util.Key)
 local RateLimit = require(Util.RateLimit)
 

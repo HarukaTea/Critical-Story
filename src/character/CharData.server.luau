@@ -139,13 +139,9 @@ local function onDead()
     char:SetAttribute("InCombat", false)
 
     for _, monsterSymbol: ObjectValue in char.CharStats.TargetMonsters:GetChildren() do
-        local monster = monsterSymbol.Value :: Model?
-
-        if not monster then continue end
-        if not monster:FindFirstChild("TargetingList") then continue end
-        if not monster.TargetingList:FindFirstChild(char.Name) then continue end
-
-        monster.TargetingList[char.Name]:Destroy()
+        pcall(function()
+            monsterSymbol.Value.TargetingList[char.Name]:Destroy()
+        end)
     end
     for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end

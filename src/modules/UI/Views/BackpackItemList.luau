@@ -72,10 +72,10 @@ local function BackpackItemList(self: table) : ScrollingFrame
             Fusion.ForValues(self.items, function(use, item: IntValue)
                 if use(self.chosenFilter) == "Others" then
                     local filter = { "Material", "Cosmetic", "Quest" }
-                    if tFind(filter, ItemBook:FindItem(item).Type) then return BackpackItemSlot(item, self) end
+                    if tFind(filter, ItemBook:FindItem(item.Name).Type) then return BackpackItemSlot(item, self) end
 
                 else
-                    if ItemBook:FindItem(item).Type == use(self.chosenFilter) then return BackpackItemSlot(item, self) end
+                    if ItemBook:FindItem(item.Name).Type == use(self.chosenFilter) then return BackpackItemSlot(item, self) end
                 end
             end, Fusion.cleanup),
         },

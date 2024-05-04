@@ -82,13 +82,13 @@ local function setup(plr: Player)
 		ds = SuphiDataStore.new(DS1, plr.UserId)
 	end
 
-	local function stateChanged(_, datastore: any)
+	local function _stateChanged(_, datastore: any)
 		while datastore.State == false do
 			if datastore:Open(TEMPLATE) ~= "Success" then wait(6) end
 		end
 	end
-	ds.StateChanged:Connect(stateChanged)
-	stateChanged(ds.State, ds)
+	ds.StateChanged:Connect(_stateChanged)
+	_stateChanged(ds.State, ds)
 
 	--- once everything is fine, we load data
 	local data = ds.Value :: table

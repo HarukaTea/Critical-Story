@@ -2,12 +2,18 @@
 --!optimize 2
 --!native
 
---// Warp Library (@Eternity_Devs)
---// version 1.0.5
+local RunService = game:GetService("RunService")
+local IsServer = RunService:IsServer()
 
-local Index = require(script.Index)
+local Server = script.Server
+local Client = script.Client
 
-return {
-	Server = Index.Server,
-	Client = Index.Client,
-}
+if IsServer then
+	require(Server.ServerProcess).start()
+
+	return require(Server.Index)
+else
+	require(Client.ClientProcess).start()
+
+	return require(Client.Index)
+end

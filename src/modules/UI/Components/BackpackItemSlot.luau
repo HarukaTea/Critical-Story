@@ -49,7 +49,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 	return Components.HoverImageButton({
 		Name = item,
 		BackgroundTransparency = 0,
-		Image = itemInfo.Icon,
+		Image = "rbxassetid://"..itemInfo.Icon,
 
 		[Children] = {
 			Components.RoundUICorner(),
@@ -132,7 +132,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 			itemFrame[item]:SetAttribute("Selected", true)
 			isSelecting:set(true)
 
-			local itemType = itemInfo.ItemType
+			local itemType = itemInfo.Type
 			self.horizonLineVisible:set(true)
 			self.itemName:set(itemInfo.Name)
 			self.itemType:set(itemType)

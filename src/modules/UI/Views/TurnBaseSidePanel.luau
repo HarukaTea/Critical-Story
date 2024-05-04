@@ -122,7 +122,7 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
                             Name = "Icon",
                             Size = fromScale(1, 1),
                             SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                            Image = ItemBook:FindItem(item).Icon,
+                            Image = "rbxassetid://"..ItemBook:FindItem(item).Icon,
 
                             [Children] = { Components.RoundUICorner() }
                         }),

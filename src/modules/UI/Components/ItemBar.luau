@@ -20,7 +20,7 @@ local fromRGB = Color3.fromRGB
 local function ItemBar(item: string): Frame
 	local itemInfo = ItemBook:FindItem(item)
 	local info = {
-		Icon = itemInfo.Icon,
+		Icon = "rbxassetid://"..itemInfo.Icon,
 		Name = itemInfo.Name,
 		TierColor = AssetBook.TierColor[itemInfo.Tier],
 		Position = Fusion.Value(fromScale(1.2, 0))

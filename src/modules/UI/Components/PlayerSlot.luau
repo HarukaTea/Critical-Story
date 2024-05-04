@@ -109,7 +109,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 						if itemInfo.Type == "Passive" and item:GetAttribute("Equipped") then
 							local index = tonumber(match(item:GetAttribute("Slot"), "%d"))
 
-							desc["Slot"..index].Image = itemInfo.Icon
+							desc["Slot"..index].Image = "rbxassetid://"..itemInfo.Icon
 						end
 					end
 
