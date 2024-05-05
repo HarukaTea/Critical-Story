@@ -28,6 +28,7 @@ return {
     SpeedBuff = 0,
     RestoreBuff = 10,
     HealBuff = 10,
+    TPRestoreBuff = 10,
 
     BurnChance = 0,
     DodgeChance = 0,

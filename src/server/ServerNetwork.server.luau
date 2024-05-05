@@ -44,6 +44,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 	elseif prompt.Name == "Chat" then
 		local npc = prompt.Parent.Parent :: Model
+
 		Events.NPCChat:Fire(plr, npc, prompt)
 
 	elseif prompt.Name == "Travel" then
@@ -53,11 +54,11 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		Events.SwitchScene:Fire(plr, 1)
 
 		wait(0.6)
-		if workspace.Maps:FindFirstChild(destination)
-			and workspace.Maps[destination]:FindFirstChild(locator) then
-
+		local success = pcall(function() --// remind me that I didn't add the locators
 			plr.Character:PivotTo(workspace.Maps[destination][locator].CFrame)
-		end
+		end)
+
+		if not success then warn("Failed to teleport to "..locator.." in "..destination.."!") end
 
 	elseif prompt.Name == "Material" then
 		local hasTool = false
@@ -75,12 +76,12 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		plr:SetAttribute("MaterialCD", true)
 		Spawn(function()
 			wait(1)
-			plr:SetAttribute("MaterialCD", nil)
+			if plr then plr:SetAttribute("MaterialCD", nil) end
 		end)
 
 		prompt.Enabled = false
 
-		local material = prompt.Parent.Parent
+		local material = prompt.Parent.Parent :: Model
 		local finalMaterial = material.Name
 		if prompt.Parent:GetAttribute("Rare") then
 			local rareChance = LootPlan.new()
@@ -384,15 +385,11 @@ Events.ChangePlayerSetting:Connect(toggleSettings)
 	Switch mob target by ctrl or click
 ]]
 local function switchMobTarget(plr: Player, monster: Model)
-	local char = plr.Character :: Model
-
-	if not char then return end
-	if not monster then return end
-	if not monster.PrimaryPart then return end
-
-	if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 then
-		char.CharStats.TargetMonster.Value = monster
-	end
+	pcall(function()
+		if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 then
+			plr.Character.CharStats.TargetMonster.Value = monster
+		end
+	end)
 end
 Events.ChangeMobTarget:Connect(switchMobTarget)
 
@@ -408,7 +405,7 @@ Events.ErrorDataStore:Connect(dataStoreErrorKick)
 	Sometimes player wanna rejoin by typing `!rejoin` in chat
 ]]
 local function rejoinRequest(plr: Player)
-	TeleS:Teleport(game.PlaceId, plr, plr:GetJoinData().TeleportData)
+	TeleS:Teleport(7523159032, plr)
 end
 Events.RejoinRequest:Connect(rejoinRequest)
 

@@ -52,14 +52,17 @@ local function setup()
         for i: string, v: any in ATTRIBUTES do
             char:SetAttribute(i, v)
         end
-        local objValue = instanceNew("ObjectValue")
-        objValue.Name = "TargetMonster"
-        objValue.Parent = charStats
+        local targetMonster = instanceNew("ObjectValue")
+        targetMonster.Name = "TargetMonster"
+        targetMonster.Parent = charStats
+        local bindableEvent = instanceNew("BindableEvent")
+        bindableEvent.Name = "NewPhase"
+        bindableEvent.Parent = charStats
 
         _createFolder("Items", charStats)
         _createFolder("ExtraOrbs", charStats)
-        _createFolder("TargetMonsters", charStats)
         _createFolder("EffectsList", charStats)
+        _createFolder("TargetMonsters", charStats)
         _createFolder("Quests", charStats)
     end
     _createStats()
@@ -124,6 +127,102 @@ local function classAttributesSetup()
 end
 Spawn(classAttributesSetup)
 
+local function charAttributesSetup()
+    local function tpCheck(tp: number)
+        if tp > 100 then char:SetAttribute("TP", 100) end
+    end
+    local function shieldCheck(shield: number)
+        local maxShield = char:GetAttribute("MaxShield") :: number
+
+        if shield > 0 and isBroken then isBroken = false end
+        if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
+
+        if shield <= 0 and not isBroken then
+            isBroken = true
+
+            Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
+        end
+    end
+
+    local function updateMinDMG()
+        char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
+    end
+    local function updateMaxDMG()
+        char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+    end
+    local function updateMagic()
+        char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
+    end
+    local function updateShield()
+        char:SetAttribute("MaxShield", 5 * plr:GetAttribute("ShieldPoints") + 5 + char:GetAttribute("ShieldBuff"))
+        char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
+    end
+    local function updateHP()
+        humanoid.MaxHealth = 30 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
+        humanoid.Health = humanoid.MaxHealth
+    end
+    local function updateSpeed(speed: number)
+        humanoid.WalkSpeed = 30 + speed
+    end
+    local function updateJump(jump: number)
+        humanoid.JumpPower = 50 + jump
+    end
+    local function levelReqCheck()
+        local level = plr:GetAttribute("Levels") :: number
+
+        if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 60 then
+            if lvUpCD then return end
+
+            lvUpCD = true
+            Signals.LevelUp:Fire(plr)
+
+            wait(1)
+            lvUpCD = false
+        end
+    end
+
+    --// Setups
+    Spawn(updateMinDMG)
+    Spawn(updateMaxDMG)
+    Spawn(updateMagic)
+    Spawn(updateShield)
+    Spawn(updateHP)
+    Spawn(updateSpeed, 0)
+    Spawn(updateJump, 0)
+    Spawn(levelReqCheck)
+
+    Fusion.Hydrate(plr)({
+        [AttributeChange("DMGPoints")] = function()
+            updateMinDMG()
+            updateMaxDMG()
+        end,
+        [AttributeChange("MagicPoints")] = updateMagic,
+        [AttributeChange("ShieldPoints")] = updateShield,
+        [AttributeChange("HealthPoints")] = updateHP,
+        [AttributeChange("EXP")] = levelReqCheck,
+        [AttributeChange("Class")] = function()
+            ServerUtil:EquipWeapon(char)
+        end
+    })
+    Fusion.Hydrate(char)({
+        [AttributeChange("TP")] = tpCheck,
+        [AttributeChange("Shield")] = shieldCheck,
+
+        [AttributeChange("MinDMGBuff")] = updateMinDMG,
+        [AttributeChange("MaxDMGBuff")] = updateMaxDMG,
+        [AttributeChange("MagicBuff")] = updateMagic,
+        [AttributeChange("ShieldBuff")] = updateShield,
+        [AttributeChange("HealthBuff")] = updateHP,
+        [AttributeChange("SpeedBuff")] = updateSpeed,
+        [AttributeChange("JumpBuff")] = updateJump,
+
+        [AttributeChange("InCombat")] = function()
+            ServerUtil:EquipWeapon(char)
+        end
+    })
+end
+Spawn(charAttributesSetup)
+
 --// Connections
 local function onDead()
     Empty()
@@ -138,106 +237,16 @@ local function onDead()
     end
     char:SetAttribute("InCombat", false)
 
-    for _, monsterSymbol: ObjectValue in char.CharStats.TargetMonsters:GetChildren() do
+    for _, monsterSymbol in char.CharStat.TargetMonsters:GetChildren() do
         pcall(function()
-            monsterSymbol.Value.TargetingList[char.Name]:Destroy()
+            for _, targetPlr in monsterSymbol.Value.TargetPlayers:GetChildren() do
+                if targetPlr.Value == char then targetPlr:Destroy() end
+            end
         end)
     end
+
     for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end
     end
 end
 humanoid.Died:Once(onDead)
-
-local function tpCheck(tp: number)
-    if tp > 100 then char:SetAttribute("TP", 100) end
-end
-local function shieldCheck(shield: number)
-    local maxShield = char:GetAttribute("MaxShield") :: number
-
-    if shield > 0 and isBroken then isBroken = false end
-    if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
-
-    if shield <= 0 and not isBroken then
-        isBroken = true
-
-        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
-    end
-end
-
-local function updateMinDMG()
-    char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
-end
-local function updateMaxDMG()
-    char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
-end
-local function updateMagic()
-    char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
-end
-local function updateShield()
-    char:SetAttribute("MaxShield", 5 * plr:GetAttribute("ShieldPoints") + 5 + char:GetAttribute("ShieldBuff"))
-    char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
-end
-local function updateHP()
-    humanoid.MaxHealth = 30 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
-    humanoid.Health = humanoid.MaxHealth
-end
-local function updateSpeed(speed: number)
-    humanoid.WalkSpeed = 30 + speed
-end
-local function updateJump(jump: number)
-    humanoid.JumpPower = 50 + jump
-end
-local function levelReqCheck()
-    local level = plr:GetAttribute("Levels") :: number
-
-    if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 60 then
-        if lvUpCD then return end
-
-        lvUpCD = true
-        Signals.LevelUp:Fire(plr)
-
-        wait(1)
-        lvUpCD = false
-    end
-end
-
---// Setups
-Spawn(updateMinDMG)
-Spawn(updateMaxDMG)
-Spawn(updateMagic)
-Spawn(updateShield)
-Spawn(updateHP)
-Spawn(updateSpeed, 0)
-Spawn(updateJump, 0)
-Spawn(levelReqCheck)
-
-Fusion.Hydrate(plr)({
-    [AttributeChange("DMGPoints")] = function()
-        updateMinDMG()
-        updateMaxDMG()
-    end,
-    [AttributeChange("MagicPoints")] = updateMagic,
-    [AttributeChange("ShieldPoints")] = updateShield,
-    [AttributeChange("HealthPoints")] = updateHP,
-    [AttributeChange("EXP")] = levelReqCheck,
-    [AttributeChange("Class")] = function()
-        ServerUtil:EquipWeapon(char)
-    end
-})
-Fusion.Hydrate(char)({
-    [AttributeChange("TP")] = tpCheck,
-    [AttributeChange("Shield")] = shieldCheck,
-
-    [AttributeChange("MinDMGBuff")] = updateMinDMG,
-    [AttributeChange("MaxDMGBuff")] = updateMaxDMG,
-    [AttributeChange("MagicBuff")] = updateMagic,
-    [AttributeChange("ShieldBuff")] = updateShield,
-    [AttributeChange("HealthBuff")] = updateHP,
-    [AttributeChange("SpeedBuff")] = updateSpeed,
-    [AttributeChange("JumpBuff")] = updateJump,
-
-    [AttributeChange("InCombat")] = function()
-        ServerUtil:EquipWeapon(char)
-    end
-})

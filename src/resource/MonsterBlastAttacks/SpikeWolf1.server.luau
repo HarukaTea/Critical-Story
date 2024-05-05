@@ -16,7 +16,7 @@ for _, child in model:GetChildren() do
 		blast.Owner.Value = target
 		blast:PivotTo(child.CFrame)
 
-		blast.Parent = target.Holder.Value
+		blast.Parent = target.AttackHolder.Value
 
 		Debris:AddItem(blast, 1)
 	end

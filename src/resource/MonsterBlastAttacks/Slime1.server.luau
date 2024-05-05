@@ -14,7 +14,7 @@ blast:PivotTo(model.Base.CFrame)
 
 if model:HasTag("TurnBase") then blast:AddTag("TurnBase") end
 
-blast.Parent = char.Holder.Value
+blast.Parent = char.AttackHolder.Value
 
 for _, child in blast:GetDescendants() do
     if child:IsA("BasePart") then

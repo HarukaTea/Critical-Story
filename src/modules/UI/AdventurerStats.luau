@@ -181,8 +181,6 @@ return function(plr: Player)
 	end
 	CAS:BindAction("ChangeMobTargetLAlt", _changeMobTarget, false, Enum.KeyCode.LeftAlt)
 	CAS:BindAction("ChangeMobTargetRAlt", _changeMobTarget, false, Enum.KeyCode.RightAlt)
-	CAS:BindAction("ChangeMobTargetLCtrl", _changeMobTarget, false, Enum.KeyCode.LeftControl)
-	CAS:BindAction("ChangeMobTargetRCtrl", _changeMobTarget, false, Enum.KeyCode.RightControl)
 
 	--- Setups
 	local function _autoEquipItems()
@@ -291,8 +289,6 @@ return function(plr: Player)
 
 		CAS:UnbindAction("ChangeMobTargetLAlt")
 		CAS:UnbindAction("ChangeMobTargetRAlt")
-		CAS:UnbindAction("ChangeMobTargetLCtrl")
-		CAS:UnbindAction("ChangeMobTargetRCtrl")
 
 		Events.EquipItems:DisconnectAll()
 		Events.RefreshBackpack:DisconnectAll()

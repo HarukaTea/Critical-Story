@@ -13,8 +13,8 @@ return {
     Group = "Testers",
     Args = {
         {
-            Type = "player",
-            Name = "player",
+            Type = "players",
+            Name = "players",
             Description = "The player who will be set"
         },
         function(context: table)

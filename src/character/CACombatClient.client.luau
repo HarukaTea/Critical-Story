@@ -131,11 +131,10 @@ local function onTouched(hit: BasePart)
 		if orbTouchCD then return end
 
 		local check = true
-		Promise.new(function(resolve)
-			if orb.Owner.Value ~= char then resolve(false) end
-			if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then resolve(false) end
-		end):andThen(function(result)
-			check = result
+		Promise.new(function(resolve, reject)
+			if orb.Owner.Value ~= char then reject() end
+			if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
+
 		end):catch(function()
 			check = false
 		end)
@@ -197,7 +196,7 @@ end
 
 local function _destroyInCombat(monster: Model, obj: Instance)
 	local success = pcall(function()
-		if not monster.TargetingList:FindFirstChild(char.Name) then obj:Destroy() end
+		if not monster.TargetPlayers:FindFirstChild(char.Name) then obj:Destroy() end
 	end)
 
 	if not success then obj:Destroy() end

@@ -3,10 +3,13 @@
 --!native
 
 local DSS = game:GetService("DataStoreService")
+local MS = game:GetService("MessagingService")
 local Players = game:GetService("Players")
+local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Signals = require(SSS.Modules.Data.ServerSignals)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local DS = DSS:GetDataStore("CS_MILKPANEL")
 local SCOPE = "CS_BANLIST_V1"
@@ -24,6 +27,16 @@ local function setup()
     else
         banList = ds
     end
+
+    MS:SubscribeAsync("BanRequest", function(message: table)
+        local data = message.Data :: table
+
+        if Players:FindFirstChild(data[1]) then
+            local cheater = Players[data[1]] :: Player
+
+            cheater:Kick("You've got banned! Reason: "..data[3]..", Duration: "..data[2].." Hours!")
+        end
+    end)
 end
 setup()
 
@@ -49,7 +62,7 @@ local function banRequest(plr: Player, duration: number, reason: string)
         Duration = duration,
         Reason = reason
     }
-    plr:Kick("You got banned! Reason: "..reason..", unban in "..duration.." hours!")
+    MS:PublishAsync("BanRequest", { plr.Name, duration, reason })
 
     DS:SetAsync(SCOPE, banList)
 end
@@ -62,5 +75,5 @@ game:BindToClose(saveList)
 
 --// Setups
 for _, plr: Player in Players:GetPlayers() do
-    if plr then checkIsBanned(plr) end
+    if plr then Spawn(checkIsBanned, plr) end
 end

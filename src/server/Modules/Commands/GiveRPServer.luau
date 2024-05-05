@@ -9,14 +9,16 @@ local Guard = require(RepS.Modules.Packages.Guard)
 
 local numberCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
 
-return function (_, plr: Player, rep: number)
-    local repPass, repWant = numberCheck(rep)
+return function (_, players: table, rp: number)
+    local rpPass, rpWant = numberCheck(rp)
 
-    if not repPass then
-        return "I guess you typed incorrectly..."
+    if not rpPass then
+        return "I guess you typed incorrect RP amount..."
     end
 
-    HarukaLib:Add(plr, "RP", repWant)
+    for _, plr: Player in players do
+        HarukaLib:Add(plr, "RP", rpWant)
+    end
 
-    return plr.DisplayName.."'s RP has added "..repWant
+    return "RP Added: "..HarukaLib:NumberConvert(rpWant, "%.1f").."!"
 end

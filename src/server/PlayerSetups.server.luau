@@ -184,13 +184,13 @@ local function clear(plr: Player)
 	end
 
 	--- check if player is combating
-	Spawn(function()
+	pcall(function()
 		for _, monster: Instance in workspace.Monsters:GetDescendants() do
 			if monster:HasTag("Monster") and monster.PrimaryPart then
-				if not monster:FindFirstChild("TargetingList") then continue end
+				if not monster:FindFirstChild("TargetPlayers") then continue end
 
-				if monster.TargetingList:FindFirstChild(plr.Name) then
-					monster.TargetingList[plr.Name]:Destroy()
+				if monster.TargetPlayers:FindFirstChild(plr.Name) then
+					monster.TargetPlayers[plr.Name]:Destroy()
 
 					print(plr.Name .. " left during combat with " .. monster.Name)
 				end

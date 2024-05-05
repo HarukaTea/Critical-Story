@@ -11,8 +11,8 @@ local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
+local Promise = require(RepS.Modules.Packages.Promise)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
@@ -184,10 +184,6 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 			ServerUtil:WeldPart(child, monster[child.Name .. "Model"])
 		end
 	end
-	local monsterHPScript = RepS.Resources.Unloads.MonsterHP:Clone() :: Script
-	monsterHPScript.Disabled = true
-	monsterHPScript.Parent = monster
-
 	monster.Parent = locator
 
 	locator.Transparency = 1
@@ -213,9 +209,6 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	owner.Value = monster
 	owner.Parent = folder
 
-	monster.Holder.Value = folder
-	monster.MonsterHP.Disabled = false
-
 	if not monster:GetAttribute("SubMonster") then
 		local cageArea = RepS.Package.Unloads.CombatCage:Clone() :: Model
 		cageArea:PivotTo(monster.Parent.CFrame)
@@ -226,6 +219,8 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	else
 		monster.CageHolder.Value = monster.Parent.Parent:FindFirstChildOfClass("Model").CageHolder.Value
 	end
+
+	monster.AttackHolder.Value = folder
 end
 
 --[[
@@ -238,7 +233,7 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	local locator = monster.Parent :: BasePart
 
 	wait(1)
-	if monster.Holder.Value then monster.Holder.Value:Destroy() end
+	if monster.AttackHolder.Value then monster.AttackHolder.Value:Destroy() end
 
 	local defeatedEffect = RepS.Package.Effects.DefeatedEffect:Clone() :: Part
 	defeatedEffect.Position = deadPos
@@ -280,11 +275,11 @@ end
 ]]
 function ServerUtil:GetPlayersByMonster(monster: Model) : table
 	if not monster then return end
-	if not monster:FindFirstChild("TargetingList") then return end
+	if not monster:FindFirstChild("TargetPlayers") then return end
 
 	local combatPlrs = {}
 
-	for _, target: ObjectValue in monster.TargetingList:GetChildren() do
+	for _, target: ObjectValue in monster.TargetPlayers:GetChildren() do
 		local tempPlr = Players:GetPlayerFromCharacter(target.Value)
 
 		if tempPlr then insert(combatPlrs, tempPlr) end
@@ -316,23 +311,23 @@ end
 	Return a randomly generate a position in the combat area
 ]]
 function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
-	--- checks
-	local check = true
+	local orbLocation: CFrame
 
-	Spawn(function()
-		if not monster then check = false return end
-		if not monster.Parent then check = false return end
-		if not monster.Parent.Parent then check = false return end
+	Promise.new(function(resolve)
+		local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
+		local ray = rayNew(position, cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
+		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ServerUtil:FindAllIgnoreParts())
+
+		resolve(position, pos)
+
+	end):andThen(function(position: Vector3, pos: Vector3)
+		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
+
+	end):catch(function()
+		orbLocation = cfNew(0, 0, 0)
 	end)
-	if not check then return cfNew(0, 0, 0) end
 
-	local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
-	local ray = rayNew(
-		position,
-		cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
-	local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ServerUtil:FindAllIgnoreParts())
-
-	return cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
+	return orbLocation
 end
 
 --[[
@@ -342,7 +337,7 @@ function ServerUtil:AddSingleTarget(plr: Player, monster: Model)
 	local playerSymbol = instanceNew("ObjectValue")
 	playerSymbol.Value = plr.Character
 	playerSymbol.Name = plr.Name
-	playerSymbol.Parent = monster.TargetingList
+	playerSymbol.Parent = monster.TargetPlayers
 
 	local monsterSymbol = instanceNew("ObjectValue")
 	monsterSymbol.Value = monster
@@ -690,15 +685,13 @@ end
 ]]
 function ServerUtil:SortPlayers(players: table, monster: Model, cage: Model)
 	for index, plr: Player in players do
-		if not plr then continue end
-		if not plr.Character then continue end
-		if not plr.Character.PrimaryPart then continue end
+		pcall(function()
+			local char = plr.Character
 
-		local char = plr.Character
-
-		char:PivotTo(cage["Player"..index].CFrame)
-		char.Humanoid.AutoRotate = false
-		char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.Parent.Position)
+			char:PivotTo(cage["Player"..index].CFrame)
+			char.Humanoid.AutoRotate = false
+			char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.Parent.Position)
+		end)
 	end
 end
 
@@ -707,10 +700,9 @@ end
 ]]
 function ServerUtil:SortMonsters(monsters: table, cage: Model)
 	for index, monster: Model in monsters do
-		if not monster then continue end
-		if not monster.PrimaryPart then continue end
-
-		monster:PivotTo(cage["Monster"..index].CFrame)
+		pcall(function()
+			monster:PivotTo(cage["Monster"..index].CFrame)
+		end)
 	end
 end
 

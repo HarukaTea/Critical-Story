@@ -11,6 +11,7 @@ local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Promise = require(RepS.Modules.Packages.Promise)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 
@@ -30,6 +31,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 	local locator: BasePart = monster.Parent
 	local combatMode = plr:GetAttribute("CombatMode") :: string
 
+	local check = true
 	if combatMode == "Public" then
 		monster:SetAttribute("InCombat", true)
 
@@ -42,36 +44,45 @@ local function combatStartSetup(plr: Player, monster: Model)
 		border.Parent = char
 
 		wait(5)
-		if not char then monster:SetAttribute("InCombat", false) return end
-		if not char.PrimaryPart then monster:SetAttribute("InCombat", false) return end
+		Promise.new(function(resolve, reject)
+			if char.Humanoid.Health <= 0 then reject() end
 
-		local maxPlayer = 0
-		for _, player: Player in Players:GetPlayers() do
-			if not player then continue end
-			if not player.Character then continue end
-			if not player.Character.PrimaryPart then continue end
-			if maxPlayer >= 4 then break end
-			if player == plr then continue end
+		end):andThen(function()
+			local maxPlayer = 0
+			for _, player: Player in Players:GetPlayers() do
+				if maxPlayer >= 4 then break end
+				if player == plr then continue end
 
-			if (player.Character.PrimaryPart.Position - locator.Position).Magnitude <= 22 then
-				maxPlayer += 1
+				pcall(function()
+					if (player.Character.PrimaryPart.Position - locator.Position).Magnitude <= 22 then
+						maxPlayer += 1
 
-				for _, mob in locator:GetDescendants() do
-					if mob:HasTag("Monster") and mob.PrimaryPart then ServerUtil:AddTargetForMonster(player, mob) end
-				end
+						for _, mob in locator:GetDescendants() do
+							if mob:HasTag("Monster") and mob.PrimaryPart then ServerUtil:AddTargetForMonster(player, mob) end
+						end
+					end
+				end)
 			end
-		end
 
-		border:Destroy()
-		char.PrimaryPart.Anchored = false
+			border:Destroy()
+			char.PrimaryPart.Anchored = false
+
+		end):catch(function()
+			monster:SetAttribute("InCombat", false)
+
+			check = false
+		end)
 	end
 
+	if not check then return end
+
+	--// Activate
 	for _, mob in locator:GetDescendants() do
 		if mob:HasTag("Monster") and mob.PrimaryPart then
-			ServerUtil:AddTargetForMonster(plr, mob)
-
 			if combatMode == "Public" then ServerUtil:MonsterActivateCombat(mob) continue end
 			if not mob:GetAttribute("InCombat") then ServerUtil:MonsterActivateCombat(mob) end
+
+			ServerUtil:AddTargetForMonster(plr, mob)
 		end
 	end
 
@@ -85,19 +96,20 @@ Events.CombatStart:Connect(combatStartSetup)
 ]]
 local function mobTakeDMG(plr: Player, orb: Model)
 	local char = plr.Character :: Model
-	local HRP = char.PrimaryPart
 
 	--- pre checks
-	if not orb then return end
-	if not orb:FindFirstChild("Owner") then return end
-	if orb.Owner.Value ~= char then return end
-	if (HRP.Position - orb.PrimaryPart.Position).Magnitude > 16 then return end
-	if not char.CharStats.TargetMonster.Value then return end
-	if not HRP then return end
-	if not orb.Parent then return end
-	if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then return end
+	local check = true
+	Promise.new(function(resolve, reject)
+		if orb.Owner.Value ~= char then reject() end
+		if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
 
-	local monster = char.CharStats.TargetMonster.Value :: Model
+	end):catch(function()
+		check = false
+	end)
+	if not check then return end
+
+	--- dmg calculations
+	local monster = char.CharStats.TargetMonster.Value :: Model?
 	local class = orb:GetAttribute("Style") :: string
 	local dmgType = if orb:GetAttribute("DMGType") then orb:GetAttribute("DMGType") else AssetBook.ClassInfo[class].Type
 	local baseDamage = 0
@@ -107,31 +119,34 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	else
 		baseDamage = char:GetAttribute("Magic")
 	end
+	baseDamage = floor(baseDamage)
 
 	orb.Owner:Destroy()
 
-	--- final check
-	if not monster.PrimaryPart then return end
-	if monster:GetAttribute("CantAttack") then baseDamage = 0 end
+	pcall(function()
+		if monster:GetAttribute("CantAttack") then baseDamage = 0 end
 
-	--- extra effects
-	local burnChance = plr.Character:GetAttribute("BurnChance") :: number
-	if burnChance > 0 then
-		local burn = LootPlan.new()
+		--- attack
+		local subStyle = orb:GetAttribute("SubStyle") :: string?
+		local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
 
-		burn:Add("Burn", burnChance)
-		burn:Add("None", 100 - burnChance)
+		if CAAttackUtil[style] then CAAttackUtil[style](plr, monster, baseDamage, orb) end
+		orb:Destroy()
 
-		if burnChance:Roll() == "Burn" then SkillUtil:Burn(plr, monster, 6) end
+		--- extra attack
+		local burnChance = char:GetAttribute("BurnChance") :: number
 
-		burn:Destroy()
-	end
+		if burnChance > 0 then
+			local burn = LootPlan.new()
 
-	local subStyle = orb:GetAttribute("SubStyle") :: string?
-	local style = if subStyle then subStyle else orb:GetAttribute("Style") :: string
-	if CAAttackUtil[style] then CAAttackUtil[style](plr, monster, baseDamage, orb) end
+			burn:Add("Burn", burnChance)
+			burn:Add("None", 100 - burnChance)
 
-	orb:Destroy()
+			if burn:Roll() == "Burn" then SkillUtil:Burn(plr, monster, 6) end
+
+			burn:Destroy()
+		end
+	end)
 end
 Events.MobTakeDMG:Connect(mobTakeDMG)
 
@@ -146,15 +161,9 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 
 	local char = plr.Character :: Model
 	local humanoid = char.Humanoid :: Humanoid
-    local monster = dmgPart.Owner.Value :: Model | string
+    local monster = dmgPart.Owner.Value :: Model?
 	local shield = char:GetAttribute("Shield") :: number
 	local dmg = monster:GetAttribute("Damage") :: number
-
-    --- if attacker is void
-	if monster == "Abyss" then
-		char.Humanoid:TakeDamage(char.Humanoid.MaxHealth + 1)
-		return
-	end
 
 	--- dodge roll
 	local dodgeChance = char:GetAttribute("DodgeChance") :: number

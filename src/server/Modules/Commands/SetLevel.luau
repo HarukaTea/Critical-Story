@@ -9,8 +9,8 @@ return {
     Group = "Testers",
     Args = {
         {
-            Type = "player",
-            Name = "player",
+            Type = "players",
+            Name = "players",
             Description = "The player you want to apply"
         },
         {

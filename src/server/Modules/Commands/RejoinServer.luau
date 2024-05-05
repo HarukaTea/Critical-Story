@@ -4,8 +4,8 @@
 
 local TeleS = game:GetService("TeleportService")
 
-return function (_, plr: Player)
-    TeleS:Teleport(game.PlaceId, plr, plr:GetJoinData().TeleportData)
+return function (context)
+    TeleS:Teleport(7523159032, context.Executor)
 
     return "Attempt to rejoin..."
 end

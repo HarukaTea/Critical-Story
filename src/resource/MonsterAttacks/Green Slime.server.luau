@@ -29,7 +29,7 @@ local function slimeShot(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 end
 
 local function slimeWave(target: Model)
@@ -40,13 +40,13 @@ local function slimeWave(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + char.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 end
 
 local function attacking()
 	wait(0.5)
-	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
-		local list = char.TargetingList:GetChildren()
+	if char.TargetPlayers:FindFirstChildOfClass("ObjectValue") then
+		local list = char.TargetPlayers:GetChildren()
 		local target = list[random(1, #list)] :: ObjectValue
 
 		local style = random(1, 2)
@@ -70,7 +70,7 @@ local function attacking()
 		elseif style == 2 then
 			for _ = 1, random(1, 3) do
 				slimeWave(target.Value)
-				wait(0.5)
+				wait(0.8)
 			end
 		end
 

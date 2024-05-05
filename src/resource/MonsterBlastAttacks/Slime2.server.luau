@@ -32,7 +32,7 @@ for i = 1, 5 do
 			blast:SetAttribute("SlimeWaveProjectile", true)
 			if model:HasTag("TurnBase") then blast:AddTag("TurnBase") end
 
-			blast.Parent = char.Holder.Value
+			blast.Parent = char.AttackHolder.Value
 			for _, descendant in blast:GetDescendants() do
 				if descendant:IsA("BasePart") then
 					descendant.Color = model:GetAttribute("SlimeColor")

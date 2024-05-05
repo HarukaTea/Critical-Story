@@ -7,6 +7,7 @@ local SSS = game:GetService("ServerScriptService")
 
 local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local Promise = require(RepS.Modules.Packages.Promise)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -19,15 +20,20 @@ local wait = task.wait
 local insert = table.insert
 
 local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
-    if not monster then return end
-    if not monster:FindFirstChild("TargetingList") then return end
+	local locator: BasePart, mainMonster: Model, targetPlayers : table
+	local function _refreshTargets()
+		mainMonster = locator:FindFirstChildWhichIsA("Model", true)
+		targetPlayers = ServerUtil:GetPlayersByMonster(mainMonster)
+	end
 
-	local locator: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+	Promise.new(function()
+		locator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
 
-	--pcall(function()
+		_refreshTargets()
+
 		if isFirstRound then
 			local mobs = {}
-			for _, mob in locator:GetDescendants() do
+			for _, mob: Instance in locator:GetDescendants() do
 				if mob:HasTag("Monster") and mob.PrimaryPart then mobs[#mobs + 1] = mob end
 			end
 
@@ -35,20 +41,16 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		end
 
 		--// Player phase
-		monster = locator:FindFirstChildWhichIsA("Model", true)
-		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-			if not plr then continue end
-
+		for _, plr: Player in targetPlayers do
 			Events.FreezePlayerControls:Fire(plr, "Freeze")
 			Events.CameraPointTo:Fire(plr, cage.Cam)
 		end
-		ServerUtil:SortPlayers(ServerUtil:GetPlayersByMonster(monster), monster, cage)
+		ServerUtil:SortPlayers(targetPlayers, monster, cage)
 
 		wait(2)
-		monster = locator:FindFirstChildWhichIsA("Model", true)
-		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-			if not plr then continue end
+		_refreshTargets()
 
+		for _, plr: Player in targetPlayers do
 			plr:SetAttribute("NextAction", "")
 			plr:SetAttribute("NextItem", nil)
 
@@ -61,9 +63,9 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		local function _playerAllDoneCheck() : boolean
 			local check = true
 
-			monster = locator:FindFirstChildWhichIsA("Model", true)
-			for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-				if not plr then continue end
+			_refreshTargets()
+
+			for _, plr: Player in targetPlayers do
 				if plr:GetAttribute("NextAction") == "" then check = false break end
 			end
 
@@ -72,10 +74,9 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		repeat wait(1) maxTimeOut -= 1 until _playerAllDoneCheck() or maxTimeOut <= 0
 
 		--// Player execution phase
-		monster = locator:FindFirstChildWhichIsA("Model", true)
-		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-			if not plr then continue end
+		_refreshTargets()
 
+		for _, plr: Player in targetPlayers do
 			Events.NewPhase:Fire(plr, "Execution")
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
 
@@ -102,12 +103,11 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 			end)
 		end
 
-		wait(2)
 		--// Mob phase
-		monster = locator:FindFirstChildWhichIsA("Model", true)
-		for _, plr: Player in ServerUtil:GetPlayersByMonster(monster) do
-			if not plr then continue end
+		wait(2)
+		_refreshTargets()
 
+		for _, plr: Player in targetPlayers do
 			local char = plr.Character
 
 			char.Humanoid.AutoRotate = true
@@ -135,25 +135,23 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		local attacks, mobs = {}, {}
 		for _, mob in locator:GetDescendants() do
 			if mob:HasTag("Monster") and mob.PrimaryPart then
-				if not mob:FindFirstChild("Holder") then continue end
-				if not mob.Holder.Value then continue end
-
-				for _, attack: Instance in mob.Holder.Value:GetDescendants() do
-					if attack:IsA("BasePart") then
-						if attack.Transparency < 1 then insert(attacks, attack) end
+				pcall(function()
+					for _, attack: Instance in mob.AttackHolder.Value:GetDescendants() do
+						if attack:IsA("BasePart") then
+							if attack.Transparency < 1 then insert(attacks, attack) end
+						end
+						attack:RemoveTag("MonsterDMG")
 					end
-					attack:RemoveTag("MonsterDMG")
-				end
+				end)
 
 				mobs[#mobs + 1] = mob
 			end
 		end
 		ServerUtil:SortMonsters(mobs, cage)
 
-		monster = locator:FindFirstChildWhichIsA("Model", true)
-		for _, plr in ServerUtil:GetPlayersByMonster(monster) do
-			if not plr then continue end
+		_refreshTargets()
 
+		for _, plr in targetPlayers do
 			Events.CreateCombatBorder:Fire(plr, "Destroy")
 			Events.ClientTween:Fire(plr, attacks, { Transparency = 1 }, "one")
 
@@ -166,8 +164,11 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 			end
 		end
 
-		turnBaseCombatRound(monster)
-	--end)
+		turnBaseCombatRound(mainMonster)
+
+	end):catch(function()
+		script.Disabled = true
+	end)
 end
 
 turnBaseCombatRound(owner.Value, true)

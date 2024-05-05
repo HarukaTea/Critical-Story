@@ -15,7 +15,9 @@ local wait = task.wait
 --- effects fade
 local function fadeEffect(effect: ParticleEmitter)
     wait(0.4)
-    effect.Enabled = false
+    pcall(function()
+        effect.Enabled = false
+    end)
 end
 CS:GetInstanceAddedSignal("GlobalEffects"):Connect(fadeEffect)
 
@@ -28,6 +30,8 @@ local function fadeText(text: BasePart)
     bv.Parent = text
 
     wait(1)
-    TS:Create(text.Display.Text, AssetBook.TweenInfos.half, { TextTransparency = 1, TextStrokeTransparency = 1 }):Play()
+    pcall(function()
+        TS:Create(text.Display.Text, AssetBook.TweenInfos.half, { TextTransparency = 1, TextStrokeTransparency = 1 }):Play()
+    end)
 end
 CS:GetInstanceAddedSignal("TextEffects"):Connect(fadeText)

@@ -95,9 +95,9 @@ local function mainSetup()
 		end
 	end
 	for _, child: Model in package.MonsterModels:GetChildren() do
-		local targetingList = instanceNew("Folder")
-		targetingList.Name = "TargetingList"
-		targetingList.Parent = child
+		local targetPlayers = instanceNew("Folder")
+		targetPlayers.Name = "TargetPlayers"
+		targetPlayers.Parent = child
 
 		local waitingList = instanceNew("Folder")
 		waitingList.Name = "WaitingList"
@@ -107,13 +107,16 @@ local function mainSetup()
 		effects.Name = "EffectsList"
 		effects.Parent = child
 
-		local holder = instanceNew("ObjectValue")
-		holder.Name = "Holder"
-		holder.Parent = child
+		local attackHolder = instanceNew("ObjectValue")
+		attackHolder.Name = "AttackHolder"
+		attackHolder.Parent = child
 
 		local cageHolder = instanceNew("ObjectValue")
 		cageHolder.Name = "CageHolder"
 		cageHolder.Parent = child
+
+		resources.Unloads.CombatEnds:Clone().Parent = child
+		resources.Unloads.MonsterData:Clone().Parent = child
 	end
 	for _, child: Model in package.MonsterAttacks:GetDescendants() do
 		if resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
@@ -124,8 +127,7 @@ local function mainSetup()
 		if locator:HasTag("MonsterLocation") then
 			RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
 
-			local monster = ServerUtil:SetupMonster(locator)
-			resources.Unloads.CombatEnds:Clone().Parent = monster
+			ServerUtil:SetupMonster(locator)
 		end
 	end
 
@@ -134,7 +136,6 @@ local function mainSetup()
 		resources.Unloads.OrbAnim:Clone().Parent = child
 	end
 	resources.Unloads.BorderColorTween:Clone().Parent = package.Unloads.CombatBorder.Border
-	resources.Unloads.BorderColorTween.Parent = package.Unloads.PublicBorder.Border
 
 	--- player extra info setup
 	local joinData

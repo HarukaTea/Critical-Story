@@ -29,7 +29,7 @@ local function slimeShot(target: Model)
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 end
 
 local function slimeWave(target: Model)
@@ -41,7 +41,7 @@ local function slimeWave(target: Model)
 	blast:PivotTo(cfNew(post, post + char.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
 
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 end
 
 local function slimeDiveDown(target: Model)
@@ -51,7 +51,7 @@ local function slimeDiveDown(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + char.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 
 	local divedown = blast.Base.CFrame * cfNew(0,-8,0)
 	wait(0.5)
@@ -65,7 +65,7 @@ local function slimeDiveUp(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 	char.PrimaryPart.CFrame = blast.Base.CFrame * cfNew(0,-8,0)
 
 	local diveup = blast.Base.CFrame * cfNew(0, char.PrimaryPart.Size.Y/2, 0)
@@ -81,7 +81,7 @@ local function slimeBarrage(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(cfNew(post,post+target.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 
 	for i = 1, random(3, 5) do
 		local postR = ServerUtil:FindPartOnRay(char.Parent.Position + v3New(random(-32,32), 20, random(-32,32)), { target })
@@ -90,7 +90,7 @@ local function slimeBarrage(target: Model)
 		blastR.Owner.Value = char
 		blastR:PivotTo(cfNew(postR, postR + target.PrimaryPart.CFrame.LookVector))
 		blastR:SetAttribute("SlimeColor", SLIME_COLOR)
-		blastR.Parent = char.Holder.Value
+		blastR.Parent = char.AttackHolder.Value
 	end
 
 	wait(0.5)
@@ -100,15 +100,15 @@ local function slimeBarrage(target: Model)
 	blastS.Owner.Value = char
 	blastS:PivotTo(char.PrimaryPart.CFrame)
 	blastS:SetAttribute("SlimeColor", SLIME_COLOR)
-	blastS.Parent = char.Holder.Value
+	blastS.Parent = char.AttackHolder.Value
 
 	char.PrimaryPart.CFrame *= cfNew(0,0,-2.5)
 end
 
 local function attacking()
 	wait(1)
-	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
-		local list = char.TargetingList:GetChildren()
+	if char.TargetPlayers:FindFirstChildOfClass("ObjectValue") then
+		local list = char.TargetPlayers:GetChildren()
 		local target = list[random(1, #list)] :: ObjectValue
 
 		local style = random(1, 4)

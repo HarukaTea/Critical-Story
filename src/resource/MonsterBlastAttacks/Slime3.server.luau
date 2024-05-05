@@ -26,7 +26,7 @@ for i = 1,2 do
 
 			if model:HasTag("TurnBase") then blast:AddTag("TurnBase") end
 
-			blast.Parent = char.Holder.Value
+			blast.Parent = char.AttackHolder.Value
 
 			for _, descendant in blast:GetDescendants() do
 				if descendant:IsA("BasePart") then

@@ -32,13 +32,13 @@ local function bite(target: Model)
 	blast:PivotTo(cfNew(post,post+target.PrimaryPart.CFrame.LookVector) * cfNew(0, 3 ,0))
 	blast:PivotTo(cfNew(blast.Base.Position, char.PrimaryPart.Position))
 
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 end
 
 local function attacking()
 	wait(0.5)
-	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
-		local list = char.TargetingList:GetChildren()
+	if char.TargetPlayers:FindFirstChildOfClass("ObjectValue") then
+		local list = char.TargetPlayers:GetChildren()
 		local target = list[random(1, #list)] :: ObjectValue
 
 		for i = 1, random(2, 3) do

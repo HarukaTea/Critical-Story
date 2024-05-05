@@ -9,14 +9,16 @@ local Guard = require(RepS.Modules.Packages.Guard)
 
 local numberCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
 
-return function (_, plr: Player, gold: number)
+return function (_, players: table, gold: number)
     local goldPass, goldWant = numberCheck(gold)
 
     if not goldPass then
-        return "I guess you typed incorrectly..."
+        return "I guess you typed incorrect gold amount..."
     end
 
-    HarukaLib:Add(plr, "Gold", goldWant)
+    for _, plr: Player in players do
+        HarukaLib:Add(plr, "Gold", goldWant)
+    end
 
-    return plr.DisplayName.."'s Gold has added "..HarukaLib:NumberConvert(goldWant, "%.1f")
+    return "Gold Added: "..HarukaLib:NumberConvert(goldWant, "%.1f").."!"
 end

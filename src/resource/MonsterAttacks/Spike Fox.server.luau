@@ -41,7 +41,7 @@ local function spikeShot(target: Model)
 	blast.Owner.Value = char
 	blast:PivotTo(char.PrimaryPart.CFrame)
 
-	blast.Parent = char.Holder.Value
+	blast.Parent = char.AttackHolder.Value
 
 	if char.Head:FindFirstChild("Encountered") then return end
 
@@ -59,7 +59,7 @@ local function spikeRain(target: Model)
 	local rangeTip = RepS.Package.MonsterAttacks.Wolf.SpikeWolf2Range:Clone() :: Part
 	rangeTip.Position = rangePos
 	rangeTip.Owner.Value = char
-	rangeTip.Parent = char.Holder.Value
+	rangeTip.Parent = char.AttackHolder.Value
 
 	Debris:AddItem(rangeTip, 1)
 
@@ -71,7 +71,7 @@ local function spikeRain(target: Model)
 		blast:PivotTo(cfNew(post) * cfAngles(0, rad(random(1, 360)), 0))
 		blast.Owner.Value = char
 
-		blast.Parent = char.Holder.Value
+		blast.Parent = char.AttackHolder.Value
 
 		Debris:AddItem(blast, 10)
 	end
@@ -79,8 +79,8 @@ end
 
 local function attacking()
 	wait(0.5)
-	if char.TargetingList:FindFirstChildOfClass("ObjectValue") then
-		local list = char.TargetingList:GetChildren()
+	if char.TargetPlayers:FindFirstChildOfClass("ObjectValue") then
+		local list = char.TargetPlayers:GetChildren()
 		local target = list[random(1, #list)] :: ObjectValue
 
 		local style = random(1, 2)

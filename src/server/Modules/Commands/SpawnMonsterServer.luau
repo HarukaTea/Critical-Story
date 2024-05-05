@@ -14,7 +14,7 @@ local cfNew = CFrame.new
 local wait = task.wait
 
 local levelCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
-local amountCheck = Guard.Check(Guard.NumberMinMax(-1, 99999999))
+local amountCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
 
 return function (context: table, monster: string, level: number, amount: number)
     local levelPass, levelWant = levelCheck(level)
@@ -29,14 +29,15 @@ return function (context: table, monster: string, level: number, amount: number)
     if levelWant > 950 then
         return "Nah are you sure you can beat monsters that above level 950?"
     end
-    if amountWant > 4 then
-        return "Nah "..(amountWant + 1).." monsters will explode the server!"
+    if amountWant > 5 then
+        return "Nah "..amountWant.." monsters will explode the server!"
     end
 
-    local worldMonster = workspace.Monsters:FindFirstChild(AssetBook.MonsterIds[monster], true) :: BasePart
+    local worldMonster = workspace.Monsters:FindFirstChild("Green Slime", true) :: BasePart
     worldMonster = worldMonster:FindFirstChildWhichIsA("Model", true)
 
     local locator = worldMonster.Parent:Clone() :: BasePart
+    locator.Name = AssetBook.MonsterIds[monster]
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
     locator:SetAttribute("CantRespawn", true)
@@ -45,9 +46,7 @@ return function (context: table, monster: string, level: number, amount: number)
     locator.Parent = workspace.Monsters
 
     RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
-
     local spawnedMonster = ServerUtil:SetupMonster(locator, levelWant)
-    RepS.Resources.Unloads.CombatEnds:Clone().Parent = spawnedMonster
 
     spawnedMonster:SetAttribute("InCombat", true)
     Spawn(function()
@@ -55,9 +54,10 @@ return function (context: table, monster: string, level: number, amount: number)
         spawnedMonster:SetAttribute("InCombat", false)
     end)
 
-    for _ = 1, amount do
+    for _ = 1, amount - 1 do
         local subLocator = worldMonster.Parent:Clone() :: BasePart
 
+        subLocator.Name = AssetBook.MonsterIds[monster]
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)
         subLocator:SetAttribute("CantRespawn", true)
@@ -67,8 +67,7 @@ return function (context: table, monster: string, level: number, amount: number)
 
         RepS.Package.Unloads.CombatEnd:Clone().Parent = subLocator
 
-        local spawnSubMonster = ServerUtil:SetupMonster(subLocator, levelWant)
-        RepS.Resources.Unloads.CombatEnds:Clone().Parent = spawnSubMonster
+        ServerUtil:SetupMonster(subLocator, levelWant)
     end
 
     return "Level "..levelWant.." "..AssetBook.MonsterIds[monster].." x"..amountWant.." spawned"

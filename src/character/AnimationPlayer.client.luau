@@ -41,7 +41,7 @@ anims.FireStaffAnim2 = anims.WizardAnim2
 
 --// Connections
 local function playAnim(anim: string)
-	if not anims[anim] then return end
+	if not anims[anim] then warn("Can't found animation: "..anim.."!") return end
 
 	anims[anim]:Play()
 end

@@ -26,12 +26,13 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
             local realItems, realSkills = {}, {}
 
             for _, item: IntValue in items do
-                local itemInfo = ItemBook:FindItem(item)
+                local itemInfo = ItemBook:FindItem(item.Name)
 
                 if itemInfo.Type == "Active" and item.Value > 0 then
-                    if not itemInfo.IsSkill then
+                    if itemInfo.IsCM then
                         realItems[#realItems + 1] = item.Name
-                    else
+
+                    elseif itemInfo.IsSkill then
                         realSkills[#realSkills + 1] = item.Name
                     end
                 end
@@ -87,7 +88,7 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
                 end
             }),
             Components.Frame({
-                Name = "PaddingBottom",
+                Name = "Padding",
                 Size = fromScale(0.95, 0.01)
             }),
             Fusion.ForValues(if id == "Items" then self.items else self.skills, function(_, item: string)
@@ -168,7 +169,7 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
                 })
             end, Fusion.cleanup),
             Components.Frame({
-                Name = "PaddingTop",
+                Name = "Padding",
                 Size = fromScale(0.95, 0.01)
             }),
         }

@@ -95,12 +95,12 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 				self.targetingMob:set(newMob)
 
 				if tFind(taggedMob, newMob) then return end
-				if not newMob:FindFirstChild("TargetingList") then return end
+				if not newMob:FindFirstChild("TargetPlayers") then return end
 
-				self.playersInCombat:set(newMob.TargetingList:GetChildren())
+				self.playersInCombat:set(newMob.TargetPlayers:GetChildren())
 				taggedMob[#taggedMob + 1] = newMob
 
-				Hydrate(newMob)({
+				Hydrate(newMob.TargetPlayers)({
 					[OnEvent("ChildAdded")] = _addPlr,
 					[OnEvent("ChildRemoved")] = _removePlr
 				})

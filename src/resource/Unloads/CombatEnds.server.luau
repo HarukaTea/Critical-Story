@@ -19,7 +19,7 @@ local instanceNew = Instance.new
 local function combatEnds()
     monster.Attack.Disabled = true
 
-    local attackFolder = monster.Holder.Value :: Folder?
+    local attackFolder = monster.AttackHolder.Value :: Folder?
     local continueCombatCheck = false
 
     --- another issue, don't change this else it will bug

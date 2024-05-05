@@ -17,7 +17,7 @@ wait(0.3)
 local blast = model.Projectile.Value:Clone() :: Model
 blast.Owner.Value = model.Owner.Value
 blast:PivotTo(model.Base.CFrame)
-blast.Parent = char.Holder.Value
+blast.Parent = char.AttackHolder.Value
 
 for _, descendant in blast:GetDescendants() do
     if descendant:IsA("BasePart") and not descendant:GetAttribute("BombCore") then

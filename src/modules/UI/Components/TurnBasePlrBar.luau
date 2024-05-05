@@ -55,8 +55,8 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                 Size = fromScale(0.18, 1),
 
                 Position = Tween(Computed(function(use)
-                    if use(self.targetingMob) and use(self.targetingMob):FindFirstChild("TargetingList") then
-                        if use(self.targetingMob).TargetingList:FindFirstChild(char.Name) then
+                    if use(self.targetingMob) and use(self.targetingMob):FindFirstChild("TargetPlayers") then
+                        if use(self.targetingMob).TargetPlayers:FindFirstChild(char.Name) then
                             return fromScale(0, 0)
                         else
                             return fromScale(-0.3, 0)
