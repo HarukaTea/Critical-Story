@@ -50,7 +50,7 @@ local function QuestBar(quest: IntValue) : Frame
                 Text = StoryBook[questType][quest.Value].Name,
 
                 [Children] = {
-                    Components.TextUIStroke({ Thickness = 2.5 })
+                    Components.TextUIStroke({ Thickness = 2 })
                 }
             }),
             Components.TextLabel({
@@ -61,7 +61,7 @@ local function QuestBar(quest: IntValue) : Frame
                 Text = StoryBook[questType][quest.Value].Target,
 
                 [Children] = {
-                    Components.TextUIStroke({ Thickness = 2.5 })
+                    Components.TextUIStroke({ Thickness = 2 })
                 }
             })
         }

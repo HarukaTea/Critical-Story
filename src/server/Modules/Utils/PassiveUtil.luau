@@ -137,6 +137,8 @@ function PassiveUtil:ClearAllPassives(char: Model)
         char:SetAttribute(attribute, nil)
     end
     char.CharStats.ExtraOrbs:ClearAllChildren()
+    local light = char.PrimaryPart:FindFirstChildOfClass("PointLight")
+    if light then light:Destroy() end
 
     --- re-equip
     for attibute: string, value: any in char.CharStats.Items:GetAttributes() do

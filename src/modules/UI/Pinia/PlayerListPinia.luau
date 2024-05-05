@@ -11,7 +11,7 @@ local Value = Fusion.Value
 local fromScale = UDim2.fromScale
 
 local function PlayerListPinia(self: table)
-    self.list, self.desc = Value(), Value()
+    self.list = Value()
 
 	self.absSize, self.absContentSize = Value(90), Value(30)
 	self.players = Value({})
@@ -25,6 +25,11 @@ local function PlayerListPinia(self: table)
     self.userName = Value("")
     self.level = Value("")
     self.role = Value("")
+
+    self.playerItemIconList = {
+        Value("Null"), Value("Null"), Value("Null"),
+        Value("Null"), Value("Null"), Value("Null"), Value("Null")
+    }
 end
 
 return PlayerListPinia

@@ -23,15 +23,16 @@ local function mapValue(val: number, duration: number) : number
     return to
 end
 
-local function ProgressCircle(direction: string, effect: string, info: table) : Frame
-    local maxDuration = 0
+local function ProgressCircle(direction: string, effect: Script) : Frame
+    local maxTurn = 0
+	local turn = Fusion.Value(effect:GetAttribute("Turn"))
 
-    Fusion.Hydrate(info.Script)({
-        [Fusion.AttributeChange("Duration")] = function(newDuration: number)
-            if newDuration > maxDuration then maxDuration = newDuration end
+    Fusion.Hydrate(effect)({
+		[Fusion.AttributeChange("Turn")] = function(newTurn: number)
+			if newTurn >= maxTurn then maxTurn = newTurn end
 
-            info.Duration:set(newDuration)
-        end
+			turn:set(newTurn)
+		end
     })
 
     return Components.Frame({
@@ -53,7 +54,7 @@ local function ProgressCircle(direction: string, effect: string, info: table) : 
 				[Children] = {
 					Fusion.New("UIGradient")({
 						Rotation = Fusion.Computed(function(use)
-                            local mappedDuration = mapValue(use(info.Duration), maxDuration)
+                            local mappedDuration = mapValue(use(turn), maxTurn)
 							local angle = clamp(mappedDuration * 360, 0, 360)
 
 							return if direction == "Left" then clamp(angle, 180, 360) else clamp(angle, 0, 180)
@@ -70,20 +71,34 @@ local function ProgressCircle(direction: string, effect: string, info: table) : 
 	})
 end
 
-local function MonsterEffect(effect: string, info: table, self: table) : ImageLabel
+local function EffectIndicator(effect: Script) : ImageLabel
     return Components.ImageLabel({
-        Name = effect,
+        Name = effect.Name,
         BackgroundTransparency = 0,
-        Size = fromScale(0.22, 1),
-        Image = AssetBook.BuffImages[effect],
+        Size = fromScale(1, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+        Image = AssetBook.BuffImages[effect.Name],
 
         [Children] = {
             Components.RoundUICorner(),
 
-            ProgressCircle("Left", effect, info),
-            ProgressCircle("Right", effect, info)
+            ProgressCircle("Left", effect),
+            ProgressCircle("Right", effect),
+
+			Components.TextLabel({
+				Name = "Power",
+				AnchorPoint = v2New(0.5, 0),
+				Text = if effect:GetAttribute("Power") then effect:GetAttribute("Power").."X" else "",
+				Position = fromScale(0.5, 0.6),
+				Size = fromScale(1.2, 0.5),
+				ZIndex = 3,
+
+				[Children] = {
+					Components.TextUIStroke({ Thickness = 2.5 })
+				}
+			})
         }
     })
 end
 
-return MonsterEffect
+return EffectIndicator

@@ -50,7 +50,6 @@ local function AdventurerStatsPinia(self: table)
         Magic = Value(char:GetAttribute("Magic")),
     }
 
-	self.shadowTrans = Value(1)
 	self.Add, self.Empty = Bin()
 
 	self.charClassInfo = {

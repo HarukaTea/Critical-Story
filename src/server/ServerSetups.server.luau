@@ -115,7 +115,6 @@ local function mainSetup()
 		cageHolder.Name = "CageHolder"
 		cageHolder.Parent = child
 
-		resources.Unloads.CombatEnds:Clone().Parent = child
 		resources.Unloads.MonsterData:Clone().Parent = child
 	end
 	for _, child: Model in package.MonsterAttacks:GetDescendants() do
@@ -124,11 +123,7 @@ local function mainSetup()
 		end
 	end
 	for _, locator: Instance in workspace.Monsters:GetDescendants() do
-		if locator:HasTag("MonsterLocation") then
-			RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
-
-			ServerUtil:SetupMonster(locator)
-		end
+		if locator:HasTag("MonsterLocation") then ServerUtil:SetupMonster(locator) end
 	end
 
 	--- player attacks setups

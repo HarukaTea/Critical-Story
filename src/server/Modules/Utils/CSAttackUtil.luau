@@ -8,7 +8,7 @@ local SSS = game:GetService("ServerScriptService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 
 local random = math.random
 
@@ -32,7 +32,7 @@ function CSAttackUtil:DealDMG(plr: Player)
     Events.ClassClientVFX:Fire(plr, monster)
 
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CSAttackUtil.Warrior(plr: Player)

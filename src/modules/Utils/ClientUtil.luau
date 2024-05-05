@@ -10,7 +10,6 @@ local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local cfNew = CFrame.new
@@ -58,7 +57,7 @@ end
     Hit by monsters
 ]]
 function ClientUtil:CharOnHit(char: Model)
-    Spawn(function()
+    pcall(function()
         local hitEff = RepS.Package.Effects.HitEffect:Clone() :: BasePart
         hitEff.CFrame = char.Torso.CFrame
         hitEff.Effect.Image.Rotation = random(1, 360)
@@ -153,8 +152,6 @@ function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
     local function _setExVisibleState(ui: ScreenGui, state: boolean)
 		ui.BG.Visible = state
 		ui.Shadow.Visible = state
-
-        if state then workspace.Sounds.SFXs[if ui.Name == "Backpack" then "Equip" else "MapOpen"]:Play() end
 	end
 	local function _setOthersVisibleState(state: boolean)
 		plrGui.AdventurerStats.Enabled = state

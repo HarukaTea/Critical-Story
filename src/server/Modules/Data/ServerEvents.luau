@@ -33,7 +33,6 @@ local Events = {
 	NewQuest = Warp("NewQuest"),
 	PlaySound = Warp("PlaySound"),
 	PlayAnimation = Warp("PlayAnimation"),
-	RefreshBackpack = Warp("RefreshBackpack"),
 	RejoinRequest = Warp("RejoinRequest"),
 	SwitchScene = Warp("SwitchScene"),
 	UseItem = Warp("UseItem"),

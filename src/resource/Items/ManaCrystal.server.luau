@@ -2,18 +2,18 @@
 --!optimize 2
 --!native
 
-local HarukaLib = require(game:GetService("ReplicatedStorage").Modules.Packages.HarukaLib)
+local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
+
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
+local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local char = script.Parent.Parent.Parent :: Model
 
-local wait = task.wait
-local floor = math.floor
+script:SetAttribute("Turn", math.huge)
 
-while wait(1) do
-	local currentMana = char:GetAttribute("Mana") :: number
-	local maxMana = char:GetAttribute("MaxMana") :: number
-
-	if currentMana < maxMana then
-        HarukaLib:Add(char, "Mana", floor(maxMana * 0.05))
-    end
-end
+Fusion.Hydrate(script)({
+	[Fusion.AttributeChange("Turn")] = function()
+		BuffEffectsUtil:RestoreTP(char, 10)
+	end
+})

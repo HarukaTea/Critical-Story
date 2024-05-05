@@ -6,11 +6,8 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local char = script.Parent.Parent.Parent :: Model
 
-local light = RepS.Package.Effects.Light:Clone() :: PointLight
-light.Enabled = true
-light.Parent = char.PrimaryPart
-
-local function onDestroyed()
-    light:Destroy()
+if not char.PrimaryPart:FindFirstChildOfClass("PointLight") then
+    local light = RepS.Package.Effects.Light:Clone() :: PointLight
+    light.Enabled = true
+    light.Parent = char.PrimaryPart
 end
-script.Destroying:Connect(onDestroyed)

@@ -6,10 +6,10 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
@@ -21,20 +21,19 @@ local cfLookAt = CFrame.lookAt
 local fromRGB = Color3.fromRGB
 local floor = math.floor
 local one = Vector3.one
-local delay = task.delay
 
-local ITEM_ATTRIBUTES = { CD = 10, MANA_REQ = 100, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { TP_REQ = 50, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.MagicCasted:Fire(plr)
+Events.PlayAnimation:Fire(plr, "MagicCasted1")
 
 local fireBall = RepS.Package.MagicAssets.FireBall:Clone() :: Part
 fireBall.CFrame = char.PrimaryPart.CFrame
 fireBall.CFrame = cfLookAt(fireBall.Position, monster.PrimaryPart.Position)
-fireBall.Parent = workspace
+fireBall.Parent = char
 Debris:AddItem(fireBall, 5)
 
 local bv = instanceNew("BodyVelocity")
@@ -51,17 +50,14 @@ while wait(0.01) do
 		if (fireBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			SkillUtil:Burn(plr, monster, 4)
-			SkillUtil:MagicVFX(monster)
+			BuffEffectsUtil:Burn(char, monster, 1)
+			BuffEffectsUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			fireBall.Spirit.Enabled = false
 			fireBall.CFrame = monster.PrimaryPart.CFrame
 			fireBall.Anchored = true
-
-			delay(1, function()
-				fireBall:Destroy()
-			end)
+			Debris:AddItem(fireBall, 1)
 
 			Events.ClientTween:Fires({ fireBall }, { Size = one * 9, Transparency = 1 }, "one")
 

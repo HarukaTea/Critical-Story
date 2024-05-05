@@ -14,7 +14,7 @@ local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local function PlayerItemSlot(id: string): ImageLabel
+local function PlayerItemSlot(id: number, self: table): ImageLabel
     local POSITIONS = {
         fromScale(0.164, 0.391),
         fromScale(0.401, 0.391),
@@ -30,7 +30,11 @@ local function PlayerItemSlot(id: string): ImageLabel
 		BackgroundColor3 = color3New(),
 		Position = POSITIONS[id],
 		Size = fromScale(0.19, 0.165),
-		Image = ItemBook.ItemImagesEx.Null,
+
+		Image = Computed(function(use)
+            return if use(self.playerItemIconList[id]) == "Null" then
+                ItemBook.ItemImagesEx.Null else "rbxassetid://"..ItemBook:FindItem(use(self.playerItemIconList[id])).Icon
+        end),
 
 		[Children] = {
 			Components.RoundUICorner(),
@@ -49,8 +53,6 @@ local function PlayerDescFrame(self: table) : Frame
         Visible = Fusion.Computed(function(use)
             return use(self.playerDescVisible)
         end),
-
-        [Fusion.Ref] = self.desc,
 
         [Children] = {
             Components.Frame({
@@ -119,13 +121,13 @@ local function PlayerDescFrame(self: table) : Frame
                 BackgroundTransparency = 0.7
             }),
 
-            PlayerItemSlot(1),
-            PlayerItemSlot(2),
-            PlayerItemSlot(3),
-            PlayerItemSlot(4),
-            PlayerItemSlot(5),
-            PlayerItemSlot(6),
-            PlayerItemSlot(7),
+            PlayerItemSlot(1, self),
+            PlayerItemSlot(2, self),
+            PlayerItemSlot(3, self),
+            PlayerItemSlot(4, self),
+            PlayerItemSlot(5, self),
+            PlayerItemSlot(6, self),
+            PlayerItemSlot(7, self),
 
             Components.TextLabel({
                 Name = "Role",

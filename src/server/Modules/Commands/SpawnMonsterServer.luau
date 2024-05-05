@@ -45,7 +45,6 @@ return function (context: table, monster: string, level: number, amount: number)
     locator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
     locator.Parent = workspace.Monsters
 
-    RepS.Package.Unloads.CombatEnd:Clone().Parent = locator
     local spawnedMonster = ServerUtil:SetupMonster(locator, levelWant)
 
     spawnedMonster:SetAttribute("InCombat", true)
@@ -64,8 +63,6 @@ return function (context: table, monster: string, level: number, amount: number)
         subLocator:SetAttribute("Levels", levelWant)
         subLocator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
         subLocator.Parent = locator
-
-        RepS.Package.Unloads.CombatEnd:Clone().Parent = subLocator
 
         ServerUtil:SetupMonster(subLocator, levelWant)
     end

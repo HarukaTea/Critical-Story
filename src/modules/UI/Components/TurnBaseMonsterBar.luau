@@ -9,8 +9,10 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Children, Tween, Computed, Value, New, OnEvent =
-    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.New, Fusion.OnEvent
+local TurnBaseEffectList = require(RepS.Modules.UI.Views.TurnBaseEffectList)
+
+local Children, Tween, Computed, Value, New, OnEvent, Hydrate =
+    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.New, Fusion.OnEvent, Fusion.Hydrate
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -19,6 +21,7 @@ local fromRGB = Color3.fromRGB
 local udimNew = UDim.new
 local insert, tFind = table.insert, table.find
 local clamp = math.clamp
+local wait = task.wait
 
 local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
     local info = {
@@ -27,16 +30,18 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
 
         Targeting = Value(if self.charData.TargetMonster.Value == monster then true else false),
         HP = Value(monster:GetAttribute("Health")),
-        MaxHP = Value(monster:GetAttribute("MaxHealth"))
+        MaxHP = Value(monster:GetAttribute("MaxHealth")),
+
+        EffectsList = Value({})
     }
-    Fusion.Hydrate(self.charData.TargetMonster)({
+    Hydrate(self.charData.TargetMonster)({
 		[Fusion.OnChange("Value")] = function(newTarget: Model?)
 			if not newTarget then return end
 
 			info.Targeting:set(monster == newTarget)
 		end
 	})
-	Fusion.Hydrate(monster)({
+	Hydrate(monster)({
 		[Fusion.AttributeChange("Health")] = function(hp: number)
 			info.HP:set(hp)
 
@@ -46,6 +51,15 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
 			info.MaxHP:set(hp)
 		end
 	})
+
+    local function _setEffectsChildren()
+		wait()
+		info.EffectsList:set(monster.EffectsList:GetChildren())
+	end
+    Hydrate(monster.EffectsList)({
+        [Fusion.OnEvent("ChildAdded")] = _setEffectsChildren,
+        [Fusion.OnEvent("ChildRemoved")] = _setEffectsChildren
+    })
 
     return Components.Frame({
         Name = monster.Name,
@@ -195,7 +209,9 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
                                 }
                             })
                         }
-                    })
+                    }),
+
+                    TurnBaseEffectList("Monster", info)
                 }
             }),
         }

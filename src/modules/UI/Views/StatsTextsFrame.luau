@@ -71,10 +71,9 @@ local function StatText(id: string, self: table) : TextLabel
             charDMGStats.MaxDMG:set(newDMG)
         end,
         [AttributeChange("Magic")] = function(newMagic: number)
-            charDMGStats.MinDMG:set(newMagic)
+            charDMGStats.Magic:set(newMagic)
         end,
     })
-    charDMGStats.MinDMG:set(char:GetAttribute("MinDMG"), true) --// This often doesn't work when joined the game
 
     return Components.TextLabel({
         Name = id.."Text",

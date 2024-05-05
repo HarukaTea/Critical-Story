@@ -25,6 +25,7 @@ local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
+local PlayerEffectsList = require(RepS.Modules.UI.Views.PlayerEffectsList)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
@@ -121,6 +122,7 @@ return function(plr: Player)
 					ClassFrame(self),
 					ChatFrame(self),
 					StatsTextsFrame(self),
+					PlayerEffectsList(self)
 				},
 			}),
 			Components.Frame({
@@ -134,6 +136,7 @@ return function(plr: Player)
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					LocationTitleFrame(self),
+					LevelUpVFXFrame(self),
 				}
 			}),
 			Components.Frame({
@@ -144,7 +147,6 @@ return function(plr: Player)
 				[Children] = {
 					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
-					LevelUpVFXFrame(self),
 					PromptsFrame(self),
 					ItemAcquiredFrame(self),
 					QuestFrame(self),
@@ -155,12 +157,6 @@ return function(plr: Player)
 					ClassAbilityIndicator(self, "Knight"),
 					ClassAbilityIndicator(self, "Rogue"),
 				}
-			}),
-			Components.Frame({
-				Name = "Shadow",
-				BackgroundTransparency = Fusion.Tween(Computed(function(use)
-					return use(self.shadowTrans)
-				end), AssetBook.TweenInfos.twiceHalf),
 			})
 		},
 	})
@@ -186,7 +182,7 @@ return function(plr: Player)
 	local function _autoEquipItems()
 		for _, item in self.inventory:GetChildren() do
 			if item.Value > 0 and item:GetAttribute("Equipped") then
-				Events.EquipItems:Fire(ItemBook:FindItem(item).Type, item:GetAttribute("Slot"), item.Name)
+				Events.EquipItems:Fire(ItemBook:FindItem(item.Name).Type, item:GetAttribute("Slot"), item.Name)
 			end
 		end
 	end
@@ -291,7 +287,6 @@ return function(plr: Player)
 		CAS:UnbindAction("ChangeMobTargetRAlt")
 
 		Events.EquipItems:DisconnectAll()
-		Events.RefreshBackpack:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()
 		Events.LevelUp:DisconnectAll()
 		Events.NPCChat:DisconnectAll()

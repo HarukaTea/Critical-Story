@@ -59,7 +59,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 				Text = player.DisplayName,
 
 				TextColor3 = Computed(function(use)
-					return if use(role) ~= "" then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+					return if use(role) ~= "" or not use(role) then fromRGB(170, 255, 255) else color3New(1, 1, 1)
 				end),
 
 				[Children] = {
@@ -73,7 +73,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 				ZIndex = 2,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
-					local list, desc = Fusion.peek(self.list) :: Frame, Fusion.peek(self.desc) :: Frame
+					local list = Fusion.peek(self.list) :: Frame
 
 					for _, element: Frame in list:GetChildren() do
 						if element:IsA("Frame") then
@@ -83,9 +83,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 							element.PlayerName.TextColor3 = roleColor
 						end
 					end
-					for _, element: ImageLabel in desc:GetChildren() do
-						if sFind(element.Name, "Slot") then element.Image = ItemBook.ItemImagesEx.Null end
-					end
+					for _, element: any in self.playerItemIconList do element:set("Null", true) end
 
 					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
 					list[player.Name].PlayerName.TextColor3 = color3New()
@@ -104,12 +102,12 @@ local function PlayerSlot(self: table, player: Player): Frame
 					local items = player:WaitForChild("Inventory", 999) :: Folder
 
 					for _, item: IntValue in items:GetChildren() do
-						local itemInfo = ItemBook:FindItem(item)
+						local itemInfo = ItemBook:FindItem(item.Name)
 
 						if itemInfo.Type == "Passive" and item:GetAttribute("Equipped") then
 							local index = tonumber(match(item:GetAttribute("Slot"), "%d"))
 
-							desc["Slot"..index].Image = "rbxassetid://"..itemInfo.Icon
+							self.playerItemIconList[index]:set(item.Name, true)
 						end
 					end
 

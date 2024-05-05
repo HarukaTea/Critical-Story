@@ -10,14 +10,17 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 
-local Children, Tween, Computed, New, OnEvent, Value =
-    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.New, Fusion.OnEvent, Fusion.Value
+local TurnBaseEffectList = require(RepS.Modules.UI.Views.TurnBaseEffectList)
+
+local Children, Tween, Computed, New, OnEvent, Value, Hydrate =
+    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.New, Fusion.OnEvent, Fusion.Value, Fusion.Hydrate
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local udimNew = UDim.new
 local clamp = math.clamp
+local wait = task.wait
 
 local function TurnBasePlrBar(char: Model, self: table) : Frame
     local plr = Players:GetPlayerFromCharacter(char)
@@ -27,10 +30,12 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
 
         HP = Value(char.Humanoid.Health),
         MaxHP = Value(char.Humanoid.MaxHealth),
-        NextAction = Value("")
+        NextAction = Value(""),
+
+        EffectsList = Value({})
     }
 
-    Fusion.Hydrate(char.Humanoid)({
+    Hydrate(char.Humanoid)({
         [Fusion.OnChange("Health")] = function(newHP: number)
             info.HP:set(newHP)
         end,
@@ -38,10 +43,19 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
             info.MaxHP:set(newHP)
         end
     })
-    Fusion.Hydrate(plr)({
+    Hydrate(plr)({
         [Fusion.AttributeChange("NextAction")] = function(newAction: string)
             info.NextAction:set(newAction)
         end
+    })
+
+    local function _setEffectsChildren()
+		wait()
+		info.EffectsList:set(char.CharStats.EffectsList:GetChildren())
+	end
+    Hydrate(char.CharStats.EffectsList)({
+        [Fusion.OnEvent("ChildAdded")] = _setEffectsChildren,
+        [Fusion.OnEvent("ChildRemoved")] = _setEffectsChildren
     })
 
     return Components.Frame({
@@ -203,7 +217,9 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                                 }
                             })
                         }
-                    })
+                    }),
+
+                    TurnBaseEffectList("Player", info)
                 }
             })
         }

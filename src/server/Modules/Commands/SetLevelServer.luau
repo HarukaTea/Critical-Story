@@ -19,6 +19,7 @@ return function (_, players: table, level: number)
         return "The level cap is 125 bro!"
     else
         for _, plr: Player in players do
+            plr:SetAttribute("EXP", 0)
             plr:SetAttribute("DMGPoints", 0)
             plr:SetAttribute("MagicPoints", 0)
             plr:SetAttribute("HealthPoints", 0)

@@ -19,7 +19,6 @@ local wait = task.wait
 local function LevelUpVFXFrame(self: table) : Frame
     local function _showLvlUpVFX()
 		self.levelUpShown:set(true)
-		self.shadowTrans:set(0.15)
 
 		wait(0.2)
 		self.levelUpPos:set(fromScale(0.42, 0))
@@ -31,7 +30,6 @@ local function LevelUpVFXFrame(self: table) : Frame
 		self.levelUpShown:set(false)
 		self.levelUpPos:set(fromScale(0.55, 0))
 		self.levelUpTitleShown:set(false)
-		self.shadowTrans:set(1)
 	end
 	Events.LevelUp:Connect(_showLvlUpVFX)
 
@@ -46,7 +44,8 @@ local function LevelUpVFXFrame(self: table) : Frame
             Components.Frame({
                 Name = "Level",
                 AnchorPoint = v2New(0.5, 0),
-                Size = fromScale(0.039, 1),
+                Size = fromScale(1, 1),
+                SizeConstraint = Enum.SizeConstraint.RelativeYY,
                 BackgroundTransparency = 0,
 
                 Position = Fusion.Tween(Computed(function(use)
@@ -76,7 +75,7 @@ local function LevelUpVFXFrame(self: table) : Frame
                 Position = fromScale(0.468, 0.149),
                 Size = fromScale(0.15, 0.615),
                 Text = "LEVEL UP!",
-                TextColor3 = fromRGB(255, 255, 0),
+                TextColor3 = fromRGB(255, 255, 127),
                 TextXAlignment = Enum.TextXAlignment.Left,
 
                 Visible = Computed(function(use)

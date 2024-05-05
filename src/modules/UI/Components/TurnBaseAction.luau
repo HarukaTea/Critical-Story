@@ -51,9 +51,11 @@ local function TurnBaseAction(id: string, self: table) : Frame
 
                     if id == "Items" then
                         self.itemPanelVisible:set(not Fusion.peek(self.itemPanelVisible))
+                        self.skillPanelVisible:set(false)
 
                     elseif id == "Skills" then
                         self.skillPanelVisible:set(not Fusion.peek(self.skillPanelVisible))
+                        self.itemPanelVisible:set(false)
 
                     else
                         self.actionClickCD = true

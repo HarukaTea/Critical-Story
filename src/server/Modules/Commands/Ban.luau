@@ -8,9 +8,9 @@ return {
     Group = "Moderators",
     Args = {
         {
-            Type = "player",
+            Type = "string",
             Name = "player",
-            Description = "The player you wanna ban"
+            Description = "The player's username you wanna ban"
         },
         {
             Type = "number",

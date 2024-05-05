@@ -51,6 +51,13 @@ local function SettingsFrame(self: table): Frame
 						child.Material = Enum.Material.Plastic
 					end
 				end
+				for _, child: Instance in workspace.MapComponents:GetDescendants() do
+					if child:IsA("BasePart") or child:IsA("UnionOperation") then
+						potatoStoreParts[child] = child.Material
+
+						child.Material = Enum.Material.Plastic
+					end
+				end
 			end
 		end,
 		[AttributeChange("PlayerList")] = function(state: boolean)

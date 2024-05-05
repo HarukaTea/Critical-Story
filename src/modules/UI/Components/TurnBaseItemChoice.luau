@@ -1,0 +1,106 @@
+--!nocheck
+--!optimize 2
+--!native
+
+local RepS = game:GetService("ReplicatedStorage")
+
+local Components = require(RepS.Modules.UI.Vanilla)
+local Events = require(RepS.Modules.Data.Events)
+local Fusion = require(RepS.Modules.Packages.Fusion)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
+
+local Value, OnEvent, Computed = Fusion.Value, Fusion.OnEvent, Fusion.Computed
+
+local v2New = Vector2.new
+local fromScale = UDim2.fromScale
+local wait = task.wait
+local fromRGB, fromHex = Color3.fromRGB, Color3.fromHex
+
+local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
+    local isSelecting = Value(false)
+
+    local itemAmount
+    if id == "Items" then
+        itemAmount = Value(self.inventory[item].Value)
+
+        Fusion.Hydrate(self.inventory[item])({
+            [Fusion.OnChange("Value")] = function(newAmount: number)
+                itemAmount:set(newAmount)
+            end
+        })
+    end
+
+    return Components.Frame({
+        Name = item,
+        BackgroundTransparency = 0,
+        Size = fromScale(0.95, 0.224),
+
+        [Fusion.Children] = {
+            Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 6.158 }),
+            Components.RoundUICorner(),
+            Components.UIStroke({
+                Thickness = 2.3,
+
+                Enabled = Computed(function(use)
+                    return use(isSelecting)
+                end)
+            }),
+            Components.ImageLabel({
+                Name = "Icon",
+                Size = fromScale(1, 1),
+                SizeConstraint = Enum.SizeConstraint.RelativeYY,
+                Image = "rbxassetid://"..ItemBook:FindItem(item).Icon,
+
+                [Fusion.Children] = { Components.RoundUICorner() }
+            }),
+            Components.TextLabel({
+                Name = "Item",
+                AnchorPoint = v2New(0, 0.5),
+                Position = fromScale(0.2, 0.5),
+                Size = fromScale(0.712, 0.6),
+                TextXAlignment = Enum.TextXAlignment.Left,
+
+                Text = Computed(function()
+                    return ItemBook:FindItem(item).Name
+                end),
+            }),
+            Components.TextLabel({
+                Name = if id == "Items" then "Amount" else "TP",
+                AnchorPoint = v2New(0, 0.5),
+                Position = fromScale(0.2, 0.5),
+                Size = fromScale(0.712, 0.6),
+                TextXAlignment = Enum.TextXAlignment.Right,
+                TextColor3 = if id == "Items" then fromHex("#eccc68") else fromRGB(0, 255, 255),
+
+                Text = Computed(function(use)
+                    return if id == "Items" then "x"..use(itemAmount) else ItemBook:FindItem(item).TP.."%"
+                end),
+            }),
+
+            Components.HoverImageButton({
+                [OnEvent("MouseEnter")] = function()
+                    isSelecting:set(true)
+                end,
+                [OnEvent("MouseLeave")] = function()
+                    isSelecting:set(false)
+                end,
+                [OnEvent("MouseButton1Click")] = function()
+                    if self.actionClickCD then return end
+
+                    self.actionClickCD = true
+                    self.panelPos:set(fromScale(0.5, 5))
+                    self.transHPBarSize:set(fromScale(0, 0.875))
+                    self.itemPanelVisible:set(false)
+                    self.skillPanelVisible:set(false)
+
+                    Events.NextActionRequest:Fire("Items", item)
+
+                    wait(1)
+                    self.actionClickCD = false
+                end
+            })
+        }
+    })
+end
+
+return TurnBaseItemChoice

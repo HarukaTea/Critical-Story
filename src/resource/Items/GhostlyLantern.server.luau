@@ -23,13 +23,13 @@ local v3New = Vector3.new
 local random = math.random
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local ITEM_ATTRIBUTES = { CD = 10, MANA_REQ = 600, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { TP_REQ = 60, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.MagicCasted:Fire(plr)
+Events.PlayAnimation:Fire("MagicCasted1")
 
 local lantern = RepS.Package.MagicAssets.GhostlyLantern.Lantern:Clone() :: MeshPart
 lantern.CFrame = char.Torso.CFrame * cfNew(0,0,-4)
@@ -58,7 +58,7 @@ pcall(function()
 
 		Spawn(function()
 			Spawn(function()
-				for j = 1, 10 do
+				for _ = 1, 10 do
 					local numSeq = nsNew({nsKPNew(0, 0.5+i, 2), nsKPNew(1, 0.5+i, 2)})
 					beamPart.Beam.Transparency = numSeq
 					wait(0.1)

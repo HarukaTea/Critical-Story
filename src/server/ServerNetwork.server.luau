@@ -155,7 +155,7 @@ local function addPoint(plr: Player, option: string, times: number)
 		local cost = (level * LEVEL_POINT - plr:GetAttribute("LvPoints")) * 20
 
 		if plr:GetAttribute("Gold") < cost then
-			Events.CreateHint:Fire(plr, "You don't have enough Gold to reset!", "Error")
+			Events.CreateHint:Fire(plr, "You don't have enough Gold to reset!")
 			return
 		end
 
@@ -210,8 +210,7 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 		end
 		equipNewItem(plr, item, itemSlot)
 
-		Events.RefreshBackpack:Fire(plr)
-		Events.EquipItems:Fire(plr, itemType, itemSlot, item)
+		Events.EquipItems:Fire(plr, itemSlot, item)
 
 	elseif itemType == "ClearPassive" and item ~= "" then
 		char.CharStats.Items:SetAttribute(item.."_PASSIVE", false)
@@ -219,7 +218,7 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 
 		unequipCheck(plr, item)
 
-		Events.RefreshBackpack:Fire(plr)
+		Events.EquipItems:Fire(plr, itemSlot, "Null")
 	end
 end
 Events.EquipItems:Connect(equipItem)
@@ -232,11 +231,7 @@ local function _essentialCheck(plr: Player, item: string) : string
 end
 local function useItem(plr: Player, item: string)
 	if RepS.Resources.Items:FindFirstChild(item) and _essentialCheck(plr, item) then
-		local charStats = plr.Character.CharStats :: Folder
-
-		if charStats.Items:FindFirstChild(item) then return end
-
-		RepS.Resources.Items[item]:Clone().Parent = charStats.Items
+		RepS.Resources.Items[item]:Clone().Parent = plr.Character.CharStats.Items
 	end
 end
 Events.UseItem:Connect(useItem)

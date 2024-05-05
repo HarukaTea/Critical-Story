@@ -12,7 +12,6 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local Promise = require(RepS.Modules.Packages.Promise)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
@@ -168,9 +167,9 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", floor(level ^ 2.2) + 49)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2) + 49)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", (floor(level ^ 1.25) + 25) * if workspace:GetAttribute("2XEXPEvent") then 2 else 1)
+	monster:SetAttribute("EXP", (floor(level ^ 1.2) + 25) * if workspace:GetAttribute("2XEXPEvent") then 2 else 1)
 	monster:SetAttribute("Damage", 5 * level)
 	monster:SetAttribute("InCombat", false)
 
@@ -295,13 +294,16 @@ function ServerUtil:FindAllIgnoreParts() : table
 	local ignore = {}
 
 	for _, child in workspace.Monsters:GetDescendants() do
-		if child:HasTag("Monster") and child.PrimaryPart then insert(ignore, child) end
+		if child:HasTag("Monster") then insert(ignore, child) end
 	end
 	for _, plr in Players:GetPlayers() do
 		if plr.Character then insert(ignore, plr.Character) end
 	end
 	for _, child in workspace.MapComponents.CombatFolders:GetChildren() do
-		if child:HasTag("CombatHolder") then insert(ignore, child) end
+		insert(ignore, child)
+	end
+	for _, child in workspace.MapComponents.OrbFolders:GetChildren() do
+		insert(ignore, child)
 	end
 
 	return ignore
@@ -453,22 +455,6 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	end
 
 	Events.GiveDrop:Fire(plr, item)
-	Events.RefreshBackpack:Fire(plr)
-end
-
---[[
-	Refresh the AdventureStats UI, though the name is RefreshBackpack lol
-]]
-function ServerUtil:RefreshBackpack(plr: Player, item: string, cd: number, isSkill: boolean?)
-	if not isSkill then plr.Inventory[item].Value -= 1 end
-
-	Events.RefreshBackpack:Fire(plr)
-
-	if plr.Inventory[item].Value == 0 then
-		plr.Inventory[item]:Destroy()
-
-		Events.RefreshBackpack:Fire(plr)
-	end
 end
 
 --[[
@@ -480,16 +466,16 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 
 	if attributes.COMBAT_REQ then
 		if not char:GetAttribute("InCombat") or not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then
-			Events.CreateHint:Fire(plr, "You can only use this during combat!", "Error")
+			Events.CreateHint:Fire(plr, "You can only use this during combat!")
 
 			wait()
 			script:Destroy()
 			return false
 		end
 	end
-	if attributes.MANA_REQ then
-		if SkillUtil:ManaCheck(plr, attributes.MANA_REQ) == false then
-			Events.CreateHint:Fire(plr, "You don't have enough Mana!", "Error")
+	if attributes.TP_REQ then
+		if char:GetAttribute("TP") < attributes.TP_REQ then
+			Events.CreateHint:Fire(plr, "You don't have enough TP!")
 
 			wait()
 			script:Destroy()
@@ -504,11 +490,10 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 		end
 	end
 
-	Debris:AddItem(script, attributes.CD)
+	Debris:AddItem(script, 5)
 
-	if not attributes.CLASS_UNIQUE then
-		ServerUtil:RefreshBackpack(plr, item, attributes.CD, ItemBook:FindItem(item).IsSkill)
-	end
+	if ItemBook:FindItem(item).IsCM then plr.Inventory[item].Value -= 1 end
+	if plr.Inventory[item].Value <= 0 then plr.Inventory[item]:Destroy() end
 
 	return true
 end

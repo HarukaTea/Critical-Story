@@ -9,7 +9,7 @@ local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local Promise = require(RepS.Modules.Packages.Promise)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 
@@ -97,8 +97,8 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 					--- pass or defend
 					plr:SetAttribute("NextAction", "Defend")
 
-					SkillUtil:DefenseBuff(plr, 30, 1)
-					SkillUtil:RestoreTP(plr, 30)
+					BuffEffectsUtil:DefenseBuff(plr.Character, 30, 1)
+					BuffEffectsUtil:RestoreTP(plr.Character, 30)
 				end
 			end)
 		end

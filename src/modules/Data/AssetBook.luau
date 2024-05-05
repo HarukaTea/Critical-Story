@@ -152,7 +152,9 @@ AssetBook.BuffImages = {
     AttackBuff = "rbxassetid://2965862892",
     MagicBuff = "rbxassetid://2965863231",
     Burn = "rbxassetid://12218488404",
-    Poison = "rbxassetid://12371171272"
+    Poison = "rbxassetid://12371171272",
+    Speed = "",
+    Jump = ""
 }
 
 AssetBook.BuffColors = {

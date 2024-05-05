@@ -22,7 +22,7 @@ local function BottomProgressBar(id: string, self: table) : Frame
         [Fusion.Children] = {
             Fusion.New("Frame")({
                 Name = "Bar",
-                BackgroundTransparency = 0.4,
+                BackgroundTransparency = 0.2,
                 BackgroundColor3 = if id == "EXP" then fromRGB(217, 193, 144) else fromRGB(255, 255, 255),
 
                 Size = Fusion.Tween(Fusion.Computed(function(use)

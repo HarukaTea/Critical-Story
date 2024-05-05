@@ -7,7 +7,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local ExCategoryOpenBtn = require(RepS.Modules.UI.Components.ExCategoryOpenBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
@@ -16,53 +15,21 @@ local Children, peek = Fusion.Children, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
-local sFind, match = string.find, string.match
+local match = string.match
 
 local function ClassFrame(self: table) : Frame
-    local function _equipItem(type: string, slot: string, item: string)
+
+    local function _equipItem(slot: string, item: string)
 		local itemSlot = peek(self.classFrame):FindFirstChild(slot, true)
         if not itemSlot then return end
-        if not self.inventory:FindFirstChild(item) then return end
 
-		itemSlot:SetAttribute("Equipped", true)
-		itemSlot:SetAttribute("ItemEquipped", item)
+		itemSlot:SetAttribute("Equipped", if item == "Null" then false else true)
+		itemSlot:SetAttribute("ItemEquipped", if item == "Null" then nil else item)
 
         local index = tonumber(match(itemSlot.Name, "%d+"))
-		if type == "Passive" then
-            self.passiveIconList[tonumber(index)]:set(item, true)
-		end
+		self.passiveIconList[index]:set(item, true)
 	end
 	Events.EquipItems:Connect(_equipItem)
-
-    local function _refreshEquippedItems()
-		local classFrame, inventory = peek(self.classFrame), self.inventory
-
-		for _, element in classFrame:GetDescendants() do
-			if sFind(element.Name, "Passive") then
-                local index = tonumber(match(element.Name, "%d+"))
-
-				element:SetAttribute("Equipped", false)
-				element:SetAttribute("ItemEquipped", "")
-
-				self.passiveIconList[index]:set("Null", true)
-			end
-		end
-
-		for _, item in inventory:GetChildren() do
-			if item.Value > 0 and ItemBook:FindItem(item).Type == "Passive" and item:GetAttribute("Equipped") then
-				local slot = item:GetAttribute("Slot")
-				local itemSlot = classFrame:FindFirstChild(slot, true)
-                if not itemSlot then continue end
-
-                local index = tonumber(match(itemSlot.Name, "%d+"))
-                self.passiveIconList[index]:set(item.Name, true)
-
-				itemSlot:SetAttribute("Equipped", true)
-				itemSlot:SetAttribute("ItemEquipped", item.Name)
-			end
-		end
-	end
-	Events.RefreshBackpack:Connect(_refreshEquippedItems)
 
     return Components.Frame({
         Name = "ClassFrame",

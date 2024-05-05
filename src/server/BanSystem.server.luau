@@ -56,13 +56,13 @@ local function checkIsBanned(plr: Player)
 end
 Players.PlayerAdded:Connect(checkIsBanned)
 
-local function banRequest(plr: Player, duration: number, reason: string)
-    banList[plr.Name] = {
+local function banRequest(plr: string, duration: number, reason: string)
+    banList[plr] = {
         BannedTime = time(),
         Duration = duration,
         Reason = reason
     }
-    MS:PublishAsync("BanRequest", { plr.Name, duration, reason })
+    MS:PublishAsync("BanRequest", { plr, duration, reason })
 
     DS:SetAsync(SCOPE, banList)
 end

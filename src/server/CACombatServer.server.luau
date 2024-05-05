@@ -7,13 +7,13 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Promise = require(RepS.Modules.Packages.Promise)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 
 local floor, random = math.floor, math.random
 local fromRGB = Color3.fromRGB
@@ -47,10 +47,12 @@ local function combatStartSetup(plr: Player, monster: Model)
 		Promise.new(function(resolve, reject)
 			if char.Humanoid.Health <= 0 then reject() end
 
+			resolve()
+
 		end):andThen(function()
 			local maxPlayer = 0
 			for _, player: Player in Players:GetPlayers() do
-				if maxPlayer >= 4 then break end
+				if maxPlayer >= 3 then break end
 				if player == plr then continue end
 
 				pcall(function()
@@ -58,7 +60,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 						maxPlayer += 1
 
 						for _, mob in locator:GetDescendants() do
-							if mob:HasTag("Monster") and mob.PrimaryPart then ServerUtil:AddTargetForMonster(player, mob) end
+							if mob:HasTag("Monster") then ServerUtil:AddTargetForMonster(player, mob) end
 						end
 					end
 				end)
@@ -79,10 +81,10 @@ local function combatStartSetup(plr: Player, monster: Model)
 	--// Activate
 	for _, mob in locator:GetDescendants() do
 		if mob:HasTag("Monster") and mob.PrimaryPart then
+			ServerUtil:AddTargetForMonster(plr, mob)
+
 			if combatMode == "Public" then ServerUtil:MonsterActivateCombat(mob) continue end
 			if not mob:GetAttribute("InCombat") then ServerUtil:MonsterActivateCombat(mob) end
-
-			ServerUtil:AddTargetForMonster(plr, mob)
 		end
 	end
 
@@ -142,7 +144,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 			burn:Add("Burn", burnChance)
 			burn:Add("None", 100 - burnChance)
 
-			if burn:Roll() == "Burn" then SkillUtil:Burn(plr, monster, 6) end
+			if burn:Roll() == "Burn" then BuffEffectsUtil:Burn(char, monster, 6) end
 
 			burn:Destroy()
 		end
@@ -185,8 +187,8 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 	end
 
     --- some extra damage
-    if dmgPart:GetAttribute("Burn") then SkillUtil:Burn(plr, monster, 6, true) end
-    if dmgPart:GetAttribute("Poison") then SkillUtil:Poison(plr, monster, 6, true) end
+    if dmgPart:GetAttribute("Burn") then BuffEffectsUtil:Burn(char, monster, 6, true) end
+    if dmgPart:GetAttribute("Poison") then BuffEffectsUtil:Poison(char, monster, 6, true) end
 
     --- defense reduce
     dmg = floor(dmg * (100 - char:GetAttribute("Defense")) / 100)

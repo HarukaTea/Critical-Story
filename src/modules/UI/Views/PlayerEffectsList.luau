@@ -7,7 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local PlayerEffect = require(RepS.Modules.UI.Components.PlayerEffect)
+local EffectIndicator = require(RepS.Modules.UI.Components.EffectIndicator)
 
 local v2New = Vector2.new
 local udNew =  UDim.new
@@ -25,20 +25,20 @@ local function PlayerEffectsList(self: table) : Frame
 	})
 
     return Components.Frame({
-        Name = "EffectsFrame",
+        Name = "PlayerEffectsFrame",
         AnchorPoint = v2New(0.5, 0),
-        Position = fromScale(0.5, -1.5),
+        Position = fromScale(0.5, -1.6),
         Size = fromScale(1, 0.78),
 
         [Fusion.Children] = {
             Fusion.New("UIListLayout")({
-                Padding = udNew(0.01, 0),
+                Padding = udNew(0, 6),
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
                 FillDirection = Enum.FillDirection.Horizontal
             }),
             Fusion.ForValues(self.charStatsDict.EffectsList, function(_, effect: Script)
-                return PlayerEffect(effect)
+                return EffectIndicator(effect)
             end, Fusion.cleanup)
         }
     })

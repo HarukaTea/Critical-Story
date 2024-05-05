@@ -11,7 +11,7 @@ local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local CAAttackUtil = {}
@@ -87,7 +87,7 @@ function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 		CAAttackUtil:DealDMG(plr, monster, baseDamage)
 	end
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
@@ -117,7 +117,7 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
     end
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 function CAAttackUtil.ArcherArrow(plr: Player)
     local char = plr.Character
@@ -141,7 +141,7 @@ function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
         RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
     end
 
-    SkillUtil:RestoreManaByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
@@ -152,7 +152,7 @@ function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
 
     if char:GetAttribute("Guard") > 100 then char:SetAttribute("Guard", 100) end
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
@@ -168,7 +168,7 @@ function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
 
     if result == "CriticalHit" then char:SetAttribute("RogueCritical", 0) end
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
@@ -201,11 +201,11 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
 
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 
     Spawn(function()
         local char = plr.Character
@@ -264,27 +264,27 @@ end
 function CAAttackUtil.AlchemistRed(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 function CAAttackUtil.AlchemistBlue(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 function CAAttackUtil.AlchemistGreen(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    SkillUtil:RestoreTPByOrb(plr)
+    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
 
 function CAAttackUtil.FireStaff(plr: Player, monster: Model)
-    SkillUtil:Burn(plr, monster, 6)
+    BuffEffectsUtil:Burn(plr.Character, monster, 6)
 end
 
 return CAAttackUtil

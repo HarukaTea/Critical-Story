@@ -158,7 +158,7 @@ local function charAttributesSetup()
         char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
     end
     local function updateHP()
-        humanoid.MaxHealth = 30 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
+        humanoid.MaxHealth = 50 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
         humanoid.Health = humanoid.MaxHealth
     end
     local function updateSpeed(speed: number)
@@ -237,7 +237,7 @@ local function onDead()
     end
     char:SetAttribute("InCombat", false)
 
-    for _, monsterSymbol in char.CharStat.TargetMonsters:GetChildren() do
+    for _, monsterSymbol in char.CharStats.TargetMonsters:GetChildren() do
         pcall(function()
             for _, targetPlr in monsterSymbol.Value.TargetPlayers:GetChildren() do
                 if targetPlr.Value == char then targetPlr:Destroy() end

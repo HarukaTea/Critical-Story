@@ -6,34 +6,33 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local SkillUtil = require(SSS.Modules.Utils.SkillUtil)
 
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 local monster = char.CharStats.TargetMonster.Value :: Model
 
-local wait, delay = task.wait, task.delay
+local wait = task.wait
 local instanceNew = Instance.new
 local cfLookAt = CFrame.lookAt
 local fromRGB = Color3.fromRGB
-local floor = math.floor
 local v3New = Vector3.new
 
-local ITEM_ATTRIBUTES = { CD = 7, MANA_REQ = 50, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { TP_REQ = 40, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.MagicCasted:Fire(plr)
+Events.PlayAnimation:Fire(plr, "MagicCasted1")
 
 local fireBall = RepS.Package.MagicAssets.FoxFlameScroll.FireBall:Clone() :: BasePart
 fireBall.CFrame = char.PrimaryPart.CFrame
 fireBall.CFrame = cfLookAt(fireBall.Position, monster.PrimaryPart.Position)
-fireBall.Parent = workspace
+fireBall.Parent = char
 Debris:AddItem(fireBall, 5)
 
 local bv = instanceNew("BodyVelocity")
@@ -50,8 +49,8 @@ while wait() do
 		if (fireBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			SkillUtil:Burn(plr, monster, 6)
-			SkillUtil:MagicVFX(monster)
+			BuffEffectsUtil:Burn(char, monster, 2)
+			BuffEffectsUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
 			local eff = RepS.Package.MagicAssets.FoxFlameScroll.FoxBlast:Clone() :: BasePart
@@ -64,12 +63,9 @@ while wait() do
 			fireBall.Spirit.Enabled = false
 			fireBall.CFrame = monster.PrimaryPart.CFrame
 			fireBall.Anchored = true
+			Debris:AddItem(fireBall, 1)
 
 			Events.ClientTween:Fires({ fireBall }, { Size = v3New(9,9,9), Transparency = 1 }, "one")
-
-			delay(1, function()
-				fireBall:Destroy()
-			end)
 
 			local dmg = char:GetAttribute("Magic") :: number
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))
