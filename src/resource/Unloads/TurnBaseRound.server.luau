@@ -5,11 +5,12 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local CSAttackUtil = require(SSS.Modules.Utils.CSAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Promise = require(RepS.Modules.Packages.Promise)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 
@@ -18,6 +19,7 @@ local owner = cage:WaitForChild("Owner") :: ObjectValue
 
 local wait = task.wait
 local insert = table.insert
+local floor = math.floor
 
 local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 	local locator: BasePart, mainMonster: Model, targetPlayers : table
@@ -29,27 +31,36 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 	Promise.new(function()
 		locator = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
 
+		--// First round actions
 		_refreshTargets()
-
 		if isFirstRound then
 			local mobs = {}
 			for _, mob: Instance in locator:GetDescendants() do
-				if mob:HasTag("Monster") and mob.PrimaryPart then mobs[#mobs + 1] = mob end
+				if mob:HasTag("Monster") then mobs[#mobs + 1] = mob end
 			end
 
 			ServerUtil:SortMonsters(mobs, cage)
 		end
 
-		--// Player phase
+		--// Player phase ready
 		for _, plr: Player in targetPlayers do
 			Events.FreezePlayerControls:Fire(plr, "Freeze")
 			Events.CameraPointTo:Fire(plr, cage.Cam)
 		end
 		ServerUtil:SortPlayers(targetPlayers, monster, cage)
 
-		wait(2)
+		--// Player phase start
+		wait(1.5)
 		_refreshTargets()
-
+		--// Buff phase
+		for _, plr: Player in targetPlayers do
+			pcall(function()
+				for _, buff: Script in plr.Character.CharStats.EffectsList:GetChildren() do
+					HarukaLib:Add(buff, "Turn", -1)
+				end
+			end)
+		end
+		--// Selections phase
 		for _, plr: Player in targetPlayers do
 			plr:SetAttribute("NextAction", "")
 			plr:SetAttribute("NextItem", nil)
@@ -75,7 +86,6 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 
 		--// Player execution phase
 		_refreshTargets()
-
 		for _, plr: Player in targetPlayers do
 			Events.NewPhase:Fire(plr, "Execution")
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
@@ -95,10 +105,14 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 
 				else
 					--- pass or defend
+					local char = plr.Character
+
 					plr:SetAttribute("NextAction", "Defend")
 
-					BuffEffectsUtil:DefenseBuff(plr.Character, 30, 1)
-					BuffEffectsUtil:RestoreTP(plr.Character, 30)
+					BuffEffectsUtil:DefenseBuff(char, 10, 1)
+					BuffEffectsUtil:RestoreTP(char, 15)
+
+					HarukaLib:Add(char, "Shield", floor(char:GetAttribute("MaxShield") * 0.2))
 				end
 			end)
 		end
@@ -148,9 +162,16 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 			end
 		end
 		ServerUtil:SortMonsters(mobs, cage)
+		--// Debuff phase
+		for _, mob in locator:GetDescendants() do
+			if mob:HasTag("Monster") and mob.PrimaryPart then
+				for _, buff: Script in mob.EffectsList:GetChildren() do
+					HarukaLib:Add(buff, "Turn", -1)
+				end
+			end
+		end
 
 		_refreshTargets()
-
 		for _, plr in targetPlayers do
 			Events.CreateCombatBorder:Fire(plr, "Destroy")
 			Events.ClientTween:Fire(plr, attacks, { Transparency = 1 }, "one")
@@ -167,7 +188,7 @@ local function turnBaseCombatRound(monster: Model, isFirstRound: boolean)
 		turnBaseCombatRound(mainMonster)
 
 	end):catch(function()
-		script.Disabled = true
+		script.Parent:Destroy()
 	end)
 end
 

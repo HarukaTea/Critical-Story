@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
@@ -83,11 +84,11 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, turn: number, isPlaye
 
 	local debuff: Script
 	if isPlayer then
-		debuff = RepS.Resources.Unloads.BurnDMGPlayer:Clone()
+		debuff = RepS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Power", 0.5)
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
-		debuff = RepS.Resources.Unloads.BurnDMG:Clone()
+		debuff = RepS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 2))
 	end
 	debuff:SetAttribute("Turn", turn)
@@ -106,11 +107,11 @@ function BuffEffectsUtil:Poison(char: Model, monster: Model, turn: number, isPla
 
 	local debuff: Script
 	if isPlayer then
-		debuff = RepS.Resources.Unloads.BurnDMGPlayer:Clone()
+		debuff = RepS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Power", 0.5)
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
-		debuff = RepS.Resources.Unloads.BurnDMG:Clone()
+		debuff = RepS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 2))
 	end
 	debuff:SetAttribute("Turn", turn)
@@ -165,14 +166,18 @@ end
 --[[
 	Give player speed buff, can't be used for monsters
 ]]
-function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, turn: number)
+function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: number)
 	local buff = RepS.Resources.Unloads.SpeedBuff:Clone() :: Script
 
-	buff:SetAttribute("Turn", turn)
+	buff:SetAttribute("Turn", duration)
 	buff:SetAttribute("Power", exSpeed)
 	buff:SetAttribute("Color", fromRGB(255, 255, 0))
 	buff:SetAttribute("Text", "SPEED UP!")
 	buff.Parent = char.CharStats.EffectsList
+
+	local speedEffect = RepS.Package.Effects.SpeedEffect:Clone() :: ParticleEmitter
+	speedEffect.Parent = char.PrimaryPart
+	Debris:AddItem(speedEffect, duration)
 
 	_playUpSound(char)
 end
@@ -190,6 +195,15 @@ function BuffEffectsUtil:DefenseBuff(char: Model, def: number, turn: number)
 	buff.Parent = char.CharStats.EffectsList
 
 	_playUpSound(char)
+end
+
+--[[
+	Give player purify status
+]]
+function BuffEffectsUtil:PurifyBuff(char: Model)
+	for _, buff: Script in char.CharStats.EffectsList:GetChildren() do
+		if AssetBook.BuffInfo[buff.Name].Type == "Debuff" then buff:SetAttribute("Turn", -1) end
+	end
 end
 
 return BuffEffectsUtil

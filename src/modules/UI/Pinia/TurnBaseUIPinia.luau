@@ -15,6 +15,7 @@ local function TurnBaseUIPinia(self: table)
     local char = self.char :: Model
 
     self.isInCombat = Value(char:GetAttribute("InCombat"))
+    self.playerClass = Value(self.plr:GetAttribute("Class"))
 
     self.charStatsDict = {
 		Shield = Value(char:GetAttribute("Shield")),
@@ -24,6 +25,8 @@ local function TurnBaseUIPinia(self: table)
 
     self.phaseBarProgress = Value(fromScale(0, 1))
     self.phaseBarTweenInfo = Value(AssetBook.TweenInfos.fourHalf)
+
+    self.bottomTipText = Value("")
 
     self.panelPos = Value(fromScale(0.5, 5))
     self.actionClickCD = false
@@ -46,6 +49,9 @@ local function TurnBaseUIPinia(self: table)
     self.currentPhase = Value("Player")
 	self.phasePos = { Value(fromScale(-0.2, 0)), Value(fromScale(1.2, 0.9)) }
 	self.phaseTrans = Value(1)
+
+    self.isInAttackPhase = Value(false)
+    self.criBarPos = Value(fromScale(0.6, 0))
 end
 
 return TurnBaseUIPinia

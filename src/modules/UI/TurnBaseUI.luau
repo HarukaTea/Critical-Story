@@ -14,6 +14,7 @@ local Pinia = require(RepS.Modules.UI.Pinia.TurnBaseUIPinia)
 local TurnBaseActionPanel = require(RepS.Modules.UI.Views.TurnBaseActionPanel)
 local TurnBaseSideList = require(RepS.Modules.UI.Views.TurnBaseSideList)
 local TurnBasePhaseShower = require(RepS.Modules.UI.Views.TurnBasePhaseShower)
+local TurnBaseCriTiming = require(RepS.Modules.UI.Views.TurnBaseCriTiming)
 
 local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local TurnBaseStatBar = require(RepS.Modules.UI.Components.TurnBaseStatBar)
@@ -84,6 +85,7 @@ return function (plr: Player)
 
 					TurnBaseSideList("Monster", self),
 					TurnBaseSideList("Player", self),
+					TurnBaseCriTiming(self),
 
                     Components.Frame({
 						Name = "StatsFrame",
@@ -110,6 +112,21 @@ return function (plr: Player)
 							}),
 							TurnBaseStatBar("TP", self)
 						},
+					}),
+					Components.TextLabel({
+						Name = "BottomTip",
+						AnchorPoint = v2New(0.5, 0.5),
+						Position = fromScale(0.5, -0.7),
+						Size = fromScale(1, 0.5),
+
+						Text = Computed(function(use)
+							return use(self.bottomTipText)
+						end),
+
+						[Children] = {
+							Components.TextUIStroke({ Thickness = 2.5 }),
+							New("UITextSizeConstraint")({ MaxTextSize = 28 })
+						}
 					}),
 
 					BottomProgressBar("PhaseTimer", self)

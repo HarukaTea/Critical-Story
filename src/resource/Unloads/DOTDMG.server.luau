@@ -6,9 +6,10 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
-local char = script.Parent.Parent.Parent :: Model
+local char = script.Parent.Parent :: Model
 local color = script:GetAttribute("Color") :: Color3
 local dmg = script:GetAttribute("Damage") :: number
 local text = script:GetAttribute("Text") :: string
@@ -27,17 +28,21 @@ local particle = RepS.Package.Effects.BurnEffect:Clone() :: ParticleEmitter
 particle.Color = csNew(color)
 particle.Parent = char.PrimaryPart
 
+local firstDMG = true
 Fusion.Hydrate(script)({
     [Fusion.AttributeChange("Turn")] = function(newTurn: number)
-        if newTurn <= 0 then
+        if newTurn >= 0 then
+            if firstDMG then firstDMG = false return end
+
+            HarukaLib:Add(char, "Health", -dmg)
+            ServerUtil:ShowNumber(char, dmg, color)
+
+            if newTurn == 0 then HarukaLib:Add(script, "Turn", -1) end
+        else
             light:Destroy()
             particle:Destroy()
 
             script:Destroy()
-        else
-            char.Humanoid.Health -= dmg
-
-            ServerUtil:ShowNumber(char, dmg, color)
         end
     end
 })

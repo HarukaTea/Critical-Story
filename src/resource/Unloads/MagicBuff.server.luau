@@ -14,7 +14,6 @@ local color = script:GetAttribute("Color") :: Color3
 local text = script:GetAttribute("Text") :: string
 local power = script:GetAttribute("Power") :: number
 
-local wait = task.wait
 local floor = math.floor
 
 ServerUtil:ShowText(char, text, color)

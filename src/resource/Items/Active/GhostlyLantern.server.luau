@@ -6,6 +6,7 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
@@ -23,13 +24,15 @@ local v3New = Vector3.new
 local random = math.random
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local ITEM_ATTRIBUTES = { TP_REQ = 60, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { TP_REQ = 60, COMBAT_REQ = true, MONSTER_REQ = true, HEAL_BUFF = 0.6 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire("MagicCasted1")
+Events.PlayAnimation:Fire("MagicCastedAnim1")
+
+BuffEffectsUtil:Heal(char, ITEM_ATTRIBUTES.HEAL_BUFF)
 
 local lantern = RepS.Package.MagicAssets.GhostlyLantern.Lantern:Clone() :: MeshPart
 lantern.CFrame = char.Torso.CFrame * cfNew(0,0,-4)

@@ -18,7 +18,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "SpeedBuff", 5)
 
     elseif item == "BurningTorch" then
-        RepS.Resources.Items.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
+        RepS.Resources.Items.Passive.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "CampfireWood" then
         HarukaLib:Add(char, "HealBuff", 30)
@@ -37,7 +37,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "ShieldBuff", 20)
 
     elseif item == "ManaCrystal" then
-        RepS.Resources.Items.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
+        RepS.Resources.Items.Passive.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "RabbitFoot" then
         HarukaLib:Add(char, "JumpBuff", 20)
@@ -61,7 +61,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "HealthBuff", 100)
 
     elseif item == "RegenerationGem" then
-        RepS.Resources.Items.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs
+        RepS.Resources.Items.Passive.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "BlackwolfNecklace" then
         HarukaLib:Add(char, "MaxDMGBuff", 150)
@@ -95,7 +95,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "MagicBuff", 50)
         HarukaLib:Add(char, "SpeedBuff", 15)
 
-        RepS.Resources.Items.FoxSpirit:Clone().Parent = char.CharStats.ExtraOrbs
+        RepS.Resources.Items.Passive.FoxSpirit:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "NorthernHalberd" then
         HarukaLib:Add(char, "MaxDMGBuff", 80)
@@ -111,6 +111,12 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "HealthBuff", 300)
         HarukaLib:Add(char, "ShieldBuff", 60)
         HarukaLib:Add(char, "MaxDMGBuff", 100)
+
+    elseif item == "Devilsknife" then
+        HarukaLib:Add(char, "BurnChance", 30)
+
+    elseif item == "SharpenerRock" then
+        HarukaLib:Add(char, "CriChance", 10)
     end
 
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", true)

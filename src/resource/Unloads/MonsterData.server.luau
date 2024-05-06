@@ -73,9 +73,14 @@ local function combatEnds()
                 ServerUtil:ShowText(char, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))
                 ServerUtil:ShowText(char, "+" .. floor(totalEXP / 5) .. " RP", fromRGB(0, 255, 255))
 
+                --// Clear
                 char:SetAttribute("InCombat", false)
                 char:SetAttribute("OrbAttackingTime", false)
                 charStats.TargetMonster.Value = nil
+
+                for _, buff: Script in charStats.EffectsList:GetChildren() do
+                    buff:SetAttribute("Turn", -1)
+                end
 
                 for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
                     if orbFolder.Name == player.Name then orbFolder:Destroy() end

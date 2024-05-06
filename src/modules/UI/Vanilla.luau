@@ -2,11 +2,16 @@
 --!optimize 2
 --!native
 
-local Fusion = require(game:GetService("ReplicatedStorage").Modules.Packages.Fusion)
+local RepS = game:GetService("ReplicatedStorage")
+
+local Fusion = require(RepS.Modules.Packages.Fusion)
+
+local New = Fusion.New
 
 local Components = {}
 
-local color3New, v2New, ud2New, udNew = Color3.new, Vector2.new, UDim2.new, UDim.new
+local color3New, v2New, ud2New, udNew, csNew, nsNew =
+	Color3.new, Vector2.new, UDim2.new, UDim.new, ColorSequence.new, NumberSequence.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
@@ -14,7 +19,8 @@ local function _createNewCompoent(props: table, uiType: string, default: table) 
 	for i, v in props do
 		default[i] = v
 	end
-	return Fusion.New(uiType)(default)
+
+	return New(uiType)(default)
 end
 
 --[[
@@ -163,16 +169,26 @@ end
 	Return a UICorner which can let GuiObject become round like a circle
 ]]
 function Components.RoundUICorner() : UICorner
-	return Fusion.New("UICorner")({ CornerRadius = udNew(0.5, 0) })
+	return New("UICorner")({ CornerRadius = udNew(0.5, 0) })
 end
 
 --[[
 	Return a UIPadding with 4px in total, usually used for text
 ]]
 function Components.NormalUIPadding() : UIPadding
-	return Fusion.New("UIPadding")({
+	return New("UIPadding")({
 		PaddingTop = udNew(0, 2),
 		PaddingBottom = udNew(0, 2),
+	})
+end
+
+--[[
+	Return a transparent UIGradient
+]]
+function Components.UIGradient() : UIGradient
+	return New("UIGradient")({
+		Color = csNew(fromRGB(30, 30, 30)),
+		Transparency = nsNew(0.15, 1)
 	})
 end
 

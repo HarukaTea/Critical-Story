@@ -2,6 +2,7 @@
 --!optimize 2
 --!native
 
+local Debris = game:GetService("Debris")
 local PPS = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
@@ -135,6 +136,10 @@ local function levelUp(plr: Player)
 
 		ServerUtil:ShowText(char, "LEVEL UP!", fromRGB(255, 255, 0))
 
+		local levelUpEffect = RepS.Package.Effects.LevelUpEffect:Clone() :: ParticleEmitter
+		levelUpEffect.Parent = char.PrimaryPart
+		Debris:AddItem(levelUpEffect, 1)
+
 		--- make character full state
 		char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
 		char.Humanoid.Health = char.Humanoid.MaxHealth
@@ -230,8 +235,13 @@ local function _essentialCheck(plr: Player, item: string) : string
 	return if plr.Inventory:FindFirstChild(item) and plr.Inventory[item].Value > 0 then true else false
 end
 local function useItem(plr: Player, item: string)
-	if RepS.Resources.Items:FindFirstChild(item) and _essentialCheck(plr, item) then
-		RepS.Resources.Items[item]:Clone().Parent = plr.Character.CharStats.Items
+	if RepS.Resources.Items.Active:FindFirstChild(item) and _essentialCheck(plr, item) then
+		if plr.Character.CharStats.Items:FindFirstChild(item) then
+			Events.CreateHint:Fire(plr, "Still in cooldown, please wait!")
+			return
+		end
+
+		RepS.Resources.Items.Active[item]:Clone().Parent = plr.Character.CharStats.Items
 	end
 end
 Events.UseItem:Connect(useItem)

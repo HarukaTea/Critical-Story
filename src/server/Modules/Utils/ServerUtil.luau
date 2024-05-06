@@ -246,6 +246,16 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 
 	if monster.CageHolder.Value then monster.CageHolder.Value:Destroy() end
 
+	pcall(function()
+		local targetPlrs = ServerUtil:GetPlayersByMonster(monster)
+		for _, plr: Player in targetPlrs do
+			if not plr then continue end
+
+			Events.FreezePlayerControls:Fire(plr, "Unfreeze")
+			Events.CameraPointTo:Fire(plr, "Reset")
+		end
+	end)
+
 	--- multi-combat mechanic
 	local waitingLocators = {}
 	if monster.WaitingList:FindFirstChildOfClass("ObjectValue") then
@@ -454,6 +464,12 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 		intValue.Parent = inventoryFolder
 	end
 
+	if not plr.Character.PrimaryPart:FindFirstChild("ItemAcquiredEffect") then
+		local itemAcquiredEffect = RepS.Package.Effects.ItemAcquiredEffect:Clone() :: ParticleEmitter
+		itemAcquiredEffect.Parent = plr.Character.PrimaryPart
+		Debris:AddItem(itemAcquiredEffect, 1)
+	end
+
 	Events.GiveDrop:Fire(plr, item)
 end
 
@@ -481,16 +497,20 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 			script:Destroy()
 			return false
 		end
+
+		HarukaLib:Add(char, "TP", -attributes.TP_REQ)
 	end
 	if attributes.MONSTER_REQ then
 		if not monster or not monster.PrimaryPart or not char.PrimaryPart then
+			Events.CreateHint:Fire(plr, "Can't find target enemy!")
+
 			wait()
 			script:Destroy()
 			return false
 		end
 	end
 
-	Debris:AddItem(script, 5)
+	Debris:AddItem(script, if attributes.CD then attributes.CD else 8)
 
 	if ItemBook:FindItem(item).IsCM then plr.Inventory[item].Value -= 1 end
 	if plr.Inventory[item].Value <= 0 then plr.Inventory[item]:Destroy() end

@@ -144,7 +144,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 			burn:Add("Burn", burnChance)
 			burn:Add("None", 100 - burnChance)
 
-			if burn:Roll() == "Burn" then BuffEffectsUtil:Burn(char, monster, 6) end
+			if burn:Roll() == "Burn" then BuffEffectsUtil:Burn(char, monster, 1, true) end
 
 			burn:Destroy()
 		end
@@ -187,8 +187,8 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 	end
 
     --- some extra damage
-    if dmgPart:GetAttribute("Burn") then BuffEffectsUtil:Burn(char, monster, 6, true) end
-    if dmgPart:GetAttribute("Poison") then BuffEffectsUtil:Poison(char, monster, 6, true) end
+    if dmgPart:GetAttribute("Burn") then BuffEffectsUtil:Burn(char, monster, 1, true) end
+    if dmgPart:GetAttribute("Poison") then BuffEffectsUtil:Poison(char, monster, 1, true) end
 
     --- defense reduce
     dmg = floor(dmg * (100 - char:GetAttribute("Defense")) / 100)

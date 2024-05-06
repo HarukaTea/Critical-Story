@@ -23,7 +23,7 @@ if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then 
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.MagicCasted:Fire(plr)
+Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
 local mark = RepS.Package.MagicAssets.ArcaneMark:Clone() :: BasePart
 mark.CFrame = monster.PrimaryPart.CFrame
@@ -31,14 +31,13 @@ mark.Parent = char
 Debris:AddItem(mark, 0.4)
 
 local radius = (mark.Size.X + mark.Size.Z)/4
-for i = 1,5 do
+for _ = 1, 5 do
 	if not monster or not monster.PrimaryPart then break end
 
 	if (mark.Position - monster.PrimaryPart.Position).Magnitude <= radius then
 		local dmg = char:GetAttribute("Magic") :: number
 
 		ServerUtil:ShowNumber(monster, dmg, fromRGB(85, 255, 255))
-
 		HarukaLib:Add(monster, "Health", -dmg)
 	end
 

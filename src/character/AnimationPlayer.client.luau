@@ -2,8 +2,10 @@
 --!optimize 2
 --!native
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
 local Signals = require(RepS.Modules.Data.Signals)
 
@@ -42,6 +44,11 @@ anims.FireStaffAnim2 = anims.WizardAnim2
 --// Connections
 local function playAnim(anim: string)
 	if not anims[anim] then warn("Can't found animation: "..anim.."!") return end
+
+	if anim == "MagicCasted1" then
+		local class = Players.LocalPlayer:GetAttribute("Class") :: string
+		if AssetBook.ClassInfo[class].Type == "Magic" then anim = "MagicCasted2" end
+	end
 
 	anims[anim]:Play()
 end

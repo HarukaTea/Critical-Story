@@ -18,12 +18,13 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-HarukaLib:Add(char, "SpeedBuff", power)
+local afterSpeed = char.Humanoid.WalkSpeed * power - char.Humanoid.WalkSpeed
+HarukaLib:Add(char, "SpeedBuff", afterSpeed)
 
 for _ = duration, 0, -0.1 do
     HarukaLib:Add(script, "Turn", -0.1)
     wait(0.1)
 end
 
-HarukaLib:Add(char, "SpeedBuff", -power)
+HarukaLib:Add(char, "SpeedBuff", -afterSpeed)
 script:Destroy()

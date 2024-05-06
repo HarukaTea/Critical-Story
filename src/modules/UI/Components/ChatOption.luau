@@ -62,7 +62,7 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.026, 0.5),
                 Size = fromScale(0.072, 0.8),
-                Image = AssetBook.ChatIcons[icon],
+                Image = AssetBook.PromptIcons[icon],
 
                 ImageColor3 = Tween(Computed(function(use)
                     return use(contentColor)

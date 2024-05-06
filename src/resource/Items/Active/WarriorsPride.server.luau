@@ -22,13 +22,13 @@ local cfNew = CFrame.new
 local v3New = Vector3.new
 local floor = math.floor
 
-local ITEM_ATTRIBUTES = { COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { TP_REQ = 50, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.KnifeKill)
-Events.MagicCasted:Fire(plr)
+Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
 local pride = RepS.Package.MagicAssets.WarriorBlast:Clone() :: UnionOperation
 pride.CFrame = char.PrimaryPart.CFrame

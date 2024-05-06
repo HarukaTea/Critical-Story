@@ -55,9 +55,6 @@ local function setup()
         local targetMonster = instanceNew("ObjectValue")
         targetMonster.Name = "TargetMonster"
         targetMonster.Parent = charStats
-        local bindableEvent = instanceNew("BindableEvent")
-        bindableEvent.Name = "NewPhase"
-        bindableEvent.Parent = charStats
 
         _createFolder("Items", charStats)
         _createFolder("ExtraOrbs", charStats)
@@ -99,27 +96,26 @@ local function classAttributesSetup()
     --- wizard
     Add(char:GetAttributeChangedSignal("InCombat"):Connect(function()
         if not char:GetAttribute("InCombat") then
-            char:SetAttribute("Arrows", 0)
+            char:SetAttribute("Stack", 0)
+            char:SetAttribute("Focus", 0)
             char:SetAttribute("Guard", 0)
-            char:SetAttribute("WizardCasted", 0)
-            char:SetAttribute("RogueCritical", 0)
-            char:SetAttribute("ResearchStage", 0)
+            char:SetAttribute("RogueCri", 0)
             char:SetAttribute("TP", 0)
         end
     end))
 
     --- knight
-    Add(Clock(1.1, function()
+    Add(Clock(1.7, function()
         if char:GetAttribute("Guard") <= 0 then return end
 
         HarukaLib:Add(char, "Guard", -1)
     end))
 
     --- Rogue
-    Add(Clock(0.7, function()
-        if char:GetAttribute("RogueCritical") <= 0 then return end
+    Add(Clock(1.2, function()
+        if char:GetAttribute("RogueCri") <= 0 then return end
 
-        HarukaLib:Add(char, "RogueCritical", -1)
+        HarukaLib:Add(char, "RogueCri", -1)
     end))
 
     --- turn-base

@@ -8,6 +8,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local Value, OnEvent, Computed = Fusion.Value, Fusion.OnEvent, Fusion.Computed
 
@@ -57,7 +58,7 @@ local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
                 Name = "Item",
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.2, 0.5),
-                Size = fromScale(0.712, 0.6),
+                Size = fromScale(0.55, 0.6),
                 TextXAlignment = Enum.TextXAlignment.Left,
 
                 Text = Computed(function()
@@ -67,11 +68,13 @@ local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
             Components.TextLabel({
                 Name = if id == "Items" then "Amount" else "TP",
                 AnchorPoint = v2New(0, 0.5),
-                Position = fromScale(0.2, 0.5),
-                Size = fromScale(0.712, 0.6),
+                Position = fromScale(0.76, 0.5),
+                Size = fromScale(0.197, 0.6),
                 TextXAlignment = Enum.TextXAlignment.Right,
-                TextColor3 = if id == "Items" then fromHex("#eccc68") else fromRGB(0, 255, 255),
 
+                TextColor3 = Computed(function(use)
+                    return if id == "Items" then fromHex("#eccc68") else if use(self.charStatsDict.TP) < ItemBook:FindItem(item).TP then fromRGB(255, 0, 0) else fromRGB(0, 255, 255)
+                end),
                 Text = Computed(function(use)
                     return if id == "Items" then "x"..use(itemAmount) else ItemBook:FindItem(item).TP.."%"
                 end),
@@ -86,6 +89,15 @@ local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
                 end,
                 [OnEvent("MouseButton1Click")] = function()
                     if self.actionClickCD then return end
+
+                    if id == "Skills" then --// TP check
+                        local TPNeeded = ItemBook:FindItem(item).TP :: number
+
+                        if self.char:GetAttribute("TP") < TPNeeded then
+                            Signals.CreateHint:Fire("You don't have enough TP!")
+                            return
+                        end
+                    end
 
                     self.actionClickCD = true
                     self.panelPos:set(fromScale(0.5, 5))

@@ -62,6 +62,8 @@ local function TurnBaseAction(id: string, self: table) : Frame
 
                         self.panelPos:set(fromScale(0.5, 5))
                         self.transHPBarSize:set(fromScale(0, 0.875))
+                        self.skillPanelVisible:set(false)
+                        self.itemPanelVisible:set(false)
 
                         Events.NextActionRequest:Fire(id)
 

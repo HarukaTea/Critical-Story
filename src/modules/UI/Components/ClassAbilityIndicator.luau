@@ -86,13 +86,13 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                         return if arrows == 1 then "1 ARROW" else arrows.." ARROWS"
 
                     elseif class == "Wizard" then
-                        return "CASTED "..use(self.charClassInfo.Wizard).."%"
+                        return "FOCUS "..use(self.charClassInfo.Wizard).."%"
 
                     elseif class == "Knight" then
                         return "GUARD "..use(self.charClassInfo.Knight).."%"
 
                     elseif class == "Rogue" then
-                        return "CRITICAL "..use(self.charClassInfo.Rogue).."%"
+                        return use(self.charClassInfo.Rogue).."% CHANCE"
                     end
                 end),
                 TextColor3 = AssetBook.ClassInfo[class].Color,

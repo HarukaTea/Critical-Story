@@ -245,16 +245,16 @@ return function(plr: Player)
             wait(0.2)
             TS:Create(bar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
 		end,
-		[AttributeChange("Arrows")] = function(arrows: number)
+		[AttributeChange("Stack")] = function(arrows: number)
 			charClassInfo.Archer:set(arrows)
 		end,
-		[AttributeChange("WizardCasted")] = function(casted: number)
+		[AttributeChange("Focus")] = function(casted: number)
 			charClassInfo.Wizard:set(casted)
 		end,
 		[AttributeChange("Guard")] = function(guarded: number)
 			charClassInfo.Knight:set(guarded)
 		end,
-		[AttributeChange("RogueCritical")] = function(criChance: number)
+		[AttributeChange("RogueCri")] = function(criChance: number)
 			charClassInfo.Rogue:set(criChance)
 		end,
 

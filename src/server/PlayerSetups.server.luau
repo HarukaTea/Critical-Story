@@ -151,17 +151,7 @@ local function setup(plr: Player)
 	end
 
 	--// Load settings
-	for setting: string, val: any in data.Settings do
-		plr:SetAttribute(setting, val)
-
-		Fusion.Hydrate(plr)({
-			[AttributeChange(setting)] = function(newSetting: any)
-				if newSetting == nil then return end
-
-				data.Settings[setting] = newSetting
-			end
-		})
-	end
+	for setting: string, val: any in TEMPLATE.Settings do plr:SetAttribute(setting, val) end
 
 	--// Connections
 	local function _save()

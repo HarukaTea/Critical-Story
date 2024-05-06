@@ -23,18 +23,7 @@ local function mapValue(val: number, duration: number) : number
     return to
 end
 
-local function ProgressCircle(direction: string, effect: Script) : Frame
-    local maxTurn = 0
-	local turn = Fusion.Value(effect:GetAttribute("Turn"))
-
-    Fusion.Hydrate(effect)({
-		[Fusion.AttributeChange("Turn")] = function(newTurn: number)
-			if newTurn >= maxTurn then maxTurn = newTurn end
-
-			turn:set(newTurn)
-		end
-    })
-
+local function ProgressCircle(direction: string, effect: Script, info: table) : Frame
     return Components.Frame({
 		Name = "ProgressCircle"..direction,
 		ClipsDescendants = true,
@@ -49,12 +38,12 @@ local function ProgressCircle(direction: string, effect: Script) : Frame
 				Position = if direction == "Right" then fromScale(-1, 0) else fromScale(0, 0),
 				Size = fromScale(2, 1),
 				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
-                ImageColor3 = AssetBook.BuffColors[effect],
+                ImageColor3 = AssetBook.BuffInfo[effect.Name].Color,
 
 				[Children] = {
 					Fusion.New("UIGradient")({
 						Rotation = Fusion.Computed(function(use)
-                            local mappedDuration = mapValue(use(turn), maxTurn)
+                            local mappedDuration = mapValue(use(info[1]), info[2])
 							local angle = clamp(mappedDuration * 360, 0, 360)
 
 							return if direction == "Left" then clamp(angle, 180, 360) else clamp(angle, 0, 180)
@@ -71,27 +60,41 @@ local function ProgressCircle(direction: string, effect: Script) : Frame
 	})
 end
 
-local function EffectIndicator(effect: Script) : ImageLabel
+local function EffectIndicator(id: string, effect: Script) : ImageLabel
+	local maxTurn = 0
+	local turn = Fusion.Value(effect:GetAttribute("Turn"))
+
+    Fusion.Hydrate(effect)({
+		[Fusion.AttributeChange("Turn")] = function(newTurn: number)
+			if newTurn >= maxTurn then maxTurn = newTurn end
+
+			turn:set(newTurn)
+		end
+    })
+
     return Components.ImageLabel({
         Name = effect.Name,
         BackgroundTransparency = 0,
         Size = fromScale(1, 1),
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
-        Image = AssetBook.BuffImages[effect.Name],
+        Image = AssetBook.BuffInfo[effect.Name].Icon,
 
         [Children] = {
             Components.RoundUICorner(),
 
-            ProgressCircle("Left", effect),
-            ProgressCircle("Right", effect),
+            ProgressCircle("Left", effect, { turn, maxTurn }),
+            ProgressCircle("Right", effect, { turn, maxTurn }),
 
 			Components.TextLabel({
 				Name = "Power",
 				AnchorPoint = v2New(0.5, 0),
-				Text = if effect:GetAttribute("Power") then effect:GetAttribute("Power").."X" else "",
 				Position = fromScale(0.5, 0.6),
 				Size = fromScale(1.2, 0.5),
 				ZIndex = 3,
+
+				Text = Fusion.Computed(function(use)
+					return if id == "Player" then effect:GetAttribute("Power").."X" else use(turn)
+				end),
 
 				[Children] = {
 					Components.TextUIStroke({ Thickness = 2.5 })

@@ -29,7 +29,7 @@ local function TurnBaseEffectList(id: string, info: table) : Frame
             }),
 
             Fusion.ForValues(info.EffectsList, function(_, effect: Script)
-                return EffectIndicator(effect)
+                return EffectIndicator("TurnBase", effect)
             end, Fusion.cleanup)
         }
     })

@@ -28,7 +28,7 @@ if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then 
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire(plr, "MagicCasted1")
+Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
 local fireBall = RepS.Package.MagicAssets.FireBall:Clone() :: Part
 fireBall.CFrame = char.PrimaryPart.CFrame

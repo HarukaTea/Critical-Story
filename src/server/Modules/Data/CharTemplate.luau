@@ -37,8 +37,8 @@ return {
 
     --- Class stats
     Combo = 0,
-    Arrows = 0,
-    WizardCasted = 0,
+    Stack = 0,
+    Focus = 0,
     Guard = 0,
-    RogueCritical = 0
+    RogueCri = 0
 }

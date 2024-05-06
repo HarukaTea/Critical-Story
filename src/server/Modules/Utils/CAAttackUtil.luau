@@ -100,19 +100,19 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
     arrow.Parent = workspace.MapComponents.OrbFolders[plr.Name]
     Debris:AddItem(arrow, arrow:GetAttribute("OrbLifeTime"))
 
-    if char:GetAttribute("Arrows") > 0 then
+    if char:GetAttribute("Stack") > 0 then
         --- bow dmg
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
         --- arrow dmg
-        for _ = char:GetAttribute("Arrows"), 1, -1 do
+        for _ = char:GetAttribute("Stack"), 1, -1 do
             if monster:GetAttribute("Health") <= 0 then break end
 
-            HarukaLib:Add(char, "Arrows", -1)
+            HarukaLib:Add(char, "Stack", -1)
 
             CAAttackUtil:DealDMG(plr, monster, baseDamage)
         end
-        if char:GetAttribute("Arrows") <= 0 then char:SetAttribute("Arrows", 0) end
+        if char:GetAttribute("Stack") <= 0 then char:SetAttribute("Stack", 0) end
     else
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
     end
@@ -122,23 +122,22 @@ end
 function CAAttackUtil.ArcherArrow(plr: Player)
     local char = plr.Character
 
-    HarukaLib:Add(char, "Arrows", 1)
+    HarukaLib:Add(char, "Stack", 1)
 
-    if char:GetAttribute("Arrows") > 10 then char:SetAttribute("Arrows", 10) end
+    if char:GetAttribute("Stack") > 10 then char:SetAttribute("Stack", 10) end
 end
 
 function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
     local magicDmg = char:GetAttribute("Magic")
 
-    HarukaLib:Add(char, "WizardCasted", 35)
+    HarukaLib:Add(char, "Focus", 35)
     CAAttackUtil:DealDMG(plr, monster, magicDmg)
 
-    if char:GetAttribute("WizardCasted") >= 100 then
-        char:SetAttribute("WizardCasted", 0)
+    if char:GetAttribute("Focus") >= 100 then
+        char:SetAttribute("Focus", 0)
 
-        Events.PlayAnimation:Fire(plr, "MagicCasted2")
-        RepS.Resources.Items.WizardMagicBall:Clone().Parent = char.CharStats.Items
+        CAAttackUtil:DealDMG(plr, monster, floor(baseDamage * 3))
     end
 
     BuffEffectsUtil:RestoreTPByOrb(plr.Character)
@@ -158,15 +157,15 @@ end
 function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
-    HarukaLib:Add(char, "RogueCritical", 10)
+    HarukaLib:Add(char, "RogueCri", 10)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    if char:GetAttribute("RogueCritical") > 100 then char:SetAttribute("RogueCritical", 100) end
+    if char:GetAttribute("RogueCri") > 100 then char:SetAttribute("RogueCri", 100) end
 
     --- extra critical hit roll cuz it's rogue class
-    local result = CAAttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCritical"))
+    local result = CAAttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCri"))
 
-    if result == "CriticalHit" then char:SetAttribute("RogueCritical", 0) end
+    if result == "CriticalHit" then char:SetAttribute("RogueCri", 0) end
 
     BuffEffectsUtil:RestoreTPByOrb(plr.Character)
 end
@@ -199,6 +198,7 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
     end
 
+    print("Processing")
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     BuffEffectsUtil:RestoreTPByOrb(plr.Character)
@@ -284,7 +284,7 @@ function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: numbe
 end
 
 function CAAttackUtil.FireStaff(plr: Player, monster: Model)
-    BuffEffectsUtil:Burn(plr.Character, monster, 6)
+    BuffEffectsUtil:Burn(plr.Character, monster, 1)
 end
 
 return CAAttackUtil

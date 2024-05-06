@@ -28,6 +28,7 @@ Fusion.Hydrate(script)({
         if newTurn <= 0 then
             HarukaLib:Add(char, "MinDMGBuff", -theoryMinDMG)
             HarukaLib:Add(char, "MaxDMGBuff", -theoryMaxDMG)
+
             script:Destroy()
         end
     end

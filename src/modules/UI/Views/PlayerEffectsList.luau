@@ -38,7 +38,7 @@ local function PlayerEffectsList(self: table) : Frame
                 FillDirection = Enum.FillDirection.Horizontal
             }),
             Fusion.ForValues(self.charStatsDict.EffectsList, function(_, effect: Script)
-                return EffectIndicator(effect)
+                return EffectIndicator("Player", effect)
             end, Fusion.cleanup)
         }
     })

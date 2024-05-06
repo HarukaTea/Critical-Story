@@ -45,16 +45,11 @@ AssetBook.QuestColor = {
     Town = fromRGB(255, 107, 129)
 }
 
-AssetBook.ChatIcons = {
+AssetBook.PromptIcons = {
     Chat = "rbxassetid://13124035950",
     Exit = "rbxassetid://16458254833",
     Buy = "rbxassetid://16458319981",
     Craft = "rbxassetid://16458320089",
-    Quest = "rbxassetid://16468992982"
-}
-
-AssetBook.PromptIcons = {
-    Chat = "rbxassetid://13124035950",
     Quest = "rbxassetid://16468992982",
     Travel = "rbxassetid://16458254833"
 }
@@ -148,20 +143,37 @@ AssetBook.MonsterAvatars = {
     ["Rock Slime"] = "rbxassetid://16483665012",
 }
 
-AssetBook.BuffImages = {
-    AttackBuff = "rbxassetid://2965862892",
-    MagicBuff = "rbxassetid://2965863231",
-    Burn = "rbxassetid://12218488404",
-    Poison = "rbxassetid://12371171272",
-    Speed = "",
-    Jump = ""
-}
-
-AssetBook.BuffColors = {
-    AttackBuff = fromRGB(255, 255, 255),
-    MagicBuff = fromRGB(255, 255, 255),
-    Burn = fromRGB(255, 0, 0),
-    Poison = fromRGB(170, 85, 255)
+AssetBook.BuffInfo = {
+    AttackBuff = {
+        Color = fromRGB(255, 255, 255),
+        Icon = "rbxassetid://2965862892",
+        Type = "Buff"
+    },
+    MagicBuff = {
+        Color = fromRGB(255, 255, 255),
+        Icon = "rbxassetid://2965863231",
+        Type = "Buff"
+    },
+    Burn = {
+        Color = fromRGB(255, 0, 0),
+        Icon = "rbxassetid://12218488404",
+        Type = "Debuff"
+    },
+    Poison = {
+        Color = fromRGB(170, 85, 255),
+        Icon = "rbxassetid://12371171272",
+        Type = "Debuff"
+    },
+    SpeedBuff = {
+        Color = fromRGB(0, 255, 255),
+        Icon = "rbxassetid://2970816149",
+        Type = "Debuff"
+    },
+    DefenseBuff = {
+        Color = fromRGB(128, 128, 128),
+        Icon = "rbxassetid://4824422041",
+        Type = "Buff"
+    }
 }
 
 AssetBook.LocationInfo = {

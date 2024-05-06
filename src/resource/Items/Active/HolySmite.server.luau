@@ -6,6 +6,7 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
@@ -24,7 +25,9 @@ if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.AnimeExplosion)
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Explosion)
-Events.PlayAnimation:Fire(plr, "MagicCasted1")
+Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+
+BuffEffectsUtil:Burn(char, monster, 1)
 
 local explosion = RepS.Package.MagicAssets.HolySmite.Explosion:Clone() :: BasePart
 explosion.CFrame = monster.PrimaryPart.CFrame
