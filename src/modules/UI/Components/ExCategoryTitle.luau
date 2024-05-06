@@ -9,6 +9,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local New, Children, OnEvent, Value, Tween, Computed =
 	Fusion.New, Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Tween, Fusion.Computed
@@ -26,8 +27,8 @@ local function ExCategoryTitle(id: string, self: table): Frame
 	if id == "Menu" then
 		playerClass = Value(plr:GetAttribute("Class"))
 
-		Fusion.Hydrate(plr)({
-			[Fusion.AttributeChange("Class")] = function(newClass: string)
+		HarukaLib:Hydrate(plr, {
+			["Attr-Class"] = function(newClass: string)
 				playerClass:set(newClass)
 			end
 		})

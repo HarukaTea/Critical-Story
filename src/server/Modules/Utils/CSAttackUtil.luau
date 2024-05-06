@@ -6,9 +6,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 
 local random = math.random
 

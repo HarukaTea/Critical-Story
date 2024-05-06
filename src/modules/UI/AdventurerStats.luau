@@ -33,8 +33,7 @@ local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
-local Children, New, AttributeChange, Computed, Hydrate, OnChange =
-	Fusion.Children, Fusion.New, Fusion.AttributeChange, Fusion.Computed, Fusion.Hydrate, Fusion.OnChange
+local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
 
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
@@ -206,36 +205,38 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	Hydrate(self.humanoid)({
-		[Fusion.OnEvent("Touched")] = function(hit)
+	HarukaLib:Hydrate(self.humanoid, {
+		["Touched"] = function(hit: BasePart)
+			if not self then return end --// Reset issue
+
 			if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
 		end
 	})
-	Hydrate(plr)({
-		[AttributeChange("EXP")] = function(exp: number)
+	HarukaLib:Hydrate(plr, {
+		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
 			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
 		end,
-		[AttributeChange("Levels")] = function(level: number)
+		["Attr-Levels"] = function(level: number)
 			playerData.Levels:set(level)
 			playerData.EXP[2]:set(floor(level ^ 1.85) + 60)
 		end,
-		[AttributeChange("Class")] = function(class: string)
+		["Attr-Class"] = function(class: string)
 			playerData.Class:set(class)
 		end,
-		[AttributeChange("Gold")] = function(gold: number)
+		["Attr-Gold"] = function(gold: number)
 			playerData.Gold:set(HarukaLib:NumberConvert(gold, "%.1f"))
 		end,
-		[AttributeChange("RP")] = function(rep: number)
-			playerData.RP:set(HarukaLib:NumberConvert(rep, "%.1f"))
+		["Attr-RP"] = function(rp: number)
+			playerData.RP:set(HarukaLib:NumberConvert(rp, "%.1f"))
 		end,
-		[AttributeChange("LvPoints")] = function(lvPoints: number)
+		["Attr-LvPoints"] = function(lvPoints: number)
 			playerData.LvPoints:set(lvPoints)
 		end
 	})
 	local charClassInfo = self.charClassInfo
-	Hydrate(self.char)({
-		[AttributeChange("Combo")] = function(combo: number)
+	HarukaLib:Hydrate(self.char, {
+		["Attr-Combo"] = function(combo: number)
 			charClassInfo.Warrior:set(combo)
 
             if combo <= 0 then return end
@@ -245,36 +246,21 @@ return function(plr: Player)
             wait(0.2)
             TS:Create(bar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
 		end,
-		[AttributeChange("Stack")] = function(arrows: number)
+		["Attr-Stack"] = function(arrows: number)
 			charClassInfo.Archer:set(arrows)
 		end,
-		[AttributeChange("Focus")] = function(casted: number)
+		["Attr-Focus"] = function(casted: number)
 			charClassInfo.Wizard:set(casted)
 		end,
-		[AttributeChange("Guard")] = function(guarded: number)
+		["Attr-Guard"] = function(guarded: number)
 			charClassInfo.Knight:set(guarded)
 		end,
-		[AttributeChange("RogueCri")] = function(criChance: number)
-			charClassInfo.Rogue:set(criChance)
+		["Attr-RogueCri"] = function(rogueCri: number)
+			charClassInfo.Rogue:set(rogueCri)
 		end,
 
-		[AttributeChange("InCombat")] = function(newState: boolean)
+		["Attr-InCombat"] = function(newState: boolean)
 			self.charStatsDict.IsInCombat:set(newState)
-		end
-	})
-	Hydrate(RepS.Package.ServerLocation)({
-		[OnChange("Value")] = function(newLocation: string)
-			self.serverLocation:set(newLocation)
-		end
-	})
-	Hydrate(RepS.Package.PrivateServerId)({
-		[OnChange("Value")] = function(newId: string)
-			self.privateId:set(newId)
-		end
-	})
-	Hydrate(RepS.Package.Version)({
-		[OnChange("Value")] = function(newVersion: string)
-			self.version:set(newVersion)
 		end
 	})
 

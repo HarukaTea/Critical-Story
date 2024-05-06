@@ -183,6 +183,7 @@ local function charAttributesSetup()
     Spawn(updateSpeed, 0)
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)
+    ServerUtil:EquipWeapon(char)
 
     HarukaLib:Hydrate(plr, {
         ["Attr-DMGPoints"] = function()
@@ -240,5 +241,7 @@ local function onDead()
     for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end
     end
+
+    script:Destroy()
 end
 humanoid.Died:Once(onDead)

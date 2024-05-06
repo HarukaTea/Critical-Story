@@ -8,6 +8,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local Value, OnEvent, Computed = Fusion.Value, Fusion.OnEvent, Fusion.Computed
@@ -24,8 +25,8 @@ local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
     if id == "Items" then
         itemAmount = Value(self.inventory[item].Value)
 
-        Fusion.Hydrate(self.inventory[item])({
-            [Fusion.OnChange("Value")] = function(newAmount: number)
+        HarukaLib:Hydrate(self.inventory[item], {
+            ["Prop-Value"] = function(newAmount: number)
                 itemAmount:set(newAmount)
             end
         })

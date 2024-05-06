@@ -5,7 +5,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -18,8 +17,8 @@ ServerUtil:ShowText(char, text, color)
 
 HarukaLib:Add(char, "Defense", power)
 
-Fusion.Hydrate(script)({
-    [Fusion.AttributeChange("Turn")] = function(newTurn: number)
+HarukaLib:Hydrate(script, {
+    ["Attr-Turn"] = function(newTurn: number)
         if newTurn <= 0 then
             HarukaLib:Add(char, "Defense", -power)
 

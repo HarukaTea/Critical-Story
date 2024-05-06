@@ -8,6 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local TurnBaseItemChoice = require(RepS.Modules.UI.Components.TurnBaseItemChoice)
 
@@ -43,13 +44,13 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
         end
 
         _handleItems()
-        Fusion.Hydrate(self.inventory)({
-            [Fusion.OnEvent("ChildAdded")] = _handleItems,
-            [Fusion.OnEvent("ChildRemoved")] = function()
+        HarukaLib:Hydrate(self.inventory, {
+            ["ChildAdded"] = _handleItems,
+            ["ChildRemoved"] = function()
                 if not self.plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
 
                 _handleItems()
-            end,
+            end
         })
     end
 

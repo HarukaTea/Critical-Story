@@ -9,6 +9,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
@@ -77,8 +78,8 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 		end)
 	end
-    Fusion.Hydrate(self.char)({
-        [Fusion.AttributeChange("CurrentRegion")] = _showCurrentLocation
+    HarukaLib:Hydrate(self.char, {
+        ["Attr-CurrentRegion"] = _showCurrentLocation
     })
 
     return Components.Frame({

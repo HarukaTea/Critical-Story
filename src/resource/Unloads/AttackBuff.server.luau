@@ -5,7 +5,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -23,8 +22,8 @@ local theoryMinDMG, theoryMaxDMG = floor(nowMinDMG * power - nowMinDMG), floor(n
 HarukaLib:Add(char, "MinDMGBuff", theoryMinDMG)
 HarukaLib:Add(char, "MaxDMGBuff", theoryMaxDMG)
 
-Fusion.Hydrate(script)({
-    [Fusion.AttributeChange("Turn")] = function(newTurn: number)
+HarukaLib:Hydrate(script, {
+    ["Attr-Turn"] = function(newTurn: number)
         if newTurn <= 0 then
             HarukaLib:Add(char, "MinDMGBuff", -theoryMinDMG)
             HarukaLib:Add(char, "MaxDMGBuff", -theoryMaxDMG)

@@ -10,6 +10,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Pinia = require(RepS.Modules.UI.Pinia.PlayerListPinia)
 
@@ -143,8 +144,8 @@ return function(plr: Player)
 	Players.PlayerRemoving:Connect(function()
 		self.players:set(Players:GetPlayers())
 	end)
-	Fusion.Hydrate(plr)({
-		[Fusion.AttributeChange("PlayerList")] = function(state: boolean)
+	HarukaLib:Hydrate(plr, {
+		["Attr-PlayerList"] = function(state: boolean)
 			self.isOpen:set(state)
 		end
 	})

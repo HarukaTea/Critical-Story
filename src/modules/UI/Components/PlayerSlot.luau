@@ -9,23 +9,24 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local New, Children, Computed, peek = Fusion.New, Fusion.Children, Fusion.Computed, Fusion.peek
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local sFind, format, match = string.find, string.format, string.match
+local format, match = string.format, string.match
 
 local function PlayerSlot(self: table, player: Player): Frame
 	local class = Fusion.Value(player:GetAttribute("Class"))
 	local role = Fusion.Value(player:GetAttribute("Role"))
 
-	Fusion.Hydrate(player)({
-		[Fusion.AttributeChange("Class")] = function(newClass: string)
+	HarukaLib:Hydrate(player, {
+		["Attr-Class"] = function(newClass: string)
 			class:set(newClass)
 		end,
-		[Fusion.AttributeChange("Role")] = function(newRole: string)
+		["Attr-Role"] = function(newRole: string)
 			role:set(newRole)
 		end
 	})

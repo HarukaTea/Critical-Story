@@ -17,7 +17,11 @@ local wait = task.wait
 local sFind = string.find
 
 --// Connections
-char.Humanoid.Died:Once(Empty)
+char.Humanoid.Died:Once(function()
+    Empty()
+
+    script:Destroy()
+end)
 
 --// Setups
 local function questDataSetup()

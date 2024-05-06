@@ -8,9 +8,9 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local Children, Value, AttributeChange, Computed =
-    Fusion.Children, Fusion.Value, Fusion.AttributeChange, Fusion.Computed
+local Children, Value, Computed = Fusion.Children, Fusion.Value, Fusion.Computed
 
 local v2New = Vector2.new
 local udNew = UDim.new
@@ -63,16 +63,16 @@ local function StatText(id: string, self: table) : TextLabel
     local char = self.char :: Model
     local charDMGStats = self.charDMGStats
 
-    Fusion.Hydrate(char)({
-        [AttributeChange("MinDMG")] = function(newDMG: number)
+    HarukaLib:Hydrate(char, {
+        ["Attr-MinDMG"] = function(newDMG: number)
             charDMGStats.MinDMG:set(newDMG)
         end,
-        [AttributeChange("MaxDMG")] = function(newDMG: number)
+        ["Attr-MaxDMG"] = function(newDMG: number)
             charDMGStats.MaxDMG:set(newDMG)
         end,
-        [AttributeChange("Magic")] = function(newMagic: number)
+        ["Attr-Magic"] = function(newMagic: number)
             charDMGStats.Magic:set(newMagic)
-        end,
+        end
     })
 
     return Components.TextLabel({

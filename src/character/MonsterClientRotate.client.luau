@@ -31,7 +31,7 @@ end
 CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
 CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
-Clock(1.5, function()
+local stopRotating = Clock(1.5, function()
     for _, monster: Model in monsters do
         if monster.PrimaryPart and char.PrimaryPart and monster:GetAttribute("InCombat") == false then
             if (char.PrimaryPart.Position - monster.PrimaryPart.Position).Magnitude <= 159.9 then
@@ -51,3 +51,10 @@ Clock(1.5, function()
         end
     end
 end)
+
+local function onDead()
+    stopRotating()
+
+    script:Destroy()
+end
+char.Humanoid.Died:Once(onDead)

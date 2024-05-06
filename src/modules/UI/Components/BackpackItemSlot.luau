@@ -25,16 +25,16 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 	local isSelecting = Value(false)
 
 	--// Connections
-	Fusion.Hydrate(item)({
-		[Fusion.OnChange("Value")] = function(newAmount: number)
+	HarukaLib:Hydrate(item, {
+		["Prop-Value"] = function(newAmount: number)
 			amount:set(newAmount)
 		end,
-		[Fusion.AttributeChange("Equipped")] = function(state: boolean)
+		["Attr-Equipped"] = function(state: boolean)
 			equipped:set(state)
 
 			self.filterInfo.Equip.Text:set(if state then "UNEQUIP" else "EQUIP")
 		end,
-		[Fusion.AttributeChange("Pinned")] = function(state: boolean)
+		["Attr-Pinned"] = function(state: boolean)
 			pinned:set(state)
 
 			self.filterInfo.Pin.Text:set(if state then "UNPIN" else "PIN")

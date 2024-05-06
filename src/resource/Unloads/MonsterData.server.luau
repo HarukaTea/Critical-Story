@@ -6,7 +6,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -123,9 +122,9 @@ local function combatEnds()
     end
 end
 
-Fusion.Hydrate(monster)({
-	[Fusion.AttributeChange("Health")] = function(newHP: number)
-		monster.Head.Display.Number.Text = newHP
+HarukaLib:Hydrate(monster, {
+    ["Attr-Health"] = function(newHP: number)
+        monster.Head.Display.Number.Text = newHP
 
 		if newHP <= 0 and not isDead then
 			isDead = true
@@ -142,15 +141,15 @@ Fusion.Hydrate(monster)({
 
 			combatEnds()
 		end
-	end
+    end
 })
-Fusion.Hydrate(monster.TargetPlayers)({
-	[Fusion.OnEvent("ChildRemoved")] = function()
-		wait()
+HarukaLib:Hydrate(monster.TargetPlayers, {
+    ["ChildRemoved"] = function()
+        wait()
 		if not monster.TargetPlayers:FindFirstChildOfClass("ObjectValue") and not isDead then
 			isDead = true
 
 			combatEnds()
 		end
-	end
+    end
 })

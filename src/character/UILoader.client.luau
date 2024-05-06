@@ -8,6 +8,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local plr = Players.LocalPlayer
+local char = script.Parent :: Model
+
+local wait = task.wait
 
 --- Reload UI modules when character respawned
 local UIModules = RepS.Modules.UI
@@ -27,3 +30,9 @@ for _, module in requireList do
 		require(module)(plr)
 	end)
 end
+
+local function onDead()
+	wait(3)
+	script:Destroy()
+end
+char.Humanoid.Died:Connect(onDead)

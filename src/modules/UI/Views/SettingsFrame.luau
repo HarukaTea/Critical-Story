@@ -7,10 +7,9 @@ local SoundService = game:GetService("SoundService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local SettingToggleBtn = require(RepS.Modules.UI.Components.SettingToggleBtn)
-
-local AttributeChange = Fusion.AttributeChange
 
 local fromScale = UDim2.fromScale
 local clear = table.clear
@@ -19,21 +18,21 @@ local function SettingsFrame(self: table): Frame
 	local potatoStoreParts = {}
 	local playerSettings = self.playerSettings :: table
 
-	Fusion.Hydrate(self.plr)({
-		[AttributeChange("CombatMode")] = function(style: string)
-			playerSettings.PublicCombat:set(style == "Public")
+	HarukaLib:Hydrate(self.plr, {
+		["Attr-CombatMode"] = function(newMode: string)
+			playerSettings.PublicCombat:set(if newMode == "Public" then true else false)
 		end,
-		[AttributeChange("Musics")] = function(state: boolean)
+		["Attr-Musics"] = function(state: boolean)
 			playerSettings.Musics:set(state)
 
 			SoundService.Musics.Volume = if state then 1 else 0
 		end,
-		[AttributeChange("SFXs")] = function(state: boolean)
+		["Attr-SFXs"] = function(state: boolean)
 			playerSettings.SFXs:set(state)
 
 			SoundService.SFXs.Volume = if state then 1 else 0
 		end,
-		[AttributeChange("PotatoMode")] = function(state: boolean)
+		["Attr-PotatoMode"] = function(state: boolean)
 			playerSettings.PotatoMode:set(state)
 
 			if state == false then
@@ -60,9 +59,9 @@ local function SettingsFrame(self: table): Frame
 				end
 			end
 		end,
-		[AttributeChange("PlayerList")] = function(state: boolean)
+		["Attr-PlayerList"] = function(state: boolean)
 			playerSettings.PlayerList:set(state)
-		end,
+		end
 	})
 
 	return Components.Frame({

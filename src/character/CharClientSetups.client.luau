@@ -54,5 +54,7 @@ local function onDied()
 
 	Lighting.ColorShift_Bottom = fromRGB(255, 0, 0)
 	Lighting.ColorShift_Top = fromRGB(255, 0, 0)
+
+	script:Destroy()
 end
 char.Humanoid.Died:Once(onDied)

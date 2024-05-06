@@ -6,14 +6,11 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
-
-local AttributeChange = Fusion.AttributeChange
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
 local DS1, DS2, DS3 = "CS_AS02_T1", "CS_AS02_T1_S2", "CS_AS02_T1_S3"
@@ -107,11 +104,11 @@ local function setup(plr: Player)
 
 		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
-		Fusion.Hydrate(plr)({
-			[AttributeChange(attr)] = function(newStat: any)
-				if newStat == nil then return end
+		HarukaLib:Hydrate(plr, {
+			["Attr-"..attr] = function(newStats: any)
+				if newStats == nil then return end --// We have false boolean data
 
-				data.Stats[attr] = HarukaLib:Serialize(newStat)
+				data.Stats[attr] = HarukaLib:Serialize(newStats)
 			end
 		})
 	end

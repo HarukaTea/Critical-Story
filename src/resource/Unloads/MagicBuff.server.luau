@@ -5,7 +5,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -22,8 +21,8 @@ local nowMagic = char:GetAttribute("Magic"):: number
 local theoryMagic = floor(nowMagic * power - nowMagic)
 HarukaLib:Add(char, "MagicBuff", theoryMagic)
 
-Fusion.Hydrate(script)({
-    [Fusion.AttributeChange("Turn")] = function(newTurn: number)
+HarukaLib:Hydrate(script, {
+    ["Attr-Turn"] = function(newTurn: number)
         if newTurn <= 0 then
             HarukaLib:Add(char, "MagicBuff", -theoryMagic)
 

@@ -6,11 +6,12 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local TurnBaseMonsterBar = require(RepS.Modules.UI.Components.TurnBaseMonsterBar)
 local TurnBasePlrBar = require(RepS.Modules.UI.Components.TurnBasePlrBar)
 
-local Children, Hydrate, OnEvent, peek = Fusion.Children, Fusion.Hydrate, Fusion.OnEvent, Fusion.peek
+local Children, peek = Fusion.Children, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -37,11 +38,10 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 			remove(afterMonsters, tFind(afterMonsters, monster))
 			self.targetingMobs:set(afterMonsters)
 		end
-		Hydrate(self.charData.TargetMonsters)({
-			[OnEvent("ChildAdded")] = _addMonster,
-			[OnEvent("ChildRemoved")] = _removeMonster
+		HarukaLib:Hydrate(self.charData.TargetMonsters, {
+			["ChildAdded"] = _addMonster,
+			["ChildRemoved"] = _removeMonster
 		})
-
 
 		local monsterHPThread: thread = nil
 		local function _combatStartSetup(monster: Model)
@@ -60,8 +60,8 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 		local function _combatEndAction()
 			if monsterHPThread then cancel(monsterHPThread) end
 		end
-		Hydrate(self.char)({
-			[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+		HarukaLib:Hydrate(self.char, {
+			["Attr-InCombat"] = function(state: boolean)
 				if state then
 					_combatStartSetup(self.charData.TargetMonster.Value)
 
@@ -88,8 +88,8 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 		end
 
 		local taggedMob = {}
-		Hydrate(self.charData.TargetMonster)({
-			[Fusion.OnChange("Value")] = function(newMob: Model?)
+		HarukaLib:Hydrate(self.charData.TargetMonster, {
+			["Prop-Value"] = function(newMob: Model?)
 				if not newMob then return end
 
 				self.targetingMob:set(newMob)
@@ -100,9 +100,9 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 				self.playersInCombat:set(newMob.TargetPlayers:GetChildren())
 				taggedMob[#taggedMob + 1] = newMob
 
-				Hydrate(newMob.TargetPlayers)({
-					[OnEvent("ChildAdded")] = _addPlr,
-					[OnEvent("ChildRemoved")] = _removePlr
+				HarukaLib:Hydrate(newMob.TargetPlayers, {
+					["ChildAdded"] = _addPlr,
+					["ChildRemoved"] = _removePlr
 				})
 			end
 		})

@@ -6,6 +6,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local EffectIndicator = require(RepS.Modules.UI.Components.EffectIndicator)
 
@@ -19,10 +20,10 @@ local function PlayerEffectsList(self: table) : Frame
 		wait()
 		self.charStatsDict.EffectsList:set(self.charData.EffectsList:GetChildren())
 	end
-	Fusion.Hydrate(self.charData.EffectsList)({
-		[Fusion.OnEvent("ChildAdded")] = _setEffectsChildren,
-		[Fusion.OnEvent("ChildRemoved")] = _setEffectsChildren
-	})
+    HarukaLib:Hydrate(self.charData.EffectsList, {
+        ["ChildAdded"] = _setEffectsChildren,
+        ["ChildRemoved"] = _setEffectsChildren
+    })
 
     return Components.Frame({
         Name = "PlayerEffectsFrame",

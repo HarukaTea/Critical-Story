@@ -7,26 +7,27 @@ local RepS = game:GetService("ReplicatedStorage")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local BackpackItemSlot = require(RepS.Modules.UI.Components.BackpackItemSlot)
 
-local Computed, OnChange, peek = Fusion.Computed, Fusion.OnChange, Fusion.peek
+local Computed, peek = Fusion.Computed, Fusion.peek
 
 local tFind = table.find
 local wait = task.wait
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 
 local function BackpackItemList(self: table) : ScrollingFrame
-    Fusion.Hydrate(workspace.CurrentCamera)({
-		[OnChange("ViewportSize")] = function(newSize: Vector2)
-			self.absSize:set({
+    HarukaLib:Hydrate(workspace.CurrentCamera, {
+        ["Prop-ViewportSize"] = function(newSize: Vector2)
+            self.absSize:set({
 				newSize.X * 0.71,
 				newSize.Y * 0.662,
 			})
 			self.absCellPadding:set({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
 			self.absCellSize:set(peek(self.absSize)[1] / 15.58)
-		end,
-	})
+        end
+    })
 
     return Components.ScrollingFrame({
         Name = "Items",

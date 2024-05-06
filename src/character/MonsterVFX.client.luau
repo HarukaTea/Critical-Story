@@ -10,6 +10,8 @@ local TS = game:GetService("TweenService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
+local char = script.Parent :: Model
+
 local wait = task.wait
 local sinh, random = math.sinh, math.random
 local v3New = Vector3.new
@@ -205,3 +207,8 @@ local function vfxHandler(blast: Model | BasePart)
 	end)
 end
 CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)
+
+local function onDead()
+	script:Destroy()
+end
+char.Humanoid.Died:Once(onDead)

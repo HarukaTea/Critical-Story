@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Computed, Tween = Fusion.Computed, Fusion.Tween
 
@@ -25,11 +26,11 @@ local function StatBar(id: string, self: table): Frame
 	local isSelecting = Fusion.Value(false)
 
 	local charStatsDict = self.charStatsDict
-	Fusion.Hydrate(self.humanoid)({
-		[Fusion.OnChange("Health")] = function(health: number)
+	HarukaLib:Hydrate(self.humanoid, {
+		["Prop-Health"] = function(health: number)
 			charStatsDict.HP[1]:set(health)
 		end,
-		[Fusion.OnChange("MaxHealth")] = function(health: number)
+		["Prop-MaxHealth"] = function(health: number)
 			charStatsDict.HP[2]:set(health)
 		end
 	})

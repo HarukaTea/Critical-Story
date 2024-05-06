@@ -13,11 +13,9 @@ local Signals = require(RepS.Modules.Data.Signals)
 
 local CharPointsBtn = require(RepS.Modules.UI.Components.CharPointsBtn)
 
-local Children, New, AttributeChange, Hydrate, Tween, Computed, OnEvent, peek =
+local Children, New, Tween, Computed, OnEvent, peek =
 	Fusion.Children,
 	Fusion.New,
-	Fusion.AttributeChange,
-	Fusion.Hydrate,
 	Fusion.Tween,
 	Fusion.Computed,
 	Fusion.OnEvent,
@@ -57,46 +55,46 @@ local function CharacterFrame(self: table): Frame
 	local plr, char = self.plr :: Player, self.char :: Model
 	local playerData, charData = self.playerData, self.charData
 
-	Hydrate(plr)({
-		[AttributeChange("Levels")] = function(level: number)
-			playerData.Levels:set(level)
+	HarukaLib:Hydrate(plr, {
+		["Attr-Levels"] = function(levels: number)
+			playerData.Levels:set(levels)
 		end,
-		[AttributeChange("LvPoints")] = function(point: number)
-			playerData.LvPoints:set(point)
+		["Attr-LvPoints"] = function(points: number)
+			playerData.LvPoints:set(points)
 		end,
-		[AttributeChange("DMGPoints")] = function(point: number)
-			playerData.DMG:set(point)
+		["Attr-DMGPoints"] = function(points: number)
+			playerData.DMG:set(points)
 		end,
-		[AttributeChange("MagicPoints")] = function(point: number)
-			playerData.Magic:set(point)
+		["Attr-MagicPoints"] = function(points: number)
+			playerData.Magic:set(points)
 		end,
-		[AttributeChange("HealthPoints")] = function(point: number)
-			playerData.Health:set(point)
+		["Attr-HealthPoints"] = function(points: number)
+			playerData.Health:set(points)
 		end,
-		[AttributeChange("ShieldPoints")] = function(point: number)
-			playerData.Shield:set(point)
+		["Attr-ShieldPoints"] = function(points: number)
+			playerData.Shield:set(points)
 		end,
-		[AttributeChange("Gold")] = function(gold: number)
+		["Attr-Gold"] = function(gold: number)
 			playerData.Gold:set(gold)
 		end
 	})
-	Hydrate(char)({
-		[AttributeChange("MinDMG")] = function(dmg: number)
+	HarukaLib:Hydrate(char, {
+		["Attr-MinDMG"] = function(dmg: number)
 			charData.MinDMG:set(dmg)
 		end,
-		[AttributeChange("MaxDMG")] = function(dmg: number)
+		["Attr-MaxDMG"] = function(dmg: number)
 			charData.MaxDMG:set(dmg)
 		end,
-		[AttributeChange("Magic")] = function(magic: number)
+		["Attr-Magic"] = function(magic: number)
 			charData.Magic:set(magic)
 		end,
-		[AttributeChange("MaxShield")] = function(shield: number)
+		["Attr-MaxShield"] = function(shield: number)
 			charData.Shield:set(shield)
 		end
 	})
-	Hydrate(char.Humanoid)({
-		[Fusion.OnChange("MaxHealth")] = function(hp: number)
-			charData.Health:set(hp)
+	HarukaLib:Hydrate(char.Humanoid, {
+		["Prop-MaxHealth"] = function(maxHP: number)
+			charData.Health:set(maxHP)
 		end
 	})
 

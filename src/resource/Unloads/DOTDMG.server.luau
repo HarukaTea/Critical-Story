@@ -5,7 +5,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -29,8 +28,8 @@ particle.Color = csNew(color)
 particle.Parent = char.PrimaryPart
 
 local firstDMG = true
-Fusion.Hydrate(script)({
-    [Fusion.AttributeChange("Turn")] = function(newTurn: number)
+HarukaLib:Hydrate(script, {
+    ["Attr-Turn"] = function(newTurn: number)
         if newTurn >= 0 then
             if firstDMG then firstDMG = false return end
 

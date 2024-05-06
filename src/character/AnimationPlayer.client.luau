@@ -59,5 +59,7 @@ Signals.PlayAnimation:Connect(playAnim)
 local function onDead()
 	Events.PlayAnimation:DisconnectAll()
 	Signals.PlayAnimation:DisconnectAll()
+
+	script:Destroy()
 end
 humanoid.Died:Once(onDead)

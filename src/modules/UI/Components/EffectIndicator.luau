@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Children = Fusion.Children
 
@@ -64,13 +65,13 @@ local function EffectIndicator(id: string, effect: Script) : ImageLabel
 	local maxTurn = 0
 	local turn = Fusion.Value(effect:GetAttribute("Turn"))
 
-    Fusion.Hydrate(effect)({
-		[Fusion.AttributeChange("Turn")] = function(newTurn: number)
+	HarukaLib:Hydrate(effect, {
+		["Attr-Turn"] = function(newTurn: number)
 			if newTurn >= maxTurn then maxTurn = newTurn end
 
 			turn:set(newTurn)
 		end
-    })
+	})
 
     return Components.ImageLabel({
         Name = effect.Name,

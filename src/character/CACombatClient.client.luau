@@ -241,4 +241,8 @@ CS:GetInstanceAddedSignal("TurnBaseCage"):Connect(cageHolderHandler)
 local stopDetecting = setup()
 
 --// Clear
-humanoid.Died:Once(stopDetecting)
+humanoid.Died:Once(function()
+	stopDetecting()
+
+	script:Destroy()
+end)

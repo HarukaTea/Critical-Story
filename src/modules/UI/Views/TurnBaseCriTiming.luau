@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
 
@@ -14,8 +15,8 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 
 local function TurnBaseCriTiming(self: table) : Frame
-    Fusion.Hydrate(self.plr)({
-        [Fusion.AttributeChange("Class")] = function(newClass: string)
+    HarukaLib:Hydrate(self.plr, {
+        ["Attr-Class"] = function(newClass: string)
             self.playerClass:set(newClass)
         end
     })

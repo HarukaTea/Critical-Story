@@ -8,7 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Clock = require(RepS.Modules.Packages.Clock)
-local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent :: Model
@@ -65,7 +65,15 @@ local function orbSpawnHandler(state: boolean)
         stopSpawn = nil
 	end
 end
-
-Fusion.Hydrate(char)({
-    [Fusion.AttributeChange("OrbAttackingTime")] = orbSpawnHandler
+HarukaLib:Hydrate(char, {
+    ["Attr-OrbAttackingTime"] = orbSpawnHandler
 })
+
+local function onDead()
+    if stopSpawn then stopSpawn() end
+
+    stopSpawn = nil
+
+    script:Destroy()
+end
+char.Humanoid.Died:Once(onDead)

@@ -8,6 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
 
@@ -82,8 +83,8 @@ return function(plr: Player)
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUI(plr, "AdventurerMenu", true) end
 	end
-	Fusion.Hydrate(self.char)({
-		[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+	HarukaLib:Hydrate(self.char, {
+		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
 	})

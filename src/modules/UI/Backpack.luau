@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Pinia = require(RepS.Modules.UI.Pinia.BackpackPinia)
 
@@ -127,25 +128,25 @@ return function(plr: Player)
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
 
 	---// listening events
-	Fusion.Hydrate(self.inventory)({
-		[Fusion.OnEvent("ChildAdded")] = function()
+	HarukaLib:Hydrate(self.inventory, {
+		["ChildAdded"] = function()
 			wait()
 			self.items:set(self.inventory:GetChildren())
 		end,
-		[Fusion.OnEvent("ChildRemoved")] = function()
+		["ChildRemoved"] = function()
 			if not plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
 
 			wait()
 			self.items:set(self.inventory:GetChildren())
-		end,
+		end
 	})
 
 	--// Connections
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUI(plr, "Backpack", true) end
 	end
-	Fusion.Hydrate(self.char)({
-		[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+	HarukaLib:Hydrate(self.char, {
+		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
 	})

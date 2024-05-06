@@ -8,11 +8,12 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local TurnBaseEffectList = require(RepS.Modules.UI.Views.TurnBaseEffectList)
 
-local Children, Tween, Computed, Value, New, OnEvent, Hydrate =
-    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.New, Fusion.OnEvent, Fusion.Hydrate
+local Children, Tween, Computed, Value, New, OnEvent =
+    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.New, Fusion.OnEvent
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -34,31 +35,31 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
 
         EffectsList = Value({})
     }
-    Hydrate(self.charData.TargetMonster)({
-		[Fusion.OnChange("Value")] = function(newTarget: Model?)
-			if not newTarget then return end
+    HarukaLib:Hydrate(self.charData.TargetMonster, {
+        ["Prop-Value"] = function(newTarget: Model?)
+            if not newTarget then return end
 
 			info.Targeting:set(monster == newTarget)
-		end
-	})
-	Hydrate(monster)({
-		[Fusion.AttributeChange("Health")] = function(hp: number)
-			info.HP:set(hp)
+        end
+    })
+    HarukaLib:Hydrate(monster, {
+        ["Attr-Health"] = function(hp: number)
+            info.HP:set(hp)
 
 			if hp <= 0 then info.innerPos:set(fromScale(1.3, 0)) end
-		end,
-		[Fusion.AttributeChange("MaxHealth")] = function(hp: number)
-			info.MaxHP:set(hp)
-		end
-	})
+        end,
+        ["Attr-MaxHealth"] = function(hp: number)
+            info.MaxHP:set(hp)
+        end
+    })
 
     local function _setEffectsChildren()
 		wait()
 		info.EffectsList:set(monster.EffectsList:GetChildren())
 	end
-    Hydrate(monster.EffectsList)({
-        [Fusion.OnEvent("ChildAdded")] = _setEffectsChildren,
-        [Fusion.OnEvent("ChildRemoved")] = _setEffectsChildren
+    HarukaLib:Hydrate(monster.EffectsList, {
+        ["ChildAdded"] = _setEffectsChildren,
+        ["ChildRemoved"] = _setEffectsChildren
     })
 
     return Components.Frame({

@@ -9,11 +9,12 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local TurnBaseEffectList = require(RepS.Modules.UI.Views.TurnBaseEffectList)
 
-local Children, Tween, Computed, New, OnEvent, Value, Hydrate =
-    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.New, Fusion.OnEvent, Fusion.Value, Fusion.Hydrate
+local Children, Tween, Computed, New, OnEvent, Value =
+    Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.New, Fusion.OnEvent, Fusion.Value
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
@@ -35,16 +36,16 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
         EffectsList = Value({})
     }
 
-    Hydrate(char.Humanoid)({
-        [Fusion.OnChange("Health")] = function(newHP: number)
+    HarukaLib:Hydrate(char.Humanoid, {
+        ["Prop-Health"] = function(newHP: number)
             info.HP:set(newHP)
         end,
-        [Fusion.OnChange("MaxHealth")] = function(newHP: number)
+        ["Prop-MaxHealth"] = function(newHP: number)
             info.MaxHP:set(newHP)
         end
     })
-    Hydrate(plr)({
-        [Fusion.AttributeChange("NextAction")] = function(newAction: string)
+    HarukaLib:Hydrate(plr, {
+        ["Attr-NextAction"] = function(newAction: string)
             info.NextAction:set(newAction)
         end
     })
@@ -53,9 +54,9 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
 		wait()
 		info.EffectsList:set(char.CharStats.EffectsList:GetChildren())
 	end
-    Hydrate(char.CharStats.EffectsList)({
-        [Fusion.OnEvent("ChildAdded")] = _setEffectsChildren,
-        [Fusion.OnEvent("ChildRemoved")] = _setEffectsChildren
+    HarukaLib:Hydrate(char.CharStats.EffectsList, {
+        ["ChildAdded"] = _setEffectsChildren,
+        ["ChildRemoved"] = _setEffectsChildren
     })
 
     return Components.Frame({

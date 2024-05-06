@@ -8,6 +8,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Pinia = require(RepS.Modules.UI.Pinia.TurnBaseUIPinia)
 
@@ -44,17 +45,17 @@ return function (plr: Player)
 	Pinia(self)
 
 	local charStatsDict = self.charStatsDict :: table
-	Fusion.Hydrate(self.char)({
-		[AttributeChange("InCombat")] = function(newState: boolean)
+	HarukaLib:Hydrate(self.char, {
+		["Attr-InCombat"] = function(newState: boolean)
 			self.isInCombat:set(newState)
 		end,
-		[AttributeChange("Shield")] = function(newShield: number)
+		["Attr-Shield"] = function(newShield: number)
 			charStatsDict.Shield:set(newShield)
 		end,
-		[AttributeChange("MaxShield")] = function(newShield: number)
-			charStatsDict.MaxShield:set(newShield)
+		["Attr-MaxShield"] = function(newMaxShield: number)
+			charStatsDict.MaxShield:set(newMaxShield)
 		end,
-		[AttributeChange("TP")] = function(newTP: number)
+		["Attr-TP"] = function(newTP: number)
 			charStatsDict.TP:set(newTP)
 		end
 	})
