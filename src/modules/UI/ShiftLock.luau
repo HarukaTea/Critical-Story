@@ -99,6 +99,8 @@ return function(plr: Player)
 		self:SetLockState("Off")
 
 		UI:Destroy()
+
+		self = nil
 	end
 	self.char.Humanoid.Died:Once(clearGarbage)
 end

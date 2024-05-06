@@ -148,6 +148,8 @@ return function (plr: Player)
 		UI:Destroy()
 
 		Events.NewPhase:DisconnectAll()
+
+		self = nil
 	end
 	self.char.Humanoid.Died:Once(onDead)
 end

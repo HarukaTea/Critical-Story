@@ -295,6 +295,8 @@ return function(plr: Player)
 		Signals.ExCategoryOpened:DisconnectAll()
 
 		self.Empty()
+
+		self = nil
 	end
 	self.humanoid.Died:Once(_clearGarbage)
 end

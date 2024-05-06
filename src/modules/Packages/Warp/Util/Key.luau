@@ -1,10 +1,6 @@
---!nocheck
---!optimize 2
+--!strict
 --!native
-
-local sub = string.sub
-local randomNew = Random.new
-
+--!optimize 2
 return function(): number?
-	return tonumber(sub(tostring(randomNew():NextNumber()), 3, 6))
+	return tonumber(string.sub(tostring(Random.new():NextNumber()), 3, 6)) -- 4 digits
 end

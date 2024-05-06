@@ -5,7 +5,7 @@
 local HarukaLib = {}
 
 local floor, log10, abs = math.floor, math.log10, math.abs
-local format, gsub = string.format, string.gsub
+local format, gsub, sFind, sub = string.format, string.gsub, string.find, string.sub
 local cfNew, v3New, fromRGB = CFrame.new, Vector3.new, Color3.fromRGB
 local unpack = table.unpack
 
@@ -114,6 +114,36 @@ function HarukaLib:Deserialize(val: table)
 
 	else
 		return val
+	end
+end
+
+--[[
+	A custom remade of `Fusion.Hydrate`
+]]
+function HarukaLib:Hydrate(obj: Instance, props: table)
+	for prop, func in props do
+		if sFind(prop, "Attr") then
+			local _, endPos = sFind(prop, "Attr")
+			local attr = sub(prop, endPos + 2)
+
+			obj:GetAttributeChangedSignal(attr):Connect(function()
+				func(obj:GetAttribute(attr))
+			end)
+
+		elseif props == "ChildAdded" then
+			obj.ChildAdded:Connect(func)
+
+		elseif props == "ChildRemoved" then
+			obj.ChildRemoved:Connect(func)
+
+		elseif sFind(prop, "Prop") then
+			local _, endPos = sFind(prop, "Prop")
+			local propName = sub(prop, endPos + 2)
+
+			obj:GetPropertyChangedSignal(propName):Connect(function()
+				func(obj[propName])
+			end)
+		end
 	end
 end
 

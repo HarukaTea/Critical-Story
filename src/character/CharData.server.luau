@@ -11,7 +11,6 @@ local SSS = game:GetService("ServerScriptService")
 local Bin = require(RepS.Modules.Packages.Bin)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
@@ -25,8 +24,6 @@ local humanoid = char.Humanoid :: Humanoid
 
 local isBroken = false
 local lvUpCD = false
-
-local AttributeChange = Fusion.AttributeChange
 
 local ATTRIBUTES = require(SSS.Modules.Data.CharTemplate)
 
@@ -187,32 +184,31 @@ local function charAttributesSetup()
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)
 
-    Fusion.Hydrate(plr)({
-        [AttributeChange("DMGPoints")] = function()
+    HarukaLib:Hydrate(plr, {
+        ["Attr-DMGPoints"] = function()
             updateMinDMG()
             updateMaxDMG()
         end,
-        [AttributeChange("MagicPoints")] = updateMagic,
-        [AttributeChange("ShieldPoints")] = updateShield,
-        [AttributeChange("HealthPoints")] = updateHP,
-        [AttributeChange("EXP")] = levelReqCheck,
-        [AttributeChange("Class")] = function()
+        ["Attr-MagicPoints"] = updateMagic,
+        ["Attr-ShieldPoints"] = updateShield,
+        ["Attr-HealthPoints"] = updateHP,
+        ["Attr-EXP"] = levelReqCheck,
+        ["Attr-Class"] = function()
             ServerUtil:EquipWeapon(char)
         end
     })
-    Fusion.Hydrate(char)({
-        [AttributeChange("TP")] = tpCheck,
-        [AttributeChange("Shield")] = shieldCheck,
+    HarukaLib:Hydrate(char, {
+        ["Attr-TP"] = tpCheck,
+        ["Attr-Shield"] = shieldCheck,
 
-        [AttributeChange("MinDMGBuff")] = updateMinDMG,
-        [AttributeChange("MaxDMGBuff")] = updateMaxDMG,
-        [AttributeChange("MagicBuff")] = updateMagic,
-        [AttributeChange("ShieldBuff")] = updateShield,
-        [AttributeChange("HealthBuff")] = updateHP,
-        [AttributeChange("SpeedBuff")] = updateSpeed,
-        [AttributeChange("JumpBuff")] = updateJump,
+        ["Attr-MinDMGBuff"] = updateMinDMG,
+        ["Attr-MaxDMGBuff"] = updateMaxDMG,
+        ["Attr-MagicBuff"] = updateShield,
+        ["Attr-ShieldBuff"] = updateShield,
+        ["Attr-HealthBuff"] = updateHP,
+        ["Attr-JumpBuff"] = updateJump,
 
-        [AttributeChange("InCombat")] = function()
+        ["Attr-InCombat"] = function()
             ServerUtil:EquipWeapon(char)
         end
     })

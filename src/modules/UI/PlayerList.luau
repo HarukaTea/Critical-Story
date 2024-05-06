@@ -153,6 +153,8 @@ return function(plr: Player)
 		UI:Destroy()
 
 		CAS:UnbindAction("TogglePlayerList")
+
+		self = nil
 	end
 	char.Humanoid.Died:Once(_onDead)
 end

@@ -9,7 +9,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
-local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Promise = require(RepS.Modules.Packages.Promise)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -222,8 +222,8 @@ local function cageHolderHandler(cage: Model)
 end
 
 --// Connection setups
-Fusion.Hydrate(char)({
-	[Fusion.AttributeChange("InCombat")] = function(state: boolean)
+HarukaLib:Hydrate(char, {
+	["Attr-InCombat"] = function(state: boolean)
 		if state then
 			startCombat(char.CharStats.TargetMonster.Value)
 

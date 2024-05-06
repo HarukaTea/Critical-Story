@@ -1,86 +1,83 @@
---!nocheck
---!optimize 2
+--!strict
 --!native
-
+--!optimize 2
 local Client = {}
 Client.__index = Client
 
 local Util = script.Parent.Parent.Util
 
+local Type = require(script.Parent.Parent.Type)
 local ClientProcess = require(script.Parent.ClientProcess)
+local Assert = require(Util.Assert)
 local Key = require(Util.Key)
 local Serdes = require(Util.Serdes)
+local Buffer = require(Util.Buffer)
 
-local insert, remove = table.insert, table.remove
-local spawn = task.spawn
-local clock = os.clock
-local yield, isRunning = coroutine.yield, coroutine.running
-
-function Client.new(Identifier: string)
+function Client.new(isReliable: boolean, Identifier: string, conf: Type.ClientConf?)
 	local self = setmetatable({}, Client)
-	self.id = Serdes(Identifier)
-	self.fn = {}
 
-	ClientProcess.add(self.id, Identifier)
+	self._buffer = Buffer.new()
+	self._buffer:wu8(Serdes(Identifier, conf and conf.yieldWait))
+	self.id = Buffer.convert(self._buffer:build())
+	self.fn = {}
+	self._conf = table.freeze(conf or {})
+	self.IsConnected = false
+	self.isReliable = isReliable
+
+	ClientProcess.add(self.id, Identifier, conf or { yieldWait = 10, logging = { store = false, opt = false } })
+	self._buffer:remove()
 
 	return self
 end
 
-function Client:Fire(...: any)
-	ClientProcess.insertQueue(self.id, ...)
+function Client:logs()
+	Assert(self._conf.logging, "[Client]: Event is not configured with logging.")
+	return ClientProcess.getlogs(self.id)
 end
 
-function Client:Invoke(timeout: number, ...: any): any
-	return ClientProcess.insertRequest(self.id, timeout, ...)
+function Client:Fire(...: any)
+	ClientProcess.insertQueue(self.id, self.isReliable, ...)
 end
 
 function Client:Connect(callback: (args: any) -> ()): string
 	local key = tostring(Key())
-	insert(self.fn, key)
-
+	table.insert(self.fn, key)
+	self.IsConnected = #self.fn > 0
 	ClientProcess.addCallback(self.id, key, callback)
 	return key
 end
 
 function Client:Once(callback: (args: any) -> ()): string
 	local key = tostring(Key())
-	insert(self.fn, key)
-
+	table.insert(self.fn, key)
+	self.IsConnected = #self.fn > 0
 	ClientProcess.addCallback(self.id, key, function(...)
 		self:Disconnect(key)
-
-		spawn(callback, ...)
+		task.spawn(callback, ...)
 	end)
 	return key
 end
 
 function Client:Wait()
-	local thread: thread, t = isRunning(), clock()
-
+	local thread: thread, t = coroutine.running(), os.clock()
 	self:Once(function()
-		spawn(thread, clock() - t)
+		task.spawn(thread, os.clock()-t)
 	end)
-	return yield()
+	return coroutine.yield()
 end
 
 function Client:DisconnectAll()
-	for idx, key: string in self.fn do
-		ClientProcess.removeCallback(self.id, key)
-
-		remove(self.fn, idx)
+	for _, key: string in self.fn do
+		self:Disconnect(key)
 	end
 end
 
-function Client:Disconnect(key: string)
-	assert(typeof(key) == "string", "Key must be a string type.")
-
+function Client:Disconnect(key: string): boolean
+	Assert(typeof(key) == "string", "Key must be a string type.")
 	ClientProcess.removeCallback(self.id, key)
-end
-
-function Client:Destroy()
-	self:DisconnectAll()
-
-	setmetatable(self, nil)
+	table.remove(self.fn, table.find(self.fn, key))
+	self.IsConnected = #self.fn > 0
+	return table.find(self.fn, key) == nil
 end
 
 return Client.new

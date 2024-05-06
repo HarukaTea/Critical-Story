@@ -2,7 +2,8 @@
   "robloxLsp.workspace.ignoreDir": [
     ".vscode",
     "**/_Index/**",
-    "src/modules/Packages/Cmdr/Shared/Util.lua"
+    "src/modules/Packages/Cmdr/Shared/Util.lua",
+    "src/modules/Packages/Warp/Util/Buffer"
   ],
 
   "files.exclude": {

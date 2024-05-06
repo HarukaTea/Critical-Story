@@ -112,6 +112,8 @@ return function(plr: Player)
 		Signals.CreateHint:DisconnectAll()
 
 		UI:Destroy()
+
+		self = nil
 	end
 	char.Humanoid.Died:Once(_onDead)
 end

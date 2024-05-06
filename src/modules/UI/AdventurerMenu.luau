@@ -94,6 +94,8 @@ return function(plr: Player)
 
 		UI:Destroy()
 		plr:SetAttribute("CurrentMenu", "None")
+
+		self = nil
 	end
 	self.char.Humanoid.Died:Once(_clearGarbage)
 end

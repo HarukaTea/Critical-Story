@@ -158,6 +158,8 @@ return function(plr: Player)
 		plr:SetAttribute("CurrentMenu", "None")
 
 		self.itemSlotClicked:Destroy()
+
+		self = nil
 	end
 	self.char.Humanoid.Died:Once(_clearGarbage)
 end
