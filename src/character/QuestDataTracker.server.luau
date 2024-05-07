@@ -5,10 +5,10 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
-local Bin = require(RepS.Modules.Packages.Bin)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
-local Add, Empty = Bin()
+local Add, Empty = HarukaLib.Bin()
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)

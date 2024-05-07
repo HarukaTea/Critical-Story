@@ -7,7 +7,6 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
-local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Promise = require(RepS.Modules.Packages.Promise)
@@ -55,7 +54,7 @@ local function setup()
 	CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
 	--- detect mobs when player is near them
-    return Clock(0.15, function()
+    return HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
 		if encounterCD then return end
 

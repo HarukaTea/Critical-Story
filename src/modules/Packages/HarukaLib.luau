@@ -2,12 +2,15 @@
 --!optimize 2
 --!native
 
+local RS = game:GetService("RunService")
+
 local HarukaLib = {}
 
 local floor, log10, abs = math.floor, math.log10, math.abs
 local format, gsub, sFind, sub = string.format, string.gsub, string.find, string.sub
 local cfNew, v3New, fromRGB = CFrame.new, Vector3.new, Color3.fromRGB
-local unpack = table.unpack
+local unpack, clear = table.unpack, table.clear
+local spawn = task.spawn
 
 --[[
 	Convert a number to string with abbr, for example, `10000` -> `10K`
@@ -147,6 +150,60 @@ function HarukaLib:Hydrate(obj: Instance, props: table)
 				func(obj[propName])
 			end)
 		end
+	end
+end
+
+--[[
+	A custom remade of `Bin`
+]]
+function HarukaLib.Bin()
+	local bin = {}
+
+	return function (item: any)
+		bin[#bin + 1] = item
+
+		return item
+
+	end, function()
+		for _, item: any in bin do
+			if typeof(item) == "Instance" then
+				item:Destroy()
+
+			elseif typeof(item) == "RBXScriptConnection" then
+				item:Disconnect()
+
+			elseif typeof(item) == "function" then
+				spawn(item)
+			end
+		end
+
+		clear(bin)
+	end
+end
+
+--[[
+	A custom remade of `Clock`
+]]
+function HarukaLib.Clock(tickTime: number, func: () -> ())
+	local nowTime = 0
+	local dropTime = tickTime * 10
+
+	local connection = RS.Heartbeat:Connect(function(deltaTime)
+		nowTime += deltaTime
+
+		if nowTime > dropTime then
+			nowTime = 0
+			func()
+
+		elseif nowTime > tickTime then
+			nowTime -= tickTime
+
+			func()
+		end
+	end)
+
+	return function ()
+		connection:Disconnect()
 	end
 end
 

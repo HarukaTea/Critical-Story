@@ -7,7 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Bin = require(RepS.Modules.Packages.Bin)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local char = script.Parent :: Model
@@ -15,7 +15,7 @@ local plr = Players:GetPlayerFromCharacter(char)
 local camera = workspace.CurrentCamera
 local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
 
-local Add, Empty = Bin()
+local Add, Empty = HarukaLib.Bin()
 
 local v3Zero = Vector3.zero
 local cfNew = CFrame.new

@@ -23,7 +23,7 @@ return function (context: table, monster: string, level: number, amount: number)
     if not levelPass or not amountPass then
         return "I guess you typed incorrectly..."
     end
-    if not AssetBook.MonsterIds[monster] then
+    if not AssetBook.MonsterInfo[monster] then
         return "Are you sure there is a monster called "..monster.."?"
     end
     if levelWant > 950 then
@@ -37,7 +37,7 @@ return function (context: table, monster: string, level: number, amount: number)
     worldMonster = worldMonster:FindFirstChildWhichIsA("Model", true)
 
     local locator = worldMonster.Parent:Clone() :: BasePart
-    locator.Name = AssetBook.MonsterIds[monster]
+    locator.Name = AssetBook.MonsterInfo[monster].Name
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
     locator:SetAttribute("CantRespawn", true)
@@ -56,7 +56,7 @@ return function (context: table, monster: string, level: number, amount: number)
     for _ = 1, amount - 1 do
         local subLocator = worldMonster.Parent:Clone() :: BasePart
 
-        subLocator.Name = AssetBook.MonsterIds[monster]
+        subLocator.Name = AssetBook.MonsterInfo[monster].Name
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)
         subLocator:SetAttribute("CantRespawn", true)
@@ -67,5 +67,5 @@ return function (context: table, monster: string, level: number, amount: number)
         ServerUtil:SetupMonster(subLocator, levelWant)
     end
 
-    return "Level "..levelWant.." "..AssetBook.MonsterIds[monster].." x"..amountWant.." spawned"
+    return "Level "..levelWant.." "..AssetBook.MonsterInfo[monster].Name.." x"..amountWant.." spawned"
 end

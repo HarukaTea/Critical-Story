@@ -54,10 +54,9 @@ local function clientTweenPlayer(objs: table, goal: table, style: string)
 	style = AssetBook.TweenInfos[style]
 
 	for _, obj: Instance in objs do
-		if not obj then continue end
-		if not obj.Parent then continue end
-
-		SuperTween.new(obj, style, goal):Play()
+		pcall(function()
+			TS:Create(obj, style, goal):Play()
+		end)
 	end
 end
 Events.ClientTween:Connect(clientTweenPlayer)

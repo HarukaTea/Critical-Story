@@ -5,7 +5,7 @@
 local CS = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")
 
-local Clock = require(RepS.Modules.Packages.Clock)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
@@ -31,7 +31,7 @@ end
 CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
 CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
-local stopRotating = Clock(1.5, function()
+local stopRotating = HarukaLib.Clock(1.5, function()
     for _, monster: Model in monsters do
         if monster.PrimaryPart and char.PrimaryPart and monster:GetAttribute("InCombat") == false then
             if (char.PrimaryPart.Position - monster.PrimaryPart.Position).Magnitude <= 159.9 then

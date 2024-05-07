@@ -8,15 +8,13 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
 
-local Bin = require(RepS.Modules.Packages.Bin)
-local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local Add, Empty = Bin()
+local Add, Empty = HarukaLib.Bin()
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
@@ -63,7 +61,7 @@ local function setup()
 
     ServerUtil:SetCollisionGroup(char, "Player")
 
-    Add(Clock(1, function()
+    Add(HarukaLib.Clock(1, function()
         HarukaLib:Add(plr, "PlayTime", 1)
     end))
 
@@ -102,14 +100,14 @@ local function classAttributesSetup()
     end))
 
     --- knight
-    Add(Clock(1.7, function()
+    Add(HarukaLib.Clock(1.7, function()
         if char:GetAttribute("Guard") <= 0 then return end
 
         HarukaLib:Add(char, "Guard", -1)
     end))
 
     --- Rogue
-    Add(Clock(1.2, function()
+    Add(HarukaLib.Clock(1.2, function()
         if char:GetAttribute("RogueCri") <= 0 then return end
 
         HarukaLib:Add(char, "RogueCri", -1)

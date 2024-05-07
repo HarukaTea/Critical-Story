@@ -22,12 +22,12 @@ local fromRGB = Color3.fromRGB
 local udimNew = UDim.new
 local clamp = math.clamp
 local wait = task.wait
+local fontFromName = Font.fromName
 
 local function TurnBasePlrBar(char: Model, self: table) : Frame
     local plr = Players:GetPlayerFromCharacter(char)
     local info = {
         isSelecting = Value(false),
-        actionIsSelecting = Value(false),
 
         HP = Value(char.Humanoid.Health),
         MaxHP = Value(char.Humanoid.MaxHealth),
@@ -89,30 +89,37 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                             return if use(info.isSelecting) then 0.3 else 1
                         end), AssetBook.TweenInfos.twiceHalf)
                     }),
-                    Components.ImageLabel({
-                        Name = "PlayerClass",
-                        Image = AssetBook.ClassInfo[plr:GetAttribute("Class")].Image,
-                        Position = fromScale(0.78, 0),
-                        Size = fromScale(1, 1),
-                        SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                        BackgroundTransparency = 0,
-
-                        [Children] = { Components.RoundUICorner() }
-                    }),
                     Components.TextLabel({
                         Name = "PlayerName",
                         Position = fromScale(0.117, 0.1),
                         Size = fromScale(0.634, 0.35),
                         Text = plr.DisplayName,
                         TextXAlignment = Enum.TextXAlignment.Right,
-                        TextColor3 = AssetBook.ClassInfo[plr:GetAttribute("Class")].Color
+                        TextColor3 = AssetBook.ClassInfo[plr:GetAttribute("Class")].Color,
+                    }),
+                    Components.TextLabel({
+                        Name = "Targeting",
+                        AnchorPoint = v2New(0, 0.5),
+                        Size = fromScale(0.8, 0.8),
+                        SizeConstraint = Enum.SizeConstraint.RelativeYY,
+                        FontFace = fontFromName("Roboto", Enum.FontWeight.Bold),
+                        Text = "<",
+
+                        Visible = Computed(function(use)
+                            return if use(self.targetingPlayer) == plr then true else false
+                        end),
+                        Position = Tween(Computed(function(use)
+                            return use(self.playerTargetingPos)
+                        end), AssetBook.TweenInfos.half),
+
+                        [Children] = { Components.TextUIStroke({ Thickness = 3 }) }
                     }),
                     Components.ImageLabel({
                         Name = "NextAction",
-                        BackgroundTransparency = 0,
-                        Position = fromScale(1.1, 0),
+                        Position = fromScale(0.78, 0),
                         Size = fromScale(1, 1),
                         SizeConstraint = Enum.SizeConstraint.RelativeYY,
+                        BackgroundTransparency = 0,
 
                         Image = Computed(function(use)
                             local nextAction = use(info.NextAction)
@@ -131,25 +138,7 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                             end
                         end),
 
-                        [Children] = {
-                            Components.RoundUICorner(),
-                            Components.UIStroke({
-                                Enabled = true,
-                                Thickness = 2.7,
-
-                                Transparency = Tween(Computed(function(use)
-                                    return if use(info.actionIsSelecting) then 0.3 else 1
-                                end), AssetBook.TweenInfos.twiceHalf)
-                            }),
-                            Components.HoverImageButton({
-                                [OnEvent("MouseEnter")] = function()
-                                    info.actionIsSelecting:set(true)
-                                end,
-                                [OnEvent("MouseLeave")] = function()
-                                    info.actionIsSelecting:set(false)
-                                end
-                            })
-                        }
+                        [Children] = { Components.RoundUICorner() }
                     }),
 
                     Components.HoverImageButton({
@@ -159,6 +148,11 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                         [OnEvent("MouseLeave")] = function()
                             info.isSelecting:set(false)
                         end,
+                        [OnEvent("MouseButton1Click")] = function()
+                            self.targetingPlayer:set(plr)
+
+                            workspace.Sounds.SFXs.SelectionConfirmed:Play()
+                        end
                     }),
 
                     Fusion.New("Frame")({

@@ -7,10 +7,13 @@ local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Atmosphere = require(RepS.Modules.Packages.Atmosphere)
 
 local instanceNew = Instance.new
 local v3New = Vector3.new
 local wait = task.wait
+
+--// Effects init
 
 --- effects fade
 local function fadeEffect(effect: ParticleEmitter)
@@ -35,3 +38,28 @@ local function fadeText(text: BasePart)
     end)
 end
 CS:GetInstanceAddedSignal("TextEffects"):Connect(fadeText)
+
+--// Atmopshere init
+
+--- wind lines
+Atmosphere.WindLines:Init({
+    Direction = v3New(1, 0, 0.3),
+    Speed = 25,
+    LifeTime = 0.8,
+    SpawnRate = 6,
+})
+
+--- wind shakes
+Atmosphere.WindShake:SetDefaultSettings({
+    WindSpeed = 20,
+    WindDirection = v3New(1, 0, 0.3),
+    WindPower = 0.5
+})
+Atmosphere.WindShake:Init()
+for _, child: Instance in workspace:GetDescendants() do
+    if child:IsA("Model") and child.Name == "Tree" then
+        for _, treePart: BasePart in child:GetChildren() do
+            Atmosphere.WindShake:AddObjectShake(treePart)
+        end
+    end
+end

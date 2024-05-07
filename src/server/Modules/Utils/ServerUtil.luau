@@ -7,6 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -160,7 +161,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 
 	if not locator:GetAttribute("SubMonster") then
 		local tierDisplay = RepS.Package.Effects.TierDisplay:Clone() :: BillboardGui
-		tierDisplay.Monster.Text = monster.Name
+		tierDisplay.Monster.Text = AssetBook.MonsterInfo[monster.Name].Name
 		tierDisplay.Levels.Text = "Level "..level
 		tierDisplay.Parent = monster.Head
 	else

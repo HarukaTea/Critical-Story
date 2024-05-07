@@ -115,32 +115,36 @@ AssetBook.ClassInfo = {
 	}
 }
 
-AssetBook.MonsterIds = {
-    SpikeFox = "Spike Fox",
-    SpikeWolf = "Spike Wolf",
-    ThornWolf = "Thorn Wolf",
-    NeedleWolf = "Needle Wolf",
-    LavaWolf = "Lava Wolf",
+AssetBook.MonsterInfo = {
+    SpikeFox = {
+        Name = "Spike Fox",
+        Icon = "rbxassetid://13886503379"
+    },
+    SpikeWolf = {
+        Name = "Spike Wolf",
+        Icon = "rbxassetid://16483664838"
+    },
+    ThornWolf = {
+        Name = "Thorn Wolf",
+        Icon = "rbxassetid://13886503379"
+    },
+    LavaWolf = {
+        Name = "Lava Wolf",
+        Icon = "rbxassetid://13886503379"
+    },
 
-    GreenSlime = "Green Slime",
-    BlueSlime = "Blue Slime",
-    LapisSlime = "Lapis Slime",
-    PurpleSlime = "Purple Slime",
-    RockSlime = "Rock Slime"
-}
-
-AssetBook.MonsterAvatars = {
-	["Spike Fox"] = "rbxassetid://13886503379",
-	["Spike Wolf"] = "rbxassetid://16483664838",
-    ["Thorn Wolf"] = "rbxassetid://15688333529",
-    ["Needle Wolf"] = "rbxassetid://15688333529",
-    ["Lava Wolf"] = "rbxassetid://16483654080",
-
-	["Green Slime"] = "rbxassetid://15951815518",
-    ["Blue Slime"] = "rbxassetid://16483649460",
-    ["Lapis Slime"] = "rbxassetid://16483649287",
-    ["Purple Slime"] = "rbxassetid://16483649160",
-    ["Rock Slime"] = "rbxassetid://16483665012",
+    GreenSlime = {
+        Name = "Green Slime",
+        Icon = "rbxassetid://15951815518"
+    },
+    LapisSlime = {
+        Name = "Lapis Slime",
+        Icon = "rbxassetid://16483649287"
+    },
+    PurpleSlime = {
+        Name = "Purple Slime",
+        Icon = "rbxassetid://16483649160"
+    }
 }
 
 AssetBook.BuffInfo = {

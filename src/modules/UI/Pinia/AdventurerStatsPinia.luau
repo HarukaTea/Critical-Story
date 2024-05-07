@@ -5,7 +5,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Bin = require(RepS.Modules.Packages.Bin)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
@@ -50,7 +49,7 @@ local function AdventurerStatsPinia(self: table)
         Magic = Value(char:GetAttribute("Magic")),
     }
 
-	self.Add, self.Empty = Bin()
+	self.Add, self.Empty = HarukaLib.Bin()
 
 	self.charClassInfo = {
 		Warrior = Value(0),

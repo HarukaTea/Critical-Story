@@ -2,6 +2,7 @@
 --!optimize 2
 --!native
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
@@ -42,6 +43,9 @@ local function TurnBaseUIPinia(self: table)
 
     self.targetingMobs = Value({})
     self.monsterTargetingPos = Value(fromScale(-0.2, 0.5))
+
+    self.targetingPlayer = Value(Players.LocalPlayer)
+    self.playerTargetingPos = Value(fromScale(1.05, 0.5))
 
     self.playersInCombat = Value({})
     self.targetingMob = Value(self.charData.TargetMonster.Value)

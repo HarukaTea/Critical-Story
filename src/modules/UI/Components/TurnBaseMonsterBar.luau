@@ -88,7 +88,7 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
                     }),
                     Components.ImageLabel({
                         Name = "MobAvatar",
-                        Image = AssetBook.MonsterAvatars[monster.Name],
+                        Image = AssetBook.MonsterInfo[monster.Name].Icon,
                         Size = fromScale(1, 1),
                         SizeConstraint = Enum.SizeConstraint.RelativeYY,
                         BackgroundTransparency = 0,
@@ -99,7 +99,7 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
                         Name = "MobName",
                         Position = fromScale(0.253, 0.1),
                         Size = fromScale(0.627, 0.35),
-                        Text = monster.Name,
+                        Text = AssetBook.MonsterInfo[monster.Name].Name,
                         TextXAlignment = Enum.TextXAlignment.Left
                     }),
                     Components.TextLabel({

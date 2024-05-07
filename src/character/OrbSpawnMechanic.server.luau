@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local Clock = require(RepS.Modules.Packages.Clock)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -56,7 +55,7 @@ local function orbSpawnHandler(state: boolean)
     if state then
         local spawnTime = char:GetAttribute("OrbSpawnTime") :: number
 
-		stopSpawn = Clock(spawnTime, function()
+		stopSpawn = HarukaLib.Clock(spawnTime, function()
 			if char:GetAttribute("OrbAttackingTime") and char:GetAttribute("InCombat") then _spawnOrb() end
 		end)
 	else

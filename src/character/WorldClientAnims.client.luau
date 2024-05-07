@@ -4,7 +4,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local Clock = require(RepS.Modules.Packages.Clock)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
@@ -18,7 +18,7 @@ local wait = task.wait
 local function worldAnims()
     for _, child: Instance in map:GetDescendants() do
         if child.Name == "Wings" and child.Parent.Name == "Windmill" then
-			Clock(0.01, function()
+			HarukaLib.Clock(0.01, function()
 				if not char then return end
 				if not char.PrimaryPart then return end
 				if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 555 then return end

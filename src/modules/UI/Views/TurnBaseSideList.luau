@@ -2,6 +2,7 @@
 --!optimize 2
 --!native
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
@@ -104,6 +105,35 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 					["ChildAdded"] = _addPlr,
 					["ChildRemoved"] = _removePlr
 				})
+			end
+		})
+
+		local playerHPThread: thread = nil
+		local function _combatStartSetup()
+			if playerHPThread then cancel(playerHPThread) end
+
+			playerHPThread = spawn(function()
+				while true do
+					self.playerTargetingPos:set(fromScale(1.075, 0.5))
+					wait(0.6)
+					self.playerTargetingPos:set(fromScale(1.05, 0.5))
+					wait(0.6)
+				end
+			end)
+		end
+		local function _combatEndAction()
+			if playerHPThread then cancel(playerHPThread) end
+		end
+		HarukaLib:Hydrate(self.char, {
+			["Attr-InCombat"] = function(state: boolean)
+				if state then
+					self.targetingPlayer:set(Players.LocalPlayer)
+
+					_combatStartSetup()
+
+				elseif not state then
+					_combatEndAction()
+				end
 			end
 		})
 	end

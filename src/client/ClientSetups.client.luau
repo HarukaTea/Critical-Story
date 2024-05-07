@@ -7,8 +7,8 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Clock = require(RepS.Modules.Packages.Clock)
 local Events = require(RepS.Modules.Data.Events)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
@@ -43,7 +43,7 @@ local function dayNightCycle()
     local endTime = startTime + cycleTime
     local timeRatio, currentTime = minutesInADay / cycleTime, nil
 
-    Clock(0.05, function()
+    HarukaLib.Clock(0.05, function()
         currentTime = tick()
 
         if currentTime > endTime then

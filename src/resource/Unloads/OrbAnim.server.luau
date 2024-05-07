@@ -7,7 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Clock = require(RepS.Modules.Packages.Clock)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
@@ -18,7 +18,7 @@ local wait = task.wait
 local nsNew = NumberSequence.new
 
 --// Despawn
-Clock(1, function()
+HarukaLib.Clock(1, function()
     orbLifeTime -= 1
 
     if orbLifeTime <= 1 then model:SetAttribute("Despawn", true) end
