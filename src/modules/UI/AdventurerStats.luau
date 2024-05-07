@@ -25,7 +25,6 @@ local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
-local PlayerEffectsList = require(RepS.Modules.UI.Views.PlayerEffectsList)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
@@ -45,8 +44,6 @@ local v2New, udNew, ud2New = Vector2.new, UDim.new, UDim2.new
 local fromScale = UDim2.fromScale
 
 return function(plr: Player)
-	repeat wait() until plr.PlayerGui:WaitForChild("Backpack", 999)
-
 	local self = setmetatable({}, AdventurerStats)
 
 	self.plr = plr
@@ -58,40 +55,40 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local UI = Components.ScreenGui({
+	local scope = self.scope
+	local UI = Components.ScreenGui(scope, {
 		Name = "AdventurerStats",
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 2,
 		Parent = self.plrGui,
-		[Fusion.Ref] = self.UI,
 
 		[Children] = {
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "BG",
 				AnchorPoint = v2New(0.5, 0.9),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
-				Visible = Computed(function(use)
+				Visible = Computed(scope, function(use)
 					return not use(self.charStatsDict.IsInCombat)
 				end),
-				Position = Fusion.Tween(Computed(function(use)
+				Position = Fusion.Tween(scope, Computed(scope, function(use)
 					return if use(self.charStatsDict.IsInCombat) then fromScale(0.5, 3) else fromScale(0.5, 1)
 				end), AssetBook.TweenInfos.twiceHalfOne),
 
 				[Children] = {
-					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					BottomProgressBar("EXP", self),
 
-					Components.Frame({
+					Components.Frame(scope, {
 						Name = "StatsFrame",
 						AnchorPoint = v2New(0.5, 0),
 						Position = fromScale(0.5, 0.15),
 						Size = fromScale(1, 0.42),
 
 						[Children] = {
-							New("UIListLayout")({
+							New(scope, "UIListLayout")({
 								Padding = udNew(0.01, 0),
 								HorizontalAlignment = Enum.HorizontalAlignment.Center,
 								FillDirection = Enum.FillDirection.Horizontal,
@@ -100,31 +97,29 @@ return function(plr: Player)
 							StatBar("HP", self),
 						},
 					}),
-					Components.TextLabel({
+					Components.TextLabel(scope, {
 						Name = "Location",
 						Position = fromScale(0, 0.4),
 						Size = fromScale(1, 0.3),
 						FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
 						TextTransparency = 0.5,
 						TextXAlignment = Enum.TextXAlignment.Left,
-
-						Text = Computed(function(use)
-							return use(self.serverLocation).." "..use(self.privateId).." v"..use(self.version)
-						end),
+						Text = RepS.Package.ServerLocation.Value.." "
+							..RepS.Package.PrivateServerId.Value.." v"
+							..RepS.Package.Version.Value,
 
 						[Children] = {
-							New("UIPadding")({ PaddingLeft = udNew(0.01, 0) }),
-							New("UITextSizeConstraint")({ MaxTextSize = 14 })
+							New(scope, "UIPadding")({ PaddingLeft = udNew(0.01, 0) }),
+							New(scope, "UITextSizeConstraint")({ MaxTextSize = 14 })
 						}
 					}),
 
 					ClassFrame(self),
 					ChatFrame(self),
 					StatsTextsFrame(self),
-					PlayerEffectsList(self)
 				},
 			}),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "TopBG",
 				AnchorPoint = v2New(0.5, 0),
 				Position = ud2New(0.5, 0, 0, 58),
@@ -132,19 +127,19 @@ return function(plr: Player)
 				ZIndex = 2,
 
 				[Children] = {
-					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					LocationTitleFrame(self),
 					LevelUpVFXFrame(self),
 				}
 			}),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "CenterBG",
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
 				[Children] = {
-					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					PromptsFrame(self),
 					ItemAcquiredFrame(self),
@@ -174,8 +169,8 @@ return function(plr: Player)
 			Events.ChangeMobTarget:Fire(monsters[self.nowMobIndex].Value)
 		end
 	end
-	CAS:BindAction("ChangeMobTargetLAlt", _changeMobTarget, false, Enum.KeyCode.LeftAlt)
-	CAS:BindAction("ChangeMobTargetRAlt", _changeMobTarget, false, Enum.KeyCode.RightAlt)
+	CAS:BindAction("ChangeMobTargetLCtrl", _changeMobTarget, false, Enum.KeyCode.LeftControl)
+	CAS:BindAction("ChangeMobTargetRCtrl", _changeMobTarget, false, Enum.KeyCode.RightControl)
 
 	--- Setups
 	local function _autoEquipItems()
@@ -185,7 +180,6 @@ return function(plr: Player)
 			end
 		end
 	end
-	Spawn(_autoEquipItems)
 	local function moveUpJumpBtn()
 		local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
 
@@ -196,11 +190,13 @@ return function(plr: Player)
 			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).Position = fromScale(0.82, 0.8)
 		end
 	end
-	Spawn(moveUpJumpBtn)
 	local function charCurrentZone()
 		local region = HarukaLib:IsInRegion(self.char.PrimaryPart.Position, workspace:WaitForChild("MapComponents").Zones:GetChildren())
 		if region then self.char:SetAttribute("CurrentRegion", region.Name) end
 	end
+
+	Spawn(_autoEquipItems)
+	Spawn(moveUpJumpBtn)
 	Spawn(charCurrentZone)
 
 	---// Listening events
@@ -241,7 +237,7 @@ return function(plr: Player)
 
             if combo <= 0 then return end
 
-			local bar = Fusion.peek(self.UI).CenterBG.WarriorStyle.BarBG.TweenBar :: Frame
+			local bar = UI.CenterBG.WarriorStyle.BarBG.TweenBar :: Frame
 			TS:Create(bar, AssetBook.TweenInfos.twiceHalf, { Size = fromScale(1, 1) }):Play()
             wait(0.2)
             TS:Create(bar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
@@ -265,12 +261,10 @@ return function(plr: Player)
 	})
 
 	local function _clearGarbage()
-		UI:Destroy()
-
 		ClientUtil:FreezePlayerControls("Unfreeze")
 
-		CAS:UnbindAction("ChangeMobTargetLAlt")
-		CAS:UnbindAction("ChangeMobTargetRAlt")
+		CAS:UnbindAction("ChangeMobTargetLCtrl")
+		CAS:UnbindAction("ChangeMobTargetRCtrl")
 
 		Events.EquipItems:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()
@@ -281,6 +275,8 @@ return function(plr: Player)
 		Signals.ExCategoryOpened:DisconnectAll()
 
 		self.Empty()
+
+		Fusion.doCleanup(scope)
 
 		self = nil
 	end

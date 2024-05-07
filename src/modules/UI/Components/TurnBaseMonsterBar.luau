@@ -24,16 +24,16 @@ local insert, tFind = table.insert, table.find
 local clamp = math.clamp
 local wait = task.wait
 
-local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
+local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : Frame
     local info = {
-        innerPos = Value(fromScale(0.82, 0)),
-        isSelecting = Value(false),
+        innerPos = Value(scope, fromScale(0.82, 0)),
+        isSelecting = Value(scope, false),
 
-        Targeting = Value(if self.charData.TargetMonster.Value == monster then true else false),
-        HP = Value(monster:GetAttribute("Health")),
-        MaxHP = Value(monster:GetAttribute("MaxHealth")),
+        Targeting = Value(scope, if self.charData.TargetMonster.Value == monster then true else false),
+        HP = Value(scope, monster:GetAttribute("Health")),
+        MaxHP = Value(scope, monster:GetAttribute("MaxHealth")),
 
-        EffectsList = Value({})
+        EffectsList = Value(scope, {})
     }
     HarukaLib:Hydrate(self.charData.TargetMonster, {
         ["Prop-Value"] = function(newTarget: Model?)
@@ -62,47 +62,47 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
         ["ChildRemoved"] = _setEffectsChildren
     })
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = monster.Name,
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "Monster",
                 AnchorPoint = v2New(),
                 BackgroundTransparency = 0,
                 Size = fromScale(0.18, 1),
 
-                Position = Tween(Computed(function(use)
+                Position = Tween(scope, Computed(scope, function(use)
                     return use(info.innerPos)
                 end), AssetBook.TweenInfos.twiceHalfOne),
 
                 [Children] = {
-                    Components.RoundUICorner(),
-                    Components.UIStroke({
+                    Components.RoundUICorner(scope),
+                    Components.UIStroke(scope, {
                         Thickness = 2.7,
                         Enabled = true,
 
-                        Transparency = Tween(Computed(function(use)
+                        Transparency = Tween(scope, Computed(scope, function(use)
                             return if use(info.isSelecting) then 0.3 else 1
                         end), AssetBook.TweenInfos.twiceHalf)
                     }),
-                    Components.ImageLabel({
+                    Components.ImageLabel(scope, {
                         Name = "MobAvatar",
                         Image = AssetBook.MonsterInfo[monster.Name].Icon,
                         Size = fromScale(1, 1),
                         SizeConstraint = Enum.SizeConstraint.RelativeYY,
                         BackgroundTransparency = 0,
 
-                        [Children] = { Components.RoundUICorner() }
+                        [Children] = { Components.RoundUICorner(scope) }
                     }),
-                    Components.TextLabel({
+                    Components.TextLabel(scope, {
                         Name = "MobName",
                         Position = fromScale(0.253, 0.1),
                         Size = fromScale(0.627, 0.35),
                         Text = AssetBook.MonsterInfo[monster.Name].Name,
                         TextXAlignment = Enum.TextXAlignment.Left
                     }),
-                    Components.TextLabel({
+                    Components.TextLabel(scope, {
                         Name = "MobLvl",
                         Position = fromScale(0.253, 0.1),
                         Size = fromScale(0.627, 0.35),
@@ -110,7 +110,7 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
                         TextColor3 = fromRGB(234, 234, 117),
                         TextXAlignment = Enum.TextXAlignment.Right
                     }),
-                    Components.TextLabel({
+                    Components.TextLabel(scope, {
                         Name = "Targeting",
                         AnchorPoint = v2New(0, 0.5),
                         Size = fromScale(0.8, 0.8),
@@ -118,16 +118,16 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
                         FontFace = fontFromName("Roboto", Enum.FontWeight.Bold),
                         Text = ">",
 
-                        Visible = Computed(function(use)
+                        Visible = Computed(scope, function(use)
                             return use(info.Targeting)
                         end),
-                        Position = Tween(Computed(function(use)
+                        Position = Tween(scope, Computed(scope, function(use)
                             return use(self.monsterTargetingPos)
                         end), AssetBook.TweenInfos.half),
 
-                        [Children] = { Components.TextUIStroke({ Thickness = 3 }) }
+                        [Children] = { Components.TextUIStroke(scope, { Thickness = 3 }) }
                     }),
-                    Components.HoverImageButton({
+                    Components.HoverImageButton(scope, {
                         [OnEvent("MouseEnter")] = function()
                             info.isSelecting:set(true)
                         end,
@@ -153,18 +153,18 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
 						end
                     }),
 
-                    Fusion.New("Frame")({
+                    Fusion.New(scope, "Frame")({
                         Name = "HP",
                         BackgroundColor3 = fromRGB(),
                         Position = fromScale(0.253, 0.53),
                         Size = fromScale(0.625, 0.35),
 
                         [Children] = {
-                            Components.RoundUICorner(),
-                            New("Frame")({
+                            Components.RoundUICorner(scope),
+                            New(scope, "Frame")({
                                 Name = "Bar",
 
-                                BackgroundColor3 = Tween(Computed(function(use)
+                                BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 									local HP, maxHP = use(info.HP) :: number, use(info.MaxHP) :: number
 
 									if HP / maxHP <= 0.66 and HP / maxHP > 0.33 then
@@ -175,29 +175,29 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
 										return fromRGB(0, 120, 104)
 									end
 								end), AssetBook.TweenInfos.onceHalf),
-								Size = Tween(Computed(function(use)
+								Size = Tween(scope, Computed(scope, function(use)
 									local x = clamp(use(info.HP) / use(info.MaxHP), 0, 1)
 
 									return fromScale(x, 1)
 								end), AssetBook.TweenInfos.halfBack),
 
-                                [Children] = { Components.RoundUICorner() }
+                                [Children] = { Components.RoundUICorner(scope) }
                             }),
-                            Components.TextLabel({
+                            Components.TextLabel(scope, {
                                 Name = "Stat",
                                 Size = fromScale(1, 1),
                                 ZIndex = 2,
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Right,
-                                Text = Computed(function(use)
+                                Text = Computed(scope, function(use)
 									return use(info.HP) .. "/" .. use(info.MaxHP)
 								end),
 
                                 [Children] = {
-                                    New("UIPadding")({ PaddingRight = udimNew(0.04, 0) })
+                                    New(scope, "UIPadding")({ PaddingRight = udimNew(0.04, 0) })
                                 }
                             }),
-                            Components.TextLabel({
+                            Components.TextLabel(scope, {
                                 Name = "Title",
                                 Text = "HP",
                                 Size = fromScale(1, 1),
@@ -206,13 +206,13 @@ local function TurnBaseMonsterBar(monster: Model, self: table) : Frame
                                 TextXAlignment = Enum.TextXAlignment.Left,
 
                                 [Children] = {
-                                    New("UIPadding")({ PaddingLeft = udimNew(0.04, 0) })
+                                    New(scope, "UIPadding")({ PaddingLeft = udimNew(0.04, 0) })
                                 }
                             })
                         }
                     }),
 
-                    TurnBaseEffectList("Monster", info)
+                    TurnBaseEffectList("Monster", info, self)
                 }
             }),
         }

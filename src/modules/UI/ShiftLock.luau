@@ -56,29 +56,30 @@ return function(plr: Player)
 	if not isMobile then return end
 
 	local self = setmetatable({}, MobileShiftLock)
+	local scope = Fusion.scoped({})
 
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	self.rsConnection, self.enabled = nil, false
-	self.shiftLockLabel = Fusion.Value()
+	self.shiftLockLabel = Fusion.Value(scope)
 	self.ON_ICON, self.OFF_ICON = "rbxasset://textures/ui/mouseLock_on.png", "rbxasset://textures/ui/mouseLock_off.png"
 
-	local UI = Fusion.New("ScreenGui")({
+	Fusion.New(scope, "ScreenGui")({
 		Name = "MobileShiftLock",
 		ScreenInsets = Enum.ScreenInsets.None,
 		DisplayOrder = 10,
 		Parent = plr.PlayerGui,
 
 		[Fusion.Children] = {
-			Components.Frame({
+			Components.Frame(scope, {
 				AnchorPoint = v2New(1, 0.5),
 				ZIndex = 999,
 				Position = fromScale(0.984, 0.6),
 				Size = fromScale(0.035, 0.085),
 
 				[Fusion.Children] = {
-					Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 1.007 }),
-					Components.HoverImageButton({
+					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 1.007 }),
+					Components.HoverImageButton(scope, {
 						Image = self.OFF_ICON,
 						[Fusion.Ref] = self.shiftLockLabel,
 
@@ -98,7 +99,7 @@ return function(plr: Player)
 	local function clearGarbage()
 		self:SetLockState("Off")
 
-		UI:Destroy()
+		Fusion.doCleanup(scope)
 
 		self = nil
 	end

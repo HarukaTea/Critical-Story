@@ -25,6 +25,8 @@ local tFind, insert = table.find, table.insert
 local match, sFind = string.match, string.find
 
 local function ChatFrame(self: table) : Frame
+    local scope = self.scope
+
     local originDialoguesChatting = nil
     local dialoguesChatting = nil
     local dialogueIndexChatting = 1
@@ -180,29 +182,29 @@ local function ChatFrame(self: table) : Frame
     Signals.NPCChat:Connect(_chooseOption)
 
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         BackgroundTransparency = 0,
         Name = "ChatFrame",
         Position = fromScale(0.5, -2.1),
         Size = fromScale(0.585, 2.5),
 
-        Visible = Computed(function(use)
+        Visible = Computed(scope, function(use)
             return use(self.isChatting)
         end),
 
         [Fusion.Children] = {
-            Fusion.New("UICorner")({ CornerRadius = udNew(0.07, 0)  }),
-            Components.UIStroke({
+            Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.07, 0)  }),
+            Components.UIStroke(scope, {
                 Thickness = 3.5,
                 Color = fromRGB(254, 254, 254),
                 Enabled = true
             }),
-            Components.HoverImageButton({
+            Components.HoverImageButton(scope, {
                 ZIndex = 2,
 
                 [Fusion.OnEvent("MouseButton1Click")] = _nextDialogue
             }),
-            Components.ImageLabel({
+            Components.ImageLabel(scope, {
                 Name = "Triangle",
                 Position = fromScale(0.953, 0.778),
                 Size = fromScale(0.024, 0.134),
@@ -211,11 +213,11 @@ local function ChatFrame(self: table) : Frame
                 ImageColor3 = fromRGB(218, 218, 218),
                 ImageTransparency = 0.1,
 
-                Visible = Computed(function(use)
+                Visible = Computed(scope, function(use)
                     return use(self.triangleVisible)
                 end)
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Speaker",
                 Position = fromScale(0.035, 0.051),
                 Size = fromScale(0.943, 0.247),
@@ -223,11 +225,11 @@ local function ChatFrame(self: table) : Frame
                 TextColor3 = fromRGB(255, 170, 127),
                 TextXAlignment = Enum.TextXAlignment.Left,
 
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
                     return "<u>"..use(self.chatSpeaker).."</u>"
                 end)
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Dialogue",
                 Position = fromScale(0.033, 0.349),
                 Size = fromScale(0.943, 0.563),
@@ -242,28 +244,28 @@ local function ChatFrame(self: table) : Frame
                     self.chatDialogueAbsSize:set(size.Y)
                 end,
 
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
                     return use(self.chatText)
                 end),
-                TextSize = Computed(function(use)
+                TextSize = Computed(scope, function(use)
                     return use(self.chatDialogueAbsSize) / 2.5
                 end)
             }),
 
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "ChoicesFrame",
                 AnchorPoint = v2New(),
                 Position = fromScale(0.7, -1.2),
                 Size = fromScale(0.509, 1),
 
                 [Fusion.Children] = {
-                    Fusion.New("UIListLayout")({
+                    Fusion.New(scope, "UIListLayout")({
                         Padding = udNew(0.12, 0),
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         VerticalAlignment = Enum.VerticalAlignment.Bottom
                     }),
-                    Fusion.ForValues(self.chatChoices, function(_, option: string)
+                    Fusion.ForValues(scope, self.chatChoices, function(_, localScope: table, option: string)
                         local way = "Chat"
                         if sFind(option, "EXIT") then way = "Exit" end
                         if sFind(option, "BUY") then way = "Buy" end
@@ -271,8 +273,8 @@ local function ChatFrame(self: table) : Frame
                         if sFind(option, "QUEST") then way = "Quest" end
                         local index = tFind(Fusion.peek(self.chatChoices), option)
 
-                        return ChatOption(option, way, self, index)
-                    end, Fusion.cleanup)
+                        return ChatOption(option, way, self, index, localScope)
+                    end)
                 }
             })
         }

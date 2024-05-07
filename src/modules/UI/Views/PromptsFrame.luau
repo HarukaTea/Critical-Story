@@ -19,6 +19,8 @@ local insert, tFind, remove = table.insert, table.find, table.remove
     TODO: multi-prompt actions
 ]]
 local function PromptsFrame(self: table) : Frame
+	local scope = self.scope
+
     local function _addPrompt(prompt: ProximityPrompt)
 		local nowPrompts = Fusion.peek(self.promptsList)
 
@@ -43,21 +45,21 @@ local function PromptsFrame(self: table) : Frame
 	self.Add(PPS.PromptHidden:Connect(_removePrompt))
 	self.Add(PPS.PromptTriggered:Connect(_triggerPrompt))
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         AnchorPoint = v2New(0.5, 0),
         Position = fromScale(0.65, 0),
         Size = fromScale(1, 0.7),
         Name = "PromptsFrame",
 
         [Fusion.Children] = {
-            Fusion.New("UIListLayout")({
+            Fusion.New(scope, "UIListLayout")({
                 Padding = udNew(0.2, 0),
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 HorizontalAlignment = Enum.HorizontalAlignment.Center
             }),
-            Fusion.ForValues(self.promptsList, function(_, prompt: ProximityPrompt)
-                return Prompt(prompt, 1)
-            end, Fusion.cleanup)
+            Fusion.ForValues(scope, self.promptsList, function(_, localScope: table, prompt: ProximityPrompt)
+                return Prompt(prompt, 1, localScope)
+            end)
         },
     })
 end

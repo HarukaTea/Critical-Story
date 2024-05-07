@@ -3,11 +3,13 @@
 --!native
 
 local CS = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Atmosphere = require(RepS.Modules.Packages.Atmosphere)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local instanceNew = Instance.new
 local v3New = Vector3.new
@@ -41,25 +43,42 @@ CS:GetInstanceAddedSignal("TextEffects"):Connect(fadeText)
 
 --// Atmopshere init
 
---- wind lines
-Atmosphere.WindLines:Init({
-    Direction = v3New(1, 0, 0.3),
-    Speed = 25,
-    LifeTime = 0.8,
-    SpawnRate = 6,
-})
+local function enableWinds()
+    Atmosphere.WindLines:Init({
+        Direction = v3New(1, 0, 0.3),
+        Speed = 25,
+        LifeTime = 0.8,
+        SpawnRate = 6,
+    })
 
---- wind shakes
-Atmosphere.WindShake:SetDefaultSettings({
-    WindSpeed = 20,
-    WindDirection = v3New(1, 0, 0.3),
-    WindPower = 0.5
-})
-Atmosphere.WindShake:Init()
-for _, child: Instance in workspace:GetDescendants() do
-    if child:IsA("Model") and child.Name == "Tree" then
-        for _, treePart: BasePart in child:GetChildren() do
-            Atmosphere.WindShake:AddObjectShake(treePart)
+    --- wind shakes
+    Atmosphere.WindShake:SetDefaultSettings({
+        WindSpeed = 20,
+        WindDirection = v3New(1, 0, 0.3),
+        WindPower = 0.5
+    })
+    Atmosphere.WindShake:Init()
+    for _, child: Instance in workspace:GetDescendants() do
+        if child:IsA("Model") and child.Name == "Tree" then
+            for _, treePart: BasePart in child:GetChildren() do
+                Atmosphere.WindShake:AddObjectShake(treePart)
+            end
         end
     end
 end
+--- wind lines
+enableWinds()
+
+local function toggleWinds(action: string)
+    if action == "Enable" then
+        Players.LocalPlayer.Character.WorldClientAnims.Disabled = false
+
+        enableWinds()
+    else
+        Atmosphere.WindLines:Cleanup()
+        Atmosphere.WindShake:Cleanup()
+
+        Players.LocalPlayer.Character.WorldClientAnims.Disabled = true
+    end
+end
+Signals.EnableMapDetails:Connect(toggleWinds)

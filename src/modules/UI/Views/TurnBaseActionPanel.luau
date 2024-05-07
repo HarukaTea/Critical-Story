@@ -21,30 +21,30 @@ local tFind = table.find
 local fromRGB = Color3.fromRGB
 
 local function TurnBaseActionPanel(self: table) : Frame
+    local scope = self.scope
+
     local whitelist = { "Combat", "Player" }
     local function _showPanel(phase: string)
         if not tFind(whitelist, phase) then
             self.panelPos:set(fromScale(0.5, 5))
-            self.transHPBarSize:set(fromScale(0, 0.875))
             self.itemPanelVisible:set(false)
             self.skillPanelVisible:set(false)
             return
         end
 
         self.panelPos:set(fromScale(0.5, 0.5))
-        self.transHPBarSize:set(fromScale(0.14, 0.875))
     end
     Events.NewPhase:Connect(_showPanel)
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = "ActionPanel",
 
-        Position = Fusion.Tween(Fusion.Computed(function(use)
+        Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
             return use(self.panelPos)
         end), AssetBook.TweenInfos.half),
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "ImageBGCenter",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, -0.2),
@@ -54,8 +54,8 @@ local function TurnBaseActionPanel(self: table) : Frame
                 ZIndex = 0,
 
                 [Children] = {
-                    Components.RoundUICorner(),
-                    Components.UIStroke({
+                    Components.RoundUICorner(scope),
+                    Components.UIStroke(scope, {
                         Enabled = true,
                         Thickness = 2.5
                     })
@@ -65,14 +65,14 @@ local function TurnBaseActionPanel(self: table) : Frame
             TurnBaseSidePanel("Items", self),
 			TurnBaseSidePanel("Skills", self),
 
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "Actions",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, -2.3),
                 Size = fromScale(0.117, 2.844),
 
                 [Children] = {
-                    Fusion.New("UIGridLayout")({
+                    Fusion.New(scope, "UIGridLayout")({
                         CellPadding = fromScale(0.1, 0.1),
                         CellSize = fromScale(0.437, 0.457),
                         SortOrder = Enum.SortOrder.LayoutOrder,

@@ -15,12 +15,13 @@ local fromScale = UDim2.fromScale
 local clamp = math.clamp
 
 local function ClassAbilityIndicator(self: table, class: string) : Frame
+    local scope = self.scope
     local charClassInfo = self.charClassInfo :: table
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = class.."Style",
         Position = fromScale(0.5, 1.85),
-        Visible = Computed(function(use)
+        Visible = Computed(scope, function(use)
             local plrClass = use(self.playerData.Class) :: string
             local inCombat = use(self.charStatsDict.IsInCombat) :: boolean
 
@@ -33,7 +34,7 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
         end),
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
                 AnchorPoint = v2New(),
                 Name = "BarBG",
                 BackgroundTransparency = 0,
@@ -41,18 +42,18 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                 Size = fromScale(0.25, 0.2),
 
                 [Children] = {
-                    Components.RoundUICorner(),
-                    Components.Frame({
+                    Components.RoundUICorner(scope),
+                    Components.Frame(scope, {
                         Name = "TweenBar",
                         BackgroundColor3 = AssetBook.ClassInfo[class].Color,
                         BackgroundTransparency = 0,
 
-                        Visible = Computed(function(use)
+                        Visible = Computed(scope, function(use)
                             local neededClass = use(self.playerData.Class) :: string
 
                             return if neededClass == class then true else false
                         end),
-                        Size = Fusion.Tween(Computed(function(use)
+                        Size = Fusion.Tween(scope, Computed(scope, function(use)
                             if class == "Warrior" then
                                 return fromScale(0, 1)
 
@@ -68,15 +69,16 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                             end
                         end), AssetBook.TweenInfos.twiceHalf),
 
-                        [Children] = { Components.RoundUICorner() }
+                        [Children] = { Components.RoundUICorner(scope) }
                     })
                 }
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Amount",
                 Position = fromScale(0.06, -0.425),
                 Size = fromScale(0.25, 0.6),
-                Text = Fusion.Computed(function(use)
+
+                Text = Fusion.Computed(scope, function(use)
                     if class == "Warrior" then
                         return "COMBO x"..use(self.charClassInfo.Warrior)
 
@@ -97,7 +99,7 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                 end),
                 TextColor3 = AssetBook.ClassInfo[class].Color,
 
-                [Children] = { Components.TextUIStroke({ Thickness = 2.5 }) }
+                [Children] = { Components.TextUIStroke(scope, { Thickness = 2.5 }) }
             })
         }
     })

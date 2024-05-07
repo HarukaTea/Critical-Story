@@ -24,16 +24,16 @@ local clamp = math.clamp
 local wait = task.wait
 local fontFromName = Font.fromName
 
-local function TurnBasePlrBar(char: Model, self: table) : Frame
+local function TurnBasePlrBar(char: Model, self: table, scope: table) : Frame
     local plr = Players:GetPlayerFromCharacter(char)
     local info = {
-        isSelecting = Value(false),
+        isSelecting = Value(scope, false),
 
-        HP = Value(char.Humanoid.Health),
-        MaxHP = Value(char.Humanoid.MaxHealth),
-        NextAction = Value(""),
+        HP = Value(scope, char.Humanoid.Health),
+        MaxHP = Value(scope, char.Humanoid.MaxHealth),
+        NextAction = Value(scope, ""),
 
-        EffectsList = Value({})
+        EffectsList = Value(scope, {})
     }
 
     HarukaLib:Hydrate(char.Humanoid, {
@@ -59,17 +59,17 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
         ["ChildRemoved"] = _setEffectsChildren
     })
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = char.Name,
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "Player",
                 AnchorPoint = v2New(),
                 BackgroundTransparency = 0,
                 Size = fromScale(0.18, 1),
 
-                Position = Tween(Computed(function(use)
+                Position = Tween(scope, Computed(scope, function(use)
                     if use(self.targetingMob) and use(self.targetingMob):FindFirstChild("TargetPlayers") then
                         if use(self.targetingMob).TargetPlayers:FindFirstChild(char.Name) then
                             return fromScale(0, 0)
@@ -80,16 +80,16 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                 end), AssetBook.TweenInfos.twiceHalfOne),
 
                 [Children] = {
-                    Components.RoundUICorner(),
-                    Components.UIStroke({
+                    Components.RoundUICorner(scope),
+                    Components.UIStroke(scope, {
                         Thickness = 2.7,
                         Enabled = true,
 
-                        Transparency = Tween(Computed(function(use)
+                        Transparency = Tween(scope, Computed(scope, function(use)
                             return if use(info.isSelecting) then 0.3 else 1
                         end), AssetBook.TweenInfos.twiceHalf)
                     }),
-                    Components.TextLabel({
+                    Components.TextLabel(scope, {
                         Name = "PlayerName",
                         Position = fromScale(0.117, 0.1),
                         Size = fromScale(0.634, 0.35),
@@ -97,7 +97,7 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                         TextXAlignment = Enum.TextXAlignment.Right,
                         TextColor3 = AssetBook.ClassInfo[plr:GetAttribute("Class")].Color,
                     }),
-                    Components.TextLabel({
+                    Components.TextLabel(scope, {
                         Name = "Targeting",
                         AnchorPoint = v2New(0, 0.5),
                         Size = fromScale(0.8, 0.8),
@@ -105,23 +105,23 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                         FontFace = fontFromName("Roboto", Enum.FontWeight.Bold),
                         Text = "<",
 
-                        Visible = Computed(function(use)
+                        Visible = Computed(scope, function(use)
                             return if use(self.targetingPlayer) == plr then true else false
                         end),
-                        Position = Tween(Computed(function(use)
+                        Position = Tween(scope, Computed(scope, function(use)
                             return use(self.playerTargetingPos)
                         end), AssetBook.TweenInfos.half),
 
-                        [Children] = { Components.TextUIStroke({ Thickness = 3 }) }
+                        [Children] = { Components.TextUIStroke(scope, { Thickness = 3 }) }
                     }),
-                    Components.ImageLabel({
+                    Components.ImageLabel(scope, {
                         Name = "NextAction",
                         Position = fromScale(0.78, 0),
                         Size = fromScale(1, 1),
                         SizeConstraint = Enum.SizeConstraint.RelativeYY,
                         BackgroundTransparency = 0,
 
-                        Image = Computed(function(use)
+                        Image = Computed(scope, function(use)
                             local nextAction = use(info.NextAction)
 
                             if nextAction == "" or nextAction == nil then
@@ -138,10 +138,10 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                             end
                         end),
 
-                        [Children] = { Components.RoundUICorner() }
+                        [Children] = { Components.RoundUICorner(scope) }
                     }),
 
-                    Components.HoverImageButton({
+                    Components.HoverImageButton(scope, {
                         [OnEvent("MouseEnter")] = function()
                             info.isSelecting:set(true)
                         end,
@@ -155,18 +155,18 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                         end
                     }),
 
-                    Fusion.New("Frame")({
+                    Fusion.New(scope, "Frame")({
                         Name = "HP",
                         BackgroundColor3 = fromRGB(),
                         Position = fromScale(0.12, 0.53),
                         Size = fromScale(0.625, 0.35),
 
                         [Children] = {
-                            Components.RoundUICorner(),
-                            New("Frame")({
+                            Components.RoundUICorner(scope),
+                            New(scope, "Frame")({
                                 Name = "Bar",
 
-                                BackgroundColor3 = Tween(Computed(function(use)
+                                BackgroundColor3 = Tween(scope, Computed(scope, function(use)
                                     local HP, maxHP = use(info.HP) :: number, use(info.MaxHP) :: number
 
                                     if HP / maxHP <= 0.66 and HP / maxHP > 0.33 then
@@ -177,29 +177,30 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                                         return fromRGB(0, 120, 104)
                                     end
                                 end), AssetBook.TweenInfos.onceHalf),
-                                Size = Tween(Computed(function(use)
+                                Size = Tween(scope, Computed(scope, function(use)
                                     local x = clamp(use(info.HP) / use(info.MaxHP), 0, 1)
 
                                     return fromScale(x, 1)
                                 end), AssetBook.TweenInfos.halfBack),
 
-                                [Children] = { Components.RoundUICorner() }
+                                [Children] = { Components.RoundUICorner(scope) }
                             }),
-                            Components.TextLabel({
+                            Components.TextLabel(scope, {
                                 Name = "Stat",
                                 Size = fromScale(1, 1),
                                 ZIndex = 2,
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Right,
-                                Text = Computed(function(use)
+
+                                Text = Computed(scope, function(use)
                                     return use(info.HP) .. "/" .. use(info.MaxHP)
                                 end),
 
                                 [Children] = {
-                                    New("UIPadding")({ PaddingRight = udimNew(0.04, 0) })
+                                    New(scope, "UIPadding")({ PaddingRight = udimNew(0.04, 0) })
                                 }
                             }),
-                            Components.TextLabel({
+                            Components.TextLabel(scope, {
                                 Name = "Title",
                                 Text = "HP",
                                 Size = fromScale(1, 1),
@@ -208,13 +209,13 @@ local function TurnBasePlrBar(char: Model, self: table) : Frame
                                 TextXAlignment = Enum.TextXAlignment.Left,
 
                                 [Children] = {
-                                    New("UIPadding")({ PaddingLeft = udimNew(0.04, 0) })
+                                    New(scope, "UIPadding")({ PaddingLeft = udimNew(0.04, 0) })
                                 }
                             })
                         }
                     }),
 
-                    TurnBaseEffectList("Player", info)
+                    TurnBaseEffectList("Player", info, self)
                 }
             })
         }

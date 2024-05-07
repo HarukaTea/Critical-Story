@@ -20,16 +20,18 @@ local fromRGB = Color3.fromRGB
 local wait, cancel, spawn = task.wait, task.cancel, task.spawn
 
 local function TextStroke(self: table)
-    return Components.TextUIStroke({
+    return Components.TextUIStroke(self.scope, {
         Thickness = 2,
 
-        Transparency = Tween(Computed(function(use)
+        Transparency = Tween(self.scope, Computed(self.scope, function(use)
             return use(self.locationInfo.OverallStrokeTrans)
         end), AssetBook.TweenInfos.half)
     })
 end
 
 local function LocationTitleFrame(self: table) : Frame
+    local scope = self.scope
+
     local function _showCurrentLocation(location: string)
         if not location or location == "" then return end
 		local locationInfo = self.locationInfo
@@ -82,28 +84,28 @@ local function LocationTitleFrame(self: table) : Frame
         ["Attr-CurrentRegion"] = _showCurrentLocation
     })
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = "LocationTitle",
-        Visible = Computed(function(use)
+        Visible = Computed(scope, function(use)
             return use(self.locationInfo.Shown)
         end),
 
         [Children] = {
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Title",
                 Text = "Entering Area:",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0),
                 Size = fromScale(1, 0.45),
-                TextTransparency = Tween(Computed(function(use)
+                TextTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 
                 [Children] = { TextStroke(self) }
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "LocationName",
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
                     return use(self.locationInfo.Name)
                 end),
                 AnchorPoint = v2New(0.5, 0),
@@ -111,36 +113,36 @@ local function LocationTitleFrame(self: table) : Frame
                 Size = fromScale(1, 0.6),
                 TextColor3 = fromRGB(74, 222, 109),
 
-                TextTransparency = Tween(Computed(function(use)
+                TextTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 
                 [Children] = { TextStroke(self) }
             }),
-            Fusion.New("Frame")({
+            Fusion.New(scope, "Frame")({
                 Name = "HorizonLine",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 1.4),
 
-                Size = Fusion.Tween(Computed(function(use)
+                Size = Tween(scope, Computed(scope, function(use)
                     return use(self.locationInfo.HorizonLineSize)
                 end), self.locationInfo.HorizonLineTweenInfo),
-                BackgroundTransparency = Tween(Computed(function(use)
+                BackgroundTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 
-                [Children] = { Components.RoundUICorner() }
+                [Children] = { Components.RoundUICorner(scope) }
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "LocationDesc",
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
                     return use(self.locationInfo.Desc)
                 end),
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 1.7),
                 Size = fromScale(1, 0.45),
 
-                TextTransparency = Tween(Computed(function(use)
+                TextTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 

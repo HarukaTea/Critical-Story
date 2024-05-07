@@ -19,6 +19,8 @@ local wait = task.wait
 local tFind = table.find
 
 local function TurnBasePhaseShower(self: table) : Frame
+    local scope = self.scope
+
 	local phaseInfo = {
 		Player = {
 			Color = fromRGB(85, 255, 255),
@@ -67,55 +69,55 @@ local function TurnBasePhaseShower(self: table) : Frame
 	end
 	Events.NewPhase:Connect(enteringNewPhase)
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = "PhaseShower",
         Size = fromScale(1, 0.8),
 
-        BackgroundTransparency = Tween(Computed(function(use)
+        BackgroundTransparency = Tween(scope, Computed(scope, function(use)
             return use(self.phaseTrans)
         end), AssetBook.TweenInfos.twiceHalfOne),
 
         [Fusion.Children] = {
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Phase",
                 Size = fromScale(1, 1),
 
-                TextColor3 = Computed(function(use)
+                TextColor3 = Computed(scope, function(use)
                     return phaseInfo[use(self.currentPhase)].Color
                 end),
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
                     return phaseInfo[use(self.currentPhase)].Text
                 end),
-                TextTransparency = Tween(Computed(function(use)
+                TextTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.phaseTrans)
                 end), AssetBook.TweenInfos.twiceHalfOne),
 
                 [Fusion.Children] = {
-                    New("UIPadding")({
+                    New(scope, "UIPadding")({
                         PaddingTop = udNew(0.1, 0),
                         PaddingBottom = udNew(0.1, 0)
                     }),
                 }
             }),
-            New("Frame")({
+            New(scope, "Frame")({
                 Name = "TopBar",
                 Size = fromScale(0.15, 0.1),
 
-                BackgroundTransparency = Tween(Computed(function(use)
+                BackgroundTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.phaseTrans)
                 end), AssetBook.TweenInfos.twiceHalfOne),
-                Position = Tween(Computed(function(use)
+                Position = Tween(scope, Computed(scope, function(use)
                     return use(self.phasePos[1])
                 end), AssetBook.TweenInfos.two)
             }),
-            New("Frame")({
+            New(scope, "Frame")({
                 Name = "BottomBar",
                 Size = fromScale(0.15, 0.1),
 
-                BackgroundTransparency = Tween(Computed(function(use)
+                BackgroundTransparency = Tween(scope, Computed(scope, function(use)
                     return use(self.phaseTrans)
                 end), AssetBook.TweenInfos.twiceHalfOne),
-                Position = Tween(Computed(function(use)
+                Position = Tween(scope, Computed(scope, function(use)
                     return use(self.phasePos[2])
                 end), AssetBook.TweenInfos.two)
             }),

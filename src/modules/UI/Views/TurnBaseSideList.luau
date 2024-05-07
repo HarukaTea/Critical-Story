@@ -21,6 +21,8 @@ local wait, cancel, spawn = task.wait, task.cancel, task.spawn
 local insert, remove, tFind = table.insert, table.remove, table.find
 
 local function TurnBaseSideList(id: string, self: table) : Frame
+	local scope = self.scope
+
 	if id == "Monster" then
 		local function _addMonster(monster: ObjectValue)
 			wait()
@@ -138,23 +140,23 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 		})
 	end
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = id.."SideList",
         AnchorPoint = v2New(),
 		ZIndex = 2,
 		Position = fromScale(0.015 * (if id == "Player" then -1 else 1), -0.5),
 
         [Children] = {
-            Fusion.New("UIListLayout")({
+            Fusion.New(scope, "UIListLayout")({
                 Padding = udNew(0.6, 0),
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 HorizontalAlignment = if id == "Player" then Enum.HorizontalAlignment.Left else Enum.HorizontalAlignment.Right,
                 VerticalAlignment = Enum.VerticalAlignment.Bottom
             }),
 
-            Fusion.ForValues(if id == "Monster" then self.targetingMobs else self.playersInCombat, function(_, obj: ObjectValue)
-                return if id == "Monster" then TurnBaseMonsterBar(obj.Value, self) else TurnBasePlrBar(obj.Value, self)
-            end, Fusion.cleanup)
+            Fusion.ForValues(scope, if id == "Monster" then self.targetingMobs else self.playersInCombat, function(_, localScope: table, obj: ObjectValue)
+                return if id == "Monster" then TurnBaseMonsterBar(obj.Value, self, localScope) else TurnBasePlrBar(obj.Value, self, localScope)
+            end)
         }
     })
 end

@@ -18,6 +18,8 @@ local wait = task.wait
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 
 local function BackpackItemList(self: table) : ScrollingFrame
+    local scope = self.scope
+
     HarukaLib:Hydrate(workspace.CurrentCamera, {
         ["Prop-ViewportSize"] = function(newSize: Vector2)
             self.absSize:set({
@@ -29,14 +31,16 @@ local function BackpackItemList(self: table) : ScrollingFrame
         end
     })
 
-    return Components.ScrollingFrame({
+    return Components.ScrollingFrame(scope, {
         Name = "Items",
         Size = fromScale(0.99, 0.93),
         ScrollingDirection = Enum.ScrollingDirection.Y,
-        CanvasSize = Computed(function(use)
+        ClipsDescendants = false,
+
+        CanvasSize = Computed(scope, function(use)
             return if use(self.absContentSize) > use(self.absScrollSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
         end),
-        ScrollingEnabled = Computed(function(use)
+        ScrollingEnabled = Computed(scope, function(use)
             return if use(self.absContentSize) > use(self.absScrollSize) then true else false
         end),
 
@@ -58,11 +62,11 @@ local function BackpackItemList(self: table) : ScrollingFrame
         end,
 
         [Fusion.Children] = {
-            Fusion.New("UIGridLayout")({
-                CellPadding = Computed(function(use)
+            Fusion.New(scope, "UIGridLayout")({
+                CellPadding = Computed(scope, function(use)
                     return fromOffset(use(self.absCellPadding)[1], use(self.absCellPadding)[2])
                 end),
-                CellSize = Computed(function(use)
+                CellSize = Computed(scope, function(use)
                     return fromOffset(use(self.absCellSize), use(self.absCellSize))
                 end),
 
@@ -70,15 +74,15 @@ local function BackpackItemList(self: table) : ScrollingFrame
                     self.absContentSize:set(newSize.Y)
                 end,
             }),
-            Fusion.ForValues(self.items, function(use, item: IntValue)
+            Fusion.ForValues(scope, self.items, function(use, localScope: table, item: IntValue)
                 if use(self.chosenFilter) == "Others" then
                     local filter = { "Material", "Cosmetic", "Quest" }
-                    if tFind(filter, ItemBook:FindItem(item.Name).Type) then return BackpackItemSlot(item, self) end
+                    if tFind(filter, ItemBook:FindItem(item.Name).Type) then return BackpackItemSlot(item, self, localScope) end
 
                 else
-                    if ItemBook:FindItem(item.Name).Type == use(self.chosenFilter) then return BackpackItemSlot(item, self) end
+                    if ItemBook:FindItem(item.Name).Type == use(self.chosenFilter) then return BackpackItemSlot(item, self, localScope) end
                 end
-            end, Fusion.cleanup),
+            end),
         },
     })
 end

@@ -10,6 +10,7 @@ local Signals = {
 	CreateHint = Signal(),
 	CameraPointTo = Signal(),
 	ExCategoryOpened = Signal(),
+	EnableMapDetails = Signal(),
 	NPCChat = Signal(),
 	PlayAnimation = Signal(),
 	SwitchScene = Signal()

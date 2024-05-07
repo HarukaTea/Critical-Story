@@ -44,7 +44,7 @@ end
 Spawn(collisionRegister)
 
 local function cmdrRegister()
-	Cmdr:RegisterDefaultCommands({ "DefaultAdmin", "Help" })
+	Cmdr:RegisterDefaultCommands({ "DefaultAdmin", "DefaultUtil", "DefaultDebug", "Help" })
 	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
 	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
 end

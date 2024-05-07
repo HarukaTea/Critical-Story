@@ -24,39 +24,37 @@ local insert, remove, tFind = table.insert, table.remove, table.find
 local fontFromName = Font.fromName
 
 return function(plr: Player)
-	local self = setmetatable({}, Hints)
-
-	self.hintsList = Fusion.Value({})
-
+	local scope = Fusion.scoped({})
+	local hintsList = Fusion.Value(scope, {})
 	local char = plr.Character or plr.CharacterAdded:Wait()
 
-	local UI = Components.ScreenGui({
+	Components.ScreenGui(scope, {
 		Name = "Hints",
 		DisplayOrder = 100,
 		Parent = plr.PlayerGui,
 
 		[Children] = {
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "BG",
 				Position = fromScale(0.5, 0.511),
 				Size = fromScale(1, 0.979),
 				ZIndex = 999,
 
 				[Children] = {
-					New("UIListLayout")({
+					New(scope, "UIListLayout")({
 						Padding = udNew(0, 5),
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 					}),
-					New("UIPadding")({ PaddingTop = udNew(0, 10) }),
+					New(scope, "UIPadding")({ PaddingTop = udNew(0, 10) }),
 
-					Fusion.ForValues(self.hintsList, function(_, text: string)
-						local overallTrans = Fusion.Value(0)
+					Fusion.ForValues(scope, hintsList, function(_, localScope: table, text: string)
+						local overallTrans = Fusion.Value(localScope, 0)
 						Spawn(function()
 							wait(2.7)
 							overallTrans:set(1)
 						end)
 
-						return Components.TextButton({
+						return Components.TextButton(localScope, {
 							Name = "Hint",
 							AnchorPoint = v2New(0.5, 0.5),
 							AutomaticSize = Enum.AutomaticSize.X,
@@ -65,10 +63,10 @@ return function(plr: Player)
 							FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
 							TextScaled = false,
 
-							BackgroundTransparency = Fusion.Tween(Fusion.Computed(function(use)
+							BackgroundTransparency = Fusion.Tween(localScope, Fusion.Computed(localScope, function(use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
-							TextTransparency = Fusion.Tween(Fusion.Computed(function(use)
+							TextTransparency = Fusion.Tween(localScope, Fusion.Computed(localScope, function(use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
 
@@ -77,14 +75,14 @@ return function(plr: Player)
 							end,
 
 							[Children] = {
-								New("UICorner")({ CornerRadius = udNew(0.25, 0) }),
-								New("UIPadding")({
+								New(localScope, "UICorner")({ CornerRadius = udNew(0.25, 0) }),
+								New(localScope, "UIPadding")({
 									PaddingLeft = udNew(0, 11),
 									PaddingRight = udNew(0, 11),
 								}),
 							},
 						})
-					end, Fusion.cleanup)
+					end)
 				},
 			}),
 
@@ -92,17 +90,17 @@ return function(plr: Player)
 	})
 
 	local function _createHint(text: string, envir: string)
-		local past = Fusion.peek(self.hintsList)
+		local past = Fusion.peek(hintsList)
 		insert(past, text)
 
-		self.hintsList:set(past)
+		hintsList:set(past)
 		workspace.Sounds.SFXs[if envir == "Hint" then "NewInfo" else "Error"]:Play()
 
 		wait(3)
-		local now = Fusion.peek(self.hintsList)
+		local now = Fusion.peek(hintsList)
 		remove(now, tFind(now, text))
 
-		self.hintsList:set(now)
+		hintsList:set(now)
 	end
 	Events.CreateHint:Connect(_createHint)
 	Signals.CreateHint:Connect(_createHint)
@@ -111,9 +109,7 @@ return function(plr: Player)
 		Events.CreateHint:DisconnectAll()
 		Signals.CreateHint:DisconnectAll()
 
-		UI:Destroy()
-
-		self = nil
+		Fusion.doCleanup(scope)
 	end
 	char.Humanoid.Died:Once(_onDead)
 end

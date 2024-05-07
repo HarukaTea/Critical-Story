@@ -8,21 +8,20 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Value = Fusion.Value
-
 local fromScale = UDim2.fromScale
 
 local function TurnBaseUIPinia(self: table)
-    local char = self.char :: Model
+    self.scope = Fusion.scoped({})
+	local function Value(val: any)
+		return Fusion.Value(self.scope, val)
+	end
 
-    self.isInCombat = Value(char:GetAttribute("InCombat"))
     self.playerClass = Value(self.plr:GetAttribute("Class"))
 
     self.charStatsDict = {
-		Shield = Value(char:GetAttribute("Shield")),
-		MaxShield = Value(char:GetAttribute("MaxShield")),
-		TP = Value(char:GetAttribute("TP"))
-	}
+        isInCombat = Value(false),
+        TP = Value(0)
+    }
 
     self.phaseBarProgress = Value(fromScale(0, 1))
     self.phaseBarTweenInfo = Value(AssetBook.TweenInfos.fourHalf)
@@ -31,7 +30,6 @@ local function TurnBaseUIPinia(self: table)
 
     self.panelPos = Value(fromScale(0.5, 5))
     self.actionClickCD = false
-    self.transHPBarSize = Value(fromScale(0, 0.875))
 
     self.inventory = self.plr:WaitForChild("Inventory", 999)
 
@@ -43,12 +41,11 @@ local function TurnBaseUIPinia(self: table)
 
     self.targetingMobs = Value({})
     self.monsterTargetingPos = Value(fromScale(-0.2, 0.5))
-
-    self.targetingPlayer = Value(Players.LocalPlayer)
-    self.playerTargetingPos = Value(fromScale(1.05, 0.5))
+    self.targetingMob = Value(self.charData.TargetMonster.Value)
 
     self.playersInCombat = Value({})
-    self.targetingMob = Value(self.charData.TargetMonster.Value)
+    self.targetingPlayer = Value(Players.LocalPlayer)
+    self.playerTargetingPos = Value(fromScale(1.05, 0.5))
 
     self.currentPhase = Value("Player")
 	self.phasePos = { Value(fromScale(-0.2, 0)), Value(fromScale(1.2, 0.9)) }

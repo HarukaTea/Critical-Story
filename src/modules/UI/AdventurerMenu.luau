@@ -12,12 +12,12 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
 
+local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
+local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
+
 local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
 local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonMenu)
-
-local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
-local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
 
 local AdventurerMenu = {}
 AdventurerMenu.__index = AdventurerMenu
@@ -37,15 +37,14 @@ return function(plr: Player)
 
 	Pinia(self) --// Create a storage
 
-	local UI = Components.ScreenGui({
+	local UI = Components.ScreenGui(self.scope, {
 		Name = "AdventurerMenu",
 		Parent = plr.PlayerGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
-		[Fusion.Ref] = self.UI,
 
 		[Fusion.Children] = {
-			Components.Frame({
+			Components.Frame(self.scope, {
 				Name = "BG",
 				Visible = false,
 				ZIndex = 2,
@@ -55,13 +54,13 @@ return function(plr: Player)
 					SettingsFrame(self),
 
 					ExCategoryTitle("Menu", self),
-					ExCategoryBottomBtns("Left", {
+					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
 					}),
 				}
 			}),
-			Components.Frame({
+			Components.Frame(self.scope, {
 				Name = "Shadow",
 				BackgroundTransparency = 0.15,
 				ZIndex = 0,
@@ -69,7 +68,6 @@ return function(plr: Player)
 			}),
 		},
 	})
-	repeat wait() until plr.PlayerGui:WaitForChild("Backpack", 999)
 
 	--// Action bindings
 	local function _openMenu(_, inputState: Enum.UserInputState)
@@ -92,9 +90,9 @@ return function(plr: Player)
 	--// Clear
 	local function _clearGarbage()
 		CAS:UnbindAction("OpenMenu")
-
-		UI:Destroy()
 		plr:SetAttribute("CurrentMenu", "None")
+
+		Fusion.doCleanup(self.scope)
 
 		self = nil
 	end

@@ -17,26 +17,28 @@ local fromRGB = Color3.fromRGB
 local sFind, sub = string.find, string.sub
 
 local function SettingToggleBtn(id: string, self: table) : Frame
+	local scope = self.scope
 	local TEXTS = {
 		Musics = "Musics",
 		SFXs = "Sound Effects",
 		PublicCombat = "Public Combat Mode",
 		PotatoMode = "Low Detail Mode",
 		PlayerList = "Player List",
+		MapDetails = "Map Details"
 	}
-    local isSelecting = Fusion.Value(false)
+    local isSelecting = Fusion.Value(scope, false)
 
-    return Components.Frame({
+    return Components.Frame(scope, {
 		Name = id,
 
 		[Children] = {
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Title",
 				Size = fromScale(0.65, 1),
 				Text = TEXTS[id],
 				TextXAlignment = Enum.TextXAlignment.Left
 			}),
-			Components.HoverImageButton({
+			Components.HoverImageButton(scope, {
 				Name = "SwitchBG",
 				BackgroundTransparency = 0,
 				AnchorPoint = v2New(),
@@ -74,31 +76,31 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 				end,
 
 				[Children] = {
-					Components.RoundUICorner(),
-					Components.UIStroke({
+					Components.RoundUICorner(scope),
+					Components.UIStroke(scope, {
 						Thickness = 3,
 						Enabled = true,
 
-						Transparency = Tween(Computed(function(use)
+						Transparency = Tween(scope, Computed(scope, function(use)
 							return if use(isSelecting) then 0.3 else 1
 						end), AssetBook.TweenInfos.twiceHalf)
 					})
 				}
 			}),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "Switch",
 				BackgroundTransparency = 0,
 				AnchorPoint = v2New(),
 				Size = fromScale(0.1, 1),
 
-				BackgroundColor3 = Tween(Computed(function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 					return if use(self.playerSettings[id]) then fromRGB(80, 161, 118) else fromRGB(214, 71, 107)
 				end), AssetBook.TweenInfos.threeHalf),
-				Position = Tween(Computed(function(use)
+				Position = Tween(scope, Computed(scope, function(use)
 					return if use(self.playerSettings[id]) then fromScale(0.8, 0) else fromScale(0.7, 0)
 				end), AssetBook.TweenInfos.twiceHalf),
 
-				[Children] = { Components.RoundUICorner() }
+				[Children] = { Components.RoundUICorner(scope) }
 			})
 		}
 	})

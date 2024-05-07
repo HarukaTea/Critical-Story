@@ -18,6 +18,7 @@ local fromScale = UDim2.fromScale
 local match = string.match
 
 local function ClassFrame(self: table) : Frame
+    local scope = self.scope
 
     local function _equipItem(slot: string, item: string)
 		local itemSlot = peek(self.classFrame):FindFirstChild(slot, true)
@@ -31,13 +32,13 @@ local function ClassFrame(self: table) : Frame
 	end
 	Events.EquipItems:Connect(_equipItem)
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = "ClassFrame",
 		Size = fromScale(1, 1.1),
         [Fusion.Ref] = self.classFrame,
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "AFrame",
                 AnchorPoint = v2New(),
                 Position = fromScale(0.837, -1),
@@ -48,7 +49,7 @@ local function ClassFrame(self: table) : Frame
                     ExCategoryOpenBtn("Backpack", self)
                 }
             }),
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "PFrame",
                 AnchorPoint = v2New(),
                 Position = fromScale(0.015, -0.9),
@@ -57,9 +58,7 @@ local function ClassFrame(self: table) : Frame
                 [Children] = {
                     PassiveSlot(1, self),
                     PassiveSlot(2, self),
-                    PassiveSlot(3, self),
-                    PassiveSlot(4, self),
-                    PassiveSlot(5, self)
+                    PassiveSlot(3, self)
                 }
             })
         },

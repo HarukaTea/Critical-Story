@@ -20,6 +20,8 @@ local udNew = UDim.new
 local wait = task.wait
 
 local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
+    local scope = self.scope
+
     if id == "Items" then
         local function _handleItems()
             wait()
@@ -55,21 +57,20 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
     end
 
     local index = if id == "Items" then 1 else 2
-    return Components.ScrollingFrame({
+    return Components.ScrollingFrame(scope, {
         Name = id.."SidePanel",
-        ClipsDescendants = true,
         AnchorPoint = v2New(0.5, 0),
         Position = fromScale(if id == "Items" then 0.332 else 0.668, -8),
         Size = fromScale(0.173, 8),
         ScrollingDirection = Enum.ScrollingDirection.Y,
 
-        Visible = Computed(function(use)
+        Visible = Computed(scope, function(use)
             return if id == "Items" then use(self.itemPanelVisible) else use(self.skillPanelVisible)
         end),
-        CanvasSize = Computed(function(use)
+        CanvasSize = Computed(scope, function(use)
             return if use(self.sidePanelAbsContentSize[index]) > use(self.sidePanelAbsSize[index]) then fromOffset(0, use(self.sidePanelAbsContentSize[index])) else fromOffset(0, 0)
         end),
-        ScrollingEnabled = Computed(function(use)
+        ScrollingEnabled = Computed(scope, function(use)
             return if use(self.sidePanelAbsContentSize[index]) > use(self.sidePanelAbsSize[index]) then true else false
         end),
 
@@ -78,7 +79,7 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
         end,
 
         [Fusion.Children] = {
-            Fusion.New("UIListLayout")({
+            Fusion.New(scope, "UIListLayout")({
                 Padding = udNew(0, 8),
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 VerticalAlignment = Enum.VerticalAlignment.Bottom,
@@ -88,16 +89,16 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
                     self.sidePanelAbsContentSize[index]:set(newSize.Y)
                 end
             }),
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "Padding",
                 Size = fromScale(0.95, 0.01)
             }),
 
-            Fusion.ForValues(if id == "Items" then self.items else self.skills, function(_, item: string)
-                return TurnBaseItemChoice(id, item, self)
-            end, Fusion.cleanup),
+            Fusion.ForValues(scope, if id == "Items" then self.items else self.skills, function(_, localScope: table, item: string)
+                return TurnBaseItemChoice(id, item, self, localScope)
+            end),
 
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "Padding",
                 Size = fromScale(0.95, 0.01)
             }),

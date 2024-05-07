@@ -19,26 +19,28 @@ local udNew = UDim.new
 local wait = task.wait
 
 local function TurnBaseAction(id: string, self: table) : Frame
-    local isSelecting = Value(false)
+    local scope = self.scope
+    local isSelecting = Value(scope, false)
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = id,
-        BackgroundColor3 = Computed(function(use)
-            return if use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
-        end),
         BackgroundTransparency = 0,
 
+        BackgroundColor3 = Computed(scope, function(use)
+            return if use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
+        end),
+
         [Fusion.Children] = {
-            Fusion.New("UICorner")({ CornerRadius = udNew(0.1, 0) }),
-            Components.UIStroke({
+            Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.1, 0) }),
+            Components.UIStroke(scope, {
                 Enabled = true,
                 Thickness = 3.5,
 
-                Color = Computed(function(use)
+                Color = Computed(scope, function(use)
                     return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
             }),
-            Components.HoverImageButton({
+            Components.HoverImageButton(scope, {
                 [OnEvent("MouseEnter")] = function()
                     isSelecting:set(true)
                 end,
@@ -61,7 +63,6 @@ local function TurnBaseAction(id: string, self: table) : Frame
                         self.actionClickCD = true
 
                         self.panelPos:set(fromScale(0.5, 5))
-                        self.transHPBarSize:set(fromScale(0, 0.875))
                         self.skillPanelVisible:set(false)
                         self.itemPanelVisible:set(false)
 
@@ -72,25 +73,25 @@ local function TurnBaseAction(id: string, self: table) : Frame
                     end
                 end
             }),
-            Components.ImageLabel({
+            Components.ImageLabel(scope, {
                 Name = "Icon",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0.1),
                 Size = fromScale(0.5, 0.5),
                 Image = AssetBook.ActionPanelIcons[id],
 
-                ImageColor3 = Computed(function(use)
+                ImageColor3 = Computed(scope, function(use)
                     return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Action",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0.6),
                 Size = fromScale(0.9, 0.3),
                 Text = upper(id),
 
-                TextColor3 = Computed(function(use)
+                TextColor3 = Computed(scope, function(use)
                     return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
                 end),
             })

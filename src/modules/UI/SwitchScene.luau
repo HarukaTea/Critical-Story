@@ -17,7 +17,8 @@ local wait = task.wait
 local fromRGB = Color3.fromRGB
 
 return function (plr: Player)
-    local bgPos = Fusion.Value(fromScale(1.7, 1.7))
+	local scope = Fusion.scoped({})
+    local bgPos = Fusion.Value(scope, fromScale(1.7, 1.7))
 
 	local char = plr.Character or plr.CharacterAdded:Wait()
 
@@ -26,24 +27,24 @@ return function (plr: Player)
 			BackgroundColor3 = fromRGB(),
 			ZIndex = 20,
 		}
-		for i, v in pairs(props) do defaultProps[i] = v end
+		for prop: string, val: any in props do defaultProps[prop] = val end
 
-		return Fusion.New("Frame")(defaultProps)
+		return Fusion.New(scope, "Frame")(defaultProps)
 	end
-	local UI = Components.ScreenGui({
+	Components.ScreenGui(scope, {
 		Name = "SwitchScene",
 		DisplayOrder = 100,
 		Parent = plr.PlayerGui,
 
 		[Fusion.Children] = {
-			Components.ImageLabel({
+			Components.ImageLabel(scope, {
 				AnchorPoint = v2New(0.5, 0.5),
 				Position = fromScale(0.5, 0.5),
 				ZIndex = 20,
 				Image = "rbxassetid://12209511296",
 				SizeConstraint = Enum.SizeConstraint.RelativeXX,
 
-				Size = Fusion.Tween(Fusion.Computed(function(use)
+				Size = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
                     return use(bgPos)
                 end), AssetBook.TweenInfos.half),
 
@@ -100,7 +101,7 @@ return function (plr: Player)
 		Events.SwitchScene:DisconnectAll()
 		Signals.SwitchScene:DisconnectAll()
 
-		UI:Destroy()
+		Fusion.doCleanup(scope)
 	end
 	char.Humanoid.Died:Once(_onDead)
 end

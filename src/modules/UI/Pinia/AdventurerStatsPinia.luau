@@ -8,8 +8,6 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local Value = Fusion.Value
-
 local floor = math.floor
 local fromScale = UDim2.fromScale
 
@@ -17,7 +15,12 @@ local function AdventurerStatsPinia(self: table)
     local plr = self.plr :: Player
     local char = self.char :: Model
 
-	self.UI, self.skillInfo, self.classFrame = Value(), Value(), Value()
+	self.scope = Fusion.scoped({})
+	local function Value(val: any)
+		return Fusion.Value(self.scope, val)
+	end
+
+	self.skillInfo, self.classFrame = Value(), Value()
 
     self.inventory = plr:WaitForChild("Inventory", 999)
 	self.charData = char:WaitForChild("CharStats", 999)
@@ -59,12 +62,7 @@ local function AdventurerStatsPinia(self: table)
 		Rogue = Value(0)
 	}
 
-    self.version, self.privateId, self.serverLocation =
-		Value(RepS.Package.Version.Value),
-        Value(RepS.Package.PrivateServerId.Value),
-        Value(RepS.Package.ServerLocation.Value)
-
-    self.passiveIconList = { Value("Null"), Value("Null"), Value("Null"), Value("Null"), Value("Null"), Value("Null") }
+    self.passiveIconList = { Value("Null"), Value("Null"), Value("Null") }
 
     self.chatDialogueAbsSize = Value(24)
     self.chatText = Value("")
@@ -89,9 +87,9 @@ local function AdventurerStatsPinia(self: table)
         HorizonLineTweenInfo = Value(AssetBook.TweenInfos.two)
 	}
 
-    self.promptsList = Fusion.Value({})
+    self.promptsList = Value({})
 
-    self.quests = Fusion.Value(self.plr:WaitForChild("Quests", 999):GetChildren())
+    self.quests = Value(self.plr:WaitForChild("Quests", 999):GetChildren())
 end
 
 return AdventurerStatsPinia

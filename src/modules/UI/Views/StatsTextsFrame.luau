@@ -17,15 +17,16 @@ local udNew = UDim.new
 local fromScale = UDim2.fromScale
 
 local function StatImage(id: string, self: table) : ImageLabel
-    local isSelecting = Value(false)
+    local scope = self.scope
+    local isSelecting = Value(scope, false)
 
-    return Components.ImageLabel({
+    return Components.ImageLabel(scope, {
         Name = id.."Image",
         BackgroundTransparency = 0,
         Size = fromScale(1, 1),
         SizeConstraint = Enum.SizeConstraint.RelativeYY,
 
-        Image = Computed(function(use)
+        Image = Computed(scope, function(use)
             if id == "ClassATK" then
                 return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 
@@ -38,16 +39,16 @@ local function StatImage(id: string, self: table) : ImageLabel
         end),
 
         [Children] = {
-            Components.RoundUICorner(),
-            Components.UIStroke({
+            Components.RoundUICorner(scope),
+            Components.UIStroke(scope, {
                 Enabled = true,
                 Thickness = 2.5,
 
-                Transparency = Fusion.Tween(Computed(function(use)
+                Transparency = Fusion.Tween(scope, Computed(scope, function(use)
                     return if use(isSelecting) then 0.3 else 1
                 end), AssetBook.TweenInfos.twiceHalf)
             }),
-            Components.HoverImageButton({
+            Components.HoverImageButton(scope, {
                 [Fusion.OnEvent("MouseEnter")] = function()
                     isSelecting:set(true)
                 end,
@@ -60,6 +61,7 @@ local function StatImage(id: string, self: table) : ImageLabel
 end
 
 local function StatText(id: string, self: table) : TextLabel
+    local scope = self.scope
     local char = self.char :: Model
     local charDMGStats = self.charDMGStats
 
@@ -75,11 +77,11 @@ local function StatText(id: string, self: table) : TextLabel
         end
     })
 
-    return Components.TextLabel({
+    return Components.TextLabel(scope, {
         Name = id.."Text",
         AutomaticSize = Enum.AutomaticSize.X,
         Size = fromScale(0, 1),
-        Text = Computed(function(use)
+        Text = Computed(scope, function(use)
             if id == "ClassATK" then
                 if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
                     return use(charDMGStats.MinDMG).."-"..use(charDMGStats.MaxDMG)
@@ -96,20 +98,22 @@ local function StatText(id: string, self: table) : TextLabel
         end),
 
         [Children] = {
-            Components.TextUIStroke({ Thickness = 2 })
+            Components.TextUIStroke(scope, { Thickness = 2 })
         }
     })
 end
 
 local function StatsTextsFrame(self: table) : Frame
-    return Components.Frame({
+    local scope = self.scope
+
+    return Components.Frame(scope, {
         Name = "StatsTextsFrame",
         AnchorPoint = v2New(0.5, 0),
         Position = fromScale(0.5, -0.6),
         Size = fromScale(1, 0.5),
 
         [Children] = {
-            Fusion.New("UIListLayout")({
+            Fusion.New(scope, "UIListLayout")({
                 Padding = udNew(0.01, 0),
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
                 FillDirection = Enum.FillDirection.Horizontal,

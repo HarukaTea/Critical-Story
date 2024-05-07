@@ -32,6 +32,7 @@ return {
 		SFXs = true,
 		PotatoMode = false,
 		PlayerList = true,
+		MapDetails = true,
 		CombatMode = "Solo"
 	}
 }

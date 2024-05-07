@@ -11,66 +11,60 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local New, Children, Computed, peek = Fusion.New, Fusion.Children, Fusion.Computed, Fusion.peek
+local New, Children = Fusion.New, Fusion.Children
 
 local color3New, v2New, udNew = Color3.new, Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local format, match = string.format, string.match
 
-local function PlayerSlot(self: table, player: Player): Frame
-	local class = Fusion.Value(player:GetAttribute("Class"))
-	local role = Fusion.Value(player:GetAttribute("Role"))
+local function PlayerSlot(self: table, player: Player, scope: table): Frame
+	local class = Fusion.Value(scope, player:GetAttribute("Class"))
+	local role = player:GetAttribute("Role")
 
 	HarukaLib:Hydrate(player, {
 		["Attr-Class"] = function(newClass: string)
 			class:set(newClass)
-		end,
-		["Attr-Role"] = function(newRole: string)
-			role:set(newRole)
 		end
 	})
 
-	return Components.Frame({
+	return Components.Frame(scope, {
 		BackgroundTransparency = 0,
 		Size = fromScale(1, 0.2),
 		Name = player.Name,
 
 		[Children] = {
-			New("UIAspectRatioConstraint")({ AspectRatio = 4.993 }),
-			New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-			New("ImageLabel")({
+			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 4.993 }),
+			New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+			New(scope, "ImageLabel")({
 				Name = "Class",
 				AnchorPoint = v2New(0, 0.5),
 				BackgroundColor3 = color3New(),
 				Position = fromScale(0.055, 0.5),
 				Size = fromScale(0.13, 0.665),
 
-				Image = Fusion.Computed(function(use)
+				Image = Fusion.Computed(scope, function(use)
 					return AssetBook.ClassInfo[use(class)].Image
 				end),
 
-				[Children] = { Components.RoundUICorner() },
+				[Children] = { Components.RoundUICorner(scope) },
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "PlayerName",
 				Position = fromScale(0.24, 0),
 				Size = fromScale(0.721, 1),
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Text = player.DisplayName,
-
-				TextColor3 = Computed(function(use)
-					return if use(role) ~= "" or not use(role) then fromRGB(170, 255, 255) else color3New(1, 1, 1)
-				end),
+				TextColor3 = if role then fromRGB(170, 255, 255) else color3New(1, 1, 1),
 
 				[Children] = {
-					New("UIPadding")({
+					New(scope, "UIPadding")({
 						PaddingBottom = udNew(0.18, 0),
 						PaddingTop = udNew(0.18, 0)
 					})
 				}
 			}),
-			Components.HoverImageButton({
+			Components.HoverImageButton(scope, {
 				ZIndex = 2,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
@@ -91,7 +85,7 @@ local function PlayerSlot(self: table, player: Player): Frame
 
 					self.displayName:set(player.DisplayName)
 					self.userName:set("@" .. player.Name)
-					self.classImage:set(AssetBook.ClassInfo[peek(class)].Image)
+					self.classImage:set(AssetBook.ClassInfo[Fusion.peek(class)].Image)
 					self.level:set("Lv."
 						.. player:GetAttribute("Levels")
 						.. " - "
@@ -113,9 +107,9 @@ local function PlayerSlot(self: table, player: Player): Frame
 					end
 
 					self.playerDescVisible:set(true)
-				end,
-			}),
-		},
+				end
+			})
+		}
 	})
 end
 

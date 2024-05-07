@@ -33,7 +33,7 @@ local BLACKLIST = { "Equip", "Pin" }
 local function _checkSlot(self: table, type: string) : string
 	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
 
-	for _, element in classFrame:GetDescendants() do
+	for _, element: Frame in classFrame:GetDescendants() do
 		if sFind(element.Name, type) and not element:GetAttribute("Equipped") then
 			return element.Name
 		end
@@ -45,7 +45,7 @@ local function _checkSameItem(self: table, item: string, type: string) : (string
 	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
 
 	local check, sameSlot = false, nil
-	for _, element in classFrame:GetDescendants() do
+	for _, element: Frame in classFrame:GetDescendants() do
 		if sFind(element.Name, type) and element:GetAttribute("ItemEquipped") == item then
 			check = true
 			sameSlot = element.Name
@@ -56,7 +56,7 @@ local function _checkSameItem(self: table, item: string, type: string) : (string
 end
 local function _findItem(itemFrame: Frame) : string
 	local item: string?
-	for _, child in itemFrame:GetChildren() do
+	for _, child: ImageButton in itemFrame:GetChildren() do
 		if child:IsA("ImageButton") and child:GetAttribute("Selected") then
 			item = child.Name
 		end
@@ -67,27 +67,29 @@ local function _findItem(itemFrame: Frame) : string
 end
 
 local function FilterButtonBackpack(id: string, self: table): TextButton
-	return Components.TextButton({
+	local scope = self.scope
+
+	return Components.TextButton(scope, {
 		Name = id,
 		BackgroundColor3 = COLORS[id],
 
-		Text = Computed(function(use)
+		Text = Computed(scope, function(use)
 			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Text) else upper(id)
 		end),
-		Visible = Computed(function(use)
+		Visible = Computed(scope, function(use)
 			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Visible) else true
 		end),
-		Size = Computed(function(use)
+		Size = Computed(scope, function(use)
 			return if tFind(BLACKLIST, id) then if id == "Equip" then fromScale(0.116, 1) else use(self.filterInfo.Pin.Size) else fromScale(0.12, 1)
 		end),
 
 		[Fusion.Children] = {
-			Fusion.New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-			Components.UIStroke({
+			Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+			Components.UIStroke(scope, {
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(Computed(function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
 					return if use(self.chosenFilter) == id and not tFind(BLACKLIST, id) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			})

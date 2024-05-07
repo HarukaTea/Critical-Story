@@ -6,15 +6,17 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Value = Fusion.Value
-
 local function AdventurerMenuPinia(self: table) : table
     local plr = self.plr :: Player
     local char = self.char :: Model
 
-    self.UI = Value()
+	self.scope = Fusion.scoped({})
+	local function Value(val: any)
+		return Fusion.Value(self.scope, val)
+	end
 
     self.chosenFilter = Value("Character")
+	self.frames = { Character = Value(true), Settings = Value(false) }
 
     self.playerData = {
 		Levels = Value(plr:GetAttribute("Levels")),
@@ -40,6 +42,7 @@ local function AdventurerMenuPinia(self: table) : table
 		PublicCombat = Value(false),
 		PotatoMode = Value(false),
 		PlayerList = Value(true),
+		MapDetails = Value(true)
 	}
 end
 

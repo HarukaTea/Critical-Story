@@ -8,6 +8,7 @@ local SoundService = game:GetService("SoundService")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local SettingToggleBtn = require(RepS.Modules.UI.Components.SettingToggleBtn)
 
@@ -15,6 +16,7 @@ local fromScale = UDim2.fromScale
 local clear = table.clear
 
 local function SettingsFrame(self: table): Frame
+	local scope = self.scope
 	local potatoStoreParts = {}
 	local playerSettings = self.playerSettings :: table
 
@@ -61,18 +63,26 @@ local function SettingsFrame(self: table): Frame
 		end,
 		["Attr-PlayerList"] = function(state: boolean)
 			playerSettings.PlayerList:set(state)
+		end,
+		["Attr-MapDetails"] = function(state: boolean)
+			playerSettings.MapDetails:set(state)
+
+			Signals.EnableMapDetails:Fire(if state then "Enable" else "Disable")
 		end
 	})
 
-	return Components.Frame({
+	return Components.Frame(scope, {
 		Name = "Settings",
 		Position = fromScale(0.496, 0.567),
 		Size = fromScale(0.944, 0.627),
-		Visible = false,
+
+		Visible = Fusion.Computed(scope, function(use)
+			return use(self.frames.Settings)
+		end),
 
 		[Fusion.Children] = {
-			Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
-			Fusion.New("UIGridLayout")({
+			Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+			Fusion.New(scope, "UIGridLayout")({
 				CellPadding = fromScale(0.1, 0.1),
 				CellSize = fromScale(0.4, 0.09),
 				SortOrder = Enum.SortOrder.LayoutOrder
@@ -83,6 +93,7 @@ local function SettingsFrame(self: table): Frame
 			SettingToggleBtn("PublicCombat", self),
 			SettingToggleBtn("PotatoMode", self),
 			SettingToggleBtn("PlayerList", self),
+			SettingToggleBtn("MapDetails", self)
 		},
 	})
 end

@@ -12,7 +12,9 @@ local fromRGB = Color3.fromRGB
 local clamp = math.clamp
 
 local function BottomProgressBar(id: string, self: table) : Frame
-    return Fusion.New("Frame")({
+    local scope = self.scope
+
+    return Fusion.New(scope, "Frame")({
         Name = id.."Bar",
         BackgroundColor3 = fromRGB(30, 30, 30),
         Position = fromScale(0, 0.8),
@@ -20,12 +22,12 @@ local function BottomProgressBar(id: string, self: table) : Frame
         ZIndex = 2,
 
         [Fusion.Children] = {
-            Fusion.New("Frame")({
+            Fusion.New(scope, "Frame")({
                 Name = "Bar",
                 BackgroundTransparency = 0.2,
                 BackgroundColor3 = if id == "EXP" then fromRGB(217, 193, 144) else fromRGB(255, 255, 255),
 
-                Size = Fusion.Tween(Fusion.Computed(function(use)
+                Size = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
                     if id == "EXP" then
                         local x = clamp(use(self.playerData.EXP[1]) / use(self.playerData.EXP[2]), 0, 1)
 

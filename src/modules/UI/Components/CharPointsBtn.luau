@@ -20,42 +20,40 @@ local upper = string.upper
 local fontFromName = Font.fromName
 
 local function CharPointsBtn(id: string, direction: string, self: table): Frame
+	local scope = self.scope
 	local COLORS = {
 		DMG = fromRGB(255, 0, 0),
 		Magic = fromRGB(170, 170, 255),
 		Health = fromRGB(85, 255, 0),
-		Shield = fromRGB(255, 255, 0),
 	}
 	local POS = {
 		DMG = fromScale(0.721, 0.566),
 		Magic = fromScale(0.106, 0.556),
 		Health = fromScale(0.162, 0.125),
-		Shield = fromScale(0.162, 0.847),
 	}
 	local POINTS = {
 		DMG = "DMGPoints",
 		Magic = "MagicPoints",
 		Health = "HealthPoints",
-		Shield = "ShieldPoints",
 	}
-	local bgColors = { Value(fromRGB(30, 30, 30)), Value(fromRGB(30, 30, 30)) }
-	local contentColors = { Value(fromRGB(255, 255, 255)), Value(fromRGB(255, 255, 255)) }
+	local bgColors = { Value(scope, fromRGB(30, 30, 30)), Value(scope, fromRGB(30, 30, 30)) }
+	local contentColors = { Value(scope, fromRGB(255, 255, 255)), Value(scope, fromRGB(255, 255, 255)) }
 
-	return New("Frame")({
+	return New(scope, "Frame")({
         Name = id,
 		BackgroundTransparency = 1,
 		Position = POS[id],
 		Size = fromScale(0.177, 0.1),
 
 		[Children] = {
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Stat",
 				Size = fromScale(1, 1),
 				FontFace = fontFromName("TitilliumWeb", Enum.FontWeight.Bold),
 				TextXAlignment = if direction == "Left" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				TextColor3 = COLORS[id],
 
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
 					if id ~= "DMG" then
 						return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
 					else
@@ -63,19 +61,19 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 					end
 				end)
 			}),
-			Components.TextButton({
+			Components.TextButton(scope, {
 				Name = "Add",
 				Size = fromScale(0.15, 1),
 				Position = if direction == "Left" then fromScale(-0.195, 0) else fromScale(1.05, 0),
 				Text = "+",
-				Visible = Computed(function(use)
+				Visible = Computed(scope, function(use)
 					return if use(self.playerData.LvPoints) > 0 then true else false
 				end),
 
-				BackgroundColor3 = Tween(Computed(function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 					return use(bgColors[1])
 				end), AssetBook.TweenInfos.twiceHalf),
-				TextColor3 = Tween(Computed(function(use)
+				TextColor3 = Tween(scope, Computed(scope, function(use)
 					return use(contentColors[1])
 				end), AssetBook.TweenInfos.twiceHalf),
 
@@ -98,31 +96,31 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 				end,
 
 				[Children] = {
-					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-					Components.UIStroke({
+					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke(scope, {
 						Transparency = 0.2,
 						Thickness = 2.5,
 						Enabled = true,
 
-						Color = Tween(Computed(function(use)
+						Color = Tween(scope, Computed(scope, function(use)
 							return if use(bgColors[1]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
 						end), AssetBook.TweenInfos.twiceHalf)
 					})
 				}
 			}),
-			Components.TextButton({
+			Components.TextButton(scope, {
 				Name = "Add10",
 				Size = fromScale(0.28, 1),
 				Position = if direction == "Left" then fromScale(-0.565, 0) else fromScale(1.29, 0),
 				Text = "+10",
-				Visible = Computed(function(use)
+				Visible = Computed(scope, function(use)
 					return if use(self.playerData.LvPoints) >= 10 then true else false
 				end),
 
-				BackgroundColor3 = Tween(Computed(function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 					return use(bgColors[2])
 				end), AssetBook.TweenInfos.twiceHalf),
-				TextColor3 = Tween(Computed(function(use)
+				TextColor3 = Tween(scope, Computed(scope, function(use)
 					return use(contentColors[2])
 				end), AssetBook.TweenInfos.twiceHalf),
 
@@ -145,13 +143,13 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 				end,
 
 				[Children] = {
-					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-					Components.UIStroke({
+					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke(scope, {
 						Transparency = 0.2,
 						Thickness = 2.5,
 						Enabled = true,
 
-						Color = Tween(Computed(function(use)
+						Color = Tween(scope, Computed(scope, function(use)
 							return if use(bgColors[2]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
 						end))
 					})

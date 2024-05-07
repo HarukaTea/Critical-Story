@@ -7,7 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signal = require(RepS.Modules.Packages.Signal)
 
-local Value, peek = Fusion.Value, Fusion.peek
+local peek = Fusion.peek
 
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
@@ -15,12 +15,17 @@ local fromRGB = Color3.fromRGB
 local function BackpackPinia(self: table)
     local plr = self.plr :: Player
 
+    self.scope = Fusion.scoped({})
+	local function Value(val: any)
+		return Fusion.Value(self.scope, val)
+	end
+
     self.inventory = plr:WaitForChild("Inventory", 999)
 
 	self.itemFrame = Value()
 
 	self.items = Value(self.inventory:GetChildren())
-	self.noItemsShow = Value(if Fusion.peek(self.items)[1] then false else true)
+	self.noItemsShow = Value(true)
 	self.chosenFilter = Value("Passive")
 
     local camVPSize = workspace.CurrentCamera.ViewportSize

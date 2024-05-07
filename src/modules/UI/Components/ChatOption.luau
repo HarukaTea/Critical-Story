@@ -17,31 +17,31 @@ local fromRGB = Color3.fromRGB
 local v2New = Vector2.new
 local sub = string.sub
 
-local function ChatOption(option: string, icon: string, self: table, index: number) : Frame
-    local bgColor = Fusion.Value(fromRGB(30, 30, 30))
-    local contentColor = Fusion.Value(fromRGB(255, 255, 255))
+local function ChatOption(option: string, icon: string, self: table, index: number, scope: table) : Frame
+    local bgColor = Fusion.Value(scope, fromRGB(30, 30, 30))
+    local contentColor = Fusion.Value(scope, fromRGB(255, 255, 255))
 
     if icon ~= "Chat" then option = sub(option, #icon + 2) end
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         BackgroundTransparency = 0,
         Size = fromScale(0.9, 0.27),
 
-        BackgroundColor3 = Tween(Computed(function(use)
+        BackgroundColor3 = Tween(scope, Computed(scope, function(use)
             return use(bgColor)
         end), AssetBook.TweenInfos.threeHalf),
 
         [Fusion.Children] = {
-            Fusion.New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-            Components.UIStroke({
+            Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+            Components.UIStroke(scope, {
                 Thickness = 2.8,
                 Enabled = true,
 
-                Color = Tween(Computed(function(use)
+                Color = Tween(scope, Computed(scope, function(use)
                     return use(contentColor)
                 end), AssetBook.TweenInfos.threeHalf)
             }),
-            Components.HoverImageButton({
+            Components.HoverImageButton(scope, {
                 [OnEvent("MouseEnter")] = function()
                     bgColor:set(fromRGB(255, 255, 255))
                     contentColor:set(fromRGB())
@@ -57,24 +57,26 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
                     Signals.NPCChat:Fire(index)
                 end
             }),
-            Components.ImageLabel({
+            Components.ImageLabel(scope, {
                 Name = "Icon",
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.026, 0.5),
                 Size = fromScale(0.072, 0.8),
                 Image = AssetBook.PromptIcons[icon],
 
-                ImageColor3 = Tween(Computed(function(use)
+                ImageColor3 = Tween(scope, Computed(scope, function(use)
                     return use(contentColor)
                 end), AssetBook.TweenInfos.threeHalf)
             }),
-            Components.CenterTextLabel({
+            Components.TextLabel(scope, {
                 Name = "OptionText",
                 Position = fromScale(0.528, 0.5),
                 Size = fromScale(0.8, 0.7),
                 Text = option,
+                AnchorPoint = v2New(0.5, 0.5),
+		        TextXAlignment = Enum.TextXAlignment.Left,
 
-                TextColor3 = Tween(Computed(function(use)
+                TextColor3 = Tween(scope, Computed(scope, function(use)
                     return use(contentColor)
                 end), AssetBook.TweenInfos.threeHalf)
             })

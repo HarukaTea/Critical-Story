@@ -16,14 +16,14 @@ local fromScale = UDim2.fromScale
 local udNew = UDim.new
 local v2New = Vector2.new
 
-local function QuestBar(quest: IntValue) : Frame
+local function QuestBar(quest: IntValue, scope: table) : Frame
     local questType = quest.Name
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = quest.Name,
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
                 Name = "Point",
                 BackgroundColor3 = AssetBook.QuestColor[questType],
                 BackgroundTransparency = 0,
@@ -33,15 +33,15 @@ local function QuestBar(quest: IntValue) : Frame
                 Rotation = 45,
 
                 [Children] = {
-                    Fusion.New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-                    Components.UIStroke({
+                    Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+                    Components.UIStroke(scope, {
                         Thickness = 3,
                         Enabled = true,
                         Color = fromRGB()
                     })
                 }
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Series",
                 Position = fromScale(0.04, -0.1),
                 Size = fromScale(1, 0.675),
@@ -50,10 +50,10 @@ local function QuestBar(quest: IntValue) : Frame
                 Text = StoryBook[questType][quest.Value].Name,
 
                 [Children] = {
-                    Components.TextUIStroke({ Thickness = 2 })
+                    Components.TextUIStroke(scope, { Thickness = 2 })
                 }
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Info",
                 Position = fromScale(0.041, 0.575),
                 Size = fromScale(1, 0.5),
@@ -61,7 +61,7 @@ local function QuestBar(quest: IntValue) : Frame
                 Text = StoryBook[questType][quest.Value].Target,
 
                 [Children] = {
-                    Components.TextUIStroke({ Thickness = 2 })
+                    Components.TextUIStroke(scope, { Thickness = 2 })
                 }
             })
         }

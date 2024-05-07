@@ -6,11 +6,14 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local Value = Fusion.Value
-
 local fromScale = UDim2.fromScale
 
 local function PlayerListPinia(self: table)
+    self.scope = Fusion.scoped({})
+	local function Value(val: any)
+		return Fusion.Value(self.scope, val)
+	end
+
     self.list = Value()
 
 	self.absSize, self.absContentSize = Value(90), Value(30)

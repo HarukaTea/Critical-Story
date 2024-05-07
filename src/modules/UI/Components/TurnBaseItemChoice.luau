@@ -18,12 +18,12 @@ local fromScale = UDim2.fromScale
 local wait = task.wait
 local fromRGB, fromHex = Color3.fromRGB, Color3.fromHex
 
-local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
-    local isSelecting = Value(false)
+local function TurnBaseItemChoice(id: string, item: string, self: table, scope: table) : Frame
+    local isSelecting = Value(scope, false)
 
     local itemAmount
     if id == "Items" then
-        itemAmount = Value(self.inventory[item].Value)
+        itemAmount = Value(scope, self.inventory[item].Value)
 
         HarukaLib:Hydrate(self.inventory[item], {
             ["Prop-Value"] = function(newAmount: number)
@@ -32,56 +32,56 @@ local function TurnBaseItemChoice(id: string, item: string, self: table) : Frame
         })
     end
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = item,
         BackgroundTransparency = 0,
         Size = fromScale(0.95, 0.224),
 
         [Fusion.Children] = {
-            Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 6.158 }),
-            Components.RoundUICorner(),
-            Components.UIStroke({
+            Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 6.158 }),
+            Components.RoundUICorner(scope),
+            Components.UIStroke(scope, {
                 Thickness = 2.3,
 
-                Enabled = Computed(function(use)
+                Enabled = Computed(scope, function(use)
                     return use(isSelecting)
                 end)
             }),
-            Components.ImageLabel({
+            Components.ImageLabel(scope, {
                 Name = "Icon",
                 Size = fromScale(1, 1),
                 SizeConstraint = Enum.SizeConstraint.RelativeYY,
                 Image = "rbxassetid://"..ItemBook:FindItem(item).Icon,
 
-                [Fusion.Children] = { Components.RoundUICorner() }
+                [Fusion.Children] = { Components.RoundUICorner(scope) }
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = "Item",
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.2, 0.5),
                 Size = fromScale(0.55, 0.6),
                 TextXAlignment = Enum.TextXAlignment.Left,
 
-                Text = Computed(function()
+                Text = Computed(scope, function()
                     return ItemBook:FindItem(item).Name
                 end),
             }),
-            Components.TextLabel({
+            Components.TextLabel(scope, {
                 Name = if id == "Items" then "Amount" else "TP",
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.76, 0.5),
                 Size = fromScale(0.197, 0.6),
                 TextXAlignment = Enum.TextXAlignment.Right,
 
-                TextColor3 = Computed(function(use)
+                TextColor3 = Computed(scope, function(use)
                     return if id == "Items" then fromHex("#eccc68") else if use(self.charStatsDict.TP) < ItemBook:FindItem(item).TP then fromRGB(255, 0, 0) else fromRGB(0, 255, 255)
                 end),
-                Text = Computed(function(use)
+                Text = Computed(scope, function(use)
                     return if id == "Items" then "x"..use(itemAmount) else ItemBook:FindItem(item).TP.."%"
                 end),
             }),
 
-            Components.HoverImageButton({
+            Components.HoverImageButton(scope, {
                 [OnEvent("MouseEnter")] = function()
                     isSelecting:set(true)
                 end,

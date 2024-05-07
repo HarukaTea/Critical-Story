@@ -10,19 +10,20 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 
-local Children, OnEvent, Value, Computed, peek =
-	Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Computed, Fusion.peek
+local Children, OnEvent, Value, Computed, New, peek =
+	Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Computed, Fusion.New, Fusion.peek
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local tFind = table.find
+local udNew = UDim.new
 
-local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageButton
-	local amount = Value(item.Value)
-	local equipped = Value(item:GetAttribute("Equipped"))
-	local pinned = Value(item:GetAttribute("Pinned"))
-	local isSelecting = Value(false)
+local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: table): ImageButton
+	local amount = Value(scope, item.Value)
+	local equipped = Value(scope, item:GetAttribute("Equipped"))
+	local pinned = Value(scope, item:GetAttribute("Pinned"))
+	local isSelecting = Value(scope, false)
 
 	--// Connections
 	HarukaLib:Hydrate(item, {
@@ -46,22 +47,22 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 
 	item = item.Name
 	local itemInfo = ItemBook:FindItem(item)
-	return Components.HoverImageButton({
+	return Components.HoverImageButton(scope, {
 		Name = item,
 		BackgroundTransparency = 0,
 		Image = "rbxassetid://"..itemInfo.Icon,
 
 		[Children] = {
-			Components.RoundUICorner(),
-			Components.UIStroke({
+			Components.RoundUICorner(scope),
+			Components.UIStroke(scope, {
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(Computed(function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Equipped",
 				AnchorPoint = v2New(0.5, 0.5),
 				BackgroundColor3 = fromRGB(68, 135, 203),
@@ -71,16 +72,19 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 				ZIndex = 2,
 				Text = "E",
 
-				Visible = Computed(function(use)
+				Visible = Computed(scope, function(use)
 					return use(equipped)
 				end),
 
 				[Children] = {
-					Components.RoundUICorner(),
-					Components.NormalUIPadding(),
+					Components.RoundUICorner(scope),
+					New(scope, "UIPadding")({
+						PaddingTop = udNew(0, 2),
+						PaddingBottom = udNew(0, 2)
+					})
 				},
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Pinned",
 				AnchorPoint = v2New(0.5, 0.5),
 				BackgroundColor3 = fromRGB(124, 63, 189),
@@ -90,23 +94,26 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table): ImageBu
 				ZIndex = 3,
 				Text = "P",
 
-				Visible = Computed(function(use)
+				Visible = Computed(scope, function(use)
 					if not use(equipped) then return use(pinned) end
 				end),
 
 				[Children] = {
-					Components.RoundUICorner(),
-					Components.NormalUIPadding(),
+					Components.RoundUICorner(scope),
+					New(scope, "UIPadding")({
+						PaddingTop = udNew(0, 2),
+						PaddingBottom = udNew(0, 2)
+					})
 				},
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Amount",
 				Position = fromScale(0.2, 0.65),
 				Size = fromScale(1, 0.35),
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
 
-				Text = Computed(function(use)
+				Text = Computed(scope, function(use)
 					local itemAmount = use(amount) :: number
 
 					return if itemAmount <= 1 then "" else "x"..itemAmount

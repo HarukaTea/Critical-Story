@@ -18,6 +18,8 @@ local insert, tFind, remove = table.insert, table.find, table.remove
 local wait = task.wait
 
 local function ItemAcquiredFrame(self: table): Frame
+	local scope = self.scope
+
 	local function _giveDrop(item: string)
 		local nowAdded = Fusion.peek(self.newAddedItems)
 
@@ -34,18 +36,18 @@ local function ItemAcquiredFrame(self: table): Frame
 	end
 	Events.GiveDrop:Connect(_giveDrop)
 
-	return Components.Frame({
+	return Components.Frame(scope, {
 		Name = "ItemAcquiredFrame",
 
 		[Children] = {
-			New("UIListLayout")({
+			New(scope, "UIListLayout")({
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = udNew(0.15, 0),
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
 			}),
-			Fusion.ForValues(self.newAddedItems, function(_, item: string)
-				return ItemBar(item)
-			end, Fusion.cleanup),
+			Fusion.ForValues(scope, self.newAddedItems, function(_, localScope: table, item: string)
+				return ItemBar(item, localScope)
+			end),
 		},
 	})
 end

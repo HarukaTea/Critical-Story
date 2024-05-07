@@ -17,15 +17,15 @@ local v2New = Vector2.new
 local wait = task.wait
 local fromRGB = Color3.fromRGB
 
-local function ItemBar(item: string): Frame
+local function ItemBar(item: string, scope: table): Frame
 	local itemInfo = ItemBook:FindItem(item)
 	local info = {
 		Icon = "rbxassetid://"..itemInfo.Icon,
 		Name = itemInfo.Name,
 		TierColor = AssetBook.TierColor[itemInfo.Tier],
-		Position = Fusion.Value(fromScale(1.2, 0))
+		Position = Fusion.Value(scope, fromScale(1.2, 0))
 	}
-	local isSelecting = Fusion.Value(false)
+	local isSelecting = Fusion.Value(scope, false)
 
 	Spawn(function()
 		wait(0.75)
@@ -38,39 +38,39 @@ local function ItemBar(item: string): Frame
 		info.Position:set(fromScale(1.2, 0))
 	end)
 
-	return Components.Frame({
+	return Components.Frame(scope, {
 		Name = "Acquired",
 		AnchorPoint = v2New(),
 
 		[Children] = {
-			Components.Frame({
+			Components.Frame(scope, {
 				BackgroundTransparency = 0.2,
 				AnchorPoint = v2New(),
 				Size = fromScale(0.2, 1),
 
-				Position = Fusion.Tween(Fusion.Computed(function(use)
+				Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
 					return use(info.Position)
 				end), AssetBook.TweenInfos.twiceHalfOne),
 
 				[Children] = {
-					Components.RoundUICorner(),
-					Components.UIStroke({
+					Components.RoundUICorner(scope),
+					Components.UIStroke(scope, {
 						Enabled = true,
 						Thickness = 3,
 
-						Transparency = Fusion.Tween(Fusion.Computed(function(use)
+						Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
 							return if use(isSelecting) then 0.3 else 1
 						end), AssetBook.TweenInfos.twiceHalfOne)
 					}),
-					Components.ImageLabel({
+					Components.ImageLabel(scope, {
 						Name = "Icon",
 						Size = fromScale(0.196, 1),
 						Image = info.Icon,
 						BackgroundTransparency = 0,
 
-						[Children] = { Components.RoundUICorner() },
+						[Children] = { Components.RoundUICorner(scope) },
 					}),
-					Components.TextLabel({
+					Components.TextLabel(scope, {
 						Name = "Title",
 						Position = fromScale(0.23, 0.03),
 						Size = fromScale(0.529, 0.4),
@@ -78,7 +78,7 @@ local function ItemBar(item: string): Frame
 						TextColor3 = fromRGB(156, 156, 156),
 						TextXAlignment = Enum.TextXAlignment.Left,
 					}),
-					Components.TextLabel({
+					Components.TextLabel(scope, {
 						Name = "ItemName",
 						Position = fromScale(0.23, 0.44),
 						Size = fromScale(0.529, 0.45),
@@ -87,7 +87,7 @@ local function ItemBar(item: string): Frame
 						TextXAlignment = Enum.TextXAlignment.Left
 					}),
 
-					Components.HoverImageButton({
+					Components.HoverImageButton(scope, {
 						[Fusion.OnEvent("MouseEnter")] = function()
 							isSelecting:set(true)
 						end,

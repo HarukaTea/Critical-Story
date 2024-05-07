@@ -19,13 +19,14 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
 local function ExCategoryTitle(id: string, self: table): Frame
-	local bgColor = Value(fromRGB(30, 30, 30))
-	local contentColor = Value(fromRGB(255, 255, 255))
+	local scope = self.scope
+	local bgColor = Value(scope, fromRGB(30, 30, 30))
+	local contentColor = Value(scope, fromRGB(255, 255, 255))
 	local plr = self.plr :: Player
 
 	local playerClass = nil
 	if id == "Menu" then
-		playerClass = Value(plr:GetAttribute("Class"))
+		playerClass = Value(scope, plr:GetAttribute("Class"))
 
 		HarukaLib:Hydrate(plr, {
 			["Attr-Class"] = function(newClass: string)
@@ -34,17 +35,17 @@ local function ExCategoryTitle(id: string, self: table): Frame
 		})
 	end
 
-	return New("Frame")({
+	return New(scope, "Frame")({
 		Name = "Top",
 		BackgroundTransparency = 1,
 		Size = fromScale(0.97, 0.1),
 		Position = ud2New(0.01, 0, 0.04, 40),
 
 		[Children] = {
-			New("UIAspectRatioConstraint")({ AspectRatio = 25.255 }),
-			Components.ImageLabel({
+			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.255 }),
+			Components.ImageLabel(scope, {
 				Name = "Icon",
-				Image = Computed(function(use)
+				Image = Computed(scope, function(use)
 					if id == "Menu" then
 						return AssetBook.ClassInfo[use(playerClass)].Image
 
@@ -57,33 +58,33 @@ local function ExCategoryTitle(id: string, self: table): Frame
 				Size = fromScale(0.04, 1),
 				BackgroundTransparency = 0,
 
-				[Children] = { Components.RoundUICorner() },
+				[Children] = { Components.RoundUICorner(scope) },
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Position = fromScale(0.063, 0.195),
 				Size = fromScale(0.7, 0.6),
 				Text = id,
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}),
-			Components.TextButton({
+			Components.TextButton(scope, {
 				Position = fromScale(0.948, 0.066),
 				Size = fromScale(0.04, 1),
 				Text = "X",
 
-				TextColor3 = Tween(Computed(function(use)
+				TextColor3 = Tween(scope, Computed(scope, function(use)
 					return use(contentColor)
 				end), AssetBook.TweenInfos.twiceHalf),
-				BackgroundColor3 = Tween(Computed(function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 					return use(bgColor)
 				end), AssetBook.TweenInfos.twiceHalf),
 
 				[Children] = {
-					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-					Components.UIStroke({
+					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke(scope, {
 						Thickness = 3,
 						Enabled = true,
 
-						Color = Tween(Computed(function(use)
+						Color = Tween(scope, Computed(scope, function(use)
 							return use(contentColor)
 						end), AssetBook.TweenInfos.twiceHalf)
 					}),

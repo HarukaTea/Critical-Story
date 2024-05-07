@@ -1,7 +1,3 @@
---!nocheck
---!optimize 2
---!native
-
 local ARGUMENT_SHORTHANDS = [[
 Argument Shorthands
 -------------------

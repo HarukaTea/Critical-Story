@@ -15,13 +15,10 @@ local Pinia = require(RepS.Modules.UI.Pinia.TurnBaseUIPinia)
 local TurnBaseActionPanel = require(RepS.Modules.UI.Views.TurnBaseActionPanel)
 local TurnBaseSideList = require(RepS.Modules.UI.Views.TurnBaseSideList)
 local TurnBasePhaseShower = require(RepS.Modules.UI.Views.TurnBasePhaseShower)
-local TurnBaseCriTiming = require(RepS.Modules.UI.Views.TurnBaseCriTiming)
 
 local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
-local TurnBaseStatBar = require(RepS.Modules.UI.Components.TurnBaseStatBar)
 
-local Children, New, Tween, Computed, AttributeChange =
-	Fusion.Children, Fusion.New, Fusion.Tween, Fusion.Computed, Fusion.AttributeChange
+local Children, New, Tween, Computed = Fusion.Children, Fusion.New, Fusion.Tween, Fusion.Computed
 
 local TurnBaseUI = {}
 TurnBaseUI.__index = TurnBaseUI
@@ -29,7 +26,6 @@ TurnBaseUI.__type = "TurnBaseUI"
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
-local udNew = UDim.new
 local wait = task.wait
 
 return function (plr: Player)
@@ -47,97 +43,65 @@ return function (plr: Player)
 	local charStatsDict = self.charStatsDict :: table
 	HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(newState: boolean)
-			self.isInCombat:set(newState)
-		end,
-		["Attr-Shield"] = function(newShield: number)
-			charStatsDict.Shield:set(newShield)
-		end,
-		["Attr-MaxShield"] = function(newMaxShield: number)
-			charStatsDict.MaxShield:set(newMaxShield)
+			charStatsDict.isInCombat:set(newState)
 		end,
 		["Attr-TP"] = function(newTP: number)
 			charStatsDict.TP:set(newTP)
 		end
 	})
 
-    local UI = Components.ScreenGui({
+	local scope = self.scope
+    Components.ScreenGui(scope, {
         Name = "TurnBasedUI",
 		DisplayOrder = 5,
         Parent = plr.PlayerGui,
 
         [Children] = {
-            Components.Frame({
+            Components.Frame(scope, {
 				Name = "BG",
 				AnchorPoint = v2New(0.5, 0.9),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
-				Visible = Computed(function(use)
-					return use(self.isInCombat)
+				Visible = Computed(scope, function(use)
+					return use(charStatsDict.isInCombat)
 				end),
-				Position = Tween(Computed(function(use)
-					return if use(self.isInCombat) then fromScale(0.5, 1) else fromScale(0.5, 1.5)
+				Position = Tween(scope, Computed(scope, function(use)
+					return if use(charStatsDict.isInCombat) then fromScale(0.5, 1) else fromScale(0.5, 1.5)
 				end), AssetBook.TweenInfos.twiceHalfOne),
 
                 [Children] = {
-                    New("UIAspectRatioConstraint")({ AspectRatio = 25.146 }),
+                    New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.146 }),
 
                     TurnBaseActionPanel(self),
 
 					TurnBaseSideList("Monster", self),
 					TurnBaseSideList("Player", self),
-					TurnBaseCriTiming(self),
 
-                    Components.Frame({
-						Name = "StatsFrame",
-						AnchorPoint = v2New(0.5, 0),
-						Position = fromScale(0.5, 0.15),
-						Size = fromScale(1, 0.42),
-						ZIndex = 2,
-
-						[Children] = {
-							New("UIListLayout")({
-								Padding = udNew(0.01, 0),
-								HorizontalAlignment = Enum.HorizontalAlignment.Center,
-								FillDirection = Enum.FillDirection.Horizontal,
-								SortOrder = Enum.SortOrder.LayoutOrder,
-							}),
-
-							TurnBaseStatBar("DEF", self),
-							Components.Frame({
-								Name = "TransBar",
-
-								Size = Tween(Computed(function(use)
-									return use(self.transHPBarSize)
-								end), AssetBook.TweenInfos.half),
-							}),
-							TurnBaseStatBar("TP", self)
-						},
-					}),
-					Components.TextLabel({
+					Components.TextLabel(scope, {
 						Name = "BottomTip",
 						AnchorPoint = v2New(0.5, 0.5),
 						Position = fromScale(0.5, -0.7),
 						Size = fromScale(1, 0.5),
 
-						Text = Computed(function(use)
+						Text = Computed(scope, function(use)
 							return use(self.bottomTipText)
 						end),
 
 						[Children] = {
-							Components.TextUIStroke({ Thickness = 2.5 }),
-							New("UITextSizeConstraint")({ MaxTextSize = 28 })
+							Components.TextUIStroke(scope, { Thickness = 2.5 }),
+							New(scope, "UITextSizeConstraint")({ MaxTextSize = 28 })
 						}
 					}),
 
 					BottomProgressBar("PhaseTimer", self)
                 }
             }),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "CenterBG",
 
 				[Children] = {
-					New("UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					TurnBasePhaseShower(self)
 				}
@@ -146,9 +110,9 @@ return function (plr: Player)
     })
 
 	local function onDead()
-		UI:Destroy()
-
 		Events.NewPhase:DisconnectAll()
+
+		Fusion.doCleanup(scope)
 
 		self = nil
 	end

@@ -10,16 +10,16 @@ local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 
 local Pinia = require(RepS.Modules.UI.Pinia.BackpackPinia)
 
 local BackpackItemList = require(RepS.Modules.UI.Views.BackpackItemList)
+local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
 
 local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
 local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonBackpack)
-
-local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
 
 local Children = Fusion.Children
 
@@ -44,35 +44,35 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local UI = Components.ScreenGui({
+	local scope = self.scope
+	local UI = Components.ScreenGui(scope, {
 		Name = "Backpack",
 		Parent = self.plrGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 
 		[Children] = {
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "BG",
 				Visible = false,
 				ZIndex = 2,
 
 				[Children] = {
 					ExCategoryTitle("Backpack", self),
-					ExCategoryBottomBtns("Left", {
+					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Passive", self),
 						FilterButton("Active", self),
 						FilterButton("Others", self),
 					}),
-					ExCategoryBottomBtns("Right", {
+					ExCategoryBottomBtns("Right", self, {
 						FilterButton("Equip", self),
 						FilterButton("Pin", self),
 					}),
 
-					Components.Frame({
+					Components.Frame(scope, {
 						Name = "ItemBG",
 						Position = fromScale(0.375, 0.567),
 						Size = fromScale(0.71, 0.662),
-						ClipsDescendants = true,
 
 						[Children] = {
 							BackpackItemList(self)
@@ -81,7 +81,7 @@ return function(plr: Player)
 
 					ItemDescFrame(self),
 
-					Components.ImageLabel({
+					Components.ImageLabel(scope, {
 						Name = "EmptySymbol",
 						Size = fromScale(0.1, 0.255),
 						Position = fromScale(0.45, 0.42),
@@ -89,13 +89,13 @@ return function(plr: Player)
 						ImageColor3 = fromRGB(129, 129, 129),
 						ImageTransparency = 0.8,
 
-						Visible = Fusion.Computed(function(use)
+						Visible = Fusion.Computed(scope, function(use)
 							return use(self.noItemsShow)
 						end),
 
 						[Children] = {
-							Fusion.New("UIAspectRatioConstraint")({ AspectRatio = 1.004 }),
-							Components.TextLabel({
+							Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 1.004 }),
+							Components.TextLabel(scope, {
 								Name = "What",
 								Position = fromScale(0.85, -0.2),
 								Size = fromScale(0.6, 0.6),
@@ -109,7 +109,7 @@ return function(plr: Player)
 					}),
 				},
 			}),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "Shadow",
 				BackgroundTransparency = 0.15,
 				ZIndex = 0,
@@ -117,7 +117,6 @@ return function(plr: Player)
 			}),
 		},
 	})
-	repeat wait() until plr.PlayerGui:WaitForChild("AdventurerMenu", 999)
 
 	---// Actions
 	local function _openBackpack(_, inputState: Enum.UserInputState)
@@ -126,6 +125,13 @@ return function(plr: Player)
 		ClientUtil:OpenUI(plr, "Backpack")
 	end
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
+
+	--// Setups
+	local passiveCheck = false
+	for _, item: IntValue in self.inventory:GetChildren() do
+		if ItemBook:FindItem(item.Name).Type == "Passive" then passiveCheck = true break end
+	end
+	self.noItemsShow:set(not passiveCheck)
 
 	---// listening events
 	HarukaLib:Hydrate(self.inventory, {
@@ -154,11 +160,11 @@ return function(plr: Player)
 	--// Clear
 	local function _clearGarbage()
 		CAS:UnbindAction("OpenBackpack")
-
-		UI:Destroy()
 		plr:SetAttribute("CurrentMenu", "None")
 
 		self.itemSlotClicked:Destroy()
+
+		Fusion.doCleanup(scope)
 
 		self = nil
 	end

@@ -25,16 +25,15 @@ local function mapValue(val: number, duration: number) : number
 end
 
 local function ProgressCircle(direction: string, effect: Script, info: table) : Frame
-    return Components.Frame({
+    return Components.Frame(info[3], {
 		Name = "ProgressCircle"..direction,
-		ClipsDescendants = true,
 		AnchorPoint = v2New(),
 		Position = if direction == "Right" then fromScale(0.5, 0) else fromScale(0, 0),
 		Size = fromScale(0.5, 1),
 		ZIndex = 2,
 
 		[Children] = {
-			Components.ImageLabel({
+			Components.ImageLabel(info[3], {
 				Name = "ProgressImage",
 				Position = if direction == "Right" then fromScale(-1, 0) else fromScale(0, 0),
 				Size = fromScale(2, 1),
@@ -42,8 +41,8 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
                 ImageColor3 = AssetBook.BuffInfo[effect.Name].Color,
 
 				[Children] = {
-					Fusion.New("UIGradient")({
-						Rotation = Fusion.Computed(function(use)
+					Fusion.New(info[3], "UIGradient")({
+						Rotation = Fusion.Computed(info[3], function(use)
                             local mappedDuration = mapValue(use(info[1]), info[2])
 							local angle = clamp(mappedDuration * 360, 0, 360)
 
@@ -61,9 +60,9 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
 	})
 end
 
-local function EffectIndicator(id: string, effect: Script) : ImageLabel
+local function EffectIndicator(effect: Script, scope: table) : ImageLabel
 	local maxTurn = 0
-	local turn = Fusion.Value(effect:GetAttribute("Turn"))
+	local turn = Fusion.Value(scope, effect:GetAttribute("Turn"))
 
 	HarukaLib:Hydrate(effect, {
 		["Attr-Turn"] = function(newTurn: number)
@@ -73,7 +72,7 @@ local function EffectIndicator(id: string, effect: Script) : ImageLabel
 		end
 	})
 
-    return Components.ImageLabel({
+    return Components.ImageLabel(scope, {
         Name = effect.Name,
         BackgroundTransparency = 0,
         Size = fromScale(1, 1),
@@ -81,24 +80,24 @@ local function EffectIndicator(id: string, effect: Script) : ImageLabel
         Image = AssetBook.BuffInfo[effect.Name].Icon,
 
         [Children] = {
-            Components.RoundUICorner(),
+            Components.RoundUICorner(scope),
 
-            ProgressCircle("Left", effect, { turn, maxTurn }),
-            ProgressCircle("Right", effect, { turn, maxTurn }),
+            ProgressCircle("Left", effect, { turn, maxTurn, scope }),
+            ProgressCircle("Right", effect, { turn, maxTurn, scope }),
 
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Power",
 				AnchorPoint = v2New(0.5, 0),
 				Position = fromScale(0.5, 0.6),
 				Size = fromScale(1.2, 0.5),
 				ZIndex = 3,
 
-				Text = Fusion.Computed(function(use)
-					return if id == "Player" then effect:GetAttribute("Power").."X" else use(turn)
+				Text = Fusion.Computed(scope, function(use)
+					return use(turn)
 				end),
 
 				[Children] = {
-					Components.TextUIStroke({ Thickness = 2.5 })
+					Components.TextUIStroke(scope, { Thickness = 2.5 })
 				}
 			})
         }

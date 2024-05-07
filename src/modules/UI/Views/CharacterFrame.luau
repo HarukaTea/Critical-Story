@@ -25,14 +25,14 @@ local udNew =  UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local function BlockPart(pos: UDim2, size: UDim2): Frame
-	return New("Frame")({
+local function BlockPart(scope: table, pos: UDim2, size: UDim2): Frame
+	return New(scope, "Frame")({
 		BackgroundTransparency = 0.9,
 		Position = pos,
 		Size = size,
 	})
 end
-local function LinePart(pos: UDim2, direction: string, color: Color3, face: string): Frame
+local function LinePart(scope: table, pos: UDim2, direction: string, color: Color3, face: string): Frame
 	local rotation: number
 	if face == "Up" then
 		rotation = -45
@@ -42,7 +42,7 @@ local function LinePart(pos: UDim2, direction: string, color: Color3, face: stri
 		rotation = 0
 	end
 
-	return New("Frame")({
+	return New(scope, "Frame")({
 		BackgroundTransparency = 0.5,
 		BackgroundColor3 = color,
 		Position = pos,
@@ -52,6 +52,7 @@ local function LinePart(pos: UDim2, direction: string, color: Color3, face: stri
 end
 
 local function CharacterFrame(self: table): Frame
+	local scope = self.scope
 	local plr, char = self.plr :: Player, self.char :: Model
 	local playerData, charData = self.playerData, self.charData
 
@@ -98,76 +99,77 @@ local function CharacterFrame(self: table): Frame
 		end
 	})
 
-	local bgColor = Fusion.Value(fromRGB(30, 30, 30))
-	local contentColor = Fusion.Value(fromRGB(255, 255, 255))
+	local bgColor = Fusion.Value(scope, fromRGB(30, 30, 30))
+	local contentColor = Fusion.Value(scope, fromRGB(255, 255, 255))
 
-	return Components.Frame({
+	return Components.Frame(scope, {
 		Name = "Character",
 		Position = fromScale(0.496, 0.567),
 		Size = fromScale(0.944, 0.627),
 
+		Visible = Computed(scope, function(use)
+			return use(self.frames.Character)
+		end),
+
 		[Children] = {
-			New("UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
-			New("Frame")({
+			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+			New(scope, "Frame")({
 				Name = "CharacterSelfView",
 				BackgroundTransparency = 1,
 				Position = fromScale(0.393, 0),
 				Size = fromScale(0.221, 1),
 
 				[Children] = {
-					BlockPart(fromScale(0.35, 0.035), fromScale(0.294, 0.202)),
-					BlockPart(fromScale(0.297, 0.266), fromScale(0.4, 0.376)),
-					BlockPart(fromScale(0.729, 0.266), fromScale(0.198, 0.376)),
-					BlockPart(fromScale(0.07, 0.266), fromScale(0.198, 0.376)),
-					BlockPart(fromScale(0.297, 0.667), fromScale(0.188, 0.305)),
-					BlockPart(fromScale(0.51, 0.667), fromScale(0.188, 0.305)),
+					BlockPart(scope, fromScale(0.35, 0.035), fromScale(0.294, 0.202)),
+					BlockPart(scope, fromScale(0.297, 0.266), fromScale(0.4, 0.376)),
+					BlockPart(scope, fromScale(0.729, 0.266), fromScale(0.198, 0.376)),
+					BlockPart(scope, fromScale(0.07, 0.266), fromScale(0.198, 0.376)),
+					BlockPart(scope, fromScale(0.297, 0.667), fromScale(0.188, 0.305)),
+					BlockPart(scope, fromScale(0.51, 0.667), fromScale(0.188, 0.305)),
 				},
 			}),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "Lines",
 
 				[Children] = {
-					LinePart(fromScale(0.579, 0.532), "XY", fromRGB(255, 0, 0), "Down"),
-					LinePart(fromScale(0.63, 0.613), "X", fromRGB(255, 0, 0), "Line"),
-					LinePart(fromScale(0.42, 0.25), "XY", fromRGB(85, 255, 0), "Down"),
-					LinePart(fromScale(0.355, 0.17), "X", fromRGB(85, 255, 0), "Line"),
-					LinePart(fromScale(0.417, 0.813), "XY", fromRGB(255, 255, 0), "Up"),
-					LinePart(fromScale(0.352, 0.892), "X", fromRGB(255, 255, 0), "Line"),
-					LinePart(fromScale(0.369, 0.524), "XY", fromRGB(170, 170, 255), "Up"),
-					LinePart(fromScale(0.305, 0.603), "X", fromRGB(170, 170, 255), "Line"),
-					LinePart(fromScale(0.507, 0.023), "XY", fromRGB(255, 85, 0), "Up"),
-					LinePart(fromScale(0.556, -0.057), "X", fromRGB(255, 85, 0), "Line"),
+					LinePart(scope, fromScale(0.579, 0.532), "XY", fromRGB(255, 0, 0), "Down"),
+					LinePart(scope, fromScale(0.63, 0.613), "X", fromRGB(255, 0, 0), "Line"),
+					LinePart(scope, fromScale(0.42, 0.25), "XY", fromRGB(85, 255, 0), "Down"),
+					LinePart(scope, fromScale(0.355, 0.17), "X", fromRGB(85, 255, 0), "Line"),
+					LinePart(scope, fromScale(0.369, 0.524), "XY", fromRGB(170, 170, 255), "Up"),
+					LinePart(scope, fromScale(0.305, 0.603), "X", fromRGB(170, 170, 255), "Line"),
+					LinePart(scope, fromScale(0.507, 0.023), "XY", fromRGB(255, 85, 0), "Up"),
+					LinePart(scope, fromScale(0.556, -0.057), "X", fromRGB(255, 85, 0), "Line"),
 				},
 			}),
-			Components.Frame({
+			Components.Frame(scope, {
 				Name = "PointSection",
 
 				[Children] = {
 					CharPointsBtn("DMG", "Right", self),
 					CharPointsBtn("Magic", "Left", self),
 					CharPointsBtn("Health", "Left", self),
-					CharPointsBtn("Shield", "Left", self),
 				},
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "PointsLeft",
 				Position = fromScale(0.61, 1.013),
 				Size = fromScale(0.374, 0.08),
 				TextXAlignment = Enum.TextXAlignment.Right,
 				RichText = true,
-				Text = Computed(function(use)
+				Text = Computed(scope, function(use)
 					return [[SKILL POINTS LEFT:  <font color="#f6e58d">]]..use(playerData.LvPoints).."</font>"
 				end)
 			}),
-			Components.TextButton({
+			Components.TextButton(scope, {
 				Name = "Reset",
 				Position = fromScale(0.647, -0.094),
 				Size = fromScale(0.09, 0.078),
 				Text = "RESET",
-				TextColor3 = Tween(Computed(function(use)
+				TextColor3 = Tween(scope, Computed(scope, function(use)
 					return use(contentColor)
 				end), AssetBook.TweenInfos.twiceHalf),
-				BackgroundColor3 = Tween(Computed(function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 					return use(bgColor)
 				end), AssetBook.TweenInfos.twiceHalf),
 
@@ -190,32 +192,32 @@ local function CharacterFrame(self: table): Frame
 				end,
 
 				[Children] = {
-					New("UICorner")({ CornerRadius = udNew(0.2, 0) }),
-					Components.UIStroke({
+					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke(scope, {
 						Transparency = 0.2,
 						Thickness = 2.5,
 						Enabled = true,
 
-						Color = Tween(Computed(function(use)
+						Color = Tween(scope, Computed(scope, function(use)
 							return if use(bgColor) == fromRGB(30, 30, 30) then fromRGB(255, 85, 0) else fromRGB()
 						end), AssetBook.TweenInfos.twiceHalf),
 					}),
-					New("UIPadding")({ PaddingBottom = udNew(0, 1) })
+					New(scope, "UIPadding")({ PaddingBottom = udNew(0, 1) })
 				}
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "ResetCost",
 				Position = fromScale(0.752, -0.106),
 				Size = fromScale(0.146, 0.1),
 				FontFace = Font.fromName("TitilliumWeb", Enum.FontWeight.Bold),
 				TextXAlignment = Enum.TextXAlignment.Left,
 
-				Text = Computed(function(use)
+				Text = Computed(scope, function(use)
 					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 
 					return "COST: "..HarukaLib:NumberConvert(cost, "%.1f").." GOLD"
 				end),
-				TextColor3 = Tween(Computed(function(use)
+				TextColor3 = Tween(scope, Computed(scope, function(use)
 					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 					local have = use(playerData.Gold)
 

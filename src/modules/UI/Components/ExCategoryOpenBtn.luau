@@ -20,11 +20,12 @@ local udNew = UDim.new
 local fontFromEnum = Font.fromEnum
 
 local function ExCategoryOpenBtn(id: string, self: table): Frame
-	local isSelecting = Fusion.Value(false)
+	local scope = self.scope
+	local isSelecting = Fusion.Value(scope, false)
 
 	local children: ImageLabel?
 	if id == "Menu" then
-		children = Components.ImageLabel({
+		children = Components.ImageLabel(scope, {
 			Name = "Hint",
 			BackgroundColor3 = fromRGB(195, 0, 0),
 			BackgroundTransparency = 0,
@@ -32,13 +33,13 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 			Size = fromScale(0.4, 0.4),
 			ZIndex = 3,
 
-			Visible = Computed(function(use)
+			Visible = Computed(scope, function(use)
 				return if use(self.playerData.LvPoints) > 0 then true else false
 			end),
 
 			[Children] = {
-				Components.RoundUICorner(),
-				Components.TextLabel({
+				Components.RoundUICorner(scope),
+				Components.TextLabel(scope, {
 					Name = "Attention",
 					Size = fromScale(1, 1),
 					FontFace = fontFromEnum(Enum.Font.GothamBlack),
@@ -53,24 +54,24 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
-	return Fusion.New("Frame")({
+	return Fusion.New(scope, "Frame")({
 		Name = id,
 		BackgroundColor3 = color3New(),
 		Position = if id == "Menu" then fromScale(0.355, 0) else fromScale(0.71, 0),
 		Size = fromScale(0.281, 0.658),
 
 		[Children] = {
-			Components.RoundUICorner(),
-			Components.UIStroke({
+			Components.RoundUICorner(scope),
+			Components.UIStroke(scope, {
 				Thickness = 2.7,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(Computed(function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
-			Components.HoverImageButton({
-				Image = Computed(function(use)
+			Components.HoverImageButton(scope, {
+				Image = Computed(scope, function(use)
 					if id == "Backpack" then
 						return ItemBook.ItemImagesEx.Backpack
 					else
@@ -90,7 +91,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 					ClientUtil:OpenUI(self.plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
 				end,
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Key",
 				BackgroundColor3 = color3New(),
 				BackgroundTransparency = 0,
@@ -100,7 +101,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 				TextStrokeTransparency = 0,
 				Text = if id == "Menu" then "C" else "B",
 
-				[Children] = { Fusion.New("UICorner")({ CornerRadius = udNew(0.3, 0) })},
+				[Children] = { Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.3, 0) })},
 			}),
 
 			children

@@ -18,12 +18,13 @@ local fromRGB = Color3.fromRGB
 local clamp = math.clamp
 
 local function StatBar(id: string, self: table): Frame
+	local scope = self.scope
 	local colors = {
 		HP = fromRGB(48, 121, 36),
 		HPMid = fromRGB(148, 148, 0),
 		HPLow = fromRGB(203, 0, 0),
 	}
-	local isSelecting = Fusion.Value(false)
+	local isSelecting = Fusion.Value(scope, false)
 
 	local charStatsDict = self.charStatsDict
 	HarukaLib:Hydrate(self.humanoid, {
@@ -40,25 +41,25 @@ local function StatBar(id: string, self: table): Frame
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
-	return Fusion.New("Frame")({
+	return Fusion.New(scope, "Frame")({
 		Name = id,
 		AnchorPoint = v2New(0.5, 0),
 		Size = fromScale(0.25, 0.875),
 		BackgroundColor3 = color3New(),
 
 		[Fusion.Children] = {
-			Components.RoundUICorner(),
-			Components.UIStroke({
+			Components.RoundUICorner(scope),
+			Components.UIStroke(scope, {
 				Thickness = 2.5,
 				Enabled = true,
 
-				Transparency = Tween(Computed(function(use)
+				Transparency = Tween(scope, Computed(scope, function(use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
-			Fusion.New("Frame")({
+			Fusion.New(scope, "Frame")({
 				Name = "Bar",
-				BackgroundColor3 = Tween(Computed(function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
 					local HP, maxHP = use(self.charStatsDict[id][1]) :: number, use(self.charStatsDict[id][2]) :: number
 
 					if HP / maxHP <= 0.66 and HP / maxHP > 0.33 then
@@ -70,15 +71,15 @@ local function StatBar(id: string, self: table): Frame
 					end
 				end), AssetBook.TweenInfos.onceHalf),
 				ZIndex = 0,
-				Size = Tween(Computed(function(use)
+				Size = Tween(scope, Computed(scope, function(use)
 					local x = clamp(use(self.charStatsDict[id][1]) / use(self.charStatsDict[id][2]), 0, 1)
 
 					return fromScale(x, 1)
 				end), AssetBook.TweenInfos.halfBack),
 
-				[Fusion.Children] = { Components.RoundUICorner() },
+				[Fusion.Children] = { Components.RoundUICorner(scope) },
 			}),
-			Components.HoverImageButton({
+			Components.HoverImageButton(scope, {
 				ZIndex = 2,
 
 				[Fusion.OnEvent("MouseEnter")] = function()
@@ -88,7 +89,7 @@ local function StatBar(id: string, self: table): Frame
 					isSelecting:set(false)
 				end,
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Stat",
 				AnchorPoint = v2New(0.5, 0),
 				Position = fromScale(0.5, 0),
@@ -96,11 +97,11 @@ local function StatBar(id: string, self: table): Frame
 				TextXAlignment = Enum.TextXAlignment.Right,
 				TextStrokeTransparency = 0.7,
 
-				Text = Computed(function(use)
+				Text = Computed(scope, function(use)
 					return use(self.charStatsDict[id][1]) .. "/" .. use(self.charStatsDict[id][2])
 				end),
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Title",
 				AnchorPoint = v2New(0.5, 0),
 				Position = fromScale(0.5, 0),
@@ -109,7 +110,7 @@ local function StatBar(id: string, self: table): Frame
 				TextStrokeTransparency = 0.7,
 				Text = "HEALTH",
 			}),
-			Components.TextLabel({
+			Components.TextLabel(scope, {
 				Name = "Level",
 				AnchorPoint = v2New(0.5, 0),
 				Position = fromScale(-0.52, 0),
@@ -117,7 +118,7 @@ local function StatBar(id: string, self: table): Frame
 				TextXAlignment = Enum.TextXAlignment.Right,
 				TextTransparency = 0.4,
 
-				Text = Computed(function(use)
+				Text = Computed(scope, function(use)
 					return "Lv." .. use(self.playerData.Levels)
 				end),
 			})

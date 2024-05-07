@@ -6,28 +6,26 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
-local New = Fusion.New
-
 local Components = {}
 
-local color3New, v2New, ud2New, udNew, csNew, nsNew =
-	Color3.new, Vector2.new, UDim2.new, UDim.new, ColorSequence.new, NumberSequence.new
+local color3New, v2New, ud2New, udNew = Color3.new, Vector2.new, UDim2.new, UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
+local fontFromName = Font.fromName
 
-local function _createNewCompoent(props: table, uiType: string, default: table) : GuiObject
-	for i, v in props do
-		default[i] = v
+local function _createNewCompoent(scope: table, props: table, uiType: string, default: table) : GuiObject
+	for prop: string, val: any in props do
+		default[prop] = val
 	end
 
-	return New(uiType)(default)
+	return Fusion.New(scope, uiType)(default)
 end
 
 --[[
 	Return a ScreenGui, without clips and insets
 ]]
-function Components.ScreenGui(props: table) : ScreenGui
-	return _createNewCompoent(props, "ScreenGui", {
+function Components.ScreenGui(scope: table, props: table) : ScreenGui
+	return _createNewCompoent(scope, props, "ScreenGui", {
 		ClipToDeviceSafeArea = false,
 		ScreenInsets = Enum.ScreenInsets.None,
 		IgnoreGuiInset = true
@@ -37,8 +35,8 @@ end
 --[[
 	Return a transparent frame, with a center anchor, and max size
 ]]
-function Components.Frame(props: table) : Frame
-	return _createNewCompoent(props, "Frame", {
+function Components.Frame(scope: table, props: table) : Frame
+	return _createNewCompoent(scope, props, "Frame", {
 		AnchorPoint = v2New(0.5, 0.5),
 		Position = fromScale(0.5, 0.5),
 		Size = fromScale(1, 1),
@@ -50,23 +48,22 @@ end
 --[[
 	Return a transparent scrollable frame, with a center anchor, and no clips
 ]]
-function Components.ScrollingFrame(props: table) : ScrollingFrame
-	return _createNewCompoent(props, "ScrollingFrame", {
+function Components.ScrollingFrame(scope: table, props: table) : ScrollingFrame
+	return _createNewCompoent(scope, props, "ScrollingFrame", {
 		BackgroundColor3 = fromRGB(30, 30, 30),
 		BackgroundTransparency = 1,
 		AnchorPoint = v2New(0.5, 0.5),
 		Position = fromScale(0.5, 0.5),
 		CanvasSize = fromScale(0, 0),
 		ScrollBarThickness = 0,
-		ClipsDescendants = false,
 	})
 end
 
 --[[
 	Return a transparent background text, with SourceSansPro bold font, white color
 ]]
-function Components.TextLabel(props: table) : TextLabel
-	return _createNewCompoent(props, "TextLabel", {
+function Components.TextLabel(scope: table, props: table) : TextLabel
+	return _createNewCompoent(scope, props, "TextLabel", {
 		BackgroundColor3 = fromRGB(30, 30, 30),
 		BackgroundTransparency = 1,
 		FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Bold),
@@ -77,28 +74,13 @@ function Components.TextLabel(props: table) : TextLabel
 end
 
 --[[
-	The same as Components.TextLabel, but with center anchor, and left XAlignment
-]]
-function Components.CenterTextLabel(props: table) : TextLabel
-	return _createNewCompoent(props, "TextLabel", {
-		BackgroundColor3 = fromRGB(30, 30, 30),
-		BackgroundTransparency = 1,
-		FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Bold),
-		TextScaled = true,
-		TextColor3 = color3New(1, 1, 1),
-		AnchorPoint = v2New(0.5, 0.5),
-		TextXAlignment = Enum.TextXAlignment.Left,
-	})
-end
-
---[[
 	Return a textbox, with SourceSansPro bold font, white color
 ]]
-function Components.TextBox(props: table) : TextBox
-	return _createNewCompoent(props, "TextBox", {
+function Components.TextBox(scope: table, props: table) : TextBox
+	return _createNewCompoent(scope, props, "TextBox", {
 		BackgroundColor3 = color3New(),
 		ClearTextOnFocus = false,
-		FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Bold),
+		FontFace = fontFromName("SourceSansPro", Enum.FontWeight.Bold),
 		Text = "",
 		TextColor3 = color3New(1, 1, 1),
 		TextScaled = true,
@@ -108,8 +90,8 @@ end
 --[[
 	Return an empty transparent background image
 ]]
-function Components.ImageLabel(props: table) : ImageLabel
-	return _createNewCompoent(props, "ImageLabel", {
+function Components.ImageLabel(scope: table, props: table) : ImageLabel
+	return _createNewCompoent(scope, props, "ImageLabel", {
 		BackgroundColor3 = color3New(),
 		BackgroundTransparency = 1,
 		Image = "",
@@ -119,10 +101,10 @@ end
 --[[
 	Return a clickable empty transparent image, but with center anchor and full size
 ]]
-function Components.HoverImageButton(props: table) : ImageButton
-	return _createNewCompoent(props, "ImageButton", {
+function Components.HoverImageButton(scope: table, props: table) : ImageButton
+	return _createNewCompoent(scope, props, "ImageButton", {
 		Name = "Hover",
-		BackgroundColor3 = Color3.new(),
+		BackgroundColor3 = color3New(),
 		BackgroundTransparency = 1,
 		AnchorPoint = v2New(0.5, 0.5),
 		Position = fromScale(0.5, 0.5),
@@ -134,8 +116,8 @@ end
 --[[
 	Return a clickable text, with SourceSansPro bold font, and black background
 ]]
-function Components.TextButton(props: table) : TextButton
-	return _createNewCompoent(props, "TextButton", {
+function Components.TextButton(scope: table, props: table) : TextButton
+	return _createNewCompoent(scope, props, "TextButton", {
 		AutoButtonColor = true,
 		BackgroundColor3 = fromRGB(30, 30, 30),
 		FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Bold),
@@ -147,8 +129,8 @@ end
 --[[
 	Return a disabled border UIStroke, with a little transparent
 ]]
-function Components.UIStroke(props: table) : UIStroke
-	return _createNewCompoent(props, "UIStroke", {
+function Components.UIStroke(scope: table, props: table) : UIStroke
+	return _createNewCompoent(scope, props, "UIStroke", {
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		Color = color3New(1, 1, 1),
 		Transparency = 0.3,
@@ -159,8 +141,8 @@ end
 --[[
 	Same as Components.UIStroke, but it's black and usually used for text
 ]]
-function Components.TextUIStroke(props: table) : UIStroke
-	return _createNewCompoent(props, "UIStroke", {
+function Components.TextUIStroke(scope: table, props: table) : UIStroke
+	return _createNewCompoent(scope, props, "UIStroke", {
 		Transparency = 0.3,
 	})
 end
@@ -168,28 +150,8 @@ end
 --[[
 	Return a UICorner which can let GuiObject become round like a circle
 ]]
-function Components.RoundUICorner() : UICorner
-	return New("UICorner")({ CornerRadius = udNew(0.5, 0) })
-end
-
---[[
-	Return a UIPadding with 4px in total, usually used for text
-]]
-function Components.NormalUIPadding() : UIPadding
-	return New("UIPadding")({
-		PaddingTop = udNew(0, 2),
-		PaddingBottom = udNew(0, 2),
-	})
-end
-
---[[
-	Return a transparent UIGradient
-]]
-function Components.UIGradient() : UIGradient
-	return New("UIGradient")({
-		Color = csNew(fromRGB(30, 30, 30)),
-		Transparency = nsNew(0.15, 1)
-	})
+function Components.RoundUICorner(scope: table) : UICorner
+	return Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.5, 0) })
 end
 
 return Components

@@ -14,28 +14,29 @@ local udNew = UDim.new
 local wait = task.wait
 
 local function QuestFrame(self: table) : Frame
+    local scope = self.scope
     local quests = self.plr:WaitForChild("Quests", 999) :: Folder
 
     local function _changeQuests()
         wait()
         self.quests:set(quests:GetChildren())
     end
-    quests.ChildAdded:Connect(_changeQuests)
-    quests.ChildRemoved:Connect(_changeQuests)
+    self.Add(quests.ChildAdded:Connect(_changeQuests))
+    self.Add(quests.ChildRemoved:Connect(_changeQuests))
 
-    return Components.Frame({
+    return Components.Frame(scope, {
         Name = "QuestsFrame",
         Size = fromScale(1, 0.7),
 
         [Fusion.Children] = {
-            Fusion.New("UIListLayout")({
+            Fusion.New(scope, "UIListLayout")({
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Padding = udNew(0.5, 0),
                 VerticalAlignment = Enum.VerticalAlignment.Bottom
             }),
-            Fusion.ForValues(self.quests, function(_, quest: IntValue)
-                return QuestBar(quest)
-            end, Fusion.cleanup)
+            Fusion.ForValues(scope, self.quests, function(_, localScope: table, quest: IntValue)
+                return QuestBar(quest, localScope)
+            end)
         }
     })
 end
