@@ -109,7 +109,7 @@ PPS.PromptTriggered:Connect(promptsHandler)
 	Player finally reach the requirement and level up!
 ]]
 local LEVEL_CAP = 125
-local LEVEL_POINT = 1
+local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
 	return if exp >= floor(level ^ 1.85) + 60 and level < LEVEL_CAP then true else false
 end

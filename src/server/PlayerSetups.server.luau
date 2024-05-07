@@ -13,7 +13,7 @@ local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
-local DS1, DS2, DS3 = "CS_AS03_T1", "CS_AS03_T1_S2", "CS_AS03_T1_S3"
+local DS1, DS2, DS3 = "CS_AS02_T1", "CS_AS02_T1_S2", "CS_AS02_T1_S3"
 
 local newInstance = Instance.new
 local wait = task.wait

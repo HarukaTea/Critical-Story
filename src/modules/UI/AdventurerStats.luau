@@ -174,8 +174,8 @@ return function(plr: Player)
 			Events.ChangeMobTarget:Fire(monsters[self.nowMobIndex].Value)
 		end
 	end
-	CAS:BindAction("ChangeMobTargetLCtrl", _changeMobTarget, false, Enum.KeyCode.LeftControl)
-	CAS:BindAction("ChangeMobTargetRCtrl", _changeMobTarget, false, Enum.KeyCode.RightControl)
+	CAS:BindAction("ChangeMobTargetLAlt", _changeMobTarget, false, Enum.KeyCode.LeftAlt)
+	CAS:BindAction("ChangeMobTargetRAlt", _changeMobTarget, false, Enum.KeyCode.RightAlt)
 
 	--- Setups
 	local function _autoEquipItems()
@@ -269,8 +269,8 @@ return function(plr: Player)
 
 		ClientUtil:FreezePlayerControls("Unfreeze")
 
-		CAS:UnbindAction("ChangeMobTargetLCtrl")
-		CAS:UnbindAction("ChangeMobTargetRCtrl")
+		CAS:UnbindAction("ChangeMobTargetLAlt")
+		CAS:UnbindAction("ChangeMobTargetRAlt")
 
 		Events.EquipItems:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()

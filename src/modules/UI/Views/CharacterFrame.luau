@@ -180,7 +180,7 @@ local function CharacterFrame(self: table): Frame
 					contentColor:set(fromRGB(255, 255, 255))
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					local cost = ((peek(playerData.Levels) - 1) - peek(playerData.LvPoints)) * 20
+					local cost = ((peek(playerData.Levels) - 1) * 2 - peek(playerData.LvPoints)) * 20
 
 					if peek(playerData.Gold) >= cost and cost ~= 0 then
 						Events.AddPoints:Fire("Reset")
@@ -211,12 +211,12 @@ local function CharacterFrame(self: table): Frame
 				TextXAlignment = Enum.TextXAlignment.Left,
 
 				Text = Computed(function(use)
-					local cost = ((use(playerData.Levels) - 1) - use(playerData.LvPoints)) * 20
+					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 
 					return "COST: "..HarukaLib:NumberConvert(cost, "%.1f").." GOLD"
 				end),
 				TextColor3 = Tween(Computed(function(use)
-					local cost = ((use(playerData.Levels) - 1) - use(playerData.LvPoints)) * 20
+					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 					local have = use(playerData.Gold)
 
 					return if cost > have then fromRGB(255, 0, 0) else fromRGB(255, 255, 0)
