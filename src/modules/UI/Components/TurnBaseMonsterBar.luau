@@ -35,14 +35,14 @@ local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : F
 
         EffectsList = Value(scope, {})
     }
-    HarukaLib:Hydrate(self.charData.TargetMonster, {
+    scope[#scope + 1] = HarukaLib:Hydrate(self.charData.TargetMonster, {
         ["Prop-Value"] = function(newTarget: Model?)
             if not newTarget then return end
 
 			info.Targeting:set(monster == newTarget)
         end
     })
-    HarukaLib:Hydrate(monster, {
+    scope[#scope + 1] = HarukaLib:Hydrate(monster, {
         ["Attr-Health"] = function(hp: number)
             info.HP:set(hp)
 
@@ -57,7 +57,7 @@ local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : F
 		wait()
 		info.EffectsList:set(monster.EffectsList:GetChildren())
 	end
-    HarukaLib:Hydrate(monster.EffectsList, {
+    scope[#scope + 1] = HarukaLib:Hydrate(monster.EffectsList, {
         ["ChildAdded"] = _setEffectsChildren,
         ["ChildRemoved"] = _setEffectsChildren
     })

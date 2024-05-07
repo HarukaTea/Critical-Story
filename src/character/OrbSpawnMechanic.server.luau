@@ -64,14 +64,15 @@ local function orbSpawnHandler(state: boolean)
         stopSpawn = nil
 	end
 end
-HarukaLib:Hydrate(char, {
+local Empty = HarukaLib:Hydrate(char, {
     ["Attr-OrbAttackingTime"] = orbSpawnHandler
 })
 
 local function onDead()
     if stopSpawn then stopSpawn() end
-
     stopSpawn = nil
+
+    Empty()
 
     script:Destroy()
 end

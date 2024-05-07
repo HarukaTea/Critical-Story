@@ -27,7 +27,7 @@ local function StatBar(id: string, self: table): Frame
 	local isSelecting = Fusion.Value(scope, false)
 
 	local charStatsDict = self.charStatsDict
-	HarukaLib:Hydrate(self.humanoid, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.humanoid, {
 		["Prop-Health"] = function(health: number)
 			charStatsDict.HP[1]:set(health)
 		end,

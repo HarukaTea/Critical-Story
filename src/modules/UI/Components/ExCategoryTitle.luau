@@ -28,7 +28,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 	if id == "Menu" then
 		playerClass = Value(scope, plr:GetAttribute("Class"))
 
-		HarukaLib:Hydrate(plr, {
+		self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
 			["Attr-Class"] = function(newClass: string)
 				playerClass:set(newClass)
 			end

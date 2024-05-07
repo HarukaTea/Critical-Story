@@ -201,14 +201,14 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	HarukaLib:Hydrate(self.humanoid, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.humanoid, {
 		["Touched"] = function(hit: BasePart)
 			if not self then return end --// Reset issue
 
 			if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
 		end
 	})
-	HarukaLib:Hydrate(plr, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
 			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
@@ -231,7 +231,7 @@ return function(plr: Player)
 		end
 	})
 	local charClassInfo = self.charClassInfo
-	HarukaLib:Hydrate(self.char, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
 		["Attr-Combo"] = function(combo: number)
 			charClassInfo.Warrior:set(combo)
 
@@ -276,6 +276,7 @@ return function(plr: Player)
 
 		self.Empty()
 
+		Fusion.doCleanup(self.emptyList)
 		Fusion.doCleanup(scope)
 
 		self = nil

@@ -26,7 +26,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: t
 	local isSelecting = Value(scope, false)
 
 	--// Connections
-	HarukaLib:Hydrate(item, {
+	scope[#scope + 1] = HarukaLib:Hydrate(item, {
 		["Prop-Value"] = function(newAmount: number)
 			amount:set(newAmount)
 		end,

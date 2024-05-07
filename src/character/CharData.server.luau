@@ -15,6 +15,7 @@ local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
+local emptyList = { Empty }
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
@@ -183,7 +184,7 @@ local function charAttributesSetup()
     Spawn(levelReqCheck)
     ServerUtil:EquipWeapon(char)
 
-    HarukaLib:Hydrate(plr, {
+    emptyList[#emptyList + 1] = HarukaLib:Hydrate(plr, {
         ["Attr-DMGPoints"] = function()
             updateMinDMG()
             updateMaxDMG()
@@ -196,7 +197,7 @@ local function charAttributesSetup()
             ServerUtil:EquipWeapon(char)
         end
     })
-    HarukaLib:Hydrate(char, {
+    emptyList[#emptyList + 1] = HarukaLib:Hydrate(char, {
         ["Attr-TP"] = tpCheck,
         ["Attr-Shield"] = shieldCheck,
 
@@ -216,7 +217,9 @@ Spawn(charAttributesSetup)
 
 --// Connections
 local function onDead()
-    Empty()
+    for _, emptyFunc: () -> () in emptyList do
+        emptyFunc()
+    end
 
     if char.PrimaryPart then
         plr:SetAttribute("LastLeave", char.PrimaryPart.Position)

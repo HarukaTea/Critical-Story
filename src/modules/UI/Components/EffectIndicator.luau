@@ -64,7 +64,7 @@ local function EffectIndicator(effect: Script, scope: table) : ImageLabel
 	local maxTurn = 0
 	local turn = Fusion.Value(scope, effect:GetAttribute("Turn"))
 
-	HarukaLib:Hydrate(effect, {
+	scope[#scope + 1] = HarukaLib:Hydrate(effect, {
 		["Attr-Turn"] = function(newTurn: number)
 			if newTurn >= maxTurn then maxTurn = newTurn end
 

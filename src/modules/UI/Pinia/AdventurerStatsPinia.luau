@@ -20,6 +20,8 @@ local function AdventurerStatsPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
+	self.emptyList = {}
+
 	self.skillInfo, self.classFrame = Value(), Value()
 
     self.inventory = plr:WaitForChild("Inventory", 999)

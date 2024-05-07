@@ -41,7 +41,7 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 			remove(afterMonsters, tFind(afterMonsters, monster))
 			self.targetingMobs:set(afterMonsters)
 		end
-		HarukaLib:Hydrate(self.charData.TargetMonsters, {
+		self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.charData.TargetMonsters, {
 			["ChildAdded"] = _addMonster,
 			["ChildRemoved"] = _removeMonster
 		})
@@ -63,7 +63,7 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 		local function _combatEndAction()
 			if monsterHPThread then cancel(monsterHPThread) end
 		end
-		HarukaLib:Hydrate(self.char, {
+		self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
 			["Attr-InCombat"] = function(state: boolean)
 				if state then
 					_combatStartSetup(self.charData.TargetMonster.Value)
@@ -91,7 +91,7 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 		end
 
 		local taggedMob = {}
-		HarukaLib:Hydrate(self.charData.TargetMonster, {
+		self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.charData.TargetMonster, {
 			["Prop-Value"] = function(newMob: Model?)
 				if not newMob then return end
 
@@ -103,7 +103,7 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 				self.playersInCombat:set(newMob.TargetPlayers:GetChildren())
 				taggedMob[#taggedMob + 1] = newMob
 
-				HarukaLib:Hydrate(newMob.TargetPlayers, {
+				self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(newMob.TargetPlayers, {
 					["ChildAdded"] = _addPlr,
 					["ChildRemoved"] = _removePlr
 				})
@@ -126,7 +126,7 @@ local function TurnBaseSideList(id: string, self: table) : Frame
 		local function _combatEndAction()
 			if playerHPThread then cancel(playerHPThread) end
 		end
-		HarukaLib:Hydrate(self.char, {
+		self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
 			["Attr-InCombat"] = function(state: boolean)
 				if state then
 					self.targetingPlayer:set(Players.LocalPlayer)

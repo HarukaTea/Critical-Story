@@ -20,7 +20,7 @@ local function SettingsFrame(self: table): Frame
 	local potatoStoreParts = {}
 	local playerSettings = self.playerSettings :: table
 
-	HarukaLib:Hydrate(self.plr, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.plr, {
 		["Attr-CombatMode"] = function(newMode: string)
 			playerSettings.PublicCombat:set(if newMode == "Public" then true else false)
 		end,

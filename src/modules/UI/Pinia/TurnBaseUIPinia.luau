@@ -16,6 +16,8 @@ local function TurnBaseUIPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
+    self.emptyList = {}
+
     self.playerClass = Value(self.plr:GetAttribute("Class"))
 
     self.charStatsDict = {

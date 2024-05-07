@@ -25,7 +25,7 @@ local function TurnBaseItemChoice(id: string, item: string, self: table, scope: 
     if id == "Items" then
         itemAmount = Value(scope, self.inventory[item].Value)
 
-        HarukaLib:Hydrate(self.inventory[item], {
+        scope[#scope + 1] = HarukaLib:Hydrate(self.inventory[item], {
             ["Prop-Value"] = function(newAmount: number)
                 itemAmount:set(newAmount)
             end

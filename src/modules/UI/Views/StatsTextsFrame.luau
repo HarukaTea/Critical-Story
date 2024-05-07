@@ -65,7 +65,7 @@ local function StatText(id: string, self: table) : TextLabel
     local char = self.char :: Model
     local charDMGStats = self.charDMGStats
 
-    HarukaLib:Hydrate(char, {
+    self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(char, {
         ["Attr-MinDMG"] = function(newDMG: number)
             charDMGStats.MinDMG:set(newDMG)
         end,

@@ -134,7 +134,7 @@ return function(plr: Player)
 	self.noItemsShow:set(not passiveCheck)
 
 	---// listening events
-	HarukaLib:Hydrate(self.inventory, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.inventory, {
 		["ChildAdded"] = function()
 			wait()
 			self.items:set(self.inventory:GetChildren())
@@ -151,7 +151,7 @@ return function(plr: Player)
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUI(plr, "Backpack", true) end
 	end
-	HarukaLib:Hydrate(self.char, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
@@ -164,6 +164,7 @@ return function(plr: Player)
 
 		self.itemSlotClicked:Destroy()
 
+		Fusion.doCleanup(self.emptyList)
 		Fusion.doCleanup(scope)
 
 		self = nil

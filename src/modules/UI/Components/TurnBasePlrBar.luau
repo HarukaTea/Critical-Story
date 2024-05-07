@@ -36,7 +36,7 @@ local function TurnBasePlrBar(char: Model, self: table, scope: table) : Frame
         EffectsList = Value(scope, {})
     }
 
-    HarukaLib:Hydrate(char.Humanoid, {
+    scope[#scope + 1] = HarukaLib:Hydrate(char.Humanoid, {
         ["Prop-Health"] = function(newHP: number)
             info.HP:set(newHP)
         end,
@@ -44,7 +44,7 @@ local function TurnBasePlrBar(char: Model, self: table, scope: table) : Frame
             info.MaxHP:set(newHP)
         end
     })
-    HarukaLib:Hydrate(plr, {
+    scope[#scope + 1] = HarukaLib:Hydrate(plr, {
         ["Attr-NextAction"] = function(newAction: string)
             info.NextAction:set(newAction)
         end
@@ -54,7 +54,7 @@ local function TurnBasePlrBar(char: Model, self: table, scope: table) : Frame
 		wait()
 		info.EffectsList:set(char.CharStats.EffectsList:GetChildren())
 	end
-    HarukaLib:Hydrate(char.CharStats.EffectsList, {
+    scope[#scope + 1] = HarukaLib:Hydrate(char.CharStats.EffectsList, {
         ["ChildAdded"] = _setEffectsChildren,
         ["ChildRemoved"] = _setEffectsChildren
     })

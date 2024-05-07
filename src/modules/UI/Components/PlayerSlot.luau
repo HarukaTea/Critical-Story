@@ -22,7 +22,7 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 	local class = Fusion.Value(scope, player:GetAttribute("Class"))
 	local role = player:GetAttribute("Role")
 
-	HarukaLib:Hydrate(player, {
+	scope[#scope + 1] = HarukaLib:Hydrate(player, {
 		["Attr-Class"] = function(newClass: string)
 			class:set(newClass)
 		end

@@ -121,36 +121,42 @@ function HarukaLib:Deserialize(val: table)
 end
 
 --[[
-	A custom remade of `Fusion.Hydrate`
+	A custom remade of `Fusion.Hydrate`, return a way to disconnect
 ]]
 function HarukaLib:Hydrate(obj: Instance, props: table)
+	local Add, Empty = HarukaLib.Bin()
+
 	for prop, func in props do
 		if sFind(prop, "Attr") then
 			local _, endPos = sFind(prop, "Attr")
 			local attr = sub(prop, endPos + 2)
 
-			obj:GetAttributeChangedSignal(attr):Connect(function()
+			Add(obj:GetAttributeChangedSignal(attr):Connect(function()
 				func(obj:GetAttribute(attr))
-			end)
+			end))
 
 		elseif prop == "ChildAdded" then
-			obj.ChildAdded:Connect(func)
+			Add(obj.ChildAdded:Connect(func))
 
 		elseif prop == "ChildRemoved" then
-			obj.ChildRemoved:Connect(func)
+			Add(obj.ChildRemoved:Connect(func))
 
 		elseif prop == "Touched" then
-			obj.Touched:Connect(func)
+			Add(obj.Touched:Connect(func))
 
 		elseif sFind(prop, "Prop") then
 			local _, endPos = sFind(prop, "Prop")
 			local propName = sub(prop, endPos + 2)
 
-			obj:GetPropertyChangedSignal(propName):Connect(function()
+			Add(obj:GetPropertyChangedSignal(propName):Connect(function()
 				func(obj[propName])
-			end)
+			end))
 		end
 	end
+
+	obj.Destroying:Connect(Empty)
+
+	return Empty
 end
 
 --[[

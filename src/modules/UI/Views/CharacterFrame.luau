@@ -56,7 +56,7 @@ local function CharacterFrame(self: table): Frame
 	local plr, char = self.plr :: Player, self.char :: Model
 	local playerData, charData = self.playerData, self.charData
 
-	HarukaLib:Hydrate(plr, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
 		["Attr-Levels"] = function(levels: number)
 			playerData.Levels:set(levels)
 		end,
@@ -79,7 +79,7 @@ local function CharacterFrame(self: table): Frame
 			playerData.Gold:set(gold)
 		end
 	})
-	HarukaLib:Hydrate(char, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(char, {
 		["Attr-MinDMG"] = function(dmg: number)
 			charData.MinDMG:set(dmg)
 		end,
@@ -93,7 +93,7 @@ local function CharacterFrame(self: table): Frame
 			charData.Shield:set(shield)
 		end
 	})
-	HarukaLib:Hydrate(char.Humanoid, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(char.Humanoid, {
 		["Prop-MaxHealth"] = function(maxHP: number)
 			charData.Health:set(maxHP)
 		end

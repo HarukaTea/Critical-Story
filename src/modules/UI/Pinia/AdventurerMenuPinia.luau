@@ -15,6 +15,8 @@ local function AdventurerMenuPinia(self: table) : table
 		return Fusion.Value(self.scope, val)
 	end
 
+	self.emptyList = {}
+
     self.chosenFilter = Value("Character")
 	self.frames = { Character = Value(true), Settings = Value(false) }
 

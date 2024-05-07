@@ -41,7 +41,7 @@ return function (plr: Player)
 	Pinia(self)
 
 	local charStatsDict = self.charStatsDict :: table
-	HarukaLib:Hydrate(self.char, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(newState: boolean)
 			charStatsDict.isInCombat:set(newState)
 		end,
@@ -112,6 +112,7 @@ return function (plr: Player)
 	local function onDead()
 		Events.NewPhase:DisconnectAll()
 
+		Fusion.doCleanup(self.emptyList)
 		Fusion.doCleanup(scope)
 
 		self = nil

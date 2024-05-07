@@ -20,7 +20,7 @@ local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local function BackpackItemList(self: table) : ScrollingFrame
     local scope = self.scope
 
-    HarukaLib:Hydrate(workspace.CurrentCamera, {
+    self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(workspace.CurrentCamera, {
         ["Prop-ViewportSize"] = function(newSize: Vector2)
             self.absSize:set({
 				newSize.X * 0.71,

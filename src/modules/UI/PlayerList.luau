@@ -144,7 +144,7 @@ return function(plr: Player)
 	Players.PlayerRemoving:Connect(function()
 		self.players:set(Players:GetPlayers())
 	end)
-	HarukaLib:Hydrate(plr, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
 		["Attr-PlayerList"] = function(state: boolean)
 			self.isOpen:set(state)
 		end
@@ -153,6 +153,7 @@ return function(plr: Player)
 	local function _onDead()
 		CAS:UnbindAction("TogglePlayerList")
 
+		Fusion.doCleanup(self.emptyList)
 		Fusion.doCleanup(scope)
 
 		self = nil

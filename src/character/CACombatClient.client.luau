@@ -221,7 +221,7 @@ local function cageHolderHandler(cage: Model)
 end
 
 --// Connection setups
-HarukaLib:Hydrate(char, {
+local Empty = HarukaLib:Hydrate(char, {
 	["Attr-InCombat"] = function(state: boolean)
 		if state then
 			startCombat(char.CharStats.TargetMonster.Value)
@@ -242,6 +242,7 @@ local stopDetecting = setup()
 --// Clear
 humanoid.Died:Once(function()
 	stopDetecting()
+	Empty()
 
 	script:Destroy()
 end)

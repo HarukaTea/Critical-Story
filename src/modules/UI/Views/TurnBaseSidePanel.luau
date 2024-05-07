@@ -46,7 +46,7 @@ local function TurnBaseSidePanel(id: string, self: table) : ScrollingFrame
         end
 
         _handleItems()
-        HarukaLib:Hydrate(self.inventory, {
+        self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.inventory, {
             ["ChildAdded"] = _handleItems,
             ["ChildRemoved"] = function()
                 if not self.plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved

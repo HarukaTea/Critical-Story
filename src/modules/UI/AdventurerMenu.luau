@@ -81,7 +81,7 @@ return function(plr: Player)
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUI(plr, "AdventurerMenu", true) end
 	end
-	HarukaLib:Hydrate(self.char, {
+	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
@@ -92,6 +92,7 @@ return function(plr: Player)
 		CAS:UnbindAction("OpenMenu")
 		plr:SetAttribute("CurrentMenu", "None")
 
+		Fusion.doCleanup(self.emptyList)
 		Fusion.doCleanup(self.scope)
 
 		self = nil

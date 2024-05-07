@@ -20,6 +20,8 @@ local function BackpackPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
+    self.emptyList = {}
+
     self.inventory = plr:WaitForChild("Inventory", 999)
 
 	self.itemFrame = Value()
