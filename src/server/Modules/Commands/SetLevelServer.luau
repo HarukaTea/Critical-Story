@@ -25,7 +25,7 @@ return function (_, players: table, level: number)
             plr:SetAttribute("HealthPoints", 0)
             plr:SetAttribute("ShieldPoints", 0)
             plr:SetAttribute("Levels", levelWant)
-            plr:SetAttribute("LvPoints", (levelWant - 1) * 2)
+            plr:SetAttribute("LvPoints", (levelWant - 1))
         end
 
         return "Level has set to "..levelWant.."!"

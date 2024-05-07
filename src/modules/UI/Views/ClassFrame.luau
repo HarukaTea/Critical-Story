@@ -58,8 +58,6 @@ local function ClassFrame(self: table) : Frame
                     PassiveSlot(1, self),
                     PassiveSlot(2, self),
                     PassiveSlot(3, self),
-                    PassiveSlot(4, self),
-                    PassiveSlot(5, self)
                 }
             })
         },

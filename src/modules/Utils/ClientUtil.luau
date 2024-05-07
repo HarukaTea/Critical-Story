@@ -7,7 +7,6 @@ local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
-local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Signals = require(RepS.Modules.Data.Signals)
@@ -123,14 +122,10 @@ end
 ]]
 function ClientUtil:FreezePlayerControls(action: string)
     if action == "Freeze" then
-        UIS.ModalEnabled = true
-
         CAS:BindActionAtPriority("FreezeControl", function()
             return Enum.ContextActionResult.Sink
         end, false, Enum.ContextActionPriority.High.Value, unpack(Enum.PlayerActions:GetEnumItems()))
     else
-        UIS.ModalEnabled = false
-
         CAS:UnbindAction("FreezeControl")
     end
 end
