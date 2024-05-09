@@ -20,6 +20,10 @@ local function PlayerItemSlot(id: number, self: table): ImageLabel
         fromScale(0.164, 0.391),
         fromScale(0.401, 0.391),
         fromScale(0.637, 0.391),
+        fromScale(0.048, 0.558),
+        fromScale(0.28, 0.558),
+        fromScale(0.516, 0.558),
+        fromScale(0.753, 0.558),
     }
 
 	return New(scope, "ImageLabel")({
@@ -123,6 +127,10 @@ local function PlayerDescFrame(self: table) : Frame
             PlayerItemSlot(1, self),
             PlayerItemSlot(2, self),
             PlayerItemSlot(3, self),
+            PlayerItemSlot(4, self),
+            PlayerItemSlot(5, self),
+            PlayerItemSlot(6, self),
+            PlayerItemSlot(7, self),
 
             Components.TextLabel(scope, {
                 Name = "Role",

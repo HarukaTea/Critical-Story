@@ -5,42 +5,31 @@
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
-local TS = game:GetService("TweenService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
 
 local wait, random, rad = task.wait, math.random, math.rad
-local cfNew, cfLookat, cfAngles = CFrame.new, CFrame.lookAt, CFrame.Angles
+local cfNew, cfAngles = CFrame.new, CFrame.Angles
 local v3New = Vector3.new
 
-local function lookAt(target: Model)
-	local pos, pos2 = target.PrimaryPart.Position, char.PrimaryPart.Position :: Vector3
-	local x, y, z = cfLookat(pos2, pos):ToOrientation()
-
-	char.PrimaryPart.CFrame = cfNew(pos2) * cfAngles(0, y, 0)
-	return pos, pos2, y
-end
 
 local function moving(target: Model)
-	local pos, pos2, y = lookAt(target)
+	local post = ServerUtil:FindPartOnRay(char.Parent.Position + v3New(random(-32,32), 0, random(-32,32)))
 
-	TS:Create(
-		char.PrimaryPart,
-		AssetBook.TweenInfos.onceHalf,
-		{ CFrame = cfNew(v3New(pos.X, pos2.Y, pos.Z)) * cfAngles(0, y, 0) }):Play()
-	wait(0.35)
+	char:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector) * cfNew(0, 1.5, 0))
+	char:PivotTo(cfNew(char.PrimaryPart.Position, target.PrimaryPart.Position))
+	char.PrimaryPart.Orientation *= v3New(0, 1, 1)
 end
 
 local function spikeShot(target: Model)
-	lookAt(target)
+	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolf1:Clone() :: Model
 	blast.Owner.Value = char
 	blast:PivotTo(char.PrimaryPart.CFrame)
-
 	blast.Parent = char.AttackHolder.Value
 
 	if char.Head:FindFirstChild("Encountered") then return end
@@ -52,7 +41,7 @@ local function spikeShot(target: Model)
 end
 
 local function spikeRain(target: Model)
-	lookAt(target)
+	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local rangePos = ServerUtil:FindPartOnRay(target.PrimaryPart.Position + v3New(random(-15, 15), 10, random(-15, 15)))
 
@@ -63,18 +52,21 @@ local function spikeRain(target: Model)
 
 	Debris:AddItem(rangeTip, 1)
 
-	for _ = 1, random(5, 6) do
-		local post = ServerUtil:FindPartOnRay(rangePos + v3New(random(-15, 15), 10, random(-15, 15)))
+	Spawn(function()
+		wait(0.5)
+		for _ = 1, random(5, 6) do
+			local post = ServerUtil:FindPartOnRay(rangePos + v3New(random(-15, 15), 10, random(-15, 15)))
 
-		local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolfSpike2:Clone() :: Model
-		blast:PivotTo(cfNew(post, post + blast.Base.CFrame.LookVector))
-		blast:PivotTo(cfNew(post) * cfAngles(0, rad(random(1, 360)), 0))
-		blast.Owner.Value = char
+			local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolfSpike2:Clone() :: Model
+			blast:PivotTo(cfNew(post, post + blast.Base.CFrame.LookVector))
+			blast:PivotTo(cfNew(post) * cfAngles(0, rad(random(1, 360)), 0))
+			blast.Owner.Value = char
 
-		blast.Parent = char.AttackHolder.Value
+			blast.Parent = char.AttackHolder.Value
 
-		Debris:AddItem(blast, 10)
-	end
+			Debris:AddItem(blast, 10)
+		end
+	end)
 end
 
 local function attacking()
@@ -86,29 +78,44 @@ local function attacking()
 		local style = random(1, 2)
 
 		if style == 1 then
-			for i = 1, random(2, 3) do
+			for _ = 1, random(2, 3) do
 				moving(target.Value)
 				wait(0.1)
 			end
 			wait(0.3)
-			for i = 1, random(2, 3) do
+			for _ = 1, random(2, 3) do
 				spikeShot(target.Value)
 				wait(0.5)
 			end
-			wait(0.3)
+
 			if random(1, 2) == 1 then
+				char.PrimaryPart.Anchored = true
+
 				spikeRain(target.Value)
-				wait(0.6)
+				wait(0.5)
+
+				char.PrimaryPart.Anchored = false
 			end
+
 		elseif style == 2 then
-			for i = 1, random(2, 3) do
+			for _ = 1, random(2, 3) do
 				moving(target.Value)
 				wait(0.1)
 			end
+
 			wait(0.3)
-			for i = 1, random(2, 3) do
+			for _ = 1, random(2, 3) do
 				spikeRain(target.Value)
 				wait(0.6)
+			end
+
+			if random(1, 2) == 1 then
+				char.PrimaryPart.Anchored = true
+
+				spikeRain(target.Value)
+				wait(0.5)
+
+				char.PrimaryPart.Anchored = false
 			end
 		end
 

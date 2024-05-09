@@ -5,6 +5,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local function AdventurerMenuPinia(self: table) : table
     local plr = self.plr :: Player
@@ -15,7 +16,7 @@ local function AdventurerMenuPinia(self: table) : table
 		return Fusion.Value(self.scope, val)
 	end
 
-	self.emptyList = {}
+	self.Add, self.Empty = HarukaLib.Bin()
 
     self.chosenFilter = Value("Character")
 	self.frames = { Character = Value(true), Settings = Value(false) }
@@ -26,6 +27,7 @@ local function AdventurerMenuPinia(self: table) : table
 		DMG = Value(plr:GetAttribute("DMGPoints")),
 		Magic = Value(plr:GetAttribute("MagicPoints")),
 		Health = Value(plr:GetAttribute("HealthPoints")),
+		Mana = Value(plr:GetAttribute("ManaPoints")),
 		Shield = Value(plr:GetAttribute("ShieldPoints")),
 		Gold = Value(plr:GetAttribute("Gold"))
 	}
@@ -34,6 +36,7 @@ local function AdventurerMenuPinia(self: table) : table
 		MinDMG = Value(char:GetAttribute("MinDMG")),
 		MaxDMG = Value(char:GetAttribute("MaxDMG")),
 		Magic = Value(char:GetAttribute("Magic")),
+		Mana = Value(char:GetAttribute("MaxMana")),
 		Shield = Value(char:GetAttribute("MaxShield")),
 		Health = Value(char.Humanoid.MaxHealth)
 	}

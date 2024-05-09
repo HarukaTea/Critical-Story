@@ -19,6 +19,18 @@ for _, child in workspace.MonsterModels:GetDescendants() do
     end
 end
 
+for _, child in workspace.MapComponents.Statues:GetChildren() do
+    child.Prompt.Class.ActionText = child.Name
+
+    for attr, _ in child.Prompt.Class:GetAttributes() do
+        child.Prompt.Class:SetAttribute(attr, nil)
+    end
+end
+for _, child in workspace.MapComponents.Chests:GetChildren() do
+    child.Giver.ItemName:Destroy()
+    child.Giver.Opened:Destroy()
+end
+
 for _, child in workspace.Maps:GetChildren() do
     if child:IsA("Model") then
         local folder = Instance.new("Folder")

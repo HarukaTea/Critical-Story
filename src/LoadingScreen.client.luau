@@ -71,10 +71,6 @@ textLabel.TextColor3 = fromRGB(217, 193, 144)
 textLabel.FontFace = fontFromName("SourceSansPro", Enum.FontWeight.Bold)
 textLabel.Parent = bg
 
-local textSizeConstraint = newInstance("UITextSizeConstraint")
-textSizeConstraint.MaxTextSize = 28
-textSizeConstraint.Parent = textLabel
-
 --- loading progress bar
 local bar = newInstance("Frame")
 bar.AnchorPoint = v2New(0, 1)

@@ -48,8 +48,6 @@ local function onDied()
 		if sound:IsA("Sound") then sound:Stop() end
 	end
 
-	workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-
 	effects.DeathBlur:Clone().Parent = camera
 
 	Lighting.ColorShift_Bottom = fromRGB(255, 0, 0)

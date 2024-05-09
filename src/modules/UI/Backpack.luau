@@ -67,6 +67,7 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Right", self, {
 						FilterButton("Equip", self),
 						FilterButton("Pin", self),
+						FilterButton("Use", self),
 					}),
 
 					Components.Frame(scope, {
@@ -134,28 +135,26 @@ return function(plr: Player)
 	self.noItemsShow:set(not passiveCheck)
 
 	---// listening events
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.inventory, {
-		["ChildAdded"] = function()
-			wait()
-			self.items:set(self.inventory:GetChildren())
-		end,
-		["ChildRemoved"] = function()
-			if not plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
+	self.Add(self.inventory.ChildAdded:Connect(function()
+		wait()
+		self.items:set(self.inventory:GetChildren())
+	end))
+	self.Add(self.inventory.ChildRemoved:Connect(function()
+		if not plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
 
-			wait()
-			self.items:set(self.inventory:GetChildren())
-		end
-	})
+		wait()
+		self.items:set(self.inventory:GetChildren())
+	end))
 
 	--// Connections
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUI(plr, "Backpack", true) end
 	end
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
+	self.Add(HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
-	})
+	}))
 
 	--// Clear
 	local function _clearGarbage()
@@ -164,7 +163,8 @@ return function(plr: Player)
 
 		self.itemSlotClicked:Destroy()
 
-		Fusion.doCleanup(self.emptyList)
+		self.Empty()
+		
 		Fusion.doCleanup(scope)
 
 		self = nil

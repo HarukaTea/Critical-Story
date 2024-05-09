@@ -143,13 +143,11 @@ HarukaLib:Hydrate(monster, {
 		end
     end
 })
-HarukaLib:Hydrate(monster.TargetPlayers, {
-    ["ChildRemoved"] = function()
-        wait()
-		if not monster.TargetPlayers:FindFirstChildOfClass("ObjectValue") and not isDead then
-			isDead = true
+monster.TargetPlayers.ChildRemoved:Connect(function()
+    wait()
+    if not monster.TargetPlayers:FindFirstChildOfClass("ObjectValue") and not isDead then
+        isDead = true
 
-			combatEnds()
-		end
+        combatEnds()
     end
-})
+end)

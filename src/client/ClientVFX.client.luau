@@ -48,7 +48,7 @@ local function enableWinds()
         Direction = v3New(1, 0, 0.3),
         Speed = 25,
         LifeTime = 0.8,
-        SpawnRate = 6,
+        SpawnRate = 5,
     })
 
     --- wind shakes
@@ -61,7 +61,7 @@ local function enableWinds()
     for _, child: Instance in workspace:GetDescendants() do
         if child:IsA("Model") and child.Name == "Tree" then
             for _, treePart: BasePart in child:GetChildren() do
-                Atmosphere.WindShake:AddObjectShake(treePart)
+                if treePart.Material == Enum.Material.Grass then Atmosphere.WindShake:AddObjectShake(treePart) end
             end
         end
     end

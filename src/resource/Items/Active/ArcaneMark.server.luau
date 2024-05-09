@@ -17,7 +17,7 @@ local monster = char.CharStats.TargetMonster.Value :: Model
 local wait = task.wait
 local fromRGB = Color3.fromRGB
 
-local ITEM_ATTRIBUTES = { TP_REQ = 50, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { CD = 10, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

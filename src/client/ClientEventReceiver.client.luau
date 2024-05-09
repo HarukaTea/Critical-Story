@@ -2,22 +2,16 @@
 --!optimize 2
 --!native
 
-local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Events = require(RepS.Modules.Data.Events)
-local Signals = require(RepS.Modules.Data.Signals)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
-local plr = Players.LocalPlayer
-
 local wait = task.wait
-local cfAngles, cfNew = CFrame.Angles, CFrame.new
+local cfAngles = CFrame.Angles
 local rad = math.rad
-local v3New = Vector3.new
 
 --[[
 	Play the sound when server requests, usually used for
@@ -71,57 +65,3 @@ local function vfxChestUnlock(chest: Model)
 	SuperTween.new(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) }):Play()
 end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
-
---[[
-	Create a border when mob phase starts
-]]
-local function createBorder(method: string, locator: BasePart)
-	local char = Players.LocalPlayer.Character
-
-	if method == "Create" then
-		if (char.PrimaryPart.Position - locator.Position).Magnitude >= 32 then
-			char:PivotTo(cfNew(locator.Position + v3New(0, 5.99, 0)))
-		end
-		local border = RepS.Package.Unloads.CombatBorder:Clone() :: Model
-		border:PivotTo(cfNew(locator.Position))
-		border.Parent = char
-
-	else
-		if char:FindFirstChild("CombatBorder") then char.CombatBorder:Destroy() end
-	end
-end
-Events.CreateCombatBorder:Connect(createBorder)
-
---[[
-	Tween to that camera position
-]]
-local function cameraTween(cam: BasePart | string)
-	local camera = workspace.CurrentCamera
-
-	if cam == "Reset" then
-		camera.CameraType = Enum.CameraType.Custom
-		return
-	end
-
-	camera.CameraType = Enum.CameraType.Scriptable
-	TS:Create(camera, AssetBook.TweenInfos.one, { CFrame = cam.CFrame }):Play()
-end
-Events.CameraPointTo:Connect(cameraTween)
-Signals.CameraPointTo:Connect(cameraTween)
-
-
---[[
-	Freeze player's controls when combating
-]]
-local function freezePlayerControls(method: string)
-	ClientUtil:FreezePlayerControls(method)
-end
-Events.FreezePlayerControls:Connect(freezePlayerControls)
-
---[[
-	Class attack vfx!
-]]
-local function classVFX(monster: Model)
-	ClientUtil:ClassHitVFX(monster, plr.Character)
-end
-Events.ClassClientVFX:Connect(classVFX)

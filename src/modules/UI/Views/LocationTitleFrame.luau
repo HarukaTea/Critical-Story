@@ -3,14 +3,11 @@
 --!native
 
 local RepS = game:GetService("ReplicatedStorage")
-local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
 
@@ -38,29 +35,12 @@ local function LocationTitleFrame(self: table) : Frame
 
 		if locationInfo.Thread then cancel(locationInfo.Thread) end
 
-		wait()
-        Events.ChangePlayerLocation:Fire(location)
-
 		locationInfo.Thread = spawn(function()
-            Spawn(function()
-                local overworldMusic = workspace.Sounds.Overworld :: Sound
-                if overworldMusic.SoundId ~= AssetBook.LocationInfo.Music[location] then
-                    TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = 0 }):Play()
-
-                    wait(0.6)
-                    overworldMusic.SoundId = AssetBook.LocationInfo.Music[location]
-                    overworldMusic:Play()
-
-                    if not overworldMusic.Playing then return end
-                    TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = AssetBook.LocationInfo.MusicVolumes[overworldMusic.SoundId] }):Play()
-                end
-            end)
-
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
-            locationInfo.Name:set(AssetBook.LocationInfo.Name[location])
-			locationInfo.Desc:set(AssetBook.LocationInfo.Desc[location])
+            locationInfo.Name:set(AssetBook.LocationInfo[location].Name)
+			locationInfo.Desc:set(AssetBook.LocationInfo[location].Desc)
 
 			wait(0.3)
 			locationInfo.OverallStrokeTrans:set(0.3)
@@ -80,9 +60,9 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 		end)
 	end
-    self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
+    self.Add(HarukaLib:Hydrate(self.char, {
         ["Attr-CurrentRegion"] = _showCurrentLocation
-    })
+    }))
 
     return Components.Frame(scope, {
         Name = "LocationTitle",

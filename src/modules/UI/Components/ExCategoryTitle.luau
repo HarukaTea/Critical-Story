@@ -28,11 +28,11 @@ local function ExCategoryTitle(id: string, self: table): Frame
 	if id == "Menu" then
 		playerClass = Value(scope, plr:GetAttribute("Class"))
 
-		self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
+		self.Add(HarukaLib:Hydrate(plr, {
 			["Attr-Class"] = function(newClass: string)
 				playerClass:set(newClass)
 			end
-		})
+		}))
 	end
 
 	return New(scope, "Frame")({

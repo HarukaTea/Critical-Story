@@ -2,18 +2,14 @@
 --!optimize 2
 --!native
 
-local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local char = script.Parent.Parent.Parent :: Model
 
-script:SetAttribute("Turn", math.huge)
+local wait = task.wait
 
-HarukaLib:Hydrate(script, {
-	["Attr-Turn"] = function()
-		BuffEffectsUtil:RestoreTP(char, 10)
-	end
-})
+while wait(15) do
+	BuffEffectsUtil:RestoreMana(char, 15)
+end

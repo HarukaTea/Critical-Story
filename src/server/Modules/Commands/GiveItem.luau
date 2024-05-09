@@ -2,9 +2,13 @@
 --!optimize 2
 --!native
 
+local RepS = game:GetService("ReplicatedStorage")
+
+local ItemBook = require(RepS.Modules.Data.ItemBook)
+
 return {
     Name = "giveitem",
-    Aliases = {"give"},
+    Aliases = { "give" },
     Description = "Give the item which exist in game to a player.",
     Group = "Testers",
     Args = {
@@ -13,11 +17,18 @@ return {
             Name = "players",
             Description = "The player who recieve this item"
         },
-        {
-            Type = "string",
-            Name = "item",
-            Description = "The item id of item, NOT the item name"
-        },
+        function(context: table)
+            local items = {}
+            for _, item: table in ItemBook.Items do
+                items[#items + 1] = item.ItemId
+            end
+
+            return {
+                Type = context.Cmdr.Util.MakeEnumType("GameItemsLib", items),
+                Name = "item",
+                Description = "The item you wish to get"
+            }
+        end,
         {
             Type = "number",
             Name = "amount",

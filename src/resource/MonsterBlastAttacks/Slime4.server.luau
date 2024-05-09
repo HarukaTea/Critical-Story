@@ -7,10 +7,8 @@ local char = model.Owner.Value :: Model
 
 local wait = task.wait
 
-for _, descendant in model:GetDescendants() do
-    if descendant:IsA("BasePart") then
-        descendant.Color = model:GetAttribute("SlimeColor")
-    end
+for _, descendant: BasePart in model:GetDescendants() do
+    if descendant:IsA("BasePart") then descendant.Color = model:GetAttribute("SlimeColor") end
 end
 
 wait(0.3)
@@ -19,10 +17,8 @@ blast.Owner.Value = model.Owner.Value
 blast:PivotTo(model.Base.CFrame)
 blast.Parent = char.AttackHolder.Value
 
-for _, descendant in blast:GetDescendants() do
-    if descendant:IsA("BasePart") and not descendant:GetAttribute("BombCore") then
-        descendant.Color = model:GetAttribute("SlimeColor")
-    end
+for _, descendant: BasePart in blast:GetDescendants() do
+    if descendant:IsA("BasePart") and not descendant:GetAttribute("BombCore") then descendant.Color = model:GetAttribute("SlimeColor") end
 end
 
 wait(1)

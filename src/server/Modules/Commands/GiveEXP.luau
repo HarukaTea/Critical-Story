@@ -4,7 +4,7 @@
 
 return {
     Name = "giveexp",
-    Aliases = {"exp"},
+    Aliases = { "exp" },
     Description = "Give the exp to which you given.",
     Group = "Testers",
     Args = {

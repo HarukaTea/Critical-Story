@@ -18,7 +18,6 @@ local requireList = {
 	UIModules.AdventurerStats,
 	UIModules.AdventurerMenu,
 	UIModules.Backpack,
-	UIModules.TurnBaseUI,
 	UIModules.ShiftLock,
 	UIModules.PlayerList,
 	UIModules.Hints,

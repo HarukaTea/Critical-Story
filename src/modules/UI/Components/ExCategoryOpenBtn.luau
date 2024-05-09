@@ -57,7 +57,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 	return Fusion.New(scope, "Frame")({
 		Name = id,
 		BackgroundColor3 = color3New(),
-		Position = if id == "Menu" then fromScale(0.355, 0) else fromScale(0.71, 0),
+		Position = if id == "Menu" then fromScale(0.355, -1.1) else fromScale(0.71, -1.1),
 		Size = fromScale(0.281, 0.658),
 
 		[Children] = {

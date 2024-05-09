@@ -150,15 +150,13 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: t
 			self.itemDesc:set(itemInfo.Desc)
 
 			local filterInfo = self.filterInfo :: table
-			local blacklist = { "Active", "Material" }
+			local blacklist = { "Material" }
 
 			filterInfo.Equip.Visible:set(if not tFind(blacklist, itemType) then true else false)
 			filterInfo.Equip.Text:set(if peek(equipped) then "UNEQUIP" else "EQUIP")
 
-			if itemType == "Active" and not itemInfo.IsSkill then
-				filterInfo.Equip.Visible:set(true)
-				filterInfo.Equip.Text:set("USE")
-			end
+			filterInfo.Use.Visible:set(false)
+			if itemType == "Active" and not itemInfo.IsSkill then filterInfo.Use.Visible:set(true) end
 
 			filterInfo.Pin.Visible:set(true)
 			filterInfo.Pin.Text:set(if peek(pinned) then "UNPIN" else "PIN")

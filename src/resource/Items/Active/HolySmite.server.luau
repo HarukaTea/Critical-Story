@@ -18,7 +18,7 @@ local monster = char.CharStats.TargetMonster.Value :: Model
 local fromRGB = Color3.fromRGB
 local v3New = Vector3.new
 
-local ITEM_ATTRIBUTES = { TP_REQ = 60, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
@@ -27,7 +27,7 @@ Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.AnimeExplosion)
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Explosion)
 Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
-BuffEffectsUtil:Burn(char, monster, 1)
+BuffEffectsUtil:Burn(char, monster, 6)
 
 local explosion = RepS.Package.MagicAssets.HolySmite.Explosion:Clone() :: BasePart
 explosion.CFrame = monster.PrimaryPart.CFrame

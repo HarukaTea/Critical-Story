@@ -64,6 +64,8 @@ local function setup()
 
     Add(HarukaLib.Clock(1, function()
         HarukaLib:Add(plr, "PlayTime", 1)
+
+        if char:GetAttribute("HitCD") >= 0 then HarukaLib:Add(char, "HitCD", -1) end
     end))
 
     --// Spawn to the nearest respawn point
@@ -92,36 +94,35 @@ local function classAttributesSetup()
     --- wizard
     Add(char:GetAttributeChangedSignal("InCombat"):Connect(function()
         if not char:GetAttribute("InCombat") then
+            char:SetAttribute("Combo", 0)
             char:SetAttribute("Stack", 0)
             char:SetAttribute("Focus", 0)
             char:SetAttribute("Guard", 0)
             char:SetAttribute("RogueCri", 0)
-            char:SetAttribute("TP", 0)
         end
     end))
 
     --- knight
-    Add(HarukaLib.Clock(1.7, function()
+    Add(HarukaLib.Clock(1, function()
         if char:GetAttribute("Guard") <= 0 then return end
 
         HarukaLib:Add(char, "Guard", -1)
     end))
 
     --- Rogue
-    Add(HarukaLib.Clock(1.2, function()
+    Add(HarukaLib.Clock(0.7, function()
         if char:GetAttribute("RogueCri") <= 0 then return end
 
         HarukaLib:Add(char, "RogueCri", -1)
     end))
-
-    --- turn-base
-    plr:SetAttribute("NextAction", "")
 end
 Spawn(classAttributesSetup)
 
 local function charAttributesSetup()
-    local function tpCheck(tp: number)
-        if tp > 100 then char:SetAttribute("TP", 100) end
+    local function manaCheck(mana: number)
+        local maxMana = char:GetAttribute("MaxMana") :: number
+
+        if mana > maxMana then char:SetAttribute("Mana", maxMana) end
     end
     local function shieldCheck(shield: number)
         local maxShield = char:GetAttribute("MaxShield") :: number
@@ -146,8 +147,12 @@ local function charAttributesSetup()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
     end
     local function updateShield()
-        char:SetAttribute("MaxShield", 5 * plr:GetAttribute("ShieldPoints") + 5 + char:GetAttribute("ShieldBuff"))
+        char:SetAttribute("MaxShield", 20 * plr:GetAttribute("ShieldPoints") + 20 + char:GetAttribute("ShieldBuff"))
         char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
+    end
+    local function updateMana()
+        char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 60) + 50 + char:GetAttribute("ManaBuff"))
+        char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
     end
     local function updateHP()
         humanoid.MaxHealth = 50 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
@@ -179,6 +184,7 @@ local function charAttributesSetup()
     Spawn(updateMagic)
     Spawn(updateShield)
     Spawn(updateHP)
+    Spawn(updateMana)
     Spawn(updateSpeed, 0)
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)
@@ -192,13 +198,15 @@ local function charAttributesSetup()
         ["Attr-MagicPoints"] = updateMagic,
         ["Attr-ShieldPoints"] = updateShield,
         ["Attr-HealthPoints"] = updateHP,
+        ["Attr-ManaPoints"] = updateMana,
         ["Attr-EXP"] = levelReqCheck,
+
         ["Attr-Class"] = function()
             ServerUtil:EquipWeapon(char)
         end
     })
     emptyList[#emptyList + 1] = HarukaLib:Hydrate(char, {
-        ["Attr-TP"] = tpCheck,
+        ["Attr-Mana"] = manaCheck,
         ["Attr-Shield"] = shieldCheck,
 
         ["Attr-MinDMGBuff"] = updateMinDMG,
@@ -206,6 +214,8 @@ local function charAttributesSetup()
         ["Attr-MagicBuff"] = updateShield,
         ["Attr-ShieldBuff"] = updateShield,
         ["Attr-HealthBuff"] = updateHP,
+        ["Attr-ManaBuff"] = updateMana,
+        ["Attr-SpeedBuff"] = updateSpeed,
         ["Attr-JumpBuff"] = updateJump,
 
         ["Attr-InCombat"] = function()
@@ -217,10 +227,6 @@ Spawn(charAttributesSetup)
 
 --// Connections
 local function onDead()
-    for _, emptyFunc: () -> () in emptyList do
-        emptyFunc()
-    end
-
     if char.PrimaryPart then
         plr:SetAttribute("LastLeave", char.PrimaryPart.Position)
 
@@ -231,14 +237,17 @@ local function onDead()
     end
     char:SetAttribute("InCombat", false)
 
-    for _, monsterSymbol in char.CharStats.TargetMonsters:GetChildren() do
+    for _, emptyFunc: () -> () in emptyList do
+        emptyFunc()
+    end
+
+    for _, monsterSymbol: ObjectValue in char.CharStats.TargetMonsters:GetChildren() do
         pcall(function()
             for _, targetPlr in monsterSymbol.Value.TargetPlayers:GetChildren() do
                 if targetPlr.Value == char then targetPlr:Destroy() end
             end
         end)
     end
-
     for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end
     end

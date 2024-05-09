@@ -11,6 +11,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local Pinia = require(RepS.Modules.UI.Pinia.PlayerListPinia)
 
@@ -42,7 +43,6 @@ return function(plr: Player)
 	local scope = self.scope
 	Components.ScreenGui(scope, {
 		Name = "PlayerList",
-		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 		Parent = plr.PlayerGui,
 
@@ -144,16 +144,29 @@ return function(plr: Player)
 	Players.PlayerRemoving:Connect(function()
 		self.players:set(Players:GetPlayers())
 	end)
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
+	self.Add(HarukaLib:Hydrate(plr, {
 		["Attr-PlayerList"] = function(state: boolean)
 			self.isOpen:set(state)
 		end
-	})
+	}))
+	Signals.ExCategoryOpened:Connect(function()
+		for _, element: Frame in peek(self.list):GetChildren() do
+			if element:IsA("Frame") then
+				element.BackgroundColor3 = fromRGB(30, 30, 30)
+				element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+			end
+		end
+
+		self.playerDescVisible:set(false)
+	end)
 
 	local function _onDead()
 		CAS:UnbindAction("TogglePlayerList")
 
-		Fusion.doCleanup(self.emptyList)
+		Signals.ExCategoryOpened:DisconnectAll()
+
+		self.Empty()
+
 		Fusion.doCleanup(scope)
 
 		self = nil

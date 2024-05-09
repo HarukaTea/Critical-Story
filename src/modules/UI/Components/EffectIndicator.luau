@@ -7,7 +7,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children = Fusion.Children
 
@@ -15,25 +15,19 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local clamp = math.clamp
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
-
-local function mapValue(val: number, duration: number) : number
-    --- you may be confused about this math problem, well, I'm confused too lol
-    local from = (val - 0) / (duration - 0)
-    local to = from * (1 - 0) + 0
-
-    return to
-end
+local wait = task.wait
 
 local function ProgressCircle(direction: string, effect: Script, info: table) : Frame
-    return Components.Frame(info[3], {
+    return Components.Frame(info[2], {
 		Name = "ProgressCircle"..direction,
+		ClipsDescendants = true,
 		AnchorPoint = v2New(),
 		Position = if direction == "Right" then fromScale(0.5, 0) else fromScale(0, 0),
 		Size = fromScale(0.5, 1),
 		ZIndex = 2,
 
 		[Children] = {
-			Components.ImageLabel(info[3], {
+			Components.ImageLabel(info[2], {
 				Name = "ProgressImage",
 				Position = if direction == "Right" then fromScale(-1, 0) else fromScale(0, 0),
 				Size = fromScale(2, 1),
@@ -41,10 +35,9 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
                 ImageColor3 = AssetBook.BuffInfo[effect.Name].Color,
 
 				[Children] = {
-					Fusion.New(info[3], "UIGradient")({
-						Rotation = Fusion.Computed(info[3], function(use)
-                            local mappedDuration = mapValue(use(info[1]), info[2])
-							local angle = clamp(mappedDuration * 360, 0, 360)
+					Fusion.New(info[2], "UIGradient")({
+						Rotation = Fusion.Computed(info[2], function(use)
+							local angle = clamp(use(info[1]) * 360, 0, 360)
 
 							return if direction == "Left" then clamp(angle, 180, 360) else clamp(angle, 0, 180)
 						end),
@@ -61,16 +54,14 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
 end
 
 local function EffectIndicator(effect: Script, scope: table) : ImageLabel
-	local maxTurn = 0
-	local turn = Fusion.Value(scope, effect:GetAttribute("Turn"))
-
-	scope[#scope + 1] = HarukaLib:Hydrate(effect, {
-		["Attr-Turn"] = function(newTurn: number)
-			if newTurn >= maxTurn then maxTurn = newTurn end
-
-			turn:set(newTurn)
+	local maxDuration = effect:GetAttribute("MaxDuration")
+	local percentage = Fusion.Value(scope, 1)
+	Spawn(function()
+		for _ = maxDuration, 0.1, -0.1 do
+			percentage:set(Fusion.peek(percentage) - 1/(maxDuration * 10))
+			wait(0.1)
 		end
-	})
+	end)
 
     return Components.ImageLabel(scope, {
         Name = effect.Name,
@@ -82,8 +73,8 @@ local function EffectIndicator(effect: Script, scope: table) : ImageLabel
         [Children] = {
             Components.RoundUICorner(scope),
 
-            ProgressCircle("Left", effect, { turn, maxTurn, scope }),
-            ProgressCircle("Right", effect, { turn, maxTurn, scope }),
+            ProgressCircle("Left", effect, { percentage, scope }),
+            ProgressCircle("Right", effect, { percentage, scope }),
 
 			Components.TextLabel(scope, {
 				Name = "Power",
@@ -91,15 +82,18 @@ local function EffectIndicator(effect: Script, scope: table) : ImageLabel
 				Position = fromScale(0.5, 0.6),
 				Size = fromScale(1.2, 0.5),
 				ZIndex = 3,
-
-				Text = Fusion.Computed(scope, function(use)
-					return use(turn)
-				end),
+				Text = "2x",
 
 				[Children] = {
 					Components.TextUIStroke(scope, { Thickness = 2.5 })
 				}
-			})
+			}),
+			Components.Frame(scope, {
+                Name = "Shadow",
+                BackgroundTransparency = 0.6,
+
+                [Children] = { Components.RoundUICorner(scope) }
+            })
         }
     })
 end

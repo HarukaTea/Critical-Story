@@ -10,7 +10,7 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local TurnBaseEffectList = require(RepS.Modules.UI.Views.TurnBaseEffectList)
+local MonsterEffectsList = require(RepS.Modules.UI.Views.MonsterEffectsList)
 
 local Children, Tween, Computed, Value, New, OnEvent =
     Fusion.Children, Fusion.Tween, Fusion.Computed, Fusion.Value, Fusion.New, Fusion.OnEvent
@@ -24,7 +24,7 @@ local insert, tFind = table.insert, table.find
 local clamp = math.clamp
 local wait = task.wait
 
-local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : Frame
+local function MonsterBar(monster: Model, self: table, scope: table) : Frame
     local info = {
         innerPos = Value(scope, fromScale(0.82, 0)),
         isSelecting = Value(scope, false),
@@ -57,10 +57,8 @@ local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : F
 		wait()
 		info.EffectsList:set(monster.EffectsList:GetChildren())
 	end
-    scope[#scope + 1] = HarukaLib:Hydrate(monster.EffectsList, {
-        ["ChildAdded"] = _setEffectsChildren,
-        ["ChildRemoved"] = _setEffectsChildren
-    })
+    scope[#scope + 1] = monster.EffectsList.ChildAdded:Connect(_setEffectsChildren)
+    scope[#scope + 1] = monster.EffectsList.ChildRemoved:Connect(_setEffectsChildren)
 
     return Components.Frame(scope, {
         Name = monster.Name,
@@ -70,7 +68,7 @@ local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : F
                 Name = "Monster",
                 AnchorPoint = v2New(),
                 BackgroundTransparency = 0,
-                Size = fromScale(0.18, 1),
+                Size = fromScale(0.18, 1.02),
 
                 Position = Tween(scope, Computed(scope, function(use)
                     return use(info.innerPos)
@@ -212,11 +210,11 @@ local function TurnBaseMonsterBar(monster: Model, self: table, scope: table) : F
                         }
                     }),
 
-                    TurnBaseEffectList("Monster", info, self)
+                    MonsterEffectsList(info, self)
                 }
             }),
         }
     })
 end
 
-return TurnBaseMonsterBar
+return MonsterBar

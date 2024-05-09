@@ -5,11 +5,13 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local floor = math.floor
 local fromScale = UDim2.fromScale
+local wait = task.wait
 
 local function AdventurerStatsPinia(self: table)
     local plr = self.plr :: Player
@@ -20,9 +22,7 @@ local function AdventurerStatsPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
-	self.emptyList = {}
-
-	self.skillInfo, self.classFrame = Value(), Value()
+	self.Add, self.Empty = HarukaLib.Bin()
 
     self.inventory = plr:WaitForChild("Inventory", 999)
 	self.charData = char:WaitForChild("CharStats", 999)
@@ -42,6 +42,10 @@ local function AdventurerStatsPinia(self: table)
 
 	self.charStatsDict = {
 		HP = { Value(char.Humanoid.Health), Value(char.Humanoid.MaxHealth) },
+		MP = { Value(char:GetAttribute("Mana")), Value(char:GetAttribute("MaxMana")) },
+		DEF = { Value(char:GetAttribute("Shield")), Value(char:GetAttribute("MaxShield")) },
+
+		HPHealing = Value(false), DEFRepairing = Value(false),
 
 		MonsterAmount = Value({}),
 		IsInCombat = Value(false),
@@ -54,8 +58,6 @@ local function AdventurerStatsPinia(self: table)
         Magic = Value(char:GetAttribute("Magic")),
     }
 
-	self.Add, self.Empty = HarukaLib.Bin()
-
 	self.charClassInfo = {
 		Warrior = Value(0),
 		Archer = Value(0),
@@ -63,8 +65,6 @@ local function AdventurerStatsPinia(self: table)
 		Knight = Value(0),
 		Rogue = Value(0)
 	}
-
-    self.passiveIconList = { Value("Null"), Value("Null"), Value("Null") }
 
     self.chatDialogueAbsSize = Value(24)
     self.chatText = Value("")
@@ -92,6 +92,30 @@ local function AdventurerStatsPinia(self: table)
     self.promptsList = Value({})
 
     self.quests = Value(self.plr:WaitForChild("Quests", 999):GetChildren())
+
+	self.activeInnerCDList = { false, false, false }
+	self.activeEquipList = { Value("Null"), Value("Null"), Value("Null") }
+	self.activeCDList = { Value(0), Value(0), Value(0) }
+	self.activeCDRotationList = { Value(0), Value(0), Value(0) }
+	self.passiveEquipList = { Value("Null"), Value("Null"), Value("Null") }
+
+	self.activeSlotList = { Value(), Value(), Value() }
+	self.passiveSlotList = { Value(), Value(), Value() }
+
+	self.targetingMobs = Value({})
+	self.monsterTargetingPos = Value(fromScale(-0.2, 0.5))
+	self.targetingMob = Value(self.charData.TargetMonster.Value)
+
+	function self:UseItem(slot: number)
+		local activeInnerCDList = self.activeInnerCDList
+		if activeInnerCDList[slot] then return end
+
+		activeInnerCDList[slot] = true
+		Events.UseItem:Fire(Fusion.peek(self.activeEquipList[slot]))
+
+		wait(1)
+		activeInnerCDList[slot] = false
+	end
 end
 
 return AdventurerStatsPinia

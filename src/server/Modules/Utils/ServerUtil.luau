@@ -196,6 +196,7 @@ end
 ]]
 function ServerUtil:MonsterActivateCombat(monster: Model)
 	monster:SetAttribute("InCombat", true)
+
 	if not monster:GetAttribute("SubMonster") then monster.Head.TierDisplay.Enabled = false end
 	monster.Head.Display.Enabled = true
 
@@ -209,18 +210,8 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	owner.Value = monster
 	owner.Parent = folder
 
-	if not monster:GetAttribute("SubMonster") then
-		local cageArea = RepS.Package.Unloads.CombatCage:Clone() :: Model
-		cageArea:PivotTo(monster.Parent.CFrame)
-		cageArea.Owner.Value = monster
-		cageArea.Parent = workspace.MapComponents.CageFolders
-
-		monster.CageHolder.Value = cageArea
-	else
-		monster.CageHolder.Value = monster.Parent.Parent:FindFirstChildOfClass("Model").CageHolder.Value
-	end
-
 	monster.AttackHolder.Value = folder
+	monster.Attack.Disabled = false
 end
 
 --[[
@@ -244,18 +235,6 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 		monster:Destroy()
 		return
 	end
-
-	if monster.CageHolder.Value then monster.CageHolder.Value:Destroy() end
-
-	pcall(function()
-		local targetPlrs = ServerUtil:GetPlayersByMonster(monster)
-		for _, plr: Player in targetPlrs do
-			if not plr then continue end
-
-			Events.FreezePlayerControls:Fire(plr, "Unfreeze")
-			Events.CameraPointTo:Fire(plr, "Reset")
-		end
-	end)
 
 	--- multi-combat mechanic
 	local waitingLocators = {}
@@ -338,6 +317,8 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 
 	end):catch(function()
 		orbLocation = cfNew(0, 0, 0)
+
+		warn("Can not give a proper position for orbs!")
 	end)
 
 	return orbLocation
@@ -386,7 +367,6 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 
 		local encounterHighlight = RepS.Package.Effects.EncounterHighlight:Clone() :: Highlight
 		encounterHighlight.Parent = char
-		encounterHighlight.Adornee = char
 		Debris:AddItem(encounterHighlight, 2)
 
 		Events.ClientTween:Fires({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
@@ -481,6 +461,8 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	local char = plr.Character
 	local monster =  char.CharStats.TargetMonster.Value :: Model
 
+	local itemInfo = ItemBook:FindItem(item)
+
 	if attributes.COMBAT_REQ then
 		if not char:GetAttribute("InCombat") or not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then
 			Events.CreateHint:Fire(plr, "You can only use this during combat!")
@@ -490,16 +472,16 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 			return false
 		end
 	end
-	if attributes.TP_REQ then
-		if char:GetAttribute("TP") < attributes.TP_REQ then
-			Events.CreateHint:Fire(plr, "You don't have enough TP!")
+	if itemInfo.Mana > 0 then
+		if char:GetAttribute("Mana") < itemInfo.Mana then
+			Events.CreateHint:Fire(plr, "You don't have enough Mana!")
 
 			wait()
 			script:Destroy()
 			return false
 		end
 
-		HarukaLib:Add(char, "TP", -attributes.TP_REQ)
+		HarukaLib:Add(char, "Mana", -itemInfo.Mana)
 	end
 	if attributes.MONSTER_REQ then
 		if not monster or not monster.PrimaryPart or not char.PrimaryPart then
@@ -511,9 +493,10 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 		end
 	end
 
-	Debris:AddItem(script, if attributes.CD then attributes.CD else 8)
+	Debris:AddItem(script, if attributes.CD then attributes.CD else 1)
+	Events.ItemCD:Fire(plr, if attributes.CD then attributes.CD else 1, item)
 
-	if ItemBook:FindItem(item).IsCM then plr.Inventory[item].Value -= 1 end
+	if not ItemBook:FindItem(item).IsSkill then plr.Inventory[item].Value -= 1 end
 	if plr.Inventory[item].Value <= 0 then plr.Inventory[item]:Destroy() end
 
 	return true
@@ -556,102 +539,6 @@ function ServerUtil:SetCollisionGroup(object: Instance, group: string)
 end
 
 --[[
-	Ragdoll an NPC, note that NPC can be player, such as dead ragdoll
-]]
-function ServerUtil:RagdollNPC(npc: Model)
-	if not npc.PrimaryPart then return end
-
-	local ATTACHMENT_CFRAMES = {
-		["Neck"] = {
-			cfNew(0, 1, 0, 0, -1, 0, 1, 0, -0, 0, 0, 1),
-			cfNew(0, -0.5, 0, 0, -1, 0, 1, 0, -0, 0, 0, 1),
-		},
-		["Left Shoulder"] = {
-			cfNew(-1.3, 0.75, 0, -1, 0, 0, 0, -1, 0, 0, 0, 1),
-			cfNew(0.2, 0.75, 0, -1, 0, 0, 0, -1, 0, 0, 0, 1),
-		},
-		["Right Shoulder"] = {
-			cfNew(1.3, 0.75, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-			cfNew(-0.2, 0.75, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-		},
-		["Left Hip"] = {
-			cfNew(-0.5, -1, 0, 0, 1, -0, -1, 0, 0, 0, 0, 1),
-			cfNew(0, 1, 0, 0, 1, -0, -1, 0, 0, 0, 0, 1),
-		},
-		["Right Hip"] = {
-			cfNew(0.5, -1, 0, 0, 1, -0, -1, 0, 0, 0, 0, 1),
-			cfNew(0, 1, 0, 0, 1, -0, -1, 0, 0, 0, 0, 1),
-		},
-	}
-	npc.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
-	npc.Torso:ApplyImpulse(npc.Torso.CFrame.LookVector * 100)
-
-	local function _createColliderPart(part: BasePart)
-		if not part then return end
-
-		local rp = instanceNew("Part")
-		rp.Size = part.Size / 1.7
-		rp.Massless = true
-		rp.CFrame = part.CFrame
-		rp.Transparency = 1
-
-		local wc = instanceNew("WeldConstraint")
-		wc.Part0 = rp
-		wc.Part1 = part
-
-		wc.Parent = rp
-		rp.Parent = part
-	end
-	for _, child: Instance in npc:GetDescendants() do
-		if child:IsA("Motor6D") then
-			if not ATTACHMENT_CFRAMES[child.Name] then return end
-
-			child.Enabled = false
-			local att0, att1 = instanceNew("Attachment"), instanceNew("Attachment")
-			att0.CFrame = ATTACHMENT_CFRAMES[child.Name][1]
-			att1.CFrame = ATTACHMENT_CFRAMES[child.Name][2]
-
-			_createColliderPart()
-
-			local bsc = instanceNew("BallSocketConstraint")
-			bsc.Attachment0 = att0
-			bsc.Attachment1 = att1
-			bsc.LimitsEnabled = true
-			bsc.TwistLimitsEnabled = if child.Name == "Neck" then true else false
-			bsc.Restitution = 0
-			bsc.UpperAngle = if child.Name == "Neck" then 45 else 90
-			bsc.TwistLowerAngle = if child.Name == "Neck" then -70 else -45
-			bsc.TwistUpperAngle = if child.Name == "Neck" then 70 else 45
-
-			att0.Parent = child.Part0
-			att1.Parent = child.Part1
-			bsc.Parent = child.Parent
-		end
-	end
-
-	npc.Humanoid.AutoRotate = false
-end
-
---[[
-	Cancel the ragdoll after ragdolled, I guess it can't be used on player
-]]
-function ServerUtil:GettingUpNPC(char: Model)
-	if char.Humanoid.Health == 0 then return end
-
-	local ragdollInstanceNames = {
-		["RagdollAttachment"] = true,
-		["RagdollConstraint"] = true,
-		["ColliderPart"] = true,
-	}
-	for _, child: Instance in char:GetDescendants() do
-		if ragdollInstanceNames[child.Name] then child:Destroy() end
-		if child:IsA("Motor6D") then child.Enabled = true end
-	end
-
-	char.Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-end
-
---[[
 	Reward the quest awards
 ]]
 function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Player)
@@ -683,33 +570,6 @@ function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
 	end
 
 	return spawnPoint
-end
-
-
---[[
-	Quickly sort all players, like UIListLayout
-]]
-function ServerUtil:SortPlayers(players: table, monster: Model, cage: Model)
-	for index, plr: Player in players do
-		pcall(function()
-			local char = plr.Character
-
-			char:PivotTo(cage["Player"..index].CFrame)
-			char.Humanoid.AutoRotate = false
-			char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.Parent.Position)
-		end)
-	end
-end
-
---[[
-	Quickly sort all monsters
-]]
-function ServerUtil:SortMonsters(monsters: table, cage: Model)
-	for index, monster: Model in monsters do
-		pcall(function()
-			monster:PivotTo(cage["Monster"..index].CFrame)
-		end)
-	end
 end
 
 return ServerUtil

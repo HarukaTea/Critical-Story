@@ -10,8 +10,10 @@ local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 
-local ITEM_ATTRIBUTES = { CD = 11, DURATION = 10, POWER = 2 }
+local floor = math.floor
+
+local ITEM_ATTRIBUTES = { RESTORE_BUFF = 0.3 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
-BuffEffectsUtil:SpeedBuff(char, ITEM_ATTRIBUTES.POWER, ITEM_ATTRIBUTES.DURATION)
+BuffEffectsUtil:RestoreMana(char, floor(char:GetAttribute("MaxMana") * ITEM_ATTRIBUTES.RESTORE_BUFF))

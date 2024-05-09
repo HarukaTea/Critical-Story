@@ -11,9 +11,11 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local char = script.Parent.Parent.Parent :: Model
 local color = script:GetAttribute("Color") :: Color3
 local text = script:GetAttribute("Text") :: string
+local duration = script:GetAttribute("Duration") :: number
 local power = script:GetAttribute("Power") :: number
 
 local floor = math.floor
+local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
@@ -21,12 +23,8 @@ local nowMagic = char:GetAttribute("Magic"):: number
 local theoryMagic = floor(nowMagic * power - nowMagic)
 HarukaLib:Add(char, "MagicBuff", theoryMagic)
 
-HarukaLib:Hydrate(script, {
-    ["Attr-Turn"] = function(newTurn: number)
-        if newTurn <= 0 then
-            HarukaLib:Add(char, "MagicBuff", -theoryMagic)
+wait(duration)
 
-            script:Destroy()
-        end
-    end
-})
+HarukaLib:Add(char, "MagicBuff", -theoryMagic)
+
+script:Destroy()

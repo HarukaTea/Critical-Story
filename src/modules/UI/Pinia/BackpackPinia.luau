@@ -5,6 +5,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signal = require(RepS.Modules.Packages.Signal)
 
 local peek = Fusion.peek
@@ -20,7 +21,7 @@ local function BackpackPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
-    self.emptyList = {}
+    self.Add, self.Empty = HarukaLib.Bin()
 
     self.inventory = plr:WaitForChild("Inventory", 999)
 
@@ -49,6 +50,10 @@ local function BackpackPinia(self: table)
             Text = Value("PIN"),
             Size = Value(fromScale(0.116, 1))
         },
+        Use = {
+            Visible = Value(false),
+            Text = Value("USE")
+        }
     }
 
     self.absStatSize = Value(0)
@@ -75,6 +80,7 @@ local function BackpackPinia(self: table)
 
         self.filterInfo.Equip.Visible:set(false)
         self.filterInfo.Pin.Visible:set(false)
+        self.filterInfo.Use.Visible:set(false)
     end
 end
 

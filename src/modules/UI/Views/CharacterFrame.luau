@@ -56,7 +56,7 @@ local function CharacterFrame(self: table): Frame
 	local plr, char = self.plr :: Player, self.char :: Model
 	local playerData, charData = self.playerData, self.charData
 
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
+	self.Add(HarukaLib:Hydrate(plr, {
 		["Attr-Levels"] = function(levels: number)
 			playerData.Levels:set(levels)
 		end,
@@ -75,11 +75,14 @@ local function CharacterFrame(self: table): Frame
 		["Attr-ShieldPoints"] = function(points: number)
 			playerData.Shield:set(points)
 		end,
+		["Attr-ManaPoints"] = function(points: number)
+			playerData.Mana:set(points)
+		end,
 		["Attr-Gold"] = function(gold: number)
 			playerData.Gold:set(gold)
 		end
-	})
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(char, {
+	}))
+	self.Add(HarukaLib:Hydrate(char, {
 		["Attr-MinDMG"] = function(dmg: number)
 			charData.MinDMG:set(dmg)
 		end,
@@ -91,13 +94,16 @@ local function CharacterFrame(self: table): Frame
 		end,
 		["Attr-MaxShield"] = function(shield: number)
 			charData.Shield:set(shield)
+		end,
+		["Attr-MaxMana"] = function(mana: number)
+			charData.Mana:set(mana)
 		end
-	})
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(char.Humanoid, {
+	}))
+	self.Add(HarukaLib:Hydrate(char.Humanoid, {
 		["Prop-MaxHealth"] = function(maxHP: number)
 			charData.Health:set(maxHP)
 		end
-	})
+	}))
 
 	local bgColor = Fusion.Value(scope, fromRGB(30, 30, 30))
 	local contentColor = Fusion.Value(scope, fromRGB(255, 255, 255))
@@ -132,12 +138,16 @@ local function CharacterFrame(self: table): Frame
 				Name = "Lines",
 
 				[Children] = {
-					LinePart(scope, fromScale(0.579, 0.532), "XY", fromRGB(255, 0, 0), "Down"),
-					LinePart(scope, fromScale(0.63, 0.613), "X", fromRGB(255, 0, 0), "Line"),
-					LinePart(scope, fromScale(0.42, 0.25), "XY", fromRGB(85, 255, 0), "Down"),
-					LinePart(scope, fromScale(0.355, 0.17), "X", fromRGB(85, 255, 0), "Line"),
+					LinePart(scope, fromScale(0.58, 0.698), "XY", fromRGB(255, 0, 0), "Down"),
+					LinePart(scope, fromScale(0.631, 0.779), "X", fromRGB(255, 0, 0), "Line"),
+					LinePart(scope, fromScale(0.531, 0.447), "XY", fromRGB(85, 255, 0), "Up"),
+					LinePart(scope, fromScale(0.58, 0.367), "X", fromRGB(85, 255, 0), "Line"),
+					LinePart(scope, fromScale(0.417, 0.813), "XY", fromRGB(255, 255, 0), "Up"),
+					LinePart(scope, fromScale(0.352, 0.892), "X", fromRGB(255, 255, 0), "Line"),
 					LinePart(scope, fromScale(0.369, 0.524), "XY", fromRGB(170, 170, 255), "Up"),
 					LinePart(scope, fromScale(0.305, 0.603), "X", fromRGB(170, 170, 255), "Line"),
+					LinePart(scope, fromScale(0.42, 0.25), "XY", fromRGB(0, 255, 255), "Down"),
+					LinePart(scope, fromScale(0.355, 0.17), "X", fromRGB(0, 255, 255), "Line"),
 					LinePart(scope, fromScale(0.507, 0.023), "XY", fromRGB(255, 85, 0), "Up"),
 					LinePart(scope, fromScale(0.556, -0.057), "X", fromRGB(255, 85, 0), "Line"),
 				},
@@ -147,8 +157,10 @@ local function CharacterFrame(self: table): Frame
 
 				[Children] = {
 					CharPointsBtn("DMG", "Right", self),
+					CharPointsBtn("Health", "Right", self),
+					CharPointsBtn("Shield", "Left", self),
+					CharPointsBtn("Mana", "Left", self),
 					CharPointsBtn("Magic", "Left", self),
-					CharPointsBtn("Health", "Left", self),
 				},
 			}),
 			Components.TextLabel(scope, {

@@ -23,18 +23,24 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 	local scope = self.scope
 	local COLORS = {
 		DMG = fromRGB(255, 0, 0),
-		Magic = fromRGB(170, 170, 255),
 		Health = fromRGB(85, 255, 0),
+		Mana = fromRGB(0, 255, 255),
+		Shield = fromRGB(255, 255, 0),
+		Magic = fromRGB(170, 170, 255),
 	}
 	local POS = {
-		DMG = fromScale(0.721, 0.566),
+		DMG = fromScale(0.721, 0.732),
+		Health = fromScale(0.669, 0.322),
+		Mana = fromScale(0.162, 0.125),
+		Shield = fromScale(0.162, 0.847),
 		Magic = fromScale(0.106, 0.556),
-		Health = fromScale(0.162, 0.125),
 	}
 	local POINTS = {
 		DMG = "DMGPoints",
-		Magic = "MagicPoints",
 		Health = "HealthPoints",
+		Mana = "ManaPoints",
+		Shield = "ShieldPoints",
+		Magic = "MagicPoints"
 	}
 	local bgColors = { Value(scope, fromRGB(30, 30, 30)), Value(scope, fromRGB(30, 30, 30)) }
 	local contentColors = { Value(scope, fromRGB(255, 255, 255)), Value(scope, fromRGB(255, 255, 255)) }

@@ -13,11 +13,11 @@ local fromScale = UDim2.fromScale
 local udNew = UDim.new
 local v2New = Vector2.new
 
-local function TurnBaseEffectList(id: string, info: table, self: table) : Frame
+local function MonsterEffectList(info: table, self: table) : Frame
     local scope = self.scope
 
     return Components.Frame(scope, {
-        Name = id.."EffectsList",
+        Name = "MonsterEffectsList",
         AnchorPoint = v2New(),
         Position = fromScale(0, -0.55),
         Size = fromScale(1, 0.5),
@@ -26,7 +26,7 @@ local function TurnBaseEffectList(id: string, info: table, self: table) : Frame
             Fusion.New(scope, "UIListLayout")({
                 Padding = udNew(0, 5),
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                HorizontalAlignment = if id == "Player" then Enum.HorizontalAlignment.Right else Enum.HorizontalAlignment.Left,
+                HorizontalAlignment = Enum.HorizontalAlignment.Left,
                 FillDirection = Enum.FillDirection.Horizontal
             }),
 
@@ -37,4 +37,4 @@ local function TurnBaseEffectList(id: string, info: table, self: table) : Frame
     })
 end
 
-return TurnBaseEffectList
+return MonsterEffectList

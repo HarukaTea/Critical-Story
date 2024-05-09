@@ -7,7 +7,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
@@ -16,13 +15,6 @@ local orbLifeTime = model:GetAttribute("OrbLifeTime")
 
 local wait = task.wait
 local nsNew = NumberSequence.new
-
---// Despawn
-HarukaLib.Clock(1, function()
-    orbLifeTime -= 1
-
-    if orbLifeTime <= 1 then model:SetAttribute("Despawn", true) end
-end)
 
 --// Main
 ServerUtil:WeldPart(model.Middle, model)
@@ -35,7 +27,7 @@ SuperTween.new(model.Middle.Beam1, AssetBook.TweenInfos.half, { Transparency = n
 SuperTween.new(model.Middle.Beam2, AssetBook.TweenInfos.half, { Transparency = nsNew(-1, 1) }):Play()
 SuperTween.new(model.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 
-repeat wait() until model:GetAttribute("Despawn")
+wait(orbLifeTime - 0.6)
 
 Debris:AddItem(model, 0.5)
 

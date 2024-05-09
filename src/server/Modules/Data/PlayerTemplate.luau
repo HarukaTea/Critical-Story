@@ -17,6 +17,7 @@ return {
 		LvPoints = 0,
 		DMGPoints = 0,
 		MagicPoints = 0,
+		ManaPoints = 0,
 		ShieldPoints = 0,
 		HealthPoints = 0,
 	},

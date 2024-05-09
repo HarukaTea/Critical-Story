@@ -18,8 +18,13 @@ return {
             Description = "The player who will be set"
         },
         function(context: table)
+            local classes = {}
+            for class: string, _ in AssetBook.ClassInfo do
+                classes[#classes + 1] = class
+            end
+
             return {
-                Type = context.Cmdr.Util.MakeEnumType("PlayerClassType", AssetBook.Classes),
+                Type = context.Cmdr.Util.MakeEnumType("GameClassesLib", classes),
                 Name = "class",
                 Description = "The class you wish to get"
             }

@@ -87,8 +87,6 @@ local function combatStartSetup(plr: Player, monster: Model)
 			if not mob:GetAttribute("InCombat") then ServerUtil:MonsterActivateCombat(mob) end
 		end
 	end
-
-	RepS.Resources.Unloads.TurnBaseRound:Clone().Parent = monster.CageHolder.Value
 end
 Events.CombatStart:Connect(combatStartSetup)
 
@@ -144,7 +142,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 			burn:Add("Burn", burnChance)
 			burn:Add("None", 100 - burnChance)
 
-			if burn:Roll() == "Burn" then BuffEffectsUtil:Burn(char, monster, 1, true) end
+			if burn:Roll() == "Burn" then BuffEffectsUtil:Burn(char, monster, 6) end
 
 			burn:Destroy()
 		end
@@ -186,9 +184,22 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 		dodge:Destroy()
 	end
 
+	--- some hit cd detections
+    HarukaLib:Add(char, "HitCD", 6)
+    if char:GetAttribute("HitCD") > 6 then char:SetAttribute("HitCD", 6) end
+
+    if not char:FindFirstChild("RepairShield") then
+        RepS.Resources.Unloads.RepairShield:Clone().Parent = char
+    end
+    if not char:FindFirstChild("HealHP") then
+        RepS.Resources.Unloads.HealHP:Clone().Parent = char
+    end
+    char:SetAttribute("Repairing", false)
+    char:SetAttribute("Healing", false)
+
     --- some extra damage
-    if dmgPart:GetAttribute("Burn") then BuffEffectsUtil:Burn(char, monster, 1, true) end
-    if dmgPart:GetAttribute("Poison") then BuffEffectsUtil:Poison(char, monster, 1, true) end
+    if dmgPart:GetAttribute("Burn") then BuffEffectsUtil:Burn(char, monster, 6, true) end
+    if dmgPart:GetAttribute("Poison") then BuffEffectsUtil:Poison(char, monster, 6, true) end
 
     --- defense reduce
     dmg = floor(dmg * (100 - char:GetAttribute("Defense")) / 100)
@@ -226,14 +237,3 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 	ServerUtil:ShowNumber(char, dmg)
 end
 Events.CharTakeDMG:Connect(charTakeDMG)
-
---[[
-	Player request to do next action
-]]
-local function nextActionRequest(plr: Player, action: string, extra: string?)
-	if plr:GetAttribute("NextAction") ~= "" then return end
-	if action == "Items" then plr:SetAttribute("NextItem", extra) end
-
-	plr:SetAttribute("NextAction", action)
-end
-Events.NextActionRequest:Connect(nextActionRequest)

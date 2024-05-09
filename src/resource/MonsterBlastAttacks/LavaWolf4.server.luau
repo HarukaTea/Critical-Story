@@ -2,7 +2,7 @@
 --!optimize 2
 --!native
 
-local model = script.Parent
+local model = script.Parent :: Model
 
 local wait = task.wait
 

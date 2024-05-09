@@ -22,7 +22,7 @@ local fromRGB = Color3.fromRGB
 local floor = math.floor
 local one = Vector3.one
 
-local ITEM_ATTRIBUTES = { TP_REQ = 50, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
@@ -50,7 +50,7 @@ while wait(0.01) do
 		if (fireBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			BuffEffectsUtil:Burn(char, monster, 1)
+			BuffEffectsUtil:Burn(char, monster, 6)
 			BuffEffectsUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 

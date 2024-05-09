@@ -135,15 +135,6 @@ function HarukaLib:Hydrate(obj: Instance, props: table)
 				func(obj:GetAttribute(attr))
 			end))
 
-		elseif prop == "ChildAdded" then
-			Add(obj.ChildAdded:Connect(func))
-
-		elseif prop == "ChildRemoved" then
-			Add(obj.ChildRemoved:Connect(func))
-
-		elseif prop == "Touched" then
-			Add(obj.Touched:Connect(func))
-
 		elseif sFind(prop, "Prop") then
 			local _, endPos = sFind(prop, "Prop")
 			local propName = sub(prop, endPos + 2)

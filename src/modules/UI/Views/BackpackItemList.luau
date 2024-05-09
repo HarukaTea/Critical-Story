@@ -20,7 +20,7 @@ local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local function BackpackItemList(self: table) : ScrollingFrame
     local scope = self.scope
 
-    self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(workspace.CurrentCamera, {
+    self.Add(HarukaLib:Hydrate(workspace.CurrentCamera, {
         ["Prop-ViewportSize"] = function(newSize: Vector2)
             self.absSize:set({
 				newSize.X * 0.71,
@@ -29,7 +29,7 @@ local function BackpackItemList(self: table) : ScrollingFrame
 			self.absCellPadding:set({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
 			self.absCellSize:set(peek(self.absSize)[1] / 15.58)
         end
-    })
+    }))
 
     return Components.ScrollingFrame(scope, {
         Name = "Items",

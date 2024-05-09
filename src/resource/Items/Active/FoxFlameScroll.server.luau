@@ -21,7 +21,7 @@ local cfLookAt = CFrame.lookAt
 local fromRGB = Color3.fromRGB
 local v3New = Vector3.new
 
-local ITEM_ATTRIBUTES = { TP_REQ = 40, COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
@@ -49,7 +49,7 @@ while wait() do
 		if (fireBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			BuffEffectsUtil:Burn(char, monster, 2)
+			BuffEffectsUtil:Burn(char, monster, 12)
 			BuffEffectsUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 

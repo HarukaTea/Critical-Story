@@ -25,10 +25,11 @@ local COLORS = {
 	Active = fromRGB(167, 111, 83),
 	Others = fromRGB(0, 130, 139),
 
-	Equip = fromRGB(85, 85, 85),
+	Equip = fromRGB(131, 131, 65),
+	Use = fromRGB(103, 154, 154),
 	Pin = fromRGB(93, 47, 140),
 }
-local BLACKLIST = { "Equip", "Pin" }
+local BLACKLIST = { "Equip", "Pin", "Use" }
 
 local function _checkSlot(self: table, type: string) : string
 	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
@@ -57,9 +58,7 @@ end
 local function _findItem(itemFrame: Frame) : string
 	local item: string?
 	for _, child: ImageButton in itemFrame:GetChildren() do
-		if child:IsA("ImageButton") and child:GetAttribute("Selected") then
-			item = child.Name
-		end
+		if child:IsA("ImageButton") and child:GetAttribute("Selected") then item = child.Name end
 	end
 	if not item then return "None" end
 
@@ -80,7 +79,11 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Visible) else true
 		end),
 		Size = Computed(scope, function(use)
-			return if tFind(BLACKLIST, id) then if id == "Equip" then fromScale(0.116, 1) else use(self.filterInfo.Pin.Size) else fromScale(0.12, 1)
+			if tFind(BLACKLIST, id) then
+				return if id == "Pin" then use(self.filterInfo.Pin.Size) else fromScale(0.116, 1)
+			else
+				return fromScale(0.12, 1)
+			end
 		end),
 
 		[Fusion.Children] = {
@@ -100,15 +103,12 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 			if id == "Equip" then
 				local item = _findItem(peek(self.itemFrame))
+
+				if item == "None" then return end
+
 				local itemInfo = ItemBook:FindItem(item)
 				local itemType = itemInfo.Type :: string
-				if item == "None" or not itemType then return end
-
-				--- actives
-				if itemType == "Active" and not itemInfo.IsSkill then
-					Events.UseItem:Fire(item)
-					return
-				end
+				if not itemType then return end
 
 				--- equip
 				local slot = _checkSlot(self, itemType)
@@ -120,6 +120,21 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 				elseif checkSame == "Exist" then
 					Events.EquipItems:Fire("Clear" .. itemType, sameSlot, item)
+				end
+
+			elseif id == "Use" then
+				local item = _findItem(peek(self.itemFrame))
+
+				if item == "None" then return end
+
+				local itemInfo = ItemBook:FindItem(item)
+				local itemType = itemInfo.Type :: string
+				if not itemType then return end
+
+				--- actives
+				if itemType == "Active" and not itemInfo.IsSkill then
+					Events.UseItem:Fire(item)
+					return
 				end
 
 			elseif id == "Pin" then

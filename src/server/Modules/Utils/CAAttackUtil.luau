@@ -87,7 +87,7 @@ function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 		CAAttackUtil:DealDMG(plr, monster, baseDamage)
 	end
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
@@ -98,7 +98,7 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
     arrow:PivotTo(ServerUtil:GenerateOrbPos(monster))
     arrow:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
     arrow.Parent = workspace.MapComponents.OrbFolders[plr.Name]
-    Debris:AddItem(arrow, arrow:GetAttribute("OrbLifeTime"))
+    Debris:AddItem(arrow, char:GetAttribute("OrbLifeTime"))
 
     if char:GetAttribute("Stack") > 0 then
         --- bow dmg
@@ -117,7 +117,7 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
     end
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 function CAAttackUtil.ArcherArrow(plr: Player)
     local char = plr.Character
@@ -140,7 +140,7 @@ function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
         CAAttackUtil:DealDMG(plr, monster, floor(baseDamage * 3))
     end
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
@@ -151,7 +151,7 @@ function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
 
     if char:GetAttribute("Guard") > 100 then char:SetAttribute("Guard", 100) end
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
@@ -167,10 +167,12 @@ function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
 
     if result == "CriticalHit" then char:SetAttribute("RogueCri", 0) end
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
+    local char = plr.Character
+
     if not orb:GetAttribute("RepeaterSpawned") then
         local pos = ServerUtil:GenerateOrbPos(monster)
         local repeaterOrb = RepS.Package.PlayerAttacks.RepeaterOrb:Clone() :: Model
@@ -178,9 +180,9 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         repeaterOrb.Owner.Value = plr.Character
         repeaterOrb:PivotTo(pos)
         repeaterOrb:SetAttribute("RepeaterSpawned", true)
-        repeaterOrb:SetAttribute("OrbLifeTime", plr.Character:GetAttribute("OrbLifeTime"))
+        repeaterOrb:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
         repeaterOrb.Parent = workspace.MapComponents.OrbFolders[plr.Name]
-        Debris:AddItem(repeaterOrb, repeaterOrb:GetAttribute("OrbLifeTime"))
+        Debris:AddItem(repeaterOrb, char:GetAttribute("OrbLifeTime"))
 
         local laser = instanceNew("Part")
         laser.Material = Enum.Material.Neon
@@ -198,14 +200,13 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
     end
 
-    print("Processing")
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 
     Spawn(function()
         local char = plr.Character
@@ -264,27 +265,27 @@ end
 function CAAttackUtil.AlchemistRed(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 function CAAttackUtil.AlchemistBlue(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 function CAAttackUtil.AlchemistGreen(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: number)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    BuffEffectsUtil:RestoreTPByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.FireStaff(plr: Player, monster: Model)
-    BuffEffectsUtil:Burn(plr.Character, monster, 1)
+    BuffEffectsUtil:Burn(plr.Character, monster, 6)
 end
 
 return CAAttackUtil

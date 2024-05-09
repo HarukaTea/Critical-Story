@@ -11,10 +11,12 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local char = script.Parent.Parent :: Model
 local color = script:GetAttribute("Color") :: Color3
 local dmg = script:GetAttribute("Damage") :: number
+local duration = script:GetAttribute("Duration") :: number
 local text = script:GetAttribute("Text") :: string
 
 local instanceNew = Instance.new
 local csNew = ColorSequence.new
+local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
@@ -27,21 +29,14 @@ local particle = RepS.Package.Effects.BurnEffect:Clone() :: ParticleEmitter
 particle.Color = csNew(color)
 particle.Parent = char.PrimaryPart
 
-local firstDMG = true
-HarukaLib:Hydrate(script, {
-    ["Attr-Turn"] = function(newTurn: number)
-        if newTurn >= 0 then
-            if firstDMG then firstDMG = false return end
+for _ = duration, 0, -1 do
+    HarukaLib:Add(char, "Health", -dmg)
 
-            HarukaLib:Add(char, "Health", -dmg)
-            ServerUtil:ShowNumber(char, dmg, color)
+    ServerUtil:ShowNumber(char, dmg, color)
+    wait(1)
+end
 
-            if newTurn == 0 then HarukaLib:Add(script, "Turn", -1) end
-        else
-            light:Destroy()
-            particle:Destroy()
+light:Destroy()
+particle:Destroy()
 
-            script:Destroy()
-        end
-    end
-})
+script:Destroy()

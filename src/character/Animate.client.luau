@@ -32,10 +32,10 @@ local animNames = {
 		{ id = "rbxassetid://12405336225", weight = 10 }
 	},
 	walk = {
-		{ id = "rbxassetid://12405387090", weight = 10 },
+		{ id = "rbxassetid://12256026550", weight = 10 },
 	},
 	run = {
-		{ id = "rbxassetid://12405387090", weight = 10 },
+		{ id = "rbxassetid://12256026550", weight = 10 },
 	},
 	jump = {
 		{ id = "rbxassetid://7119107413", weight = 10 },
@@ -44,7 +44,7 @@ local animNames = {
 		{ id = "rbxassetid://7119109919", weight = 10 },
 	},
 	climb = {
-		{ id = "http://www.roblox.com/asset/?id=180436334", weight = 10 },
+		{ id = "rbxassetid://17431070946", weight = 10 },
 	},
 	sit = {
 		{ id = "rbxassetid://12256035150", weight = 10 },

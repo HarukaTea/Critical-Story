@@ -4,7 +4,7 @@
 
 return {
     Name = "giverep",
-    Aliases = {"rep"},
+    Aliases = { "rp" },
     Description = "Add the reputation to which you given.",
     Group = "Testers",
     Args = {

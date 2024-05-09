@@ -26,7 +26,7 @@ local function orbSpawnHandler(state: boolean)
         orb:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
         orb.Parent = orbFolders[char.Name]
 
-        Debris:AddItem(orb, orb:GetAttribute("OrbLifeTime"))
+        Debris:AddItem(orb, char:GetAttribute("OrbLifeTime"))
     end
     local function _spawnOrb(isSpawned: boolean?)
         local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
@@ -53,10 +53,10 @@ local function orbSpawnHandler(state: boolean)
     end
 
     if state then
-        local spawnTime = char:GetAttribute("OrbSpawnTime") :: number
+        local spawnTime = char:GetAttribute("OrbSpawnTime")
 
 		stopSpawn = HarukaLib.Clock(spawnTime, function()
-			if char:GetAttribute("OrbAttackingTime") and char:GetAttribute("InCombat") then _spawnOrb() end
+			if char:GetAttribute("InCombat") then _spawnOrb() end
 		end)
 	else
 		if stopSpawn then stopSpawn() end
@@ -65,7 +65,7 @@ local function orbSpawnHandler(state: boolean)
 	end
 end
 local Empty = HarukaLib:Hydrate(char, {
-    ["Attr-OrbAttackingTime"] = orbSpawnHandler
+    ["Attr-InCombat"] = orbSpawnHandler
 })
 
 local function onDead()

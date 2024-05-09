@@ -10,7 +10,7 @@ local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 
-local ITEM_ATTRIBUTES = { CD = 1, HEAL_BUFF = 0.3 }
+local ITEM_ATTRIBUTES = { HEAL_BUFF = 0.3 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

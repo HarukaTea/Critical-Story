@@ -26,11 +26,11 @@ end
 --[[
 	Arrow players to restore mana by orbs, magic-class only
 ]]
-function BuffEffectsUtil:RestoreTPByOrb(char: Model)
-	local currentTP = char:GetAttribute("TP") :: number
-	if currentTP >= 100 then return end
+function BuffEffectsUtil:RestoreManaByOrb(char: Model)
+	local currentTP = char:GetAttribute("Mana") :: number
+	if currentTP >= char:GetAttribute("MaxMana") then return end
 
-	HarukaLib:Add(char, "TP", ceil(100 * (char:GetAttribute("RestoreBuff") / 100)))
+	HarukaLib:Add(char, "Mana", ceil(100 * (char:GetAttribute("RestoreBuff") / 100)))
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
@@ -40,8 +40,8 @@ end
 --[[
 	Restore mana, by script lol
 ]]
-function BuffEffectsUtil:RestoreTP(char: Model, restoreVal: number)
-	HarukaLib:Add(char, "TP", restoreVal)
+function BuffEffectsUtil:RestoreMana(char: Model, restoreVal: number)
+	HarukaLib:Add(char, "Mana", restoreVal)
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
@@ -78,20 +78,21 @@ end
 --[[
 	Burn dmg, also can be used for players, related to Magic
 ]]
-function BuffEffectsUtil:Burn(char: Model, monster: Model, turn: number, isPlayer: boolean?)
+function BuffEffectsUtil:Burn(char: Model, monster: Model, duration: number, isPlayer: boolean?)
 	if char.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
 	local debuff: Script
 	if isPlayer then
 		debuff = RepS.Resources.Unloads.DOTDMGPlayer:Clone()
-		debuff:SetAttribute("Power", 0.5)
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
 		debuff = RepS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 2))
 	end
-	debuff:SetAttribute("Turn", turn)
+	debuff:SetAttribute("Power", 0.5)
+	debuff:SetAttribute("Duration", duration)
+	debuff:SetAttribute("MaxDuration", duration)
 	debuff:SetAttribute("Color", fromRGB(255, 85, 0))
 	debuff:SetAttribute("Text", "BURN!")
 	debuff.Name = "Burn"
@@ -101,20 +102,21 @@ end
 --[[
 	Poison dmg, which is related to DMG
 ]]
-function BuffEffectsUtil:Poison(char: Model, monster: Model, turn: number, isPlayer: boolean?)
+function BuffEffectsUtil:Poison(char: Model, monster: Model, duration: number, isPlayer: boolean?)
 	if char.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
 	local debuff: Script
 	if isPlayer then
 		debuff = RepS.Resources.Unloads.DOTDMGPlayer:Clone()
-		debuff:SetAttribute("Power", 0.5)
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
 		debuff = RepS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 2))
 	end
-	debuff:SetAttribute("Turn", turn)
+	debuff:SetAttribute("Power", 0.5)
+	debuff:SetAttribute("Duration", duration)
+	debuff:SetAttribute("MaxDuration", duration)
 	debuff:SetAttribute("Color", fromRGB(55, 66, 250))
 	debuff:SetAttribute("Text", "POISON!")
 	debuff.Name = "Poison"
@@ -124,7 +126,7 @@ end
 --[[
 	Give player attack buff, also can be used for monsters
 ]]
-function BuffEffectsUtil:AttackBuff(char: Model, attackPower: number, turn: number, isMob: boolean?)
+function BuffEffectsUtil:AttackBuff(char: Model, attackPower: number, duration: number, isMob: boolean?)
 	if isMob then
 		if not char:FindFirstChild("EffectsList") then return end
 	else
@@ -137,7 +139,8 @@ function BuffEffectsUtil:AttackBuff(char: Model, attackPower: number, turn: numb
 	else
 		buff = RepS.Resources.Unloads.AttackBuff:Clone()
 	end
-	buff:SetAttribute("Turn", turn)
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("MaxDuration", duration)
 	buff:SetAttribute("Power", attackPower)
 	buff:SetAttribute("Color", fromRGB(255, 255, 0))
 	buff:SetAttribute("Text", "ATTACK UP!")
@@ -150,11 +153,12 @@ end
 --[[
 	Give player magic buff, can't be used for monsters
 ]]
-function BuffEffectsUtil:MagicBuff(char: Model, power: number, turn: number)
+function BuffEffectsUtil:MagicBuff(char: Model, power: number, duration: number)
 	if char.Humanoid.Health <= 0 then return end
 
 	local buff = RepS.Resources.Unloads.MagicBuff:Clone() :: Script
-	buff:SetAttribute("Turn", turn)
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("MaxDuration", duration)
 	buff:SetAttribute("Power", power)
 	buff:SetAttribute("Color", fromRGB(162, 0, 255))
 	buff:SetAttribute("Text", "MAGIC UP!")
@@ -169,7 +173,8 @@ end
 function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: number)
 	local buff = RepS.Resources.Unloads.SpeedBuff:Clone() :: Script
 
-	buff:SetAttribute("Turn", duration)
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("MaxDuration", duration)
 	buff:SetAttribute("Power", exSpeed)
 	buff:SetAttribute("Color", fromRGB(255, 255, 0))
 	buff:SetAttribute("Text", "SPEED UP!")
@@ -185,10 +190,11 @@ end
 --[[
 	Give player defense buff, it's real defense
 ]]
-function BuffEffectsUtil:DefenseBuff(char: Model, def: number, turn: number)
+function BuffEffectsUtil:DefenseBuff(char: Model, def: number, duration: number)
 	local buff = RepS.Resources.Unloads.DefenseBuff:Clone() :: Script
 
-	buff:SetAttribute("Turn", turn)
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("MaxDuration", duration)
 	buff:SetAttribute("Power", def)
 	buff:SetAttribute("Color", fromRGB(128, 128, 128))
 	buff:SetAttribute("Text", "DEFENSE UP!")
@@ -202,7 +208,7 @@ end
 ]]
 function BuffEffectsUtil:PurifyBuff(char: Model)
 	for _, buff: Script in char.CharStats.EffectsList:GetChildren() do
-		if AssetBook.BuffInfo[buff.Name].Type == "Debuff" then buff:SetAttribute("Turn", -1) end
+		if AssetBook.BuffInfo[buff.Name].Type == "Debuff" then buff:Destroy() end
 	end
 end
 

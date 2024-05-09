@@ -20,7 +20,7 @@ local function SettingsFrame(self: table): Frame
 	local potatoStoreParts = {}
 	local playerSettings = self.playerSettings :: table
 
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.plr, {
+	self.Add(HarukaLib:Hydrate(self.plr, {
 		["Attr-CombatMode"] = function(newMode: string)
 			playerSettings.PublicCombat:set(if newMode == "Public" then true else false)
 		end,
@@ -69,7 +69,7 @@ local function SettingsFrame(self: table): Frame
 
 			Signals.EnableMapDetails:Fire(if state then "Enable" else "Disable")
 		end
-	})
+	}))
 
 	return Components.Frame(scope, {
 		Name = "Settings",

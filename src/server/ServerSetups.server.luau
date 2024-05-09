@@ -74,7 +74,7 @@ local function mainSetup()
 		if sound.Name == "SFXs" then
 			for _, sfx in sound:GetChildren() do sfx.SoundGroup = SoundService.SFXs end
 		else
-			sound.SoundGroup = SoundService.Musics
+			if sound:IsA("Sound") then sound.SoundGroup = SoundService.Musics end
 		end
 	end
 	package.Sounds.Parent = workspace
@@ -110,10 +110,6 @@ local function mainSetup()
 		local attackHolder = instanceNew("ObjectValue")
 		attackHolder.Name = "AttackHolder"
 		attackHolder.Parent = child
-
-		local cageHolder = instanceNew("ObjectValue")
-		cageHolder.Name = "CageHolder"
-		cageHolder.Parent = child
 
 		resources.Unloads.MonsterData:Clone().Parent = child
 	end

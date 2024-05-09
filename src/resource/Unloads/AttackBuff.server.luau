@@ -11,9 +11,11 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local char = script.Parent.Parent.Parent :: Model
 local color = script:GetAttribute("Color") :: Color3
 local text = script:GetAttribute("Text") :: string
+local duration = script:GetAttribute("Duration") :: number
 local power = script:GetAttribute("Power") :: number
 
 local floor = math.floor
+local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
@@ -22,13 +24,9 @@ local theoryMinDMG, theoryMaxDMG = floor(nowMinDMG * power - nowMinDMG), floor(n
 HarukaLib:Add(char, "MinDMGBuff", theoryMinDMG)
 HarukaLib:Add(char, "MaxDMGBuff", theoryMaxDMG)
 
-HarukaLib:Hydrate(script, {
-    ["Attr-Turn"] = function(newTurn: number)
-        if newTurn <= 0 then
-            HarukaLib:Add(char, "MinDMGBuff", -theoryMinDMG)
-            HarukaLib:Add(char, "MaxDMGBuff", -theoryMaxDMG)
+wait(duration)
 
-            script:Destroy()
-        end
-    end
-})
+HarukaLib:Add(char, "MinDMGBuff", -theoryMinDMG)
+HarukaLib:Add(char, "MaxDMGBuff", -theoryMaxDMG)
+
+script:Destroy()

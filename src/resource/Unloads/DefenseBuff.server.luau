@@ -11,18 +11,17 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local char = script.Parent.Parent.Parent :: Model
 local color = script:GetAttribute("Color") :: Color3
 local text = script:GetAttribute("Text") :: string
+local duration = script:GetAttribute("Duration") :: number
 local power = script:GetAttribute("Power") :: number
+
+local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
 HarukaLib:Add(char, "Defense", power)
 
-HarukaLib:Hydrate(script, {
-    ["Attr-Turn"] = function(newTurn: number)
-        if newTurn <= 0 then
-            HarukaLib:Add(char, "Defense", -power)
+wait(duration)
 
-            script:Destroy()
-        end
-    end
-})
+HarukaLib:Add(char, "Defense", -power)
+
+script:Destroy()

@@ -65,7 +65,7 @@ local function StatText(id: string, self: table) : TextLabel
     local char = self.char :: Model
     local charDMGStats = self.charDMGStats
 
-    self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(char, {
+    self.Add(HarukaLib:Hydrate(char, {
         ["Attr-MinDMG"] = function(newDMG: number)
             charDMGStats.MinDMG:set(newDMG)
         end,
@@ -75,7 +75,7 @@ local function StatText(id: string, self: table) : TextLabel
         ["Attr-Magic"] = function(newMagic: number)
             charDMGStats.Magic:set(newMagic)
         end
-    })
+    }))
 
     return Components.TextLabel(scope, {
         Name = id.."Text",

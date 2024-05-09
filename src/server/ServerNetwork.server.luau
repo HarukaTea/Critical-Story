@@ -108,7 +108,7 @@ PPS.PromptTriggered:Connect(promptsHandler)
 --[[
 	Player finally reach the requirement and level up!
 ]]
-local LEVEL_CAP = 125
+local LEVEL_CAP = 150
 local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
 	return if exp >= floor(level ^ 1.85) + 60 and level < LEVEL_CAP then true else false
@@ -169,6 +169,7 @@ local function addPoint(plr: Player, option: string, times: number)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
 		plr:SetAttribute("ShieldPoints", 0)
+		plr:SetAttribute("ManaPoints", 0)
 		plr:SetAttribute("LvPoints", level * LEVEL_POINT)
 		return
 	end
@@ -217,10 +218,20 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 
 		Events.EquipItems:Fire(plr, itemSlot, item)
 
+	elseif itemType == "Active" then
+		equipNewItem(plr, item, itemSlot)
+
+		Events.EquipItems:Fire(plr, itemSlot, item)
+
 	elseif itemType == "ClearPassive" and item ~= "" then
 		char.CharStats.Items:SetAttribute(item.."_PASSIVE", false)
 		PassiveUtil:ClearAllPassives(char)
 
+		unequipCheck(plr, item)
+
+		Events.EquipItems:Fire(plr, itemSlot, "Null")
+
+	elseif itemType == "ClearActive" and item ~= "" then
 		unequipCheck(plr, item)
 
 		Events.EquipItems:Fire(plr, itemSlot, "Null")

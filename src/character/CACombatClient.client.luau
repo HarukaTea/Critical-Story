@@ -30,12 +30,12 @@ local wait = task.wait
 local newInstance = Instance.new
 local v3New = Vector3.new
 local tFind, remove = table.find, table.remove
+local cfNew = CFrame.new
 
 --// Pre-functions
 local function setup()
 	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do folder:Destroy() end
 	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
-	for _, folder: Folder in mapComponents.CageFolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
 	local monsters = {} :: { Model }
@@ -79,9 +79,21 @@ end
 --// Connections
 local function startCombat(monster: Model)
 	if not monster then return end
+	if not monster.Parent then return end
 	if not monster.PrimaryPart then return end
 
+	local locator: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+
+	if isInCombat then return end
 	isInCombat = true
+
+	--- border
+	if (char.PrimaryPart.Position - locator.Position).Magnitude >= 32 then
+		char:PivotTo(cfNew(locator.Position + v3New(0, 5.99, 0)))
+	end
+	local border = RepS.Package.Unloads.CombatBorder:Clone() :: Model
+	border:PivotTo(cfNew(locator.Position))
+	border.Parent = char
 
 	--- sound actions
 	musics.Overworld:Stop()
@@ -93,7 +105,7 @@ local function startCombat(monster: Model)
 		wait(0.39)
 		sfxs.EnterCombat2:Play()
 	end)
-	musics.Combat:Play()
+	musics[locator:GetAttribute("Music")]:Play()
 end
 local function endCombat()
 	if not isInCombat then return end
@@ -101,9 +113,6 @@ local function endCombat()
 
 	isInCombat = false
 	humanoid.AutoRotate = true
-
-	ClientUtil:FreezePlayerControls("Unfreeze")
-	Signals.CameraPointTo:Fire("Reset")
 
 	--- sound actions
 	for _, sound: Sound in workspace.Sounds:GetChildren() do
@@ -213,12 +222,6 @@ local function orbFolderHandler(folder: Folder)
 
 	if folder.Name ~= char.Name then folder:Destroy() end
 end
-local function cageHolderHandler(cage: Model)
-	local owner = cage:WaitForChild("Owner")
-	repeat wait() until owner.Value
-
-	_destroyInCombat(owner.Value, cage)
-end
 
 --// Connection setups
 local Empty = HarukaLib:Hydrate(char, {
@@ -234,7 +237,6 @@ local Empty = HarukaLib:Hydrate(char, {
 humanoid.Touched:Connect(onTouched)
 CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler)
 CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler)
-CS:GetInstanceAddedSignal("TurnBaseCage"):Connect(cageHolderHandler)
 
 --// Setup
 local stopDetecting = setup()

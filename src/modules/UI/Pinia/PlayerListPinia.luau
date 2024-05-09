@@ -5,6 +5,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local fromScale = UDim2.fromScale
 
@@ -14,8 +15,8 @@ local function PlayerListPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
-    self.emptyList = {}
-    
+    self.Add, self.Empty = HarukaLib.Bin()
+
     self.list = Value()
 
 	self.absSize, self.absContentSize = Value(90), Value(30)

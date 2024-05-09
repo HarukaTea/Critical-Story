@@ -19,12 +19,17 @@ local fromRGB = Color3.fromRGB
 local format, match = string.format, string.match
 
 local function PlayerSlot(self: table, player: Player, scope: table): Frame
-	local class = Fusion.Value(scope, player:GetAttribute("Class"))
-	local role = player:GetAttribute("Role")
+	local class = Fusion.Value(scope, player:GetAttribute("Class") or "Warrior") --// This often errors lol
+	local role = Fusion.Value(scope, player:GetAttribute("Role"))
 
 	scope[#scope + 1] = HarukaLib:Hydrate(player, {
 		["Attr-Class"] = function(newClass: string)
 			class:set(newClass)
+		end,
+		["Attr-Role"] = function(newRole: string)
+			if newRole ~= "" or newRole == nil then return end
+
+			role:set(newRole)
 		end
 	})
 
@@ -55,7 +60,10 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 				Size = fromScale(0.721, 1),
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Text = player.DisplayName,
-				TextColor3 = if role then fromRGB(170, 255, 255) else color3New(1, 1, 1),
+
+				TextColor3 = Fusion.Computed(scope, function(use)
+					return if use(role) then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+				end),
 
 				[Children] = {
 					New(scope, "UIPadding")({
@@ -101,6 +109,11 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 
 						if itemInfo.Type == "Passive" and item:GetAttribute("Equipped") then
 							local index = tonumber(match(item:GetAttribute("Slot"), "%d"))
+
+							self.playerItemIconList[index]:set(item.Name, true)
+
+						elseif itemInfo.Type == "Active" and item:GetAttribute("Equipped") then
+							local index = tonumber(match(item:GetAttribute("Slot"), "%d")) + 3
 
 							self.playerItemIconList[index]:set(item.Name, true)
 						end

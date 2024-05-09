@@ -4,7 +4,7 @@
 
 return {
     Name = "givegold",
-    Aliases = {"gold"},
+    Aliases = { "gold" },
     Description = "Give the gold to which you given.",
     Group = "Testers",
     Args = {

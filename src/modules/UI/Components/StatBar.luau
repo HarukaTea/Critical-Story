@@ -19,22 +19,32 @@ local clamp = math.clamp
 
 local function StatBar(id: string, self: table): Frame
 	local scope = self.scope
+	local names = { HP = "HEALTH", MP = "MANA", DEF = "SHIELD" }
 	local colors = {
 		HP = fromRGB(48, 121, 36),
 		HPMid = fromRGB(148, 148, 0),
 		HPLow = fromRGB(203, 0, 0),
+		MP = fromRGB(73, 67, 167),
+		DEF = fromRGB(167, 115, 56),
+		DEFRepairing = fromRGB(72, 166, 176),
 	}
 	local isSelecting = Fusion.Value(scope, false)
 
-	local charStatsDict = self.charStatsDict
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.humanoid, {
-		["Prop-Health"] = function(health: number)
-			charStatsDict.HP[1]:set(health)
-		end,
-		["Prop-MaxHealth"] = function(health: number)
-			charStatsDict.HP[2]:set(health)
-		end
-	})
+	local children: TextLabel
+	if id == "DEF" then
+		children = Components.TextLabel(scope, {
+			Name = "Level",
+			AnchorPoint = v2New(0.5, 0),
+			Position = fromScale(-0.52, 0),
+			Size = fromScale(0.94, 1),
+			TextXAlignment = Enum.TextXAlignment.Right,
+			TextTransparency = 0.4,
+
+			Text = Computed(scope, function(use)
+				return "Lv." .. use(self.playerData.Levels)
+			end),
+		})
+	end
 
 	local function exCategoryOpened()
 		isSelecting:set(false)
@@ -44,7 +54,7 @@ local function StatBar(id: string, self: table): Frame
 	return Fusion.New(scope, "Frame")({
 		Name = id,
 		AnchorPoint = v2New(0.5, 0),
-		Size = fromScale(0.25, 0.875),
+		Size = if id == "HP" then fromScale(0.215, 0.875) else fromScale(0.185, 0.875),
 		BackgroundColor3 = color3New(),
 
 		[Fusion.Children] = {
@@ -59,23 +69,35 @@ local function StatBar(id: string, self: table): Frame
 			}),
 			Fusion.New(scope, "Frame")({
 				Name = "Bar",
-				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
-					local HP, maxHP = use(self.charStatsDict[id][1]) :: number, use(self.charStatsDict[id][2]) :: number
-
-					if HP / maxHP <= 0.66 and HP / maxHP > 0.33 then
-						return colors.HPMid
-					elseif HP / maxHP <= 0.33 then
-						return colors.HPLow
-					else
-						return colors.HP
-					end
-				end), AssetBook.TweenInfos.onceHalf),
 				ZIndex = 0,
+
 				Size = Tween(scope, Computed(scope, function(use)
 					local x = clamp(use(self.charStatsDict[id][1]) / use(self.charStatsDict[id][2]), 0, 1)
 
 					return fromScale(x, 1)
 				end), AssetBook.TweenInfos.halfBack),
+
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
+					if id == "HP" then
+						if use(self.charStatsDict.HPHealing) then
+							return colors.DEFRepairing
+						end
+
+						local HP, maxHP = use(self.charStatsDict[id][1]) :: number, use(self.charStatsDict[id][2]) :: number
+
+						if HP / maxHP <= 0.66 and HP / maxHP > 0.33 then
+							return colors.HPMid
+						elseif HP / maxHP <= 0.33 then
+							return colors.HPLow
+						else
+							return colors.HP
+						end
+					elseif id == "DEF" then
+						return if use(self.charStatsDict.DEFRepairing) then colors.DEFRepairing else colors.DEF
+					else
+						return colors[id]
+					end
+				end), AssetBook.TweenInfos.onceHalf),
 
 				[Fusion.Children] = { Components.RoundUICorner(scope) },
 			}),
@@ -108,20 +130,10 @@ local function StatBar(id: string, self: table): Frame
 				Size = fromScale(0.94, 1),
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextStrokeTransparency = 0.7,
-				Text = "HEALTH",
+				Text = names[id],
 			}),
-			Components.TextLabel(scope, {
-				Name = "Level",
-				AnchorPoint = v2New(0.5, 0),
-				Position = fromScale(-0.52, 0),
-				Size = fromScale(0.94, 1),
-				TextXAlignment = Enum.TextXAlignment.Right,
-				TextTransparency = 0.4,
 
-				Text = Computed(scope, function(use)
-					return "Lv." .. use(self.playerData.Levels)
-				end),
-			})
+			children
 		},
 	})
 end

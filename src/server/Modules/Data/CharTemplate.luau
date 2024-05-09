@@ -7,16 +7,19 @@ return {
     MinDMG = 0,
     MaxDMG = 0,
     Magic = 0,
-    TP = 0,
+    Mana = 0,
+    MaxMana = 1,
     Shield = 0,
     MaxShield = 1,
     Defense = 0,
-    OrbSpawnTime = 6,
-    OrbLifeTime = 15,
 
     --- States
     InCombat = false,
-    OrbAttackingTime = false,
+    OrbSpawnTime = 3,
+    OrbLifeTime = 10,
+    HitCD = 0,
+    DEFRepairing = false,
+    HPHealing = false,
 
     --- Buffes
     HealthBuff = 0,
@@ -24,11 +27,11 @@ return {
     MinDMGBuff = 0,
     MaxDMGBuff = 0,
     MagicBuff = 0,
+    ManaBuff = 0,
     ShieldBuff = 0,
     SpeedBuff = 0,
     RestoreBuff = 10,
     HealBuff = 10,
-    TPRestoreBuff = 10,
 
     BurnChance = 0,
     DodgeChance = 0,

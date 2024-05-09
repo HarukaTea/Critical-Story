@@ -24,7 +24,9 @@ local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
+local MonsterSideList = require(RepS.Modules.UI.Views.MonsterSideList)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
+local PlayerEffectsList = require(RepS.Modules.UI.Views.PlayerEffectsList)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
@@ -32,7 +34,7 @@ local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
-local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
+local Children, New = Fusion.Children, Fusion.New
 
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
@@ -42,6 +44,7 @@ local wait = task.wait
 local floor = math.floor
 local v2New, udNew, ud2New = Vector2.new, UDim.new, UDim2.new
 local fromScale = UDim2.fromScale
+local match = string.match
 
 return function(plr: Player)
 	local self = setmetatable({}, AdventurerStats)
@@ -58,7 +61,6 @@ return function(plr: Player)
 	local scope = self.scope
 	local UI = Components.ScreenGui(scope, {
 		Name = "AdventurerStats",
-		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 2,
 		Parent = self.plrGui,
 
@@ -66,15 +68,9 @@ return function(plr: Player)
 			Components.Frame(scope, {
 				Name = "BG",
 				AnchorPoint = v2New(0.5, 0.9),
+				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
-
-				Visible = Computed(scope, function(use)
-					return not use(self.charStatsDict.IsInCombat)
-				end),
-				Position = Fusion.Tween(scope, Computed(scope, function(use)
-					return if use(self.charStatsDict.IsInCombat) then fromScale(0.5, 3) else fromScale(0.5, 1)
-				end), AssetBook.TweenInfos.twiceHalfOne),
 
 				[Children] = {
 					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
@@ -94,7 +90,10 @@ return function(plr: Player)
 								FillDirection = Enum.FillDirection.Horizontal,
 								SortOrder = Enum.SortOrder.LayoutOrder,
 							}),
+
+							StatBar("DEF", self),
 							StatBar("HP", self),
+							StatBar("MP", self),
 						},
 					}),
 					Components.TextLabel(scope, {
@@ -117,6 +116,8 @@ return function(plr: Player)
 					ClassFrame(self),
 					ChatFrame(self),
 					StatsTextsFrame(self),
+					MonsterSideList(self),
+					PlayerEffectsList(self)
 				},
 			}),
 			Components.Frame(scope, {
@@ -169,8 +170,16 @@ return function(plr: Player)
 			Events.ChangeMobTarget:Fire(monsters[self.nowMobIndex].Value)
 		end
 	end
+	local function _useItem(actionName: string, inputState: Enum.UserInputState)
+		if inputState ~= Enum.UserInputState.Begin then return end
+
+		self:UseItem(tonumber(match(actionName, "%d")))
+	end
 	CAS:BindAction("ChangeMobTargetLCtrl", _changeMobTarget, false, Enum.KeyCode.LeftControl)
 	CAS:BindAction("ChangeMobTargetRCtrl", _changeMobTarget, false, Enum.KeyCode.RightControl)
+	CAS:BindAction("UseItem1", _useItem, false, Enum.KeyCode.One)
+	CAS:BindAction("UseItem2", _useItem, false, Enum.KeyCode.Two)
+	CAS:BindAction("UseItem3", _useItem, false, Enum.KeyCode.Three)
 
 	--- Setups
 	local function _autoEquipItems()
@@ -201,14 +210,10 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.humanoid, {
-		["Touched"] = function(hit: BasePart)
-			if not self then return end --// Reset issue
-
-			if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
-		end
-	})
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(plr, {
+	self.Add(self.humanoid.Touched:Connect(function(hit: BasePart)
+		if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
+	end))
+	self.Add(HarukaLib:Hydrate(plr, {
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
 			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
@@ -229,9 +234,10 @@ return function(plr: Player)
 		["Attr-LvPoints"] = function(lvPoints: number)
 			playerData.LvPoints:set(lvPoints)
 		end
-	})
+	}))
+
 	local charClassInfo = self.charClassInfo
-	self.emptyList[#self.emptyList + 1] = HarukaLib:Hydrate(self.char, {
+	self.Add(HarukaLib:Hydrate(self.char, {
 		["Attr-Combo"] = function(combo: number)
 			charClassInfo.Warrior:set(combo)
 
@@ -258,13 +264,46 @@ return function(plr: Player)
 		["Attr-InCombat"] = function(newState: boolean)
 			self.charStatsDict.IsInCombat:set(newState)
 		end
-	})
+	}))
+
+	local charStatsDict = self.charStatsDict
+	self.Add(HarukaLib:Hydrate(self.char, {
+		["Attr-Mana"] = function(mana: number)
+			charStatsDict.MP[1]:set(mana)
+		end,
+		["Attr-MaxMana"] = function(maxMana: number)
+			charStatsDict.MP[2]:set(maxMana)
+		end,
+		["Attr-Shield"] = function(shield: number)
+			charStatsDict.DEF[1]:set(shield)
+		end,
+		["Attr-MaxShield"] = function(maxShield: number)
+			charStatsDict.DEF[2]:set(maxShield)
+		end,
+		["Attr-Healing"] = function(state: boolean)
+			charStatsDict.HPHealing:set(state)
+		end,
+		["Attr-Repairing"] = function(state: boolean)
+			charStatsDict.DEFRepairing:set(state)
+		end
+	}))
+	self.Add(HarukaLib:Hydrate(self.humanoid, {
+		["Prop-Health"] = function(health: number)
+			charStatsDict.HP[1]:set(health)
+		end,
+		["Prop-MaxHealth"] = function(health: number)
+			charStatsDict.HP[2]:set(health)
+		end
+	}))
 
 	local function _clearGarbage()
 		ClientUtil:FreezePlayerControls("Unfreeze")
 
 		CAS:UnbindAction("ChangeMobTargetLCtrl")
 		CAS:UnbindAction("ChangeMobTargetRCtrl")
+		CAS:UnbindAction("UseItem1")
+		CAS:UnbindAction("UseItem2")
+		CAS:UnbindAction("UseItem3")
 
 		Events.EquipItems:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()
@@ -276,7 +315,6 @@ return function(plr: Player)
 
 		self.Empty()
 
-		Fusion.doCleanup(self.emptyList)
 		Fusion.doCleanup(scope)
 
 		self = nil

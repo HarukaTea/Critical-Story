@@ -18,14 +18,12 @@ local Value = Fusion.Value
 local color3New = Color3.new
 local fromScale = UDim2.fromScale
 
-local function PassiveSlot(id: number, self: table): Frame
+local function PassiveSlot(index: number, self: table): Frame
 	local scope = self.scope
 	local positions = {
 		fromScale(0, 0),
 		fromScale(0.355, 0),
-		fromScale(0.71, 0),
-		fromScale(0, -0.8),
-		fromScale(0.355, -0.8)
+		fromScale(0.71, 0)
 	}
 	local isSelecting = Value(scope, false)
 
@@ -35,10 +33,11 @@ local function PassiveSlot(id: number, self: table): Frame
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
 	return Fusion.New(scope, "Frame")({
-		Name = "Passive" .. id,
+		Name = "Passive" .. index,
 		BackgroundColor3 = color3New(),
-		Position = positions[id],
+		Position = positions[index],
 		Size = fromScale(0.281, 0.658),
+		[Fusion.Ref] = self.passiveSlotList[index],
 
 		[Fusion.Children] = {
 			Components.RoundUICorner(scope),
@@ -54,7 +53,7 @@ local function PassiveSlot(id: number, self: table): Frame
 				Name = "Icon",
 				Size = fromScale(1, 1),
 				Image = Fusion.Computed(scope, function(use)
-					local item = use(self.passiveIconList[id]) :: string
+					local item = use(self.passiveEquipList[index]) :: string
 
 					return if item == "Null" then ItemBook.ItemImagesEx.Null else "rbxassetid://"..ItemBook:FindItem(item).Icon
 				end),
