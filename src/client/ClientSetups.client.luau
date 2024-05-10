@@ -2,13 +2,11 @@
 --!optimize 2
 --!native
 
-local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
@@ -35,26 +33,6 @@ local function openAcquiredChests()
     end
 end
 Spawn(openAcquiredChests)
-
-
-local function dayNightCycle()
-    local cycleTime, minutesInADay = 12 * 60, 24 * 60
-    local startTime = tick() - (Lighting:GetMinutesAfterMidnight() / minutesInADay) * cycleTime
-    local endTime = startTime + cycleTime
-    local timeRatio, currentTime = minutesInADay / cycleTime, nil
-
-    HarukaLib.Clock(0.05, function()
-        currentTime = tick()
-
-        if currentTime > endTime then
-            startTime = endTime
-            endTime = startTime + cycleTime
-        end
-
-        Lighting:SetMinutesAfterMidnight((currentTime - startTime) * timeRatio)
-    end)
-end
-Spawn(dayNightCycle)
 
 
 local function cmdrRegister()

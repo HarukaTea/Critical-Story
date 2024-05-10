@@ -84,14 +84,19 @@ local function mainSetup()
 
 	--- zone setups
 	SS.Package.Zones.Parent = workspace.MapComponents
-	for _, zone: BasePart in workspace.MapComponents.Zones:GetChildren() do zone.Transparency = 1 end
+	for _, zone: BasePart in workspace.MapComponents.Zones:GetDescendants() do
+		if zone:IsA("BasePart") then zone.Transparency = 1 end
+	end
 
 	--- monster setups
-	for _, child: Script in resources.MonsterAttacks:GetChildren() do
-		if package.MonsterModels:FindFirstChild(child.Name) then
-			child.Parent = package.MonsterModels[child.Name]
-			child.Name = "Attack"
-			child.Disabled = true
+	for _, child: Model in package.MonsterModels:GetChildren() do
+		local ref = child:GetAttribute("LinkedScript") or child.Name
+
+		if resources.MonsterAttacks:FindFirstChild(ref) then
+			local attackScript = resources.MonsterAttacks[ref]:Clone() :: Script
+			attackScript.Disabled = true
+			attackScript.Name = "Attack"
+			attackScript.Parent = child
 		end
 	end
 	for _, child: Model in package.MonsterModels:GetChildren() do
@@ -115,7 +120,10 @@ local function mainSetup()
 	end
 	for _, child: Model in package.MonsterAttacks:GetDescendants() do
 		if resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
-			resources.MonsterBlastAttacks[child.Name].Parent = child
+			resources.MonsterBlastAttacks[child.Name]:Clone().Parent = child
+		end
+		if child:GetAttribute("LinkedScript") then
+			resources.MonsterBlastAttacks[child:GetAttribute("LinkedScript")]:Clone().Parent = child
 		end
 	end
 	for _, locator: Instance in workspace.Monsters:GetDescendants() do
@@ -136,7 +144,7 @@ local function mainSetup()
 		local groups = GS:GetGroupsAsync(plr.UserId)
 		local rank = 0
 		for _, group in groups do
-			if group.Id == 16912246 then rank = group.Rank end
+			if group.Id == 16912246 then rank = group.Rank end --// Milkshake shop
 		end
 		plr:SetAttribute("Rank", rank)
 

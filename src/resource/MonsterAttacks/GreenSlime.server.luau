@@ -7,7 +7,7 @@ local SSS = game:GetService("ServerScriptService")
 
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
-local char = script.Parent :: Model
+local monster = script.Parent :: Model
 
 local wait = task.wait
 local cfNew = CFrame.new
@@ -18,63 +18,60 @@ local fromRGB = Color3.fromRGB
 local SLIME_COLOR = fromRGB(52, 142, 64)
 
 local function lookAt(target: Model)
-	char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, target.PrimaryPart.Position)
-	char.PrimaryPart.Orientation *= v3New(0, 1, 1)
+	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
+	monster.PrimaryPart.Orientation *= v3New(0, 1, 1)
 end
 
 local function slimeShot(target: Model)
 	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
-	blast.Owner.Value = char
+	blast.Owner.Value = monster
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.AttackHolder.Value
+	blast.Parent = monster.AttackHolder.Value
 end
 
 local function slimeWave(target: Model)
 	lookAt(target)
-	local post = ServerUtil:FindPartOnRay(char.PrimaryPart.Position)
+	local post = ServerUtil:FindPartOnRay(monster.PrimaryPart.Position)
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime2:Clone() :: Model
-	blast.Owner.Value = char
-	blast:PivotTo(cfNew(post, post + char.PrimaryPart.CFrame.LookVector))
+	blast.Owner.Value = monster
+	blast:PivotTo(cfNew(post, post + monster.PrimaryPart.CFrame.LookVector))
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	blast.Parent = char.AttackHolder.Value
+	blast.Parent = monster.AttackHolder.Value
 end
 
 local function attacking()
-	wait(0.5)
-	if char.TargetPlayers:FindFirstChildOfClass("ObjectValue") then
-		local list = char.TargetPlayers:GetChildren()
-		local target = list[random(1, #list)] :: ObjectValue
-
-		local style = random(1, 2)
-
-		if style == 1 then
+	ServerUtil.MobBehaviorTree(monster, {
+		function (target: Model) : boolean
 			if random(1, 2) == 1 then
-				slimeWave(target.Value)
+				slimeWave(target)
 				wait(0.5)
 			end
 
+			return false
+		end,
+
+		function (target: Model) : boolean
 			for _ = 1, random(2, 3) do
-				lookAt(target.Value)
+				lookAt(target)
 
 				for _ = 1, 3 do
-					slimeShot(target.Value)
+					slimeShot(target)
 					wait(0.2)
 				end
 				wait(0.5)
 			end
+		end,
 
-		elseif style == 2 then
+		function (target: Model) : boolean
 			for _ = 1, random(1, 3) do
-				slimeWave(target.Value)
+				slimeWave(target)
 				wait(0.8)
 			end
 		end
-
-		attacking()
-	end
+	})
 end
 attacking()

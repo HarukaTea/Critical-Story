@@ -61,12 +61,14 @@ local function ExCategoryTitle(id: string, self: table): Frame
 				[Children] = { Components.RoundUICorner(scope) },
 			}),
 			Components.TextLabel(scope, {
+				Name = "Title",
 				Position = fromScale(0.063, 0.195),
 				Size = fromScale(0.7, 0.6),
 				Text = id,
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}),
 			Components.TextButton(scope, {
+				Name = "Close",
 				Position = fromScale(0.948, 0.066),
 				Size = fromScale(0.04, 1),
 				Text = "X",

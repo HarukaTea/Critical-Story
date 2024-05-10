@@ -33,7 +33,10 @@ CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
 
 local stopRotating = HarukaLib.Clock(1.5, function()
     for _, monster: Model in monsters do
-        if monster.PrimaryPart and char.PrimaryPart and monster:GetAttribute("InCombat") == false then
+        if monster.PrimaryPart and char.PrimaryPart
+            and monster:GetAttribute("InCombat") == false
+            and not monster:GetAttribute("CantRotate") then
+
             if (char.PrimaryPart.Position - monster.PrimaryPart.Position).Magnitude <= 159.9 then
                 Spawn(function()
                     local rotating = random(5, 20)

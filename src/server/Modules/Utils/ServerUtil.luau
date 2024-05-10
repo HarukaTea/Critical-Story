@@ -32,7 +32,7 @@ local ServerUtil = {}
 function ServerUtil:WeldPart(part: Part, welded: Model)
 	local C = welded:GetChildren()
 	for i = 1, #C do
-		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") then
+		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") or C[i]:IsA("CornerWedgePart") then
 			local W = instanceNew("Weld")
 			W.Part0 = welded.Middle
 			W.Part1 = C[i]
@@ -50,7 +50,7 @@ function ServerUtil:WeldPart(part: Part, welded: Model)
 
 	local h = welded:GetChildren()
 	for _, child in h do
-		if child:IsA("BasePart") or child:IsA("UnionOperation") then child.Anchored = false end
+		if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then child.Anchored = false end
 	end
 end
 
@@ -164,6 +164,8 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		tierDisplay.Monster.Text = AssetBook.MonsterInfo[monster.Name].Name
 		tierDisplay.Levels.Text = "Level "..level
 		tierDisplay.Parent = monster.Head
+
+		tierDisplay.Enabled = if monster:GetAttribute("HideTag") then false else true
 	else
 		monster:SetAttribute("SubMonster", true)
 	end
@@ -570,6 +572,29 @@ function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
 	end
 
 	return spawnPoint
+end
+
+--[[
+	A pretty simple behavior tree for monsters
+]]
+function ServerUtil.MobBehaviorTree(monster: Model, funcs: table)
+	wait(0.5)
+	--Promise.new(function()
+		while wait() do
+			if not monster.TargetPlayers:FindFirstChildOfClass("ObjectValue") then return end
+
+			local targets = monster.TargetPlayers:GetChildren()
+			local target = targets[random(1, #targets)].Value :: Model
+			local randomFunc = funcs[random(1, #funcs)]
+
+			local state = randomFunc(target)
+
+			if not state then wait(0.5) else wait() end
+		end
+
+	--end):catch(function()
+		--warn(monster.Name.." failed to attack during combat!")
+	--end)
 end
 
 return ServerUtil

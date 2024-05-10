@@ -6,7 +6,7 @@ local RS = game:GetService("RunService")
 
 local HarukaLib = {}
 
-local floor, log10, abs = math.floor, math.log10, math.abs
+local floor, log10, abs, random = math.floor, math.log10, math.abs, math.random
 local format, gsub, sFind, sub = string.format, string.gsub, string.find, string.sub
 local cfNew, v3New, fromRGB = CFrame.new, Vector3.new, Color3.fromRGB
 local unpack, clear = table.unpack, table.clear
@@ -39,9 +39,7 @@ end
 	Clear all attributes from an instance, equals to `obj:ClearAllChildren()`
 ]]
 function HarukaLib:ClearAllAttributes(obj: Instance)
-	for attribute, _ in obj:GetAttributes() do
-		obj:SetAttribute(attribute, nil)
-	end
+	for attribute, _ in obj:GetAttributes() do obj:SetAttribute(attribute, nil) end
 end
 
 --[[
@@ -50,7 +48,7 @@ end
 function HarukaLib:IsInRegion(position: Vector3, regions: table) : BasePart
 	local region: BasePart = nil
 
-	for _, child in ipairs(regions) do
+	for _, child: BasePart in regions do
 		local point = child.CFrame:PointToObjectSpace(position)
 
 		if abs(point.X) < child.Size.X / 2 and abs(point.Y) < child.Size.Y / 2 and abs(point.Z) < child.Size.Z / 2 then
@@ -75,7 +73,7 @@ function HarukaLib:RichTextify(text: string) : string
 		["<green>"] = [[<font color="#7bed9f">]],
 	}
 
-	for oriTag, rbxColorTag in colorList do
+	for oriTag: string, rbxColorTag: string in colorList do
 		text = gsub(text, oriTag, rbxColorTag)
 	end
 
@@ -85,7 +83,7 @@ end
 --[[
 	A simple serializer for datastore
 ]]
-function HarukaLib:Serialize(val: CFrame | Vector3 | Color3)
+function HarukaLib:Serialize(val: CFrame | Vector3 | Color3) : any
 	local valType = typeof(val)
 
 	if valType == "CFrame" then
@@ -101,7 +99,7 @@ function HarukaLib:Serialize(val: CFrame | Vector3 | Color3)
 		return val --- return default
 	end
 end
-function HarukaLib:Deserialize(val: table)
+function HarukaLib:Deserialize(val: table) : any
 	if typeof(val) ~= "table" then return val end
 
 	local valType = val[1] :: string
@@ -179,7 +177,7 @@ function HarukaLib.Bin()
 end
 
 --[[
-	A custom remade of `Clock`
+	A custom remade of `Clock`, provides a callback to disconnect
 ]]
 function HarukaLib.Clock(tickTime: number, func: () -> ())
 	local nowTime = 0

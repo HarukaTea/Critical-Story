@@ -11,9 +11,12 @@ local Events = require(RepS.Modules.Data.Events)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
+local Add, Empty = HarukaLib.Bin()
+
 local char = script.Parent :: Model
 
 local wait = task.wait
+local sFind = string.find
 
 local function changeLocation(location: string)
     if not location or location == "" then return end
@@ -46,6 +49,40 @@ local function changeLocation(location: string)
         if lightingInfo then TS:Create(Lighting, AssetBook.TweenInfos.one, lightingInfo):Play() end
     end)
 end
-HarukaLib:Hydrate(char, {
+Add(HarukaLib:Hydrate(char, {
     ["Attr-CurrentRegion"] = changeLocation
-})
+}))
+Add(char.Humanoid.Touched:Connect(function(hit: BasePart)
+    if hit:HasTag("IsZone") then char:SetAttribute("CurrentRegion", hit.Name) end
+end))
+
+
+local function dayNightCycle()
+    local cycleTime, minutesInADay = 12 * 60, 24 * 60
+    local startTime = tick() - (Lighting:GetMinutesAfterMidnight() / minutesInADay) * cycleTime
+    local endTime = startTime + cycleTime
+    local timeRatio, currentTime = minutesInADay / cycleTime, nil
+
+    Add(HarukaLib.Clock(0.05, function()
+        --// Tundra
+        local currentRegion = char:GetAttribute("CurrentRegion") or "None"
+        if sFind(currentRegion, "Nixim") then Lighting:SetMinutesAfterMidnight(0) return end
+
+        currentTime = tick()
+
+        if currentTime > endTime then
+            startTime = endTime
+            endTime = startTime + cycleTime
+        end
+
+        Lighting:SetMinutesAfterMidnight((currentTime - startTime) * timeRatio)
+    end))
+end
+Spawn(dayNightCycle)
+
+--// Clear
+char.Humanoid.Died:Once(function()
+    Empty()
+
+    script:Destroy()
+end)

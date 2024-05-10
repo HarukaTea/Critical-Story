@@ -14,28 +14,28 @@ local wait = task.wait
 local v3New = Vector3.new
 local cfNew = CFrame.new
 
-wait(0.5)
-for i = 1, 2 do
-	for _, child: BasePart in model:GetChildren() do
-		if child.Name == "Position"..i then
-			local post = ServerUtil:FindPartOnRay(child.Position + v3New(0, 10, 0), { model })
+pcall(function()
+	Debris:AddItem(model, 1)
 
-			local blast = model.Projectile.Value:Clone() :: Model
-			blast.Owner.Value = model.Owner.Value
-			blast:PivotTo(cfNew(post, post + child.CFrame.LookVector))
-			blast.Parent = char.AttackHolder.Value
+	wait(0.5)
+	for i = 1, 2 do
+		for _, child: BasePart in model:GetChildren() do
+			if child.Name == "Position"..i then
+				local post = ServerUtil:FindPartOnRay(child.Position + v3New(0, 10, 0))
 
-			for _, descendant: BasePart in blast:GetDescendants() do
-				if descendant:IsA("BasePart") then descendant.Color = model:GetAttribute("SlimeColor") end
+				local blast = model.Projectile.Value:Clone() :: Model
+				blast.Owner.Value = model.Owner.Value
+				blast:PivotTo(cfNew(post, post + child.CFrame.LookVector))
+				blast.Parent = char.AttackHolder.Value
+
+				for _, descendant: BasePart in blast:GetDescendants() do
+					if descendant:IsA("BasePart") then descendant.Color = model:GetAttribute("SlimeColor") end
+				end
+				Debris:AddItem(blast, 10)
+
+				child:Destroy()
 			end
-			Debris:AddItem(blast, 10)
-
-			child:Destroy()
 		end
+		wait(0.1)
 	end
-	wait(0.1)
-end
-model.Base:Destroy()
-
-wait(1)
-model:Destroy()
+end)

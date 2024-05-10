@@ -22,7 +22,7 @@ local cfNew = CFrame.new
 local v3New = Vector3.new
 local floor = math.floor
 
-local ITEM_ATTRIBUTES = { COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

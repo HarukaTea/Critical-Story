@@ -15,7 +15,7 @@ local random = math.random
 local v3New = Vector3.new
 local fromRGB = Color3.fromRGB
 
-local SLIME_COLOR = fromRGB(0, 76, 176)
+local SLIME_COLOR = fromRGB(128, 187, 219)
 
 local function lookAt(target: Model)
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
@@ -125,18 +125,18 @@ local function attacking()
 
 			if comboRandom == 1 then
 				slimeWave(target)
-				wait(0.5)
+				wait(0.35)
 
 			elseif comboRandom == 2 then
 				slimeBarrage(target)
-				wait(0.5)
+				wait(0.35)
 			end
 		end,
 
 		function (target: Model) : boolean
 			if random(1, 2) == 1 then
 				slimeWave(target)
-				wait(0.5)
+				wait(0.35)
 			end
 
 			return false
@@ -150,14 +150,14 @@ local function attacking()
 					slimeShot(target)
 					wait(0.02)
 				end
-				wait(0.5)
+				wait(0.35)
 			end
 		end,
 
 		function (target: Model) : boolean
 			for _ = 1, 3 do
 				slimeWave(target)
-				wait(0.8)
+				wait(0.5)
 			end
 		end,
 
@@ -166,7 +166,7 @@ local function attacking()
 
             monster:SetAttribute("CantAttack", true)
 
-            wait(1)
+            wait(0.5)
             slimeDiveUp(target)
             monster:SetAttribute("CantAttack", nil)
 		end,
@@ -174,9 +174,9 @@ local function attacking()
 		function (target: Model) : boolean
 			for _ = 1, random(2,4) do
                 slimeBarrage(target)
-                wait(0.5)
+                wait(0.35)
             end
-		end
+		end,
 	})
 end
 attacking()

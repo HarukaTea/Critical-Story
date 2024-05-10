@@ -199,20 +199,11 @@ return function(plr: Player)
 			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).Position = fromScale(0.82, 0.8)
 		end
 	end
-	local function charCurrentZone()
-		local region = HarukaLib:IsInRegion(self.char.PrimaryPart.Position, workspace:WaitForChild("MapComponents").Zones:GetChildren())
-		if region then self.char:SetAttribute("CurrentRegion", region.Name) end
-	end
-
 	Spawn(_autoEquipItems)
 	Spawn(moveUpJumpBtn)
-	Spawn(charCurrentZone)
 
 	---// Listening events
 	local playerData = self.playerData
-	self.Add(self.humanoid.Touched:Connect(function(hit: BasePart)
-		if hit:HasTag("IsZone") then self.char:SetAttribute("CurrentRegion", hit.Name) end
-	end))
 	self.Add(HarukaLib:Hydrate(plr, {
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)

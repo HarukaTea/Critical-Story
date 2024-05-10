@@ -18,7 +18,7 @@ return {
             Description = "The player who recieve this item"
         },
         function(context: table)
-            local items = {}
+            local items = { "all" }
             for _, item: table in ItemBook.Items do
                 items[#items + 1] = item.ItemId
             end

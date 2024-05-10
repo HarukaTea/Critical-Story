@@ -126,6 +126,7 @@ HarukaLib:Hydrate(monster, {
     ["Attr-Health"] = function(newHP: number)
         monster.Head.Display.Number.Text = newHP
 
+        if newHP < 0 then monster.Head.Display.Number.Text = "0" end
 		if newHP <= 0 and not isDead then
 			isDead = true
 

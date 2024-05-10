@@ -3,7 +3,6 @@
 --!native
 
 local CS = game:GetService("CollectionService")
-local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
@@ -53,22 +52,23 @@ end
 
 
 --// Slimes
-local function slimeShot(blast: Model, char: Model)
-	blast.Shot.Part.Color = blast:GetAttribute("SlimeColor")
-	Debris:AddItem(blast.Shot, 0.2)
-
+local function slimeShot(blast: Model, mob: Model)
+	wait(0.3)
 	TS:Create(blast.Base, AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
 
-	local length = (char.PrimaryPart.Position - blast.Base.Position).Magnitude
-	local radius = (char.PrimaryPart.Position - blast.Shot.Base.Position).Magnitude
+	local length = (mob.PrimaryPart.Position - blast.Base.Position).Magnitude
+	local radius = (mob.PrimaryPart.Position - blast.Shot.Base.Position).Magnitude
 	local angle = sinh((length / 2) / radius)
 
-	blast.Shot:PivotTo(cfNew(char.PrimaryPart.Position, blast.Base.Position) * cfNew(0,0,-length/2))
+	blast.Shot:PivotTo(cfNew(mob.PrimaryPart.Position, blast.Base.Position) * cfNew(0,0,-length/2))
 	blast.Shot.Part.CFrame *= cfNew(0, radius / 2.5, 0)
 	blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(angle,0,0))
 
 	local rotatingangle = angle * 2 /10
 	SuperTween.new(blast.Shot, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Shot.Base.CFrame * cfAngles(-rotatingangle * 10, 0, 0) }):Play()
+
+	wait(0.2)
+	blast:Destroy()
 end
 
 local function slimeWave(blast: Model)
@@ -133,15 +133,6 @@ local function slimeDive(blast: Model)
 	end
 end
 
-local function slimeBomb(blast: Model)
-	blast.Explosion:Play()
-
-	TS:Create(blast.Bomb1, AssetBook.TweenInfos.twiceHalf, { Size = v3New(16, 16, 16) }):Play()
-	TS:Create(blast.Bomb2, AssetBook.TweenInfos.twiceHalf, { Size = v3New(22, 26, 26) }):Play()
-	TS:Create(blast.Bomb1, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
-	TS:Create(blast.Bomb2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
-end
-
 local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast1, AssetBook.TweenInfos.twiceHalf, { Size = v3New(16, 16, 16) }):Play()
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Size = v3New(22, 26, 26) }):Play()
@@ -149,34 +140,44 @@ local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
+--// Bats
+local function batEcho(blast: Model)
+	TS:Create(blast.Part, AssetBook.TweenInfos.fourHalf, { Size = v3New(), Transparency = 1 }):Play()
+
+	wait(0.1)
+	blast:Destroy()
+end
+
 --// Connections
 local function vfxHandler(blast: Model | BasePart)
-	local style = blast.Name
+	local style = blast:GetAttribute("LinkedProjectile") or blast.Name
 
 	if not blast:IsDescendantOf(workspace) then return end
 	blast:WaitForChild("Owner", 999)
 
 	---// most errors here are unnecessary to fix, so just ignore them
-	pcall(function()
-		if style == "SpikeWolf1" or style == "LavaWolf1" then
+	--pcall(function()
+		if style == "SpikeWolf1" then
 			spikeShot(blast)
 
-		elseif style == "SpikeWolfSpike1" or style == "LavaWolfSpike1" then
+		elseif style == "SpikeWolfSpike1" then
 			spike1(blast)
 
-		elseif style == "SpikeWolfSpike2" or style == "LavaWolfSpike2" then
+		elseif style == "SpikeWolfSpike2" then
 			spikeRain(blast)
 
 		elseif style == "SpikeWolf2Range" then
 			spike2Range(blast)
 
-		elseif style == "SpikeWolf4" or style == "LavaWolf4" then
+		elseif style == "SpikeWolf4" then
 			wolfBite(blast)
+
+		elseif style == "SpikeWolf5" then
+			spikeShot(blast)
 
 
 
 		elseif style == "Slime1" then
-			wait(0.3)
 			slimeShot(blast, blast.Owner.Value)
 
 		elseif style == "Slime2" then
@@ -188,12 +189,7 @@ local function vfxHandler(blast: Model | BasePart)
 			slimeDive(blast)
 
 		elseif style == "Slime4" then
-			wait(0.3)
 			slimeShot(blast, blast.Owner.Value)
-
-		elseif style == "SlimeBomb" then
-			wait(1)
-			slimeBomb(blast)
 
 		elseif style == "SlimeSpin" then
 			slimeSpin(blast)
@@ -203,8 +199,13 @@ local function vfxHandler(blast: Model | BasePart)
 
 			wait(8)
 			slimeBlastFade(blast)
+
+
+
+		elseif style == "Bat3" then
+			batEcho(blast)
 		end
-	end)
+	--end)
 end
 CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)
 

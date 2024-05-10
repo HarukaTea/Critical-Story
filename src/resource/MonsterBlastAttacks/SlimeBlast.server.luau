@@ -6,8 +6,10 @@ local model = script.Parent
 
 local wait = task.wait
 
-wait(8)
-model:RemoveTag("MonsterDMG")
+pcall(function()
+    wait(8)
+    model:RemoveTag("MonsterDMG")
 
-wait(2)
-model:Destroy()
+    wait(2)
+    model:Destroy()
+end)

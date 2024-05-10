@@ -22,7 +22,7 @@ local fromRGB = Color3.fromRGB
 local floor = math.floor
 local one = Vector3.one
 
-local ITEM_ATTRIBUTES = { COMBAT_REQ = true, MONSTER_REQ = true }
+local ITEM_ATTRIBUTES = { CD = 6, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

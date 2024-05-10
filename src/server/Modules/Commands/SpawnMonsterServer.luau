@@ -33,10 +33,8 @@ return function (context: table, monster: string, level: number, amount: number)
         return "Nah "..amountWant.." monsters will explode the server!"
     end
 
-    local worldMonster = workspace.Monsters:FindFirstChild("Green Slime", true) :: BasePart
-    worldMonster = worldMonster:FindFirstChildWhichIsA("Model", true)
-
-    local locator = worldMonster.Parent:Clone() :: BasePart
+    local tempLocator = workspace.Monsters:FindFirstChild("GreenSlime", true)
+    local locator = tempLocator:Clone() :: BasePart
     locator.Name = AssetBook.MonsterInfo[monster].Name
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
@@ -54,8 +52,7 @@ return function (context: table, monster: string, level: number, amount: number)
     end)
 
     for _ = 1, amount - 1 do
-        local subLocator = worldMonster.Parent:Clone() :: BasePart
-
+        local subLocator = tempLocator:Clone() :: BasePart
         subLocator.Name = AssetBook.MonsterInfo[monster].Name
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)

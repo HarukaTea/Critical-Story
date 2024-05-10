@@ -60,6 +60,7 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 		end)
 	end
+    _showCurrentLocation(self.char:GetAttribute("CurrentRegion"))
     self.Add(HarukaLib:Hydrate(self.char, {
         ["Attr-CurrentRegion"] = _showCurrentLocation
     }))
