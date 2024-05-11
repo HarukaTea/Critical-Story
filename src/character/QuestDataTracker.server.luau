@@ -16,13 +16,6 @@ local plr = Players:GetPlayerFromCharacter(char)
 local wait = task.wait
 local sFind = string.find
 
---// Connections
-char.Humanoid.Died:Once(function()
-    Empty()
-
-    script:Destroy()
-end)
-
 --// Setups
 local function questDataSetup()
     local quests = plr:WaitForChild("Quests", 999) :: Folder
@@ -52,3 +45,11 @@ local function questDataSetup()
     Add(quests.ChildRemoved:Connect(setQuestsScriptsRemoved))
 end
 questDataSetup()
+
+--// Clear
+local function onDead()
+    Empty()
+
+    script:Destroy()
+end
+char.Humanoid.Died:Once(onDead)

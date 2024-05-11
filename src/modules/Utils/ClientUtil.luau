@@ -25,32 +25,25 @@ local ClientUtil = {}
     The class hit visual effects
 ]]
 function ClientUtil:ClassHitVFX(monster: Model, char: Model)
-    --- checks
-    if not monster then return end
-    if not monster.PrimaryPart then return end
+    pcall(function()
+        local plr = Players:GetPlayerFromCharacter(char)
+        local class = plr:GetAttribute("Class") :: string
+        local color = AssetBook.ClassInfo[class].Color
 
-    local plr = Players:GetPlayerFromCharacter(char)
-    if not plr then return end
+        char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
 
-    local class = plr:GetAttribute("Class") :: string
-    if not AssetBook.ClassInfo[class] then return end
+        local hitEff = RepS.Package.Effects.HitEffect:Clone() :: Part
+        hitEff.CFrame = monster.PrimaryPart.CFrame
+        hitEff.Effect.Image.ImageColor3 = color
+        hitEff.Particle.Color = csNew(color)
+        hitEff.Effect.Image.Rotation = random(1, 360)
+        if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
+        hitEff.Parent = workspace
+        Debris:AddItem(hitEff, 1)
 
-    --- main
-    char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
-
-    local color = AssetBook.ClassInfo[class].Color
-
-    local hitEff = RepS.Package.Effects.HitEffect:Clone() :: Part
-    hitEff.CFrame = monster.PrimaryPart.CFrame
-    hitEff.Effect.Image.ImageColor3 = color
-    hitEff.Particle.Color = csNew(color)
-    hitEff.Effect.Image.Rotation = random(1, 360)
-    if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
-    hitEff.Parent = workspace
-    Debris:AddItem(hitEff, 1)
-
-    TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
-    TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
+        TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
+        TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
+    end)
 end
 
 --[[

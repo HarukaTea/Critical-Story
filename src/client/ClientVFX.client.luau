@@ -11,6 +11,8 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Atmosphere = require(RepS.Modules.Packages.Atmosphere)
 local Signals = require(RepS.Modules.Data.Signals)
 
+local plr = Players.LocalPlayer
+
 local instanceNew = Instance.new
 local v3New = Vector3.new
 local wait = task.wait
@@ -71,14 +73,14 @@ enableWinds()
 
 local function toggleWinds(action: string)
     if action == "Enable" then
-        Players.LocalPlayer.Character.WorldClientAnims.Disabled = false
+        plr.Character.WorldClientAnims.Disabled = false
 
         enableWinds()
     else
         Atmosphere.WindLines:Cleanup()
         Atmosphere.WindShake:Cleanup()
 
-        Players.LocalPlayer.Character.WorldClientAnims.Disabled = true
+        plr.Character.WorldClientAnims.Disabled = true
     end
 end
 Signals.EnableMapDetails:Connect(toggleWinds)

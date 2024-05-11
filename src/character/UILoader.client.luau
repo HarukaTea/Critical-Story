@@ -31,7 +31,7 @@ for _, module in requireList do
 end
 
 local function onDead()
-	wait(3)
+	wait(2)
 	script:Destroy()
 end
 char.Humanoid.Died:Connect(onDead)

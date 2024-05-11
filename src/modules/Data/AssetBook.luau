@@ -345,7 +345,7 @@ AssetBook.LocationInfo = {
         Lighting = tundra
     },
     NiximForest = {
-        Name = "Nixim Cliff",
+        Name = "Nixim Forest",
         Desc = "The vast white forest hides dangers that you might not detect.",
         Music = "Tundra",
         MusicVolume = 0.5,

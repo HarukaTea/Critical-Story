@@ -11,7 +11,7 @@ return {
 		PlayTime = 0,
 
 		Class = "Warrior",
-		LastSeenLocation = "InitusVillage",
+		LastSeenLocation = "InitusBay",
 		LastLeave = { "Vector3", 0, 0, 0 },
 
 		LvPoints = 0,

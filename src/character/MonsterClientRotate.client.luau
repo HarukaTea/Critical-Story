@@ -8,6 +8,8 @@ local RepS = game:GetService("ReplicatedStorage")
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
+local Add, Empty = HarukaLib.Bin()
+
 local char = script.Parent :: Model
 
 local wait = task.wait
@@ -28,10 +30,10 @@ local function _handleMonster(monster: Model)
         monsters[#monsters + 1] = monster
     end
 end
-CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
-CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
+Add(CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster))
+Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster))
 
-local stopRotating = HarukaLib.Clock(1.5, function()
+Add(HarukaLib.Clock(1.5, function()
     for _, monster: Model in monsters do
         if monster.PrimaryPart and char.PrimaryPart
             and monster:GetAttribute("InCombat") == false
@@ -53,10 +55,10 @@ local stopRotating = HarukaLib.Clock(1.5, function()
             end
         end
     end
-end)
+end))
 
 local function onDead()
-    stopRotating()
+    Empty()
 
     script:Destroy()
 end

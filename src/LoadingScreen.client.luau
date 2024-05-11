@@ -11,7 +11,7 @@ local TS = game:GetService("TweenService")
 local plr = Players.LocalPlayer
 
 local wait, delay = task.wait, task.delay
-local udNew, ud2New, fromOffset, fromScale = UDim.new, UDim2.new, UDim2.fromOffset, UDim2.fromScale
+local udNew, fromScale = UDim.new, UDim2.fromScale
 local newInstance, newTweenInfo = Instance.new, TweenInfo.new
 local fromRGB = Color3.fromRGB
 local v2New = Vector2.new
@@ -21,75 +21,67 @@ RF:RemoveDefaultLoadingScreen()
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Health, true)
+SG:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
 
 --- create a default blackscreen before fusion loads
 local ui = newInstance("ScreenGui")
-ui.Name = "Temp"
+ui.Name = "Loading"
 ui.ScreenInsets = Enum.ScreenInsets.None
-ui.DisplayOrder = 999
+ui.ClipToDeviceSafeArea = false
+ui.DisplayOrder = 100
 ui.Parent = plr.PlayerGui
 
 local bg = newInstance("Frame")
+bg.Name = "BG"
 bg.BackgroundColor3 = fromRGB(30, 30, 30)
-bg.Size = ud2New(1, 0, 1, 58)
-bg.Position = fromOffset(0, -58)
+bg.AnchorPoint = v2New(0.5, 0.5)
+bg.Size = fromScale(1, 1)
+bg.Position = fromScale(0.5, 0.5)
 bg.Parent = ui
 
---- center image
-local imageCenter = newInstance("ImageLabel")
-imageCenter.BackgroundTransparency = 1
-imageCenter.Position = fromScale(0.449, 0.384)
-imageCenter.Size = fromScale(0.1, 0.23)
-imageCenter.ImageColor3 = fromRGB(129, 129, 129)
-imageCenter.ImageTransparency = 0.8
-imageCenter.Image = "rbxassetid://2970814599"
-imageCenter.Parent = ui
+local bottomBG = newInstance("Frame")
+bottomBG.Name = "Bottom"
+bottomBG.BackgroundTransparency = 1
+bottomBG.AnchorPoint = v2New(0.5, 0.9)
+bottomBG.Position = fromScale(0.5, 1)
+bottomBG.Size = fromScale(1, 0.1)
+bottomBG.Parent = bg
 
 local uiAspect = newInstance("UIAspectRatioConstraint")
-uiAspect.AspectRatio = 1.002
-uiAspect.Parent = imageCenter
-
-local imageText = newInstance("TextLabel")
-imageText.BackgroundTransparency = 1
-imageText.Position = fromScale(0.85, -0.2)
-imageText.Size = fromScale(0.6, 0.6)
-imageText.Rotation = 10
-imageText.Text = "?"
-imageText.FontFace = fontFromName("GothamSSm", Enum.FontWeight.Bold)
-imageText.TextColor3 = fromRGB(129, 129, 129)
-imageText.TextTransparency = 0.7
-imageText.Parent = imageCenter
-
---- loading text
-local textLabel = newInstance("TextLabel")
-textLabel.Text = "Loading Adventure..."
-textLabel.Position = fromScale(0, 0.811)
-textLabel.Size = fromScale(1, 0.05)
-textLabel.BackgroundTransparency = 1
-textLabel.TextScaled = true
-textLabel.TextColor3 = fromRGB(217, 193, 144)
-textLabel.FontFace = fontFromName("SourceSansPro", Enum.FontWeight.Bold)
-textLabel.Parent = bg
+uiAspect.AspectRatio = 25.129
+uiAspect.Parent = bottomBG
 
 --- loading progress bar
 local bar = newInstance("Frame")
-bar.AnchorPoint = v2New(0, 1)
+bar.Name = "ProgressBar"
 bar.BackgroundColor3 = fromRGB(217, 193, 144)
-bar.Position = fromScale(0, 0.89)
-bar.Size = fromScale(0, 0.01)
-bar.Parent = ui
+bar.Position = fromScale(0, -0.5)
+bar.Size = fromScale(0, 0.1)
+bar.Parent = bottomBG
+
+--- loading text
+local textLabel = newInstance("TextLabel")
+textLabel.Name = "ProgressText"
+textLabel.Text = "Loading Adventure..."
+textLabel.Position = fromScale(0, -1.3)
+textLabel.Size = fromScale(1, 0.5)
+textLabel.BackgroundTransparency = 1
+textLabel.TextScaled = true
+textLabel.TextColor3 = fromRGB(217, 193, 144)
+textLabel.FontFace = fontFromName("Roboto", Enum.FontWeight.Bold)
+textLabel.Parent = bottomBG
+
+local textSizeConstraint = newInstance("UITextSizeConstraint")
+textSizeConstraint.MaxTextSize = 36
+textSizeConstraint.Parent = textLabel
 
 --- classes
 local classBG = newInstance("Frame")
-classBG.AnchorPoint = v2New(0, 1)
+classBG.AnchorPoint = v2New(0.5, 0)
 classBG.BackgroundTransparency = 1
-classBG.Position = fromScale(0, 0.98)
-classBG.Size = fromScale(1, 0.96)
-classBG.Parent = ui
-
-local uiAspectClass = newInstance("UIAspectRatioConstraint")
-uiAspectClass.AspectRatio = 38.342
-uiAspectClass.Parent = classBG
+classBG.Position = fromScale(0.5, -0.2)
+classBG.Size = fromScale(1, 0.75)
+classBG.Parent = bottomBG
 
 local uiList = newInstance("UIListLayout")
 uiList.Padding = udNew(0.003, 0)
@@ -114,7 +106,8 @@ local classImages = {}
 for index, class in classes do
     local image = newInstance("ImageLabel")
     image.BackgroundTransparency = 1
-    image.Size = fromScale(0.026, 1)
+    image.Size = fromScale(1, 1)
+    image.SizeConstraint = Enum.SizeConstraint.RelativeYY
     image.Image = class
     image.Parent = classBG
 
@@ -122,10 +115,10 @@ for index, class in classes do
 end
 
 local isLoaded = false
-delay(6, function()
+delay(9, function()
     textLabel.Text = "Adventure is taking longer than expected..."
 end)
-delay(16, function()
+delay(30, function()
     if isLoaded then return end
 
     textLabel.Text = "Adventure load failed...Datastore may be having issues right now..."
@@ -148,8 +141,6 @@ wait(1)
 TS:Create(bar, halfTween, { Size = fromScale(1, 0.01), BackgroundTransparency = 1 }):Play()
 TS:Create(textLabel, halfTween, { TextTransparency = 1 }):Play()
 TS:Create(bg, halfTween, { BackgroundTransparency = 1 }):Play()
-TS:Create(imageCenter, halfTween, { ImageTransparency = 1 }):Play()
-TS:Create(imageText, halfTween, { TextTransparency = 1 }):Play()
 for _, class in classImages do
     TS:Create(class, halfTween, { ImageTransparency = 1 }):Play()
 end

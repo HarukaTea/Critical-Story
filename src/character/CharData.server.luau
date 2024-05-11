@@ -15,7 +15,6 @@ local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
-local emptyList = { Empty }
 
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
@@ -190,7 +189,7 @@ local function charAttributesSetup()
     Spawn(levelReqCheck)
     ServerUtil:EquipWeapon(char)
 
-    emptyList[#emptyList + 1] = HarukaLib:Hydrate(plr, {
+    Add(HarukaLib:Hydrate(plr, {
         ["Attr-DMGPoints"] = function()
             updateMinDMG()
             updateMaxDMG()
@@ -204,8 +203,8 @@ local function charAttributesSetup()
         ["Attr-Class"] = function()
             ServerUtil:EquipWeapon(char)
         end
-    })
-    emptyList[#emptyList + 1] = HarukaLib:Hydrate(char, {
+    }))
+    Add(HarukaLib:Hydrate(char, {
         ["Attr-Mana"] = manaCheck,
         ["Attr-Shield"] = shieldCheck,
 
@@ -221,7 +220,7 @@ local function charAttributesSetup()
         ["Attr-InCombat"] = function()
             ServerUtil:EquipWeapon(char)
         end
-    })
+    }))
 end
 Spawn(charAttributesSetup)
 
@@ -237,9 +236,7 @@ local function onDead()
     end
     char:SetAttribute("InCombat", false)
 
-    for _, emptyFunc: () -> () in emptyList do
-        emptyFunc()
-    end
+    Empty()
 
     for _, monsterSymbol: ObjectValue in char.CharStats.TargetMonsters:GetChildren() do
         pcall(function()

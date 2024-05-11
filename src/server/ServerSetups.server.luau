@@ -163,14 +163,6 @@ local function mainSetup()
 	end
 	Players.PlayerAdded:Connect(_playerAdded)
 
-	--- join friend in titlescreen return info
-	local function _returnFriends(message: table)
-		for _, player: Player in Players:GetPlayers() do
-			if player.UserId == message.Data then MS:PublishAsync("JoinFriendCheck", game.JobId) end
-		end
-	end
-	MS:SubscribeAsync("ReturnFriendLocation", _returnFriends)
-
 	--- private server setup
 	local function _privateServerSetup()
 		local privateId, code = game.PrivateServerId, nil
@@ -182,7 +174,7 @@ local function mainSetup()
 			local accessCode = sub(privateId, 1, 8)
 			accessCode = upper(accessCode)
 
-			MS:SubscribeAsync("ReturnAllPrivateServers", function(message)
+			MS:SubscribeAsync("ReturnAllPrivateServers", function(message: table)
 				if message.Data == accessCode then MS:PublishAsync("JoinPrivateCheck", { accessCode, code }) end
 			end)
 

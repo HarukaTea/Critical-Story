@@ -5,10 +5,8 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
 local Spawn = require(RepS.Modules.Packages.Spawn)
-local SuperTween = require(RepS.Modules.Packages.SuperTween)
 
 local Cmdr = require(RepS:WaitForChild("CmdrClient"))
 
@@ -28,7 +26,7 @@ local function openAcquiredChests()
             chest:SetAttribute("Opened", true)
             chest.Giver.Chest.Enabled = false
 
-            SuperTween.new(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) }):Play()
+            chest.Top:PivotTo(chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0))
         end
     end
 end
@@ -37,7 +35,7 @@ Spawn(openAcquiredChests)
 
 local function cmdrRegister()
     Cmdr:SetActivationKeys({ Enum.KeyCode.Quote })
-    Cmdr:SetPlaceName("CStory-0.7.5")
+    Cmdr:SetPlaceName("CStory-0.8")
 
     plr.Chatted:Connect(function(msg)
         if msg == "!cmds" then Cmdr:Show() end

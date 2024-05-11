@@ -20,7 +20,7 @@ local v3New = Vector3.new
 local clamp, abs = math.clamp, math.abs
 local cfAngles = CFrame.Angles
 
-RS.Heartbeat:Connect(function(dt)
+local rsConnection = RS.Heartbeat:Connect(function(dt)
 	local direction = HRP.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
 	local momentum = HRP.CFrame:VectorToObjectSpace(HRP.AssemblyLinearVelocity) * MOMENTUM_FACTOR
 
@@ -36,3 +36,11 @@ RS.Heartbeat:Connect(function(dt)
 
 	m6d.C0 = m6d.C0:Lerp(originalM6dC0 * cfAngles(unpack(angles)), dt * SPEED)
 end)
+
+--// Clear
+local function onDead()
+	rsConnection:Disconnect()
+
+	script:Destroy()
+end
+humanoid.Died:Once(onDead)

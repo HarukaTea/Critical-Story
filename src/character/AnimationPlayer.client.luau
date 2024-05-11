@@ -60,6 +60,10 @@ local function onDead()
 	Events.PlayAnimation:DisconnectAll()
 	Signals.PlayAnimation:DisconnectAll()
 
+	for _, anim: AnimationTrack in anims do
+		anim:Destroy()
+	end
+
 	script:Destroy()
 end
 humanoid.Died:Once(onDead)

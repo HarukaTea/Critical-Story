@@ -10,7 +10,7 @@ local floor, log10, abs, random = math.floor, math.log10, math.abs, math.random
 local format, gsub, sFind, sub = string.format, string.gsub, string.find, string.sub
 local cfNew, v3New, fromRGB = CFrame.new, Vector3.new, Color3.fromRGB
 local unpack, clear = table.unpack, table.clear
-local spawn = task.spawn
+local spawn, cancel = task.spawn, task.cancel
 
 --[[
 	Convert a number to string with abbr, for example, `10000` -> `10K`
@@ -169,6 +169,9 @@ function HarukaLib.Bin()
 
 			elseif typeof(item) == "function" then
 				spawn(item)
+
+			elseif typeof(item) == "thread" then
+				if item then cancel(item) end
 			end
 		end
 

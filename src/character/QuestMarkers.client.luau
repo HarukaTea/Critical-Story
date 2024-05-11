@@ -70,8 +70,10 @@ Add(quests.ChildAdded:Connect(targetCurrentQuest))
 Add(quests.ChildRemoved:Connect(targetCurrentQuest))
 Add(RS.Heartbeat:Connect(__distanceCheck))
 
-char.Humanoid.Died:Once(function()
-	Empty()
+--// Clear
+local function onDead()
+    Empty()
 
-	script:Destroy()
-end)
+    script:Destroy()
+end
+char.Humanoid.Died:Once(onDead)

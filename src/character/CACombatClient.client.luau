@@ -13,6 +13,8 @@ local Promise = require(RepS.Modules.Packages.Promise)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
+local Add, Empty = HarukaLib.Bin()
+
 local char = script.Parent :: Model
 local humanoid = char.Humanoid :: Humanoid
 
@@ -50,11 +52,11 @@ local function setup()
 			if not monster:GetAttribute("SubMonster") then monsters[#monsters + 1] = monster end
 		end
 	end
-	CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster)
-	CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster)
+	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster))
+	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster))
 
 	--- detect mobs when player is near them
-    return HarukaLib.Clock(0.15, function()
+    Add(HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
 		if encounterCD then return end
 
@@ -73,7 +75,7 @@ local function setup()
                 end
             end
         end
-	end)
+	end))
 end
 
 --// Connections
@@ -139,7 +141,7 @@ local function onTouched(hit: BasePart)
 		if orbTouchCD then return end
 
 		local check = true
-		Promise.new(function(resolve, reject)
+		Promise.new(function(_, reject)
 			if orb.Owner.Value ~= char then reject() end
 			if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
 
@@ -224,7 +226,7 @@ local function orbFolderHandler(folder: Folder)
 end
 
 --// Connection setups
-local Empty = HarukaLib:Hydrate(char, {
+Add(HarukaLib:Hydrate(char, {
 	["Attr-InCombat"] = function(state: boolean)
 		if state then
 			startCombat(char.CharStats.TargetMonster.Value)
@@ -233,17 +235,16 @@ local Empty = HarukaLib:Hydrate(char, {
 			endCombat()
 		end
 	end
-})
-humanoid.Touched:Connect(onTouched)
-CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler)
-CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler)
+}))
+Add(humanoid.Touched:Connect(onTouched))
+Add(CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler))
+Add(CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler))
 
 --// Setup
-local stopDetecting = setup()
+setup()
 
 --// Clear
 humanoid.Died:Once(function()
-	stopDetecting()
 	Empty()
 
 	script:Destroy()

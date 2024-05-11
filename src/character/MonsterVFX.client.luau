@@ -4,6 +4,7 @@
 
 local CS = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")
+local RS = game:GetService("RunService")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
@@ -156,7 +157,7 @@ local function vfxHandler(blast: Model | BasePart)
 	blast:WaitForChild("Owner", 999)
 
 	---// most errors here are unnecessary to fix, so just ignore them
-	--pcall(function()
+	local success, errorMsg = pcall(function()
 		if style == "SpikeWolf1" then
 			spikeShot(blast)
 
@@ -205,11 +206,15 @@ local function vfxHandler(blast: Model | BasePart)
 		elseif style == "Bat3" then
 			batEcho(blast)
 		end
-	--end)
+	end)
+
+	if not success and RS:IsStudio() then print(errorMsg) end
 end
-CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)
+local vfxConnection = CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)
 
 local function onDead()
+	vfxConnection:Disconnect()
+
 	script:Destroy()
 end
 char.Humanoid.Died:Once(onDead)

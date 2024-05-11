@@ -81,7 +81,7 @@ local function setup(plr: Player)
 
 	local function _stateChanged(_, datastore: any)
 		while datastore.State == false do
-			if datastore:Open(TEMPLATE) ~= "Success" then wait(6) end
+			if datastore:Open(TEMPLATE) ~= "Success" then wait(2) end
 		end
 	end
 	ds.StateChanged:Connect(_stateChanged)
@@ -191,9 +191,7 @@ for _, plr in Players:GetPlayers() do Spawn(setup, plr) end
 
 --// Connections
 local function _playerAdded(plr: Player)
-	if plr:IsDescendantOf(Players) then --- in case player joins and left very quickly
-		setup(plr)
-	end
+	Spawn(setup, plr)
 end
 Players.PlayerAdded:Connect(_playerAdded)
 Players.PlayerRemoving:Connect(clear)
