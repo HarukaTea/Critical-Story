@@ -10,7 +10,7 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 
-local ITEM_ATTRIBUTES = { }
+local ITEM_ATTRIBUTES = { CD = 12 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

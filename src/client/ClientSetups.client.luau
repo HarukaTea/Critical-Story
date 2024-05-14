@@ -8,7 +8,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local Events = require(RepS.Modules.Data.Events)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local Cmdr = require(RepS:WaitForChild("CmdrClient"))
+local Cmdr = require(RepS:WaitForChild("CmdrClient", 999))
 
 local plr = Players.LocalPlayer
 

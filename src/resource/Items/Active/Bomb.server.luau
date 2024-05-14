@@ -1,0 +1,33 @@
+--!nocheck
+--!optimize 2
+--!native
+
+local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
+
+local Events = require(SSS.Modules.Data.ServerEvents)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
+
+local char = script.Parent.Parent.Parent :: Model
+local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
+local monster = char.CharStats.TargetMonster.Value :: Model
+
+local fromRGB = Color3.fromRGB
+local floor = math.floor
+
+local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true, MANA_REQ = 50 }
+
+if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
+
+---
+BuffEffectsUtil:MagicVFX(monster)
+Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Bomb)
+
+local dmg = floor(char:GetAttribute("MinDMG") * 3) :: number
+
+ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 0, 127))
+
+HarukaLib:Add(monster, "Health", -dmg)

@@ -208,7 +208,7 @@ local function vfxHandler(blast: Model | BasePart)
 		end
 	end)
 
-	if not success and RS:IsStudio() then print(errorMsg) end
+	if not success and RS:IsStudio() then warn(errorMsg) end
 end
 local vfxConnection = CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)
 

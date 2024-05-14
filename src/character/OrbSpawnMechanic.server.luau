@@ -55,6 +55,10 @@ local function orbSpawnHandler(state: boolean)
     if state then
         local spawnTime = char:GetAttribute("OrbSpawnTime")
 
+        if char:GetAttribute("CanSpawnMultiOrb") then
+            for _ = 1, 2 do _spawnOrb(true) end
+        end
+
 		stopSpawn = HarukaLib.Clock(spawnTime, function()
 			if char:GetAttribute("InCombat") then _spawnOrb() end
 		end)

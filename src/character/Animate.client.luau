@@ -10,7 +10,6 @@ local wait = task.wait
 local instanceNew = Instance.new
 local random, sin = math.random, math.sin
 local sub = string.sub
-local v3New = Vector3.new
 
 --- I optimized the animate script so it should be good right now
 local torso = char:WaitForChild("Torso")
@@ -32,10 +31,10 @@ local animNames = {
 		{ id = "rbxassetid://12405336225", weight = 10 }
 	},
 	walk = {
-		{ id = "rbxassetid://12256026550", weight = 10 },
+		{ id = "rbxassetid://12405387090", weight = 10 },
 	},
 	run = {
-		{ id = "rbxassetid://12256026550", weight = 10 },
+		{ id = "rbxassetid://12405387090", weight = 10 },
 	},
 	jump = {
 		{ id = "rbxassetid://7119107413", weight = 10 },
@@ -224,14 +223,6 @@ local function onJumping(isJumping: boolean)
 
 	jumpAnimTime = jumpAnimDuration
 	pose = "Jumping"
-
-	--- quick truss mechanic
-	if isJumping then
-        local HRP = char.PrimaryPart :: BasePart
-        local vel = HRP.AssemblyLinearVelocity
-
-        HRP.AssemblyLinearVelocity = v3New(vel.X, char.Humanoid.JumpPower * 1.1, vel.Z)
-    end
 end
 local function onClimbing(speed: number)
 	playAnimation("climb", 0.1)

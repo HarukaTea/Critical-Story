@@ -84,7 +84,9 @@ local function StatText(id: string, self: table) : TextLabel
         Text = Computed(scope, function(use)
             if id == "ClassATK" then
                 if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
-                    return use(charDMGStats.MinDMG).."-"..use(charDMGStats.MaxDMG)
+                    local minDMG, maxDMG = use(charDMGStats.MinDMG), use(charDMGStats.MaxDMG)
+
+                    return if minDMG >= maxDMG then maxDMG else minDMG.."-"..maxDMG
                 else
                     return use(charDMGStats.Magic)
                 end

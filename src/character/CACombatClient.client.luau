@@ -9,6 +9,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Events = require(RepS.Modules.Data.Events)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Octree = require(RepS.Modules.Packages.Octree)
 local Promise = require(RepS.Modules.Packages.Promise)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -31,7 +32,6 @@ local encounterCD = false
 local wait = task.wait
 local newInstance = Instance.new
 local v3New = Vector3.new
-local tFind, remove = table.find, table.remove
 local cfNew = CFrame.new
 
 --// Pre-functions
@@ -40,41 +40,34 @@ local function setup()
 	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
-	local monsters = {} :: { Model }
+	local monsterTree = Octree.new()
 	for _, monster: Model in monsterLocations:GetDescendants() do
-		if monster:HasTag("Monster") and not monster:GetAttribute("SubMonster") then monsters[#monsters + 1] = monster end
+		if monster:HasTag("Monster") and not monster:GetAttribute("SubMonster") then
+			monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+		end
 	end
 	local function _handleMonster(monster: Model)
 		wait()
-		if tFind(monsters, monster) then
-			remove(monsters, tFind(monsters, monster))
-		else
-			if not monster:GetAttribute("SubMonster") then monsters[#monsters + 1] = monster end
-		end
+		if monster:GetAttribute("SubMonster") then return end
+
+		monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 	end
 	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster))
-	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_handleMonster))
 
 	--- detect mobs when player is near them
     Add(HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
 		if encounterCD then return end
+		if not char.PrimaryPart then return end
 
-        for _, monster: Model in monsters do
-            if monster and monster.PrimaryPart and char.PrimaryPart
-				and monster:GetAttribute("InCombat") == false
-				and not monster:GetAttribute("SubMonster") then
+		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 22)
+		for _, monster: Model in nearbyMonsters do
+			if not monster then continue end
+			if not monster.PrimaryPart then continue end
 
-                if (monster.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude <= 22 then
-					encounterCD = true
-
-                    Events.CombatStart:Fire(monster)
-
-					wait(2)
-					encounterCD = false
-                end
-            end
-        end
+			Events.CombatStart:Fire(monster)
+			break
+		end
 	end))
 end
 
@@ -84,7 +77,7 @@ local function startCombat(monster: Model)
 	if not monster.Parent then return end
 	if not monster.PrimaryPart then return end
 
-	local locator: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
+	local locator = monster.Parent :: BasePart
 
 	if isInCombat then return end
 	isInCombat = true
@@ -245,6 +238,7 @@ setup()
 
 --// Clear
 humanoid.Died:Once(function()
+	wait()
 	Empty()
 
 	script:Destroy()

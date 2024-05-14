@@ -212,6 +212,8 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	owner.Value = monster
 	owner.Parent = folder
 
+	monster:PivotTo(monster.Parent.CFrame)
+
 	monster.AttackHolder.Value = folder
 	monster.Attack.Disabled = false
 end
@@ -461,8 +463,7 @@ end
 ]]
 function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, script: Script) : boolean
 	local char = plr.Character
-	local monster =  char.CharStats.TargetMonster.Value :: Model
-
+	local monster = char.CharStats.TargetMonster.Value :: Model
 	local itemInfo = ItemBook:FindItem(item)
 
 	if attributes.COMBAT_REQ then
@@ -495,11 +496,15 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 		end
 	end
 
-	Debris:AddItem(script, if attributes.CD then attributes.CD else 1)
-	Events.ItemCD:Fire(plr, if attributes.CD then attributes.CD else 1, item)
+	Debris:AddItem(script, if attributes.CD then attributes.CD else 5)
+	Events.ItemCD:Fire(plr, if attributes.CD then attributes.CD else 5, item)
 
-	if not ItemBook:FindItem(item).IsSkill then plr.Inventory[item].Value -= 1 end
-	if plr.Inventory[item].Value <= 0 then plr.Inventory[item]:Destroy() end
+	local itemSymbol = plr.Inventory[item] :: IntConstrainedValue
+	if not ItemBook:FindItem(item).IsSkill then itemSymbol.Value -= 1 end
+	if itemSymbol.Value <= 0 then
+		Events.EquipItems:Fire(plr, itemSymbol:GetAttribute("Slot"), "Null")
+		itemSymbol:Destroy()
+	end
 
 	return true
 end
@@ -533,7 +538,7 @@ end
 	A simple function to set a part's collision group
 ]]
 function ServerUtil:SetCollisionGroup(object: Instance, group: string)
-	if object:IsA("BasePart") then object.CollisionGroup = group end
+	if object:IsA("BasePart") or object:IsA("UnionOperation") or object:IsA("CornerWedgePart") then object.CollisionGroup = group end
 
 	for _, child: Instance in object:GetChildren() do
 		ServerUtil:SetCollisionGroup(child, group)

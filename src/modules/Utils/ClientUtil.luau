@@ -12,12 +12,14 @@ local UIS = game:GetService("UserInputService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local cfNew = CFrame.new
+local cfNew, cfAngles = CFrame.new, CFrame.Angles
 local csNew = ColorSequence.new
-local random = math.random
+local random, rad, floor = math.random, math.rad, math.floor
 local wait = task.wait
 local fromScale = UDim2.fromScale
 local sFind = string.find
+local instanceNew = Instance.new
+local v3New = Vector3.new
 
 local ClientUtil = {}
 

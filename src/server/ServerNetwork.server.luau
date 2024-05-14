@@ -278,29 +278,7 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 	if not StoryBook[series] then return end
 	if not plr.Quests:FindFirstChild(series) then return end
 
-	if series ~= "Town" then
-		local currentId = plr.Quests[series].Value :: number
-		if StoryBook[series][currentId].NPC ~= npc.Name then return end
-
-		if DialogueBook[npc.Name].Extra[series..currentId] then
-			Signals[DialogueBook[npc.Name].Extra[series..currentId]]:Fire(plr)
-			return
-		end
-
-		ServerUtil:GiveQuestRewards(series, currentId, plr)
-
-		plr.Quests[series]:Destroy()
-
-		local quest = instanceNew("IntConstrainedValue")
-		quest.Name = series
-		quest.MinValue = 1
-		quest.MaxValue = #StoryBook[series]
-		quest.Value = currentId + 1
-		quest.Parent = plr.Quests
-
-		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.QuestComplete)
-
-	elseif series == "Town" then
+	if series == "Town" then
 		local currentId: number = nil
 
 		for _, quest in plr.Quests:GetChildren() do
@@ -324,6 +302,28 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 		if DialogueBook[npc.Name].Extra[series..currentId] then
 			Signals[DialogueBook[npc.Name].Extra[series..currentId]]:Fire(plr)
 		end
+
+	else
+		local currentId = plr.Quests[series].Value :: number
+		if StoryBook[series][currentId].NPC ~= npc.Name then return end
+
+		if DialogueBook[npc.Name].Extra[series..currentId] then
+			Signals[DialogueBook[npc.Name].Extra[series..currentId]]:Fire(plr)
+			return
+		end
+
+		ServerUtil:GiveQuestRewards(series, currentId, plr)
+
+		plr.Quests[series]:Destroy()
+
+		local quest = instanceNew("IntConstrainedValue")
+		quest.Name = series
+		quest.MinValue = 1
+		quest.MaxValue = #StoryBook[series]
+		quest.Value = currentId + 1
+		quest.Parent = plr.Quests
+
+		Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.QuestComplete)
 	end
 end
 Events.NPCChatEnded:Connect(npcChatEnded)
@@ -421,7 +421,7 @@ Events.ErrorDataStore:Connect(dataStoreErrorKick)
 	Sometimes player wanna rejoin by typing `!rejoin` in chat
 ]]
 local function rejoinRequest(plr: Player)
-	TeleS:Teleport(7523159032, plr)
+	TeleS:Teleport(game.PlaceId, plr)
 end
 Events.RejoinRequest:Connect(rejoinRequest)
 

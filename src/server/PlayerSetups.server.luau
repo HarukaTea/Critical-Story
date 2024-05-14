@@ -17,7 +17,6 @@ local DS1, DS2, DS3 = "CS_AS01_R1", "CS_AS01_R1_S2", "CS_AS01_R1_S3"
 
 local newInstance = Instance.new
 local wait = task.wait
-local tFind = table.find
 
 local function findDataStore(plr: Player) : DataStore?
 	local joinData = plr:GetJoinData().TeleportData :: table?
@@ -62,8 +61,8 @@ local function _saveData(plr: Player, ds: any)
 	end
 	quests.Town = townQuests
 
-	data.Inventory = inventory
-	data.Quests = quests
+	data.InventoryV2 = inventory
+	data.QuestsV2 = quests
 end
 
 local function setup(plr: Player)
@@ -98,17 +97,14 @@ local function setup(plr: Player)
 	questsData.Parent = plr
 
 	---// Load stats
-	local blackList = { "LastLocation" } --- deprecated data but stored in the same table
-	for attr: string, val: any in data.Stats do
-		if tFind(blackList, attr) then continue end
-
+	for attr: string, val: any in data.StatsV2 do
 		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
 		HarukaLib:Hydrate(plr, {
 			["Attr-"..attr] = function(newStats: any)
 				if newStats == nil then return end --// We have false boolean data
 
-				data.Stats[attr] = HarukaLib:Serialize(newStats)
+				data.StatsV2[attr] = HarukaLib:Serialize(newStats)
 			end
 		})
 	end
@@ -122,7 +118,7 @@ local function setup(plr: Player)
 		intValue.Value = val
 		intValue.Parent = questsData
 	end
-	for questType: string, questId: number in data.Quests do
+	for questType: string, questId: number in data.QuestsV2 do
 		if questType == "Town" then
 			for _, townQuest: number in questId do _createQuestVal("Town", townQuest) end
 			continue
@@ -132,7 +128,7 @@ local function setup(plr: Player)
 	end
 
 	--// Load items
-	for index: string, info: table in data.Inventory do
+	for index: string, info: table in data.InventoryV2 do
 		if not ItemBook:IsItemExist(index) then continue end
 
 		local intValue = newInstance("IntConstrainedValue")

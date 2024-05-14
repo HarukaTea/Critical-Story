@@ -35,7 +35,7 @@ return function (context: table, monster: string, level: number, amount: number)
 
     local tempLocator = workspace.Monsters:FindFirstChild("GreenSlime", true)
     local locator = tempLocator:Clone() :: BasePart
-    locator.Name = AssetBook.MonsterInfo[monster].Name
+    locator.Name = monster
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", levelWant)
     locator:SetAttribute("CantRespawn", true)
@@ -53,7 +53,7 @@ return function (context: table, monster: string, level: number, amount: number)
 
     for _ = 1, amount - 1 do
         local subLocator = tempLocator:Clone() :: BasePart
-        subLocator.Name = AssetBook.MonsterInfo[monster].Name
+        subLocator.Name = monster
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)
         subLocator:SetAttribute("CantRespawn", true)

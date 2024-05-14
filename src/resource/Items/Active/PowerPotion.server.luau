@@ -10,7 +10,7 @@ local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 
-local ITEM_ATTRIBUTES = { ATTACK_BUFF = 1.5, DURATION = 6 }
+local ITEM_ATTRIBUTES = { CD = 8, ATTACK_BUFF = 1.5, DURATION = 6 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

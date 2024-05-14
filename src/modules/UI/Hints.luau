@@ -11,7 +11,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
-local Children, New = Fusion.Children, Fusion.New
+local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
 
 local Hints = {}
 Hints.__index = Hints
@@ -49,9 +49,11 @@ return function(plr: Player)
 
 					Fusion.ForValues(scope, hintsList, function(_, localScope: table, text: string)
 						local overallTrans = Fusion.Value(localScope, 0)
+						local canClick = Fusion.Value(localScope, true)
 						Spawn(function()
 							wait(2.7)
 							overallTrans:set(1)
+							canClick:set(false)
 						end)
 
 						return Components.TextButton(localScope, {
@@ -63,15 +65,21 @@ return function(plr: Player)
 							FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
 							TextScaled = false,
 
-							BackgroundTransparency = Fusion.Tween(localScope, Fusion.Computed(localScope, function(use)
+							Visible = Computed(localScope, function(use)
+								return use(canClick)
+							end),
+							BackgroundTransparency = Fusion.Tween(localScope, Computed(localScope, function(use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
-							TextTransparency = Fusion.Tween(localScope, Fusion.Computed(localScope, function(use)
+							TextTransparency = Fusion.Tween(localScope, Computed(localScope, function(use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
 
 							[Fusion.OnEvent("MouseButton1Click")] = function()
 								overallTrans:set(1)
+
+								wait(0.2)
+								canClick:set(false)
 							end,
 
 							[Children] = {

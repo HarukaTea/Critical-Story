@@ -1,274 +1,250 @@
---!nocheck
 --!optimize 2
+--!nocheck
 --!native
 
-local yield, create, isRunning = coroutine.yield, coroutine.create, coroutine.running
-local cancel, spawn = task.cancel, task.spawn
-local clear = table.clear
-
--- Signal types
-export type Connection = {
-	Disconnect: (self: Connection) -> (),
-	Destroy: (self: Connection) -> (),
+export type Connection<U...> = {
 	Connected: boolean,
+
+	Disconnect: (self: Connection<U...>) -> (),
+	Reconnect: (self: Connection<U...>) -> (),
 }
 
 export type Signal<T...> = {
+	RBXScriptConnection: RBXScriptConnection?,
+
+	Connect: <U...>(self: Signal<T...>, fn: (...any) -> (), U...) -> Connection<U...>,
+	Once: <U...>(self: Signal<T...>, fn: (...any) -> (), U...) -> Connection<U...>,
+	Wait: (self: Signal<T...>) -> T...,
 	Fire: (self: Signal<T...>, T...) -> (),
-	Connect: (self: Signal<T...>, fn: (T...) -> ()) -> Connection,
-	Once: (self: Signal<T...>, fn: (T...) -> ()) -> Connection,
 	DisconnectAll: (self: Signal<T...>) -> (),
 	Destroy: (self: Signal<T...>) -> (),
-	Wait: (self: Signal<T...>) -> T...,
 }
 
--- The currently idle thread to run the next handler on
-local freeRunnerThread = nil
+local freeThreads: { thread } = {}
 
---[[
-	Function which acquires the currently idle handler runner thread, runs the
-	function fn on it, and then releases the thread, returning it to being the
-	currently idle one.
-
-	If there was a currently idle runner thread already, that's okay, that old
-	one will just get thrown and eventually GCed.
--]]
-local function acquireAndRun(fn, ...)
-	local acquiredRunnerThread = freeRunnerThread
-	freeRunnerThread = nil
-	fn(...)
-
-	-- The handler finished running, this runner thread is free again.
-	freeRunnerThread = acquiredRunnerThread
+local function runCallback(callback, thread, ...)
+	callback(...)
+	table.insert(freeThreads, thread)
 end
 
---[[
-	Coroutine runner that we create coroutines of. The coroutine can be
-	repeatedly resumed with functions to run followed by the argument to run
-	them with.
--]]
-local function runEvent(...)
-	acquireAndRun(...)
-
+local function yielder()
 	while true do
-		acquireAndRun(yield())
+		runCallback(coroutine.yield())
 	end
 end
 
-
--- Connection class
 local Connection = {}
 Connection.__index = Connection
 
-function Connection:Disconnect()
+local function disconnect<U...>(self: Connection<U...>)
 	if not self.Connected then
 		return
 	end
 	self.Connected = false
 
-	-- Unhook the node, but DON'T clear it. That way any fire calls that are
-	-- currently sitting on this node will be able to iterate forwards off of
-	-- it, but any subsequent fire calls will not hit it, and it will be GCed
-	-- when no more fire calls are sitting on it.
-	if self._signal._handlerListHead == self then
-		self._signal._handlerListHead = self._next
-	else
-		local prev = self._signal._handlerListHead
-		while prev and prev._next ~= self do
-			prev = prev._next
-		end
-		if prev then
-			prev._next = self._next
-		end
+	local next = self._next
+	local prev = self._prev
+
+	if next then
+		next._prev = prev
+	end
+	if prev then
+		prev._next = next
+	end
+
+	local signal = self._signal
+	if signal._head == self then
+		signal._head = next
 	end
 end
-Connection.Destroy = Connection.Disconnect
 
--- Make Connection strict
-setmetatable(Connection, {
-	__index = function(_tb, key)
-		error(("Attempt to get Connection::%s (not a valid member)"):format(tostring(key)), 2)
-	end,
-	__newindex = function(_tb, key, _value)
-		error(("Attempt to set Connection::%s (not a valid member)"):format(tostring(key)), 2)
-	end,
-})
+local function reconnect<U...>(self: Connection<U...>)
+	if self.Connected then
+		return
+	end
+	self.Connected = true
 
+	local signal = self._signal
+	local head = signal._head
+	if head then
+		head._prev = self
+	end
+	signal._head = self
 
---[=[
-	Signals allow events to be dispatched and handled.
+	self._next = head
+	self._prev = false
+end
 
-	For example:
-	```lua
-	local signal = Signal.new()
+Connection.Disconnect = disconnect
+Connection.Reconnect = reconnect
 
-	signal:Connect(function(msg)
-		print("Got message:", msg)
-	end)
-
-	signal:Fire("Hello world!")
-	```
-]=]
+--\\ Signal //--
 local Signal = {}
 Signal.__index = Signal
 
---[=[
-	Constructs a new Signal
-]=]
-function Signal.new<T...>(): Signal<T...>
-	local self = setmetatable({
-		_handlerListHead = false,
-		_proxyHandler = nil,
-		_yieldedThreads = nil,
-	}, Signal)
-
-	return self
+-- stylua: ignore
+local rbxConnect, rbxDisconnect do
+	if task then
+		local bindable = Instance.new("BindableEvent")
+		rbxConnect = bindable.Event.Connect
+		rbxDisconnect = bindable.Event:Connect(function() end).Disconnect
+		bindable:Destroy()
+	end
 end
 
---[=[
-	Connects a function to the signal, which will be called anytime the signal is fired.
-
-	```lua
-	signal:Connect(function(msg, num)
-		print(msg, num)
-	end)
-
-	signal:Fire("Hello", 25)
-	```
-]=]
-function Signal:Connect(fn)
-	local connection = setmetatable({
+local function connect<T..., U...>(self: Signal<T...>, fn: (...any) -> (), ...: U...): Connection<U...>
+	local head = self._head
+	local cn = setmetatable({
 		Connected = true,
 		_signal = self,
 		_fn = fn,
-		_next = false,
+		_varargs = if not ... then false else { ... },
+		_next = head,
+		_prev = false,
 	}, Connection)
 
-	if self._handlerListHead then
-		connection._next = self._handlerListHead
-		self._handlerListHead = connection
-	else
-		self._handlerListHead = connection
+	if head then
+		head._prev = cn
 	end
+	self._head = cn
 
-	return connection
+	return cn
 end
 
---[=[
-	Disconnects all connections from the signal.
+local function once<T..., U...>(self: Signal<T...>, fn: (...any) -> (), ...: U...)
+	local cn
+	cn = connect(self, function(...)
+		disconnect(cn)
+		fn(...)
+	end, ...)
+	return cn
+end
 
-	```lua
-	signal:DisconnectAll()
-	```
-]=]
-function Signal:DisconnectAll()
-	local item = self._handlerListHead
-	while item do
-		item.Connected = false
-		item = item._next
+local wait = if task
+	then function<T...>(self: Signal<T...>): ...any
+		local thread = coroutine.running()
+		local cn
+		cn = connect(self, function(...)
+			disconnect(cn)
+			task.spawn(thread, ...)
+		end)
+		return coroutine.yield()
 	end
-	self._handlerListHead = false
-
-	local yieldedThreads = rawget(self, "_yieldedThreads")
-	if yieldedThreads then
-		for thread in yieldedThreads do
-			if coroutine.status(thread) == "suspended" then
-				warn(debug.traceback(thread, "signal disconnected; yielded thread cancelled", 2))
-
-				cancel(thread)
+	else function<T...>(self: Signal<T...>): ...any
+		local thread = coroutine.running()
+		local cn
+		cn = connect(self, function(...)
+			disconnect(cn)
+			local passed, message = coroutine.resume(thread, ...)
+			if not passed then
+				error(message, 0)
 			end
-		end
-		clear(self._yieldedThreads)
+		end)
+		return coroutine.yield()
 	end
-end
 
-
---[=[
-	Fire the signal, which will call all of the connected functions with the given arguments.
-
-	```lua
-	signal:Fire("Hello")
-
-	-- Any number of arguments can be fired:
-	signal:Fire("Hello", 32, {Test = "Test"}, true)
-	```
-]=]
-function Signal:Fire(...)
-	local item = self._handlerListHead
-	while item do
-		if item.Connected then
-			if not freeRunnerThread then
-				freeRunnerThread = create(runEvent)
+local fire = if task
+	then function<T...>(self: Signal<T...>, ...: any)
+		local cn = self._head
+		while cn do
+			local thread
+			if #freeThreads > 0 then
+				thread = freeThreads[#freeThreads]
+				freeThreads[#freeThreads] = nil
+			else
+				thread = coroutine.create(yielder)
+				coroutine.resume(thread)
 			end
 
-			spawn(freeRunnerThread, item._fn, ...)
+			if not cn._varargs then
+				task.spawn(thread, cn._fn, thread, ...)
+			else
+				local args = cn._varargs
+				local len = #args
+				local count = len
+				for _, value in { ... } do
+					count += 1
+					args[count] = value
+				end
+
+				task.spawn(thread, cn._fn, thread, table.unpack(args))
+
+				for i = count, len + 1, -1 do
+					args[i] = nil
+				end
+			end
+
+			cn = cn._next
 		end
-		item = item._next
+	end
+	else function<T...>(self: Signal<T...>, ...: any)
+		local cn = self._head
+		while cn do
+			local thread
+			if #freeThreads > 0 then
+				thread = freeThreads[#freeThreads]
+				freeThreads[#freeThreads] = nil
+			else
+				thread = coroutine.create(yielder)
+				coroutine.resume(thread)
+			end
+
+			if not cn._varargs then
+				local passed, message = coroutine.resume(thread, cn._fn, thread, ...)
+				if not passed then
+					print(string.format("%s\nstacktrace:\n%s", message, debug.traceback()))
+				end
+			else
+				local args = cn._varargs
+				local len = #args
+				local count = len
+				for _, value in { ... } do
+					count += 1
+					args[count] = value
+				end
+
+				local passed, message = coroutine.resume(thread, cn._fn, thread, table.unpack(args))
+				if not passed then
+					print(string.format("%s\nstacktrace:\n%s", message, debug.traceback()))
+				end
+
+				for i = count, len + 1, -1 do
+					args[i] = nil
+				end
+			end
+
+			cn = cn._next
+		end
+	end
+
+local function disconnectAll<T...>(self: Signal<T...>)
+	local cn = self._head
+	while cn do
+		disconnect(cn)
+		cn = cn._next
 	end
 end
 
-
---[=[
-	Yields the current thread until the signal is fired, and returns the arguments fired from the signal.
-	Yielding the current thread is not always desirable. If the desire is to only capture the next event
-	fired, using `Once` might be a better solution.
-
-	```lua
-	task.spawn(function()
-		local msg, num = signal:Wait()
-		print(msg, num) --> "Hello", 32
-	end)
-
-	signal:Fire("Hello", 32)
-	```
-]=]
-function Signal:Wait()
-	local yieldedThreads = rawget(self, "_yieldedThreads")
-	if not yieldedThreads then
-		yieldedThreads = {}
-		rawset(self, "_yieldedThreads", yieldedThreads)
-	end
-
-	local thread = isRunning()
-	yieldedThreads[thread] = true
-
-	self:Once(function(...)
-		yieldedThreads[thread] = nil
-		spawn(thread, ...)
-	end)
-
-	return yield()
-end
-
---[=[
-	Cleans up the signal.
-
-	Technically, this is only necessary if the signal is created using
-	`Signal.Wrap`. Connections should be properly GC'd once the signal
-	is no longer referenced anywhere. However, it is still good practice
-	to include ways to strictly clean up resources. Calling `Destroy`
-	on a signal will also disconnect all connections immediately.
-	```lua
-	signal:Destroy()
-	```
-]=]
-function Signal:Destroy()
-	self:DisconnectAll()
-
-	local proxyHandler = rawget(self, "_proxyHandler")
-	if proxyHandler then
-		proxyHandler:Disconnect()
+local function destroy<T...>(self: Signal<T...>)
+	disconnectAll(self)
+	local cn = self.RBXScriptConnection
+	if cn then
+		rbxDisconnect(cn)
+		self.RBXScriptConnection = nil
 	end
 end
 
--- Make signal strict
-setmetatable(Signal, {
-	__index = function(_tb, key)
-		error(("Attempt to get Signal::%s (not a valid member)"):format(tostring(key)), 2)
-	end,
-	__newindex = function(_tb, key, _value)
-		error(("Attempt to set Signal::%s (not a valid member)"):format(tostring(key)), 2)
-	end,
-})
+--\\ Constructors
+function Signal.new<T...>(): Signal<T...>
+	return setmetatable({ _head = false }, Signal)
+end
+
+--\\ Methods
+Signal.Connect = connect
+Signal.Once = once
+Signal.Wait = wait
+Signal.Fire = fire
+Signal.DisconnectAll = disconnectAll
+Signal.Destroy = destroy
 
 return Signal.new

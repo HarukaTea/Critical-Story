@@ -19,6 +19,10 @@ for _, child in workspace.MonsterModels:GetDescendants() do
     end
 end
 
+for _, child in workspace:GetDescendants() do
+    if child:IsA("ProximityPrompt") then child.HoldDuration = 0 end
+end
+
 for _, child in workspace.MapComponents.Statues:GetChildren() do
     child.Prompt.Class.ActionText = child.Name
 

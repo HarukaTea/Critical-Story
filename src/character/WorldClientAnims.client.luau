@@ -22,7 +22,7 @@ local function worldAnims()
 			Add(HarukaLib.Clock(0.01, function()
 				if not char then return end
 				if not char.PrimaryPart then return end
-				if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 555 then return end
+				if (child.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude > 520 then return end
 
 				child:PivotTo(child.PrimaryPart.CFrame * cfAngles(rad(-1.5), 0, 0))
 			end))

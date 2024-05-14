@@ -3,7 +3,7 @@
 --!native
 
 return {
-    Stats = {
+    StatsV2 = {
 		Levels = 1,
 		EXP = 0,
 		Gold = 0,
@@ -22,8 +22,8 @@ return {
 		HealthPoints = 0,
 	},
 
-	Inventory = {},
-	Quests = {
+	InventoryV2 = {},
+	QuestsV2 = {
 		Main = 1,
 		Town = {}
 	},

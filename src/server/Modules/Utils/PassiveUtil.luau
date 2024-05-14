@@ -117,6 +117,20 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
 
     elseif item == "SharpenerRock" then
         HarukaLib:Add(char, "CriChance", 10)
+
+    elseif item == "AdventurersKit" then
+        char:SetAttribute("CanSpawnMultiOrb", true)
+
+    elseif item == "ChampionCrown" then
+        HarukaLib:Add(char, "MaxDMG", 200)
+        HarukaLib:Add(char, "CriChance", 25)
+
+    elseif item == "ClimbingGear" then
+        char:SetAttribute("CanClimb", true)
+
+    elseif item == "CrimsonSlimeFang" then
+        HarukaLib:Add(char, "MaxDMG", 100)
+        HarukaLib:Add(char, "CriChance", 10)
     end
 
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", true)

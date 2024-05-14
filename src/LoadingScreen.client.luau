@@ -23,6 +23,8 @@ SG:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Health, true)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
 
+local loadFinished = false
+
 --- create a default blackscreen before fusion loads
 local ui = newInstance("ScreenGui")
 ui.Name = "Loading"
@@ -114,12 +116,13 @@ for index, class in classes do
     classImages[index] = image
 end
 
-local isLoaded = false
 delay(9, function()
+    if loadFinished then return end
+
     textLabel.Text = "Adventure is taking longer than expected..."
 end)
 delay(30, function()
-    if isLoaded then return end
+    if loadFinished then return end
 
     textLabel.Text = "Adventure load failed...Datastore may be having issues right now..."
 
@@ -129,16 +132,16 @@ end)
 
 --- wait until data loads
 local halfTween, sixTween = newTweenInfo(0.5), newTweenInfo(6)
-TS:Create(bar, sixTween, { Size = fromScale(0.6, 0.01) }):Play()
+TS:Create(bar, sixTween, { Size = fromScale(0.6, 0.1) }):Play()
 
 plr:WaitForChild("Inventory", 999)
 print("Load Finished")
 
 textLabel.Text = "Adventure Loaded!"
-isLoaded = true
+loadFinished = true
 
 wait(1)
-TS:Create(bar, halfTween, { Size = fromScale(1, 0.01), BackgroundTransparency = 1 }):Play()
+TS:Create(bar, halfTween, { Size = fromScale(1, 0.1), BackgroundTransparency = 1 }):Play()
 TS:Create(textLabel, halfTween, { TextTransparency = 1 }):Play()
 TS:Create(bg, halfTween, { BackgroundTransparency = 1 }):Play()
 for _, class in classImages do

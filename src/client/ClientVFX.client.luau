@@ -73,14 +73,10 @@ enableWinds()
 
 local function toggleWinds(action: string)
     if action == "Enable" then
-        plr.Character.WorldClientAnims.Disabled = false
-
         enableWinds()
     else
         Atmosphere.WindLines:Cleanup()
         Atmosphere.WindShake:Cleanup()
-
-        plr.Character.WorldClientAnims.Disabled = true
     end
 end
 Signals.EnableMapDetails:Connect(toggleWinds)

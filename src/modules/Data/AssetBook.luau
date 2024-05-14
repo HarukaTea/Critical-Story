@@ -19,6 +19,7 @@ AssetBook.TweenInfos = {
 	one = newTweenInfo(1),
 	oneHalf = newTweenInfo(1.5),
 	two = newTweenInfo(2),
+    four = newTweenInfo(4),
 	six = newTweenInfo(6),
     fifteen = newTweenInfo(15, Enum.EasingStyle.Linear)
 }
@@ -151,6 +152,10 @@ AssetBook.MonsterInfo = {
     PurpleSlime = {
         Name = "Purple Slime",
         Icon = "rbxassetid://16483649160"
+    },
+    IceSlime = {
+        Name = "Ice Slime",
+        Icon = ""
     }
 }
 

@@ -5,7 +5,7 @@
 return {
     Name = "noclip",
     Description = "give player noclip perm",
-    Group = "Moderators",
+    Group = "Testers",
     Args = {
         {
             Type = "player",
