@@ -3,6 +3,7 @@
 --!native
 
 local CS = game:GetService("CollectionService")
+local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local TS = game:GetService("TweenService")
@@ -64,20 +65,16 @@ local function slimeShot(blast: Model, mob: Model)
 	blast.Shot:PivotTo(cfNew(mob.PrimaryPart.Position, blast.Base.Position) * cfNew(0,0,-length/2))
 	blast.Shot.Part.CFrame *= cfNew(0, radius / 2.5, 0)
 	blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(angle,0,0))
+	Debris:AddItem(blast, 0.2)
 
 	local rotatingangle = angle * 2 /10
 	SuperTween.new(blast.Shot, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Shot.Base.CFrame * cfAngles(-rotatingangle * 10, 0, 0) }):Play()
-
-	wait(0.2)
-	blast:Destroy()
 end
 
 local function slimeWave(blast: Model)
 	blast.SlimeAttack:Play()
 
-	for i = 1, 5 do
-		TS:Create(blast["Position"..i], AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
-	end
+	for i = 1, 5 do TS:Create(blast["Position"..i], AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play() end
 end
 
 local function slimeBlast(blast: Model, noSound: boolean?)
@@ -117,10 +114,8 @@ local function slimeBlast(blast: Model, noSound: boolean?)
 end
 
 local function slimeBlastFade(blast: Model)
-	for _, child in blast:GetChildren() do
-		if child:IsA("BasePart") then
-			TS:Create(child, AssetBook.TweenInfos.one, { Size = v3New() }):Play()
-		end
+	for _, child: BasePart in blast:GetChildren() do
+		if child:IsA("BasePart") then TS:Create(child, AssetBook.TweenInfos.one, { Size = v3New() }):Play() end
 	end
 end
 
@@ -141,13 +136,6 @@ local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
---// Bats
-local function batEcho(blast: Model)
-	TS:Create(blast.Part, AssetBook.TweenInfos.fourHalf, { Size = v3New(), Transparency = 1 }):Play()
-
-	wait(0.1)
-	blast:Destroy()
-end
 
 --// Connections
 local function vfxHandler(blast: Model | BasePart)
@@ -200,11 +188,6 @@ local function vfxHandler(blast: Model | BasePart)
 
 			wait(8)
 			slimeBlastFade(blast)
-
-
-
-		elseif style == "Bat3" then
-			batEcho(blast)
 		end
 	end)
 

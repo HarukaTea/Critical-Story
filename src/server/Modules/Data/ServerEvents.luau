@@ -18,7 +18,6 @@ local Events = {
 	ChangePlayerLocation = Warp(false, "ChangePlayerLocation"),
 	EquipItems = Warp(true, "EquipItems"),
 	ItemCD = Warp(true, "ItemCD"),
-	ErrorDataStore = Warp(true, "ErrorDataStore"),
 	ForceReset = Warp(false, "ForceReset"),
 	GiveDrop = Warp(true, "GiveDrop"),
 	LevelUp = Warp(false, "LevelUpVFX"),

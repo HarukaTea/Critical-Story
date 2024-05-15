@@ -19,8 +19,10 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-local nowMinDMG, nowMaxDMG = char:GetAttribute("MinDMG"):: number, char:GetAttribute("MaxDMG") :: number
+local nowMinDMGBuff, nowMaxDMGBuff = char:GetAttribute("MinDMGBuff") :: number, char:GetAttribute("MaxDMGBuff") :: number
+local nowMinDMG, nowMaxDMG = char:GetAttribute("MinDMG") - nowMinDMGBuff :: number, char:GetAttribute("MaxDMG") - nowMaxDMGBuff :: number
 local theoryMinDMG, theoryMaxDMG = floor(nowMinDMG * power - nowMinDMG), floor(nowMaxDMG * power - nowMaxDMG)
+
 HarukaLib:Add(char, "MinDMGBuff", theoryMinDMG)
 HarukaLib:Add(char, "MaxDMGBuff", theoryMaxDMG)
 

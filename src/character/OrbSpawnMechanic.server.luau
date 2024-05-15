@@ -16,7 +16,7 @@ local plr = Players:GetPlayerFromCharacter(char)
 local random = math.random
 
 --// Connections
-local stopSpawn = nil
+local stopSpawn: thread, stopSpawn2: thread = nil, nil
 local function orbSpawnHandler(state: boolean)
     local orbFolders = workspace.MapComponents.OrbFolders :: Folder
 
@@ -28,11 +28,11 @@ local function orbSpawnHandler(state: boolean)
 
         Debris:AddItem(orb, char:GetAttribute("OrbLifeTime"))
     end
-    local function _spawnOrb(isSpawned: boolean?)
+    local function _spawnOrb()
         local monster, orbAttack = char.CharStats.TargetMonster :: ObjectValue, RepS.Package.PlayerAttacks :: Folder
-        local isInCombat, class = char:GetAttribute("InCombat") :: boolean, plr:GetAttribute("Class") :: string
+        local class = plr:GetAttribute("Class") :: string
 
-        if monster.Value and isInCombat and orbFolders:FindFirstChild(char.Name) and char.Humanoid.Health > 0 then
+        if monster.Value and orbFolders:FindFirstChild(char.Name) and char.Humanoid.Health > 0 then
             local orb
             if class == "Alchemist" then
                 orb = orbAttack["AlchemistOrb" .. random(1, 3)]:Clone() :: Model
@@ -40,14 +40,17 @@ local function orbSpawnHandler(state: boolean)
                 orb = orbAttack[class .. "Orb"]:Clone() :: Model
             end
             _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value))
+        end
+    end
+    local function _spawnExtraOrb()
+        local monster = char.CharStats.TargetMonster :: ObjectValue
 
-            --- extra orbs from items
-            if not isSpawned then
-                for attr: string, val: any in char.CharStats.ExtraOrbs:GetAttributes() do
-                    if not val then continue end
+        if monster.Value and orbFolders:FindFirstChild(char.Name) and char.Humanoid.Health > 0 then
+            ---// extra orbs from items
+            for attr: string, val: any in char.CharStats.ExtraOrbs:GetAttributes() do
+                if not val then continue end
 
-                    _placeOrb(orbAttack[attr]:Clone(), ServerUtil:GenerateOrbPos(monster.Value))
-                end
+                _placeOrb(RepS.Package.PlayerAttacks[attr]:Clone(), ServerUtil:GenerateOrbPos(monster.Value))
             end
         end
     end
@@ -56,16 +59,21 @@ local function orbSpawnHandler(state: boolean)
         local spawnTime = char:GetAttribute("OrbSpawnTime")
 
         if char:GetAttribute("CanSpawnMultiOrb") then
-            for _ = 1, 2 do _spawnOrb(true) end
+            for _ = 1, 2 do _spawnOrb() end
         end
 
 		stopSpawn = HarukaLib.Clock(spawnTime, function()
 			if char:GetAttribute("InCombat") then _spawnOrb() end
 		end)
+        stopSpawn2 = HarukaLib.Clock(spawnTime + 4, function()
+            if char:GetAttribute("InCombat") then _spawnExtraOrb() end
+        end)
 	else
 		if stopSpawn then stopSpawn() end
+        if stopSpawn2 then stopSpawn2() end
 
         stopSpawn = nil
+        stopSpawn2 = nil
 	end
 end
 local Empty = HarukaLib:Hydrate(char, {
@@ -74,7 +82,10 @@ local Empty = HarukaLib:Hydrate(char, {
 
 local function onDead()
     if stopSpawn then stopSpawn() end
+    if stopSpawn2 then stopSpawn2() end
+
     stopSpawn = nil
+    stopSpawn2 = nil
 
     Empty()
 

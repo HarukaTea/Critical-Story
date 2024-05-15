@@ -3,9 +3,11 @@
 --!native
 
 local Debris = game:GetService("Debris")
-local RepS = game:GetService("ReplicatedStorage")
-local SSS = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
+local RepS = game:GetService("ReplicatedStorage")
+local RS = game:GetService("RunService")
+local SSS = game:GetService("ServerScriptService")
+local SS = game:GetService("ServerStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
@@ -55,6 +57,19 @@ function ServerUtil:WeldPart(part: Part, welded: Model)
 end
 
 --[[
+	Disable raycasts on this object
+]]
+function ServerUtil:CancelRaycast(obj: Instance, needTouch: boolean?, needCollide: boolean?)
+	for _, part: Instance in obj:GetDescendants() do
+        if part:IsA("UnionOperation") or part:IsA("BasePart") or part:IsA("CornerWedgePart") then
+            part.CanTouch = needTouch or false
+            part.CanCollide = needCollide or false
+            part.CanQuery = false
+        end
+    end
+end
+
+--[[
 	Equip player's weapon, you can only pass an class string to force equip
 ]]
 function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
@@ -70,6 +85,8 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 		local weldPos = if weapon:GetAttribute("Position") then weapon:GetAttribute("Position") else defaultPart
 
 		ServerUtil:WeldPart(char[weldPos], weapon)
+		ServerUtil:CancelRaycast(weapon)
+		ServerUtil:SetCollisionGroup(weapon, "Player")
 
 		weapon.Parent = char
 	end
@@ -142,6 +159,10 @@ function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
 		-- equip extra
 		if armor:FindFirstChild("Extra") then _equipArmorPart("Extra") end
 
+		--- ray cancels
+		ServerUtil:CancelRaycast(armor)
+		ServerUtil:SetCollisionGroup(armor, "Player")
+
 		armor.Name = "Armor"
         armor.Parent = char
     end
@@ -156,7 +177,8 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 
 	local level = forceLevel or locator:GetAttribute("Levels") :: number
 	local monster = RepS.Package.MonsterModels[locator.Name]:Clone() :: Model
-	monster:PivotTo(cfNew(locator.Position) * cfAngles(0, rad(random(1, 360)), 0))
+	monster:PivotTo(cfNew(locator.Position))
+	if not monster:GetAttribute("CantRotate") then monster:PivotTo(cfNew(locator.Position) * cfAngles(0, rad(random(0, 360)), 0)) end
 	monster:SetAttribute("Levels", level)
 
 	if not locator:GetAttribute("SubMonster") then
@@ -170,10 +192,10 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", floor(level ^ 2) + 49)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2.35) + 99)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", (floor(level ^ 1.2) + 25) * if workspace:GetAttribute("2XEXPEvent") then 2 else 1)
-	monster:SetAttribute("Damage", 5 * level)
+	monster:SetAttribute("EXP", (floor(level ^ 1.3) + 29))
+	monster:SetAttribute("Damage", (floor(level ^ 1.4) + 4))
 	monster:SetAttribute("InCombat", false)
 
 	local numberDisplay = RepS.Package.Effects.Display:Clone() :: BillboardGui
@@ -187,6 +209,14 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		end
 	end
 	monster.Parent = locator
+
+	ServerUtil:SetCollisionGroup(monster, "NPC")
+	for _, part: Instance in monster:GetDescendants() do
+        if part:IsA("UnionOperation") or part:IsA("BasePart") or part:IsA("CornerWedgePart") then
+            part.CanTouch = false
+            part.CanQuery = false
+        end
+    end
 
 	locator.Transparency = 1
 
@@ -211,8 +241,6 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	owner.Name = "Owner"
 	owner.Value = monster
 	owner.Parent = folder
-
-	monster:PivotTo(monster.Parent.CFrame)
 
 	monster.AttackHolder.Value = folder
 	monster.Attack.Disabled = false
@@ -251,56 +279,31 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	respawnTimer.Position = respawnLocatorTip.Position
 	respawnTimer.Parent = workspace
 
-	RepS.Resources.Unloads.RespawnCountdown:Clone().Parent = respawnTimer
+	SS.Resources.Unloads.RespawnCountdown:Clone().Parent = respawnTimer
 	Debris:AddItem(respawnTimer, 13)
 
 	monster:Destroy()
 
 	wait(13)
 	ServerUtil:SetupMonster(locator)
-	for _, waitingLocator: BasePart in waitingLocators do
-		ServerUtil:SetupMonster(waitingLocator)
-	end
+	for _, waitingLocator: BasePart in waitingLocators do ServerUtil:SetupMonster(waitingLocator) end
 end
 
 --[[
 	Get all players that fighting a same monster
 ]]
 function ServerUtil:GetPlayersByMonster(monster: Model) : table
-	if not monster then return end
-	if not monster:FindFirstChild("TargetPlayers") then return end
-
 	local combatPlrs = {}
 
-	for _, target: ObjectValue in monster.TargetPlayers:GetChildren() do
-		local tempPlr = Players:GetPlayerFromCharacter(target.Value)
+	local success = pcall(function()
+		for _, target: ObjectValue in monster.TargetPlayers:GetChildren() do
+			local tempPlr = Players:GetPlayerFromCharacter(target.Value)
 
-		if tempPlr then insert(combatPlrs, tempPlr) end
-	end
+			if tempPlr then insert(combatPlrs, tempPlr) end
+		end
+	end)
 
-	return combatPlrs
-end
-
---[[
-	Find all ignore list when casting rays
-]]
-function ServerUtil:FindAllIgnoreParts() : table
-	local ignore = {}
-
-	for _, child in workspace.Monsters:GetDescendants() do
-		if child:HasTag("Monster") then insert(ignore, child) end
-	end
-	for _, plr in Players:GetPlayers() do
-		if plr.Character then insert(ignore, plr.Character) end
-	end
-	for _, child in workspace.MapComponents.CombatFolders:GetChildren() do
-		insert(ignore, child)
-	end
-	for _, child in workspace.MapComponents.OrbFolders:GetChildren() do
-		insert(ignore, child)
-	end
-
-	return ignore
+	return if success then combatPlrs else {}
 end
 
 --[[
@@ -312,7 +315,7 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	Promise.new(function(resolve)
 		local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
 		local ray = rayNew(position, cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
-		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ServerUtil:FindAllIgnoreParts())
+		local hit, pos = workspace:FindPartOnRay(ray)
 
 		resolve(position, pos)
 
@@ -422,8 +425,8 @@ end
 ]]
 function ServerUtil:GiveDrop(plr: Player, monster: Model)
 	local dropChance = LootPlan.new()
-	dropChance:Add(monster:GetAttribute("CommonDrop"), 80)
-	dropChance:Add(monster:GetAttribute("RareDrop"), 20)
+	dropChance:Add(monster:GetAttribute("CommonDrop"), 85)
+	dropChance:Add(monster:GetAttribute("RareDrop"), 15)
 
 	local drop = dropChance:Roll() :: string
 
@@ -515,7 +518,7 @@ end
 ]]
 function ServerUtil:FindPartOnRay(givenPos: Vector3) : Vector3
 	local ray = rayNew(givenPos, -(yAxis).Unit * 500)
-	local ignoreList = ServerUtil:FindAllIgnoreParts()
+	local ignoreList = {}
 
 	while wait() do
 		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
@@ -540,9 +543,7 @@ end
 function ServerUtil:SetCollisionGroup(object: Instance, group: string)
 	if object:IsA("BasePart") or object:IsA("UnionOperation") or object:IsA("CornerWedgePart") then object.CollisionGroup = group end
 
-	for _, child: Instance in object:GetChildren() do
-		ServerUtil:SetCollisionGroup(child, group)
-	end
+	for _, child: Instance in object:GetChildren() do ServerUtil:SetCollisionGroup(child, group) end
 end
 
 --[[
@@ -584,7 +585,7 @@ end
 ]]
 function ServerUtil.MobBehaviorTree(monster: Model, funcs: table)
 	wait(0.5)
-	--Promise.new(function()
+	local success, errorMsg = pcall(function()
 		while wait() do
 			if not monster.TargetPlayers:FindFirstChildOfClass("ObjectValue") then return end
 
@@ -596,10 +597,9 @@ function ServerUtil.MobBehaviorTree(monster: Model, funcs: table)
 
 			if not state then wait(0.5) else wait() end
 		end
+	end)
 
-	--end):catch(function()
-		--warn(monster.Name.." failed to attack during combat!")
-	--end)
+	if not success and RS:IsStudio() then warn(errorMsg) end
 end
 
 return ServerUtil

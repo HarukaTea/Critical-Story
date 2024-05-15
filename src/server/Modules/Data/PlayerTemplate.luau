@@ -19,7 +19,14 @@ return {
 		MagicPoints = 0,
 		ManaPoints = 0,
 		ShieldPoints = 0,
-		HealthPoints = 0,
+		HealthPoints = 0
+	},
+
+	BanStats = {
+		IsBanned = false,
+		Duration = 0,
+		BannedTime = 0,
+		Reason = ""
 	},
 
 	InventoryV2 = {},

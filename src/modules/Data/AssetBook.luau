@@ -19,6 +19,7 @@ AssetBook.TweenInfos = {
 	one = newTweenInfo(1),
 	oneHalf = newTweenInfo(1.5),
 	two = newTweenInfo(2),
+    three = newTweenInfo(3),
     four = newTweenInfo(4),
 	six = newTweenInfo(6),
     fifteen = newTweenInfo(15, Enum.EasingStyle.Linear)

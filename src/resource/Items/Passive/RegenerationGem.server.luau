@@ -10,6 +10,4 @@ local char = script.Parent.Parent.Parent :: Model
 
 local wait = task.wait
 
-while wait(15) do
-	BuffEffectsUtil:Heal(char, 0.1)
-end
+while wait(15) do BuffEffectsUtil:Heal(char, 0.1) end

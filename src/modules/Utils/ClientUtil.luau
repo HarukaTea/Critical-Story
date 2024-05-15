@@ -12,14 +12,12 @@ local UIS = game:GetService("UserInputService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local cfNew, cfAngles = CFrame.new, CFrame.Angles
+local cfNew = CFrame.new
 local csNew = ColorSequence.new
-local random, rad, floor = math.random, math.rad, math.floor
+local random = math.random
 local wait = task.wait
 local fromScale = UDim2.fromScale
 local sFind = string.find
-local instanceNew = Instance.new
-local v3New = Vector3.new
 
 local ClientUtil = {}
 
@@ -77,15 +75,17 @@ end
     Character was hit by mobs
 ]]
 function ClientUtil:SetCharTrans(trans: number, char: Model)
-    for _, child: Instance in char:GetChildren() do
-		if child:IsA("Part") and child ~= char.PrimaryPart then child.Transparency = trans end
-		if child:IsA("Model") then
-			for _, descendant in child:GetChildren() do
-				if descendant.Name == "Part" then descendant.Transparency = trans end
-			end
-		end
-		if child:IsA("Accessory") then child.Handle.Transparency = trans end
-	end
+    pcall(function()
+        for _, child: Instance in char:GetChildren() do
+            if child:IsA("Part") and child ~= char.PrimaryPart then child.Transparency = trans end
+            if child:IsA("Model") then
+                for _, descendant in child:GetChildren() do
+                    if descendant.Name == "Part" then descendant.Transparency = trans end
+                end
+            end
+            if child:IsA("Accessory") then child.Handle.Transparency = trans end
+        end
+    end)
 end
 
 --[[
@@ -136,6 +136,7 @@ end
 function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
     if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
     if not plr.Character then return end
+    if not plr.Character.PrimaryPart then return end
 
     --// In combat check
     if plr.Character:GetAttribute("InCombat") and not isForce then

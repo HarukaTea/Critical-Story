@@ -19,7 +19,9 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-local nowMagic = char:GetAttribute("Magic"):: number
+local nowMagicBuff = char:GetAttribute("MagicBuff") :: number
+local nowMagic = char:GetAttribute("Magic") - nowMagicBuff :: number
+
 local theoryMagic = floor(nowMagic * power - nowMagic)
 HarukaLib:Add(char, "MagicBuff", theoryMagic)
 

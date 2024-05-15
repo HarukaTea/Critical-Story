@@ -4,6 +4,7 @@
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
+local SS = game:GetService("ServerStorage")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
@@ -22,7 +23,7 @@ local function questDataSetup()
 
     for _, quest: IntConstrainedValue in quests:GetChildren() do
         if StoryBook[quest.Name][quest.Value]["Script"] then
-            RepS.Resources.Quests[quest.Name..quest.Value]:Clone().Parent = char.CharStats.Quests
+            SS.Resources.Quests[quest.Name..quest.Value]:Clone().Parent = char.CharStats.Quests
         end
     end
 
@@ -30,7 +31,7 @@ local function questDataSetup()
         local questName = quest.Name..quest.Value
 
         if StoryBook[quest.Name][quest.Value]["Script"] and not char.CharStats.Quests:FindFirstChild(questName) then
-            RepS.Resources.Quests[questName]:Clone().Parent = char.CharStats.Quests
+            SS.Resources.Quests[questName]:Clone().Parent = char.CharStats.Quests
         end
     end
     local function setQuestsScriptsRemoved(quest: IntConstrainedValue)

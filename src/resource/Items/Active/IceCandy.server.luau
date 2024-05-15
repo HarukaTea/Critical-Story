@@ -4,16 +4,14 @@
 
 local SSS = game:GetService("ServerScriptService")
 
-local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
-local Events = require(SSS.Modules.Data.ServerEvents)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 
 local char = script.Parent.Parent.Parent :: Model
 local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
 
-local ITEM_ATTRIBUTES = { CD = 12 }
+local ITEM_ATTRIBUTES = { BUFF = 0.25 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Heal)
-BuffEffectsUtil:PurifyBuff(char)
+BuffEffectsUtil:Heal(char, ITEM_ATTRIBUTES.BUFF)

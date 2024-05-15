@@ -49,11 +49,9 @@ return function(plr: Player)
 
 					Fusion.ForValues(scope, hintsList, function(_, localScope: table, text: string)
 						local overallTrans = Fusion.Value(localScope, 0)
-						local canClick = Fusion.Value(localScope, true)
 						Spawn(function()
 							wait(2.7)
 							overallTrans:set(1)
-							canClick:set(false)
 						end)
 
 						return Components.TextButton(localScope, {
@@ -65,9 +63,6 @@ return function(plr: Player)
 							FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
 							TextScaled = false,
 
-							Visible = Computed(localScope, function(use)
-								return use(canClick)
-							end),
 							BackgroundTransparency = Fusion.Tween(localScope, Computed(localScope, function(use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
@@ -77,9 +72,6 @@ return function(plr: Player)
 
 							[Fusion.OnEvent("MouseButton1Click")] = function()
 								overallTrans:set(1)
-
-								wait(0.2)
-								canClick:set(false)
 							end,
 
 							[Children] = {

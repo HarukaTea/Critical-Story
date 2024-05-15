@@ -10,8 +10,8 @@ local Events = require(RepS.Modules.Data.Events)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local char = script.Parent :: Model
-local humanoid = char.Humanoid :: Humanoid
-local animator = humanoid.Animator :: Animator
+local humanoid = char:WaitForChild("Humanoid") :: Humanoid
+local animator = humanoid:WaitForChild("Animator") :: Animator
 
 local animations = RepS.Package.Animations :: Folder
 
@@ -31,7 +31,6 @@ local anims = {
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
 	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2)
 }
--- Prevent animation duplication, but re-edit the table will cause table rehash?
 anims.RogueAnim1 = anims.WarriorAnim1
 anims.RogueAnim2 = anims.WarriorAnim2
 anims.StrikerAnim2 = anims.WarriorAnim2
@@ -45,9 +44,9 @@ anims.FireStaffAnim2 = anims.WizardAnim2
 local function playAnim(anim: string)
 	if not anims[anim] then warn("Can't found animation: "..anim.."!") return end
 
-	if anim == "MagicCasted1" then
+	if anim == "MagicCastedAnim1" then
 		local class = Players.LocalPlayer:GetAttribute("Class") :: string
-		if AssetBook.ClassInfo[class].Type == "Magic" then anim = "MagicCasted2" end
+		if AssetBook.ClassInfo[class].Type == "Magic" then anim = "MagicCastedAnim2" end
 	end
 
 	anims[anim]:Play()
@@ -61,7 +60,7 @@ local function onDead()
 	Signals.PlayAnimation:DisconnectAll()
 
 	for _, anim: AnimationTrack in anims do
-		anim:Destroy()
+		if anim then anim:Destroy() end
 	end
 
 	script:Destroy()

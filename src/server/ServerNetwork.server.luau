@@ -6,11 +6,13 @@ local Debris = game:GetService("Debris")
 local PPS = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
+local SS = game:GetService("ServerStorage")
 local TeleS = game:GetService("TeleportService")
 local TestS = game:GetService("TestService")
 
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
 local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(SSS.Modules.Data.ServerSignals)
@@ -98,8 +100,8 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 		ServerUtil:GiveItem(plr, finalMaterial, #material.Items:GetChildren())
 
-		wait(60)
-		material.Parent = workspace.MapComponents.Materials
+		wait(120)
+		material.Parent = workspace.MapComponents.Materials[material.Name]
 		prompt.Enabled = true
 	end
 end
@@ -114,17 +116,11 @@ local function _expCheck(exp: number, level: number) : boolean
 	return if exp >= floor(level ^ 1.85) + 60 and level < LEVEL_CAP then true else false
 end
 local function levelUp(plr: Player)
-	--- to avoid bypass actually...
-	if plr:GetAttribute("Levels") > LEVEL_CAP then
-		plr:SetAttribute("Levels", LEVEL_CAP)
-		plr:SetAttribute("EXP", 0)
-	end
-
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
 
 	if check then
+		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.85) + 60))
 		HarukaLib:Add(plr, "Levels", 1)
-		HarukaLib:Add(plr, "EXP", -(floor((plr:GetAttribute("Levels") - 1) ^ 1.85) + 60))
 		HarukaLib:Add(plr, "LvPoints", LEVEL_POINT)
 
 		if _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels")) then levelUp(plr) return end
@@ -144,7 +140,7 @@ local function levelUp(plr: Player)
 		char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
 		char.Humanoid.Health = char.Humanoid.MaxHealth
 
-	elseif not check and plr:GetAttribute("Levels") < LEVEL_CAP then
+	elseif not check and plr:GetAttribute("Levels") <= LEVEL_CAP then
 		plr:SetAttribute("Levels", LEVEL_CAP)
 		plr:SetAttribute("EXP", 0)
 	end
@@ -170,16 +166,15 @@ local function addPoint(plr: Player, option: string, times: number)
 		plr:SetAttribute("HealthPoints", 0)
 		plr:SetAttribute("ShieldPoints", 0)
 		plr:SetAttribute("ManaPoints", 0)
-		plr:SetAttribute("LvPoints", level * LEVEL_POINT)
+		plr:SetAttribute("LvPoints", (level - 1) * LEVEL_POINT)
 		return
 	end
 
-	if plr:GetAttribute("LvPoints") > 0 then
-		for _ = 1, times do
-			if plr:GetAttribute("LvPoints") > 0 then
-				HarukaLib:Add(plr, option, 1)
-				HarukaLib:Add(plr, "LvPoints", -1)
-			end
+	--// Add points
+	for _ = 1, times do
+		if plr:GetAttribute("LvPoints") > 0 then
+			HarukaLib:Add(plr, option, 1)
+			HarukaLib:Add(plr, "LvPoints", -1)
 		end
 	end
 end
@@ -188,7 +183,17 @@ Events.AddPoints:Connect(addPoint)
 --[[
 	Handle the request from player to equip an item
 ]]
-local function equipNewItem(plr: Player, item: string, slot: string)
+local function _equipCheck(plr: Player, itemType: string, requestItem: string) : boolean
+	local count = 0
+	local check = true
+	for _, item: IntConstrainedValue in plr.Inventory:GetChildren() do
+		if item:GetAttribute("Equipped") and ItemBook:FindItem(item.Name).Type == itemType then count += 1 end
+	end
+	if count >= 3 and not plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
+
+	return check
+end
+local function _equipNewItem(plr: Player, item: string, slot: string)
 	local inventory = plr.Inventory :: Folder
 
 	if not inventory:FindFirstChild(item) then return end
@@ -199,7 +204,7 @@ local function equipNewItem(plr: Player, item: string, slot: string)
 
 	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Equip)
 end
-local function unequipCheck(plr: Player, item: string)
+local function _unequipCheck(plr: Player, item: string)
 	local inventory = plr.Inventory :: Folder
 
 	if inventory:FindFirstChild(item) then
@@ -211,15 +216,17 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 	local char = plr.Character
 
 	if itemType == "Passive" then
-		if not char.CharStats.Items:GetAttribute(item) then
-			PassiveUtil:EquipPassive(item, char)
-		end
-		equipNewItem(plr, item, itemSlot)
+		if not char.CharStats.Items:GetAttribute(item) then PassiveUtil:EquipPassive(item, char) end
+		if not _equipCheck(plr, itemType, item) then return end
+
+		_equipNewItem(plr, item, itemSlot)
 
 		Events.EquipItems:Fire(plr, itemSlot, item)
 
 	elseif itemType == "Active" then
-		equipNewItem(plr, item, itemSlot)
+		if not _equipCheck(plr, itemType, item) then return end
+
+		_equipNewItem(plr, item, itemSlot)
 
 		Events.EquipItems:Fire(plr, itemSlot, item)
 
@@ -227,12 +234,12 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 		char.CharStats.Items:SetAttribute(item.."_PASSIVE", false)
 		PassiveUtil:ClearAllPassives(char)
 
-		unequipCheck(plr, item)
+		_unequipCheck(plr, item)
 
 		Events.EquipItems:Fire(plr, itemSlot, "Null")
 
 	elseif itemType == "ClearActive" and item ~= "" then
-		unequipCheck(plr, item)
+		_unequipCheck(plr, item)
 
 		Events.EquipItems:Fire(plr, itemSlot, "Null")
 	end
@@ -246,17 +253,16 @@ local function _essentialCheck(plr: Player, item: string) : string
 	return if plr.Inventory:FindFirstChild(item) and plr.Inventory[item].Value > 0 then true else false
 end
 local function useItem(plr: Player, item: string)
-	if RepS.Resources.Items.Active:FindFirstChild(item) and _essentialCheck(plr, item) then
+	if SS.Resources.Items.Active:FindFirstChild(item) and _essentialCheck(plr, item) then
 		if plr.Character.CharStats.Items:FindFirstChild(item) then
 			Events.CreateHint:Fire(plr, "Still in cooldown, please wait!")
 			return
 		end
 
-		RepS.Resources.Items.Active[item]:Clone().Parent = plr.Character.CharStats.Items
+		SS.Resources.Items.Active[item]:Clone().Parent = plr.Character.CharStats.Items
 	end
 end
 Events.UseItem:Connect(useItem)
-Signals.UseItem:Connect(useItem)
 
 --[[
 	Handle the request from player to pin an item
@@ -264,7 +270,7 @@ Signals.UseItem:Connect(useItem)
 local function pinItem(plr: Player, item: string)
 	if not plr.Inventory:FindFirstChild(item) then return end
 
-	local realItem = plr.Inventory[item] :: IntValue
+	local realItem = plr.Inventory[item] :: IntConstrainedValue
 	realItem:SetAttribute("Pinned", if realItem:GetAttribute("Pinned") then nil else true)
 end
 Events.UpdatePinnedItems:Connect(pinItem)
@@ -401,21 +407,11 @@ Events.ChangePlayerSetting:Connect(toggleSettings)
 	Switch mob target by ctrl or click
 ]]
 local function switchMobTarget(plr: Player, monster: Model)
-	pcall(function()
-		if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 then
-			plr.Character.CharStats.TargetMonster.Value = monster
-		end
-	end)
+	if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 and monster.PrimaryPart then
+		plr.Character.CharStats.TargetMonster.Value = monster
+	end
 end
 Events.ChangeMobTarget:Connect(switchMobTarget)
-
---[[
-	Sometimes datastore can be easily down, and that will crash the game
-]]
-local function dataStoreErrorKick(plr: Player)
-	plr:Kick("Rblx datastore may be down currently, rejoin to try again!")
-end
-Events.ErrorDataStore:Connect(dataStoreErrorKick)
 
 --[[
 	Sometimes player wanna rejoin by typing `!rejoin` in chat

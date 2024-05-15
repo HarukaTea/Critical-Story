@@ -30,13 +30,13 @@ if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then 
 
 ---
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire("MagicCastedAnim1")
+Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
 BuffEffectsUtil:Heal(char, ITEM_ATTRIBUTES.HEAL_BUFF)
 
 local lantern = RepS.Package.MagicAssets.GhostlyLantern.Lantern:Clone() :: MeshPart
 lantern.CFrame = char.Torso.CFrame * cfNew(0,0,-4)
-lantern.Parent = char
+lantern.Parent = workspace
 Debris:AddItem(lantern, 3)
 
 Events.ClientTween:Fires({ lantern }, { Transparency = 0 }, "twiceHalfOne")

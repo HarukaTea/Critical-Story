@@ -16,7 +16,7 @@ local csNew, nsNew = ColorSequence.new, NumberSequence.new
 local color3New = Color3.new
 
 --- Update color
-for _, child in model:GetChildren() do
+for _, child: Instance in model:GetChildren() do
 	if child:IsA("BasePart") then
 		child.Beam.Color = csNew(color, color3New())
 		child.Beam.Transparency = nsNew(1, 1)
@@ -24,7 +24,7 @@ for _, child in model:GetChildren() do
 end
 
 --- Update transparency
-for _, child in model:GetChildren() do
+for _, child: Instance in model:GetChildren() do
 	if child:IsA("BasePart") then
 		SuperTween.new(child.Beam, AssetBook.TweenInfos.twiceHalfOne, { Transparency = nsNew(0.1, 1) }):Play()
 	end

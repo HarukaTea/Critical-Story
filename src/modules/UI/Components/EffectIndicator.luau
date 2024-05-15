@@ -82,7 +82,7 @@ local function EffectIndicator(effect: Script, scope: table) : ImageLabel
 				Position = fromScale(0.5, 0.6),
 				Size = fromScale(1.2, 0.5),
 				ZIndex = 3,
-				Text = "2x",
+				Text = effect:GetAttribute("Power").."x",
 
 				[Children] = {
 					Components.TextUIStroke(scope, { Thickness = 2.5 })

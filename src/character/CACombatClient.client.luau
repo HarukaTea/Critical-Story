@@ -4,6 +4,7 @@
 
 local CS = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
@@ -17,7 +18,7 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 local Add, Empty = HarukaLib.Bin()
 
 local char = script.Parent :: Model
-local humanoid = char.Humanoid :: Humanoid
+local humanoid = char:WaitForChild("Humanoid") :: Humanoid
 
 local musics = workspace:WaitForChild("Sounds") :: Folder
 local sfxs = musics.SFXs :: Folder
@@ -27,12 +28,14 @@ local monsterLocations = workspace:WaitForChild("Monsters") :: Folder
 local isInCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
-local encounterCD = false
 
 local wait = task.wait
 local newInstance = Instance.new
 local v3New = Vector3.new
 local cfNew = CFrame.new
+
+repeat wait() until Players.LocalPlayer:GetAttribute("PlayerDataLoaded")
+repeat wait() until char:GetAttribute("CharDataLoaded")
 
 --// Pre-functions
 local function setup()
@@ -42,13 +45,15 @@ local function setup()
 	--- add all mobs
 	local monsterTree = Octree.new()
 	for _, monster: Model in monsterLocations:GetDescendants() do
-		if monster:HasTag("Monster") and not monster:GetAttribute("SubMonster") then
+		if monster:HasTag("Monster") and monster.PrimaryPart and not monster:GetAttribute("SubMonster") then
 			monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 		end
 	end
 	local function _handleMonster(monster: Model)
 		wait()
 		if monster:GetAttribute("SubMonster") then return end
+
+		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
 
 		monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 	end
@@ -57,7 +62,6 @@ local function setup()
 	--- detect mobs when player is near them
     Add(HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
-		if encounterCD then return end
 		if not char.PrimaryPart then return end
 
 		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 22)
@@ -74,17 +78,16 @@ end
 --// Connections
 local function startCombat(monster: Model)
 	if not monster then return end
-	if not monster.Parent then return end
 	if not monster.PrimaryPart then return end
 
-	local locator = monster.Parent :: BasePart
+	local locator: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
 
 	if isInCombat then return end
 	isInCombat = true
 
 	--- border
 	if (char.PrimaryPart.Position - locator.Position).Magnitude >= 32 then
-		char:PivotTo(cfNew(locator.Position + v3New(0, 5.99, 0)))
+		char:PivotTo(cfNew(locator.Position) * cfNew(0, 5.99, 0))
 	end
 	local border = RepS.Package.Unloads.CombatBorder:Clone() :: Model
 	border:PivotTo(cfNew(locator.Position))
@@ -92,14 +95,8 @@ local function startCombat(monster: Model)
 
 	--- sound actions
 	musics.Overworld:Stop()
-	Spawn(function()
-		wait(0.15)
-		sfxs.EnterCombat:Play()
-	end)
-	Spawn(function()
-		wait(0.39)
-		sfxs.EnterCombat2:Play()
-	end)
+	sfxs.EnterCombat:Play()
+
 	musics[locator:GetAttribute("Music")]:Play()
 end
 local function endCombat()
@@ -111,7 +108,7 @@ local function endCombat()
 
 	--- sound actions
 	for _, sound: Sound in workspace.Sounds:GetChildren() do
-		if sound:IsA("Sound") and sound.Name ~= "Overworld" then sound:Stop() end
+		if sound:IsA("Sound") then sound:Stop() end
 	end
 	if humanoid.Health <= 0 then
 		sfxs.Sad:Play()
@@ -127,11 +124,9 @@ local function onTouched(hit: BasePart)
 	if not hit.Parent then return end
 
 	if hit.Parent:HasTag("Orb") then
-		local orb = hit.Parent :: Model
-		local HRP = char.PrimaryPart
-
-		--- checks
 		if orbTouchCD then return end
+
+		local orb = hit.Parent :: Model
 
 		local check = true
 		Promise.new(function(_, reject)
@@ -161,8 +156,8 @@ local function onTouched(hit: BasePart)
 
 			local bv = newInstance("BodyVelocity")
 			bv.MaxForce = v3New(1, 1, 1) * 99999999
-			bv.Velocity = HRP.CFrame.LookVector + v3New(0, 1, 0) * floatWeight
-			bv.Parent = HRP
+			bv.Velocity = char.PrimaryPart.CFrame.LookVector + v3New(0, 1, 0) * floatWeight
+			bv.Parent = char.PrimaryPart
 			Debris:AddItem(bv, 0.05)
 
 			humanoid.AutoRotate = false
@@ -178,9 +173,6 @@ local function onTouched(hit: BasePart)
 		animStep = if animStep == 1 then 2 else 1
 
 	elseif hit.Parent:HasTag("MonsterDMG") then
-		local damagePart = hit.Parent :: Model
-
-		--- checks
 		if dmgTouchCD then return end
 
 		dmgTouchCD = true
@@ -191,7 +183,7 @@ local function onTouched(hit: BasePart)
 
 		if char:GetAttribute("Shield") > 0 then sfxs.ShieldAbsorb:Play() end
 
-		Events.CharTakeDMG:Fire(damagePart)
+		Events.CharTakeDMG:Fire(hit.Parent)
 
 		ClientUtil:CharOnHit(char)
 	end
@@ -211,7 +203,7 @@ local function combatHolderHandler(folder: Folder)
 	_destroyInCombat(owner.Value, folder)
 end
 local function orbFolderHandler(folder: Folder)
-	--- the purpose is to yield enough time, cuz `wait()` is not long
+	---// the purpose is to yield enough time, cuz `wait()` isn't long enough
 	local owner = folder:WaitForChild("Owner") :: ObjectValue
 	repeat wait() until owner.Value
 
@@ -224,7 +216,7 @@ Add(HarukaLib:Hydrate(char, {
 		if state then
 			startCombat(char.CharStats.TargetMonster.Value)
 
-		elseif state == false then --- must be false, else nil also trigger this
+		elseif state == false then ---// must be false, nil also trigger this
 			endCombat()
 		end
 	end
@@ -238,7 +230,6 @@ setup()
 
 --// Clear
 humanoid.Died:Once(function()
-	wait()
 	Empty()
 
 	script:Destroy()

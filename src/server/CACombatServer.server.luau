@@ -5,6 +5,7 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
+local SS = game:GetService("ServerStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
@@ -19,7 +20,6 @@ local floor, random = math.floor, math.random
 local fromRGB = Color3.fromRGB
 local wait = task.wait
 local cfNew = CFrame.new
-local v3New = Vector3.new
 
 --[[
 	Combat starts! Good luck players
@@ -27,6 +27,7 @@ local v3New = Vector3.new
 local function combatStartSetup(plr: Player, monster: Model)
 	--- if monster was occupied by another player, we will return it
 	if monster:GetAttribute("InCombat") then return end
+	if monster:GetAttribute("SubMonster") then return end
 
 	local locator: BasePart = monster.Parent
 	local combatMode = plr:GetAttribute("CombatMode") :: string
@@ -36,7 +37,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 		monster:SetAttribute("InCombat", true)
 
 		local char = plr.Character
-		char:PivotTo(cfNew(locator.Position + v3New(0, 8, 0)))
+		char:PivotTo(cfNew(locator.Position) * cfNew(0, 8, 0))
 		char.PrimaryPart.Anchored = true
 
 		local border = RepS.Package.Unloads.PublicBorder:Clone() :: Model
@@ -46,21 +47,28 @@ local function combatStartSetup(plr: Player, monster: Model)
 		wait(5)
 		Promise.new(function(resolve, reject)
 			if char.Humanoid.Health <= 0 then reject() end
+			if not monster.PrimaryPart then reject() end
 
 			resolve()
 
 		end):andThen(function()
 			local maxPlayer = 0
 			for _, player: Player in Players:GetPlayers() do
-				if maxPlayer >= 3 then break end
+				if maxPlayer >= 4 then break end
 				if player == plr then continue end
 
 				pcall(function()
-					if (player.Character.PrimaryPart.Position - locator.Position).Magnitude <= 22 then
+					local distance = player:DistanceFromCharacter(monster.PrimaryPart.Position)
+
+					if distance <= 22 and distance > 0 then
 						maxPlayer += 1
 
-						for _, mob in locator:GetDescendants() do
-							if mob:HasTag("Monster") then ServerUtil:AddTargetForMonster(player, mob) end
+						for _, mob: Model in locator:GetDescendants() do
+							if mob:HasTag("Monster") and mob.PrimaryPart then
+								ServerUtil:AddTargetForMonster(player, mob)
+
+								HarukaLib:Add(monster, "MaxHealth", monster:GetAttribute("Health"))
+							end
 						end
 					end
 				end)
@@ -75,13 +83,14 @@ local function combatStartSetup(plr: Player, monster: Model)
 			check = false
 		end)
 	end
-
 	if not check then return end
 
 	--// Activate
-	for _, mob in locator:GetDescendants() do
+	for _, mob: Model in locator:GetDescendants() do
 		if mob:HasTag("Monster") and mob.PrimaryPart then
 			ServerUtil:AddTargetForMonster(plr, mob)
+
+			mob:SetAttribute("Health", mob:GetAttribute("MaxHealth"))
 
 			if combatMode == "Public" then ServerUtil:MonsterActivateCombat(mob) continue end
 			if not mob:GetAttribute("InCombat") then ServerUtil:MonsterActivateCombat(mob) end
@@ -99,7 +108,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 
 	--- pre checks
 	local check = true
-	Promise.new(function(resolve, reject)
+	Promise.new(function(_, reject)
 		if orb.Owner.Value ~= char then reject() end
 		if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
 
@@ -115,7 +124,8 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	local baseDamage = 0
 	if dmgType == "DMG" then
 		local minDMG: number, maxDMG: number = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")
-		baseDamage = if minDMG >= maxDMG then maxDMG else random(minDMG, maxDMG)
+
+		baseDamage = if minDMG >= maxDMG then random(maxDMG, minDMG) else random(minDMG, maxDMG)
 	else
 		baseDamage = char:GetAttribute("Magic")
 	end
@@ -189,10 +199,10 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
     if char:GetAttribute("HitCD") > 6 then char:SetAttribute("HitCD", 6) end
 
     if not char:FindFirstChild("RepairShield") then
-        RepS.Resources.Unloads.RepairShield:Clone().Parent = char
+        SS.Resources.Unloads.RepairShield:Clone().Parent = char
     end
     if not char:FindFirstChild("HealHP") then
-        RepS.Resources.Unloads.HealHP:Clone().Parent = char
+        SS.Resources.Unloads.HealHP:Clone().Parent = char
     end
     char:SetAttribute("Repairing", false)
     char:SetAttribute("Healing", false)

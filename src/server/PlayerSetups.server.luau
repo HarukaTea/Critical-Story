@@ -13,10 +13,12 @@ local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
-local DS1, DS2, DS3 = "CS_AS01_R1", "CS_AS01_R1_S2", "CS_AS01_R1_S3"
+local DATASTORE = require(SSS.Modules.Data.DatastoreTemplate)
 
 local newInstance = Instance.new
 local wait = task.wait
+local time = os.time
+local format = string.format
 
 local function findDataStore(plr: Player) : DataStore?
 	local joinData = plr:GetJoinData().TeleportData :: table?
@@ -24,11 +26,11 @@ local function findDataStore(plr: Player) : DataStore?
 
 	local ds: DataStore
 	if slotChosen == "Slot2" then
-		ds = SuphiDataStore.find(DS2, plr.UserId)
+		ds = SuphiDataStore.find(DATASTORE[2], plr.UserId)
 	elseif slotChosen == "Slot3" then
-		ds = SuphiDataStore.find(DS3, plr.UserId)
+		ds = SuphiDataStore.find(DATASTORE[3], plr.UserId)
 	else
-		ds = SuphiDataStore.find(DS1, plr.UserId)
+		ds = SuphiDataStore.find(DATASTORE[1], plr.UserId)
 	end
 
 	return ds
@@ -71,11 +73,11 @@ local function setup(plr: Player)
 
 	local ds: DataStore
 	if slotChosen == "Slot2" then
-		ds = SuphiDataStore.new(DS2, plr.UserId)
+		ds = SuphiDataStore.new(DATASTORE[2], plr.UserId)
 	elseif slotChosen == "Slot3" then
-		ds = SuphiDataStore.new(DS3, plr.UserId)
+		ds = SuphiDataStore.new(DATASTORE[3], plr.UserId)
 	else
-		ds = SuphiDataStore.new(DS1, plr.UserId)
+		ds = SuphiDataStore.new(DATASTORE[1], plr.UserId)
 	end
 
 	local function _stateChanged(_, datastore: any)
@@ -156,6 +158,21 @@ local function setup(plr: Player)
 
 	--// Finish
 	plr:SetAttribute("PlayerDataLoaded", true)
+
+	--// Check if banned
+	local banInfo = data.BanStats :: table
+	if banInfo.IsBanned then
+		local timeGap = (time() - banInfo.BannedTime) / 60 / 60
+
+		if timeGap < banInfo.Duration then
+			local durationLeft = format("%.1f", tostring(banInfo.Duration - timeGap))
+
+			plr:Kick("You got banned! Reason: "..banInfo.Reason..", unban in "..durationLeft.." hours!")
+		else
+			--// unban
+			data.BanStats = TEMPLATE.BanStats
+		end
+	end
 end
 
 local function clear(plr: Player)
@@ -167,27 +184,22 @@ local function clear(plr: Player)
 	end
 
 	--- check if player is combating
-	pcall(function()
-		for _, monster: Instance in workspace.Monsters:GetDescendants() do
-			if monster:HasTag("Monster") and monster.PrimaryPart then
-				if not monster:FindFirstChild("TargetPlayers") then continue end
-
+	for _, monster: Instance in workspace.Monsters:GetDescendants() do
+		if monster:HasTag("Monster") and monster.PrimaryPart then
+			pcall(function()
 				if monster.TargetPlayers:FindFirstChild(plr.Name) then
 					monster.TargetPlayers[plr.Name]:Destroy()
 
 					print(plr.Name .. " left during combat with " .. monster.Name)
 				end
-			end
+			end)
 		end
-	end)
+	end
 end
 
 --- in case player joined before server starts
 for _, plr in Players:GetPlayers() do Spawn(setup, plr) end
 
 --// Connections
-local function _playerAdded(plr: Player)
-	Spawn(setup, plr)
-end
-Players.PlayerAdded:Connect(_playerAdded)
+Players.PlayerAdded:Connect(setup)
 Players.PlayerRemoving:Connect(clear)

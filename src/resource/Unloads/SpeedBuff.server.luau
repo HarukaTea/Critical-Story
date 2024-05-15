@@ -18,7 +18,7 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-local afterSpeed = char.Humanoid.WalkSpeed * power - char.Humanoid.WalkSpeed
+local afterSpeed = 30 * power - 30
 HarukaLib:Add(char, "SpeedBuff", afterSpeed)
 
 wait(duration)

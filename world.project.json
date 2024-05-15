@@ -1,57 +1,59 @@
 {
-  "name": "Critical-Story",
-  "tree": {
-    "$className": "DataModel",
-    "ReplicatedFirst": {
-      "LoadingScreen": {
-        "$path": "src/LoadingScreen.client.luau"
-      }
-    },
-    "ReplicatedStorage": {
-      "Modules": {
-        "$className": "Folder",
-        "$path": "src/modules"
-      },
-      "Resources": {
-        "$className": "Folder",
-        "$path": "src/resource"
-      }
-    },
-    "ServerScriptService": {
-      "$path": "src/server"
-    },
-    "StarterPlayer": {
-      "StarterPlayerScripts": {
-        "$path": "src/client"
-      },
-      "StarterCharacterScripts": {
-        "$path": "src/character"
-      },
-      "$properties": {
-        "CameraMaxZoomDistance": 64,
-        "CameraMinZoomDistance": 5,
-        "CharacterWalkSpeed": 30,
-        "EnableDynamicHeads": "Disabled",
-        "UserEmotesEnabled": false,
-        "CharacterUseJumpPower": true
-      }
-    },
+    "name": "Critical-Story",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedFirst": {
+            "LoadingScreen": {
+                "$path": "src/LoadingScreen.client.luau"
+            }
+        },
+        "ReplicatedStorage": {
+            "Modules": {
+                "$className": "Folder",
+                "$path": "src/modules"
+            }
+        },
+        "ServerScriptService": {
+            "$path": "src/server"
+        },
+        "ServerStorage": {
+            "Resources": {
+                "$className": "Folder",
+                "$path": "src/resource"
+            }
+        },
+        "StarterPlayer": {
+            "StarterPlayerScripts": {
+                "$path": "src/client"
+            },
+            "StarterCharacterScripts": {
+                "$path": "src/character"
+            },
+            "$properties": {
+                "CameraMaxZoomDistance": 64,
+                "CameraMinZoomDistance": 5,
+                "CharacterWalkSpeed": 30,
+                "EnableDynamicHeads": "Disabled",
+                "UserEmotesEnabled": false,
+                "CharacterUseJumpPower": true
+            }
+        },
 
-    "MaterialService": {
-      "$properties": {
-        "Use2022Materials": false
-      }
-    },
-    "StarterGui": {
-      "$properties": {
-        "ScreenOrientation": "LandscapeSensor"
-      }
-    },
-    "TextChatService": {
-      "$properties": {
-        "ChatTranslationEnabled": false,
-        "ChatVersion": "LegacyChatService"
-      }
+        "MaterialService": {
+            "$properties": {
+                "Use2022Materials": false
+            }
+        },
+        "StarterGui": {
+            "$properties": {
+                "ScreenOrientation": "LandscapeSensor"
+            }
+        },
+        "TextChatService": {
+            "$properties": {
+                "ChatTranslationEnabled": false,
+                "ChatVersion": "LegacyChatService"
+            }
+        }
     }
-  }
 }

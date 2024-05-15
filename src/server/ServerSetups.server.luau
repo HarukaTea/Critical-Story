@@ -17,13 +17,14 @@ local PS = game:GetService("PhysicsService")
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 
-local package = RepS.Package
-local resources = RepS.Resources
+local DATASTORE = require(SSS.Modules.Data.DatastoreTemplate)
 
 local instanceNew = Instance.new
 local wait = task.wait
 local sub, upper = string.sub, string.upper
+local time = os.time
 
 local function collisionRegister()
 	PS:RegisterCollisionGroup("Player")
@@ -51,55 +52,64 @@ end
 Spawn(cmdrRegister)
 
 local function mainSetup()
-	--- clear extra events
+	--- ray cancels
 	for _, mapPart: Instance in workspace:GetDescendants() do
 		if mapPart:IsA("BasePart") then
 			mapPart.CanTouch = false
 			mapPart.Locked = true
 		end
 	end
+
+	--- clear extra events
 	for _, link: Instance in RepS:GetDescendants() do
 		if link:IsA("PackageLink") then link:Destroy() end
 	end
 
 	--- npc setups
 	for _, npc: Model in workspace.MapComponents.NPCs:GetChildren() do
-		npc.Humanoid.Animator:LoadAnimation(package.Animations.NPCIdle):Play()
+		npc.Humanoid.Animator:LoadAnimation(RepS.Package.Animations.NPCIdle):Play()
+
+		ServerUtil:SetCollisionGroup(npc, "NPC")
+		ServerUtil:CancelRaycast(npc, false, true)
 	end
 
 	--- sound setups
 	RepS.Package.Unloads.Musics.Parent = SoundService
 	RepS.Package.Unloads.SFXs.Parent = SoundService
-	for _, sound: Sound in package.Sounds:GetChildren() do
+	for _, sound: Sound in RepS.Package.Sounds:GetChildren() do
 		if sound.Name == "SFXs" then
 			for _, sfx in sound:GetChildren() do sfx.SoundGroup = SoundService.SFXs end
 		else
 			if sound:IsA("Sound") then sound.SoundGroup = SoundService.Musics end
 		end
 	end
-	package.Sounds.Parent = workspace
-	for _, child: Instance in package.MonsterAttacks:GetDescendants() do
+	RepS.Package.Sounds.Parent = workspace
+	for _, child: Instance in RepS.Package.MonsterAttacks:GetDescendants() do
 		if child:IsA("Sound") then child.SoundGroup = SoundService.SFXs end
 	end
 
 	--- zone setups
 	SS.Package.Zones.Parent = workspace.MapComponents
 	for _, zone: BasePart in workspace.MapComponents.Zones:GetDescendants() do
-		if zone:IsA("BasePart") then zone.Transparency = 1 end
+		if zone:IsA("BasePart") then
+			zone.Transparency = 1
+			zone.CanCollide = false
+			zone.CanQuery = false
+		end
 	end
 
 	--- monster setups
-	for _, child: Model in package.MonsterModels:GetChildren() do
-		local ref = child:GetAttribute("LinkedScript") or child.Name
+	for _, monster: Model in RepS.Package.MonsterModels:GetChildren() do
+		local ref = monster:GetAttribute("LinkedScript") or monster.Name
 
-		if resources.MonsterAttacks:FindFirstChild(ref) then
-			local attackScript = resources.MonsterAttacks[ref]:Clone() :: Script
+		if SS.Resources.MonsterAttacks:FindFirstChild(ref) then
+			local attackScript = SS.Resources.MonsterAttacks[ref]:Clone() :: Script
 			attackScript.Disabled = true
 			attackScript.Name = "Attack"
-			attackScript.Parent = child
+			attackScript.Parent = monster
 		end
 	end
-	for _, child: Model in package.MonsterModels:GetChildren() do
+	for _, child: Model in RepS.Package.MonsterModels:GetChildren() do
 		local targetPlayers = instanceNew("Folder")
 		targetPlayers.Name = "TargetPlayers"
 		targetPlayers.Parent = child
@@ -116,25 +126,60 @@ local function mainSetup()
 		attackHolder.Name = "AttackHolder"
 		attackHolder.Parent = child
 
-		resources.Unloads.MonsterData:Clone().Parent = child
+		SS.Resources.Unloads.MonsterData:Clone().Parent = child
 	end
-	for _, child: Model in package.MonsterAttacks:GetDescendants() do
-		if resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
-			resources.MonsterBlastAttacks[child.Name]:Clone().Parent = child
+	for _, child: Model in RepS.Package.MonsterAttacks:GetDescendants() do
+		if SS.Resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
+			SS.Resources.MonsterBlastAttacks[child.Name]:Clone().Parent = child
 		end
 		if child:GetAttribute("LinkedScript") then
-			resources.MonsterBlastAttacks[child:GetAttribute("LinkedScript")]:Clone().Parent = child
+			SS.Resources.MonsterBlastAttacks[child:GetAttribute("LinkedScript")]:Clone().Parent = child
 		end
 	end
+	ServerUtil:CancelRaycast(RepS.Package.MonsterAttacks, true)
+
 	for _, locator: Instance in workspace.Monsters:GetDescendants() do
 		if locator:HasTag("MonsterLocation") then ServerUtil:SetupMonster(locator) end
 	end
 
 	--- player attacks setups
-	for _, child: Model in package.PlayerAttacks:GetChildren() do
-		resources.Unloads.OrbAnim:Clone().Parent = child
+	for _, orb: Model in RepS.Package.PlayerAttacks:GetChildren() do
+		SS.Resources.Unloads.OrbAnim:Clone().Parent = orb
+
+		ServerUtil:CancelRaycast(orb, true)
 	end
-	resources.Unloads.BorderColorTween:Clone().Parent = package.Unloads.CombatBorder.Border
+	SS.Resources.Unloads.BorderColorTween:Clone().Parent = RepS.Package.Unloads.CombatBorder.Border
+
+	--- ban checks
+	Spawn(function()
+		MS:SubscribeAsync("BanRequest", function(message: table)
+			local data = message.Data :: table
+			local plrName, duration, reason = data[1] :: string, data[2] :: number, data[3] :: string
+
+			if not Players:FindFirstChild(plrName) then return end
+			local cheater = Players[plrName] :: Player
+
+			local ds1, ds2, ds3 =
+				SuphiDataStore.find(DATASTORE[1], cheater.UserId) or SuphiDataStore.hidden(DATASTORE[1], cheater.UserId),
+				SuphiDataStore.find(DATASTORE[2], cheater.UserId) or SuphiDataStore.hidden(DATASTORE[2], cheater.UserId),
+				SuphiDataStore.find(DATASTORE[3], cheater.UserId) or SuphiDataStore.hidden(DATASTORE[3], cheater.UserId)
+
+			local data1, data2, data3 = ds1.Value :: table, ds2.Value :: table, ds3.Value :: table
+			local banInfo = {
+				IsBanned = true,
+				Duration = duration,
+				BannedTime = time(),
+				Reason = reason
+			}
+			data1.BanStats = banInfo; data2.BanStats = banInfo; data3.BanStats = banInfo
+
+			if ds1.Hidden then ds1:Destroy() end
+			if ds2.Hidden then ds2:Destroy() end
+			if ds3.Hidden then ds3:Destroy() end
+
+			cheater:Kick("You've got banned! Reason: "..reason..", Duration: "..duration.." Hours!")
+		end)
+	end)
 
 	--- player extra info setup
 	local joinData
@@ -148,8 +193,11 @@ local function mainSetup()
 		end
 		plr:SetAttribute("Rank", rank)
 
-		if rank == 2 then plr:SetAttribute("Role", "Tester") end
-		if rank == 125 then plr:SetAttribute("Role", "CStory Contributor") end
+		if rank >= 2 then plr:SetAttribute("Role", "Tester") end
+		if rank >= 3 then plr:SetAttribute("Role", "Grand Tester") end
+		if rank >= 4 then plr:SetAttribute("Role", "Trello Contributor") end
+		if rank >= 125 then plr:SetAttribute("Role", "CStory Contributor") end
+		if rank >= 126 then plr:SetAttribute("Role", "CStory Moderator") end
 
 		--- some other CA series developers should be included as well
 		if plr.UserId == 304008764 then plr:SetAttribute("Role", "CStory Founder") end
@@ -168,7 +216,7 @@ local function mainSetup()
 		local privateId, code = game.PrivateServerId, nil
 
 		if privateId ~= "" then
-			repeat wait() until joinData ~= nil
+			repeat wait() until joinData
 
 			code = joinData[2]
 			local accessCode = sub(privateId, 1, 8)
@@ -178,7 +226,7 @@ local function mainSetup()
 				if message.Data == accessCode then MS:PublishAsync("JoinPrivateCheck", { accessCode, code }) end
 			end)
 
-			package.PrivateServerId.Value = accessCode
+			RepS.Package.PrivateServerId.Value = accessCode
 
 			print("Private Server Id: "..accessCode)
 		end

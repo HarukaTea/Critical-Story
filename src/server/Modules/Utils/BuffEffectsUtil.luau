@@ -6,6 +6,7 @@ local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
+local SS = game:GetService("ServerStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
@@ -27,8 +28,9 @@ end
 	Arrow players to restore mana by orbs, magic-class only
 ]]
 function BuffEffectsUtil:RestoreManaByOrb(char: Model)
-	local currentTP = char:GetAttribute("Mana") :: number
-	if currentTP >= char:GetAttribute("MaxMana") then return end
+	local currentMana = char:GetAttribute("Mana") :: number
+
+	if currentMana >= char:GetAttribute("MaxMana") then return end
 
 	HarukaLib:Add(char, "Mana", ceil(100 * (char:GetAttribute("RestoreBuff") / 100)))
 
@@ -84,10 +86,10 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, duration: number, isP
 
 	local debuff: Script
 	if isPlayer then
-		debuff = RepS.Resources.Unloads.DOTDMGPlayer:Clone()
+		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
-		debuff = RepS.Resources.Unloads.DOTDMG:Clone()
+		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 2))
 	end
 	debuff:SetAttribute("Power", 0.5)
@@ -108,10 +110,10 @@ function BuffEffectsUtil:Poison(char: Model, monster: Model, duration: number, i
 
 	local debuff: Script
 	if isPlayer then
-		debuff = RepS.Resources.Unloads.DOTDMGPlayer:Clone()
+		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
 	else
-		debuff = RepS.Resources.Unloads.DOTDMG:Clone()
+		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 2))
 	end
 	debuff:SetAttribute("Power", 0.5)
@@ -135,9 +137,9 @@ function BuffEffectsUtil:AttackBuff(char: Model, attackPower: number, duration: 
 
 	local buff: Script
 	if isMob then
-		buff = RepS.Resources.Unloads.AttackBuffMob:Clone()
+		buff = SS.Resources.Unloads.AttackBuffMob:Clone()
 	else
-		buff = RepS.Resources.Unloads.AttackBuff:Clone()
+		buff = SS.Resources.Unloads.AttackBuff:Clone()
 	end
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("MaxDuration", duration)
@@ -156,7 +158,7 @@ end
 function BuffEffectsUtil:MagicBuff(char: Model, power: number, duration: number)
 	if char.Humanoid.Health <= 0 then return end
 
-	local buff = RepS.Resources.Unloads.MagicBuff:Clone() :: Script
+	local buff = SS.Resources.Unloads.MagicBuff:Clone() :: Script
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("MaxDuration", duration)
 	buff:SetAttribute("Power", power)
@@ -171,7 +173,7 @@ end
 	Give player speed buff, can't be used for monsters
 ]]
 function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: number)
-	local buff = RepS.Resources.Unloads.SpeedBuff:Clone() :: Script
+	local buff = SS.Resources.Unloads.SpeedBuff:Clone() :: Script
 
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("MaxDuration", duration)
@@ -191,7 +193,7 @@ end
 	Give player defense buff, it's real defense
 ]]
 function BuffEffectsUtil:DefenseBuff(char: Model, def: number, duration: number)
-	local buff = RepS.Resources.Unloads.DefenseBuff:Clone() :: Script
+	local buff = SS.Resources.Unloads.DefenseBuff:Clone() :: Script
 
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("MaxDuration", duration)

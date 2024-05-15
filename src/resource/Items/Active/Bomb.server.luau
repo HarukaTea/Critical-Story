@@ -17,7 +17,7 @@ local monster = char.CharStats.TargetMonster.Value :: Model
 local fromRGB = Color3.fromRGB
 local floor = math.floor
 
-local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true, MANA_REQ = 50 }
+local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

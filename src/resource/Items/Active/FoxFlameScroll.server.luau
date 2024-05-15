@@ -32,7 +32,7 @@ Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 local fireBall = RepS.Package.MagicAssets.FoxFlameScroll.FireBall:Clone() :: BasePart
 fireBall.CFrame = char.PrimaryPart.CFrame
 fireBall.CFrame = cfLookAt(fireBall.Position, monster.PrimaryPart.Position)
-fireBall.Parent = char
+fireBall.Parent = workspace
 Debris:AddItem(fireBall, 5)
 
 local bv = instanceNew("BodyVelocity")

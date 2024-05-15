@@ -31,12 +31,12 @@ BuffEffectsUtil:Burn(char, monster, 6)
 
 local explosion = RepS.Package.MagicAssets.HolySmite.Explosion:Clone() :: BasePart
 explosion.CFrame = monster.PrimaryPart.CFrame
-explosion.Parent = char
+explosion.Parent = workspace
 Debris:AddItem(explosion, 1)
 
 local holyBeam = RepS.Package.MagicAssets.HolySmite.HolyBeam:Clone() :: BasePart
 holyBeam.CFrame = monster.PrimaryPart.CFrame
-holyBeam.Parent = char
+holyBeam.Parent = workspace
 Debris:AddItem(holyBeam, 1)
 
 Events.ClientTween:Fires({ explosion }, { Size = v3New(254, 254, 254), Transparency = 1 }, "half")

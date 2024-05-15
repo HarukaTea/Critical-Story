@@ -18,7 +18,7 @@ while wait(1) do
 
 	local uri = RepS.Package.MagicAssets.UriClone:Clone() :: Model
 	uri.PrimaryPart.CFrame = char.PrimaryPart.CFrame
-	uri.Parent = char
+	uri.Parent = workspace
 	Debris:AddItem(uri, 1)
 
     local parts = {}

@@ -3,6 +3,7 @@
 --!native
 
 local RepS = game:GetService("ReplicatedStorage")
+local SS = game:GetService("ServerStorage")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
@@ -18,7 +19,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "SpeedBuff", 5)
 
     elseif item == "BurningTorch" then
-        RepS.Resources.Items.Passive.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
+        SS.Resources.Items.Passive.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "CampfireWood" then
         HarukaLib:Add(char, "HealBuff", 30)
@@ -37,7 +38,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "ShieldBuff", 20)
 
     elseif item == "ManaCrystal" then
-        RepS.Resources.Items.Passive.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
+        SS.Resources.Items.Passive.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "RabbitFoot" then
         HarukaLib:Add(char, "JumpBuff", 20)
@@ -61,7 +62,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "HealthBuff", 100)
 
     elseif item == "RegenerationGem" then
-        RepS.Resources.Items.Passive.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs
+        SS.Resources.Items.Passive.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "BlackwolfNecklace" then
         HarukaLib:Add(char, "MaxDMGBuff", 150)
@@ -95,14 +96,14 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "MagicBuff", 50)
         HarukaLib:Add(char, "SpeedBuff", 15)
 
-        RepS.Resources.Items.Passive.FoxSpirit:Clone().Parent = char.CharStats.ExtraOrbs
+        SS.Resources.Items.Passive.FoxSpirit:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "NorthernHalberd" then
         HarukaLib:Add(char, "MaxDMGBuff", 80)
 
     elseif item == "AbsorptionCrystal" then
         HarukaLib:Add(char, "ShieldBuff", 50)
-        HarukaLib:Add(char, "TPRestoreBuff", 10)
+        HarukaLib:Add(char, "RestoreBuff", 10)
 
     elseif item == "FireStaff" then
         char.CharStats.ExtraOrbs:SetAttribute("FireStaffOrb", true)
@@ -144,6 +145,8 @@ function PassiveUtil:ClearAllPassives(char: Model)
         if find(attribute, "Buff") then
             char:SetAttribute(attribute, 0)
 
+            if attribute == "RestoreBuff" or attribute == "HealBuff" then char:SetAttribute(attribute, 10) end
+
         elseif find(attribute, "Can") then
             char:SetAttribute(attribute, nil)
 
@@ -153,10 +156,10 @@ function PassiveUtil:ClearAllPassives(char: Model)
             if attribute == "CriChance" then char:SetAttribute(attribute, 1) end
         end
     end
-    for attribute: string, _ in char.CharStats.ExtraOrbs:GetAttributes() do
-        char:SetAttribute(attribute, nil)
-    end
+
     char.CharStats.ExtraOrbs:ClearAllChildren()
+    HarukaLib:ClearAllAttributes(char.CharStats.ExtraOrbs)
+
     local light = char.PrimaryPart:FindFirstChildOfClass("PointLight")
     if light then light:Destroy() end
 

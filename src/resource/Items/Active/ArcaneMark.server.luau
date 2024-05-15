@@ -27,7 +27,7 @@ Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
 local mark = RepS.Package.MagicAssets.ArcaneMark:Clone() :: BasePart
 mark.CFrame = monster.PrimaryPart.CFrame
-mark.Parent = char
+mark.Parent = workspace
 Debris:AddItem(mark, 0.4)
 
 local radius = (mark.Size.X + mark.Size.Z)/4

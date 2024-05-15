@@ -19,8 +19,7 @@ local wait = task.wait
 local instanceNew = Instance.new
 local cfLookAt = CFrame.lookAt
 local fromRGB = Color3.fromRGB
-local floor = math.floor
-local one = Vector3.one
+local v3New = Vector3.new
 
 local ITEM_ATTRIBUTES = { CD = 6, COMBAT_REQ = true, MONSTER_REQ = true }
 
@@ -30,16 +29,16 @@ if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then 
 Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
 Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
 
-local fireBall = RepS.Package.MagicAssets.FireBall:Clone() :: Part
-fireBall.CFrame = char.PrimaryPart.CFrame
-fireBall.CFrame = cfLookAt(fireBall.Position, monster.PrimaryPart.Position)
-fireBall.Parent = workspace
-Debris:AddItem(fireBall, 5)
+local tenebrisBall = RepS.Package.MagicAssets.Tenebris.TenebrisBall:Clone() :: Part
+tenebrisBall.CFrame = char.PrimaryPart.CFrame
+tenebrisBall.CFrame = cfLookAt(tenebrisBall.Position, monster.PrimaryPart.Position)
+tenebrisBall.Parent = workspace
+Debris:AddItem(tenebrisBall, 5)
 
 local bv = instanceNew("BodyVelocity")
-bv.MaxForce = one * math.huge
-bv.Velocity = fireBall.CFrame.LookVector * 50
-bv.Parent = fireBall
+bv.MaxForce = v3New(1, 1, 1) * math.huge
+bv.Velocity = tenebrisBall.CFrame.LookVector * 50
+bv.Parent = tenebrisBall
 
 --- Fireball select target
 local hit = false
@@ -47,21 +46,27 @@ while wait(0.01) do
 	if monster and not hit then
 		if not monster or not monster.PrimaryPart then break end
 
-		if (fireBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
+		if (tenebrisBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			BuffEffectsUtil:Burn(char, monster, 6)
 			BuffEffectsUtil:MagicVFX(monster)
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
 
-			fireBall.Spirit.Enabled = false
-			fireBall.CFrame = monster.PrimaryPart.CFrame
-			fireBall.Anchored = true
-			Debris:AddItem(fireBall, 1)
+			local eff = RepS.Package.MagicAssets.Tenebris.Flashed:Clone() :: BasePart
+			eff.CFrame = monster.PrimaryPart.CFrame
+			eff.Parent = workspace
+			Debris:AddItem(eff, 1)
 
-			Events.ClientTween:Fires({ fireBall }, { Size = one * 9, Transparency = 1 }, "one")
+			Events.ClientTween:Fires({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
 
-			local dmg = floor(char:GetAttribute("Magic") / 2)
+			tenebrisBall.Spirit.Enabled = false
+			tenebrisBall.CFrame = monster.PrimaryPart.CFrame
+			tenebrisBall.Anchored = true
+			Debris:AddItem(tenebrisBall, 1)
+
+			Events.ClientTween:Fires({ tenebrisBall }, { Size = v3New(1, 1, 1) * 9, Transparency = 1 }, "one")
+
+			local dmg = char:GetAttribute("Magic")
             HarukaLib:Add(monster, "Health", -dmg)
 
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))

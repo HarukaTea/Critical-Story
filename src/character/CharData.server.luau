@@ -60,6 +60,7 @@ local function setup()
     _createStats()
 
     ServerUtil:SetCollisionGroup(char, "Player")
+    ServerUtil:CancelRaycast(char, true)
 
     Add(HarukaLib.Clock(1, function()
         HarukaLib:Add(plr, "PlayTime", 1)
@@ -176,6 +177,15 @@ local function charAttributesSetup()
             lvUpCD = false
         end
     end
+    local function levelCheck(level: number)
+        if not level then return end
+
+        --- to avoid bypass
+        if level > 150 then
+            plr:SetAttribute("Levels", 150)
+            plr:SetAttribute("EXP", 0)
+        end
+    end
 
     --// Setups
     Spawn(updateMinDMG)
@@ -198,7 +208,9 @@ local function charAttributesSetup()
         ["Attr-ShieldPoints"] = updateShield,
         ["Attr-HealthPoints"] = updateHP,
         ["Attr-ManaPoints"] = updateMana,
+
         ["Attr-EXP"] = levelReqCheck,
+        ["Attr-Levels"] = levelCheck,
 
         ["Attr-Class"] = function()
             ServerUtil:EquipWeapon(char)

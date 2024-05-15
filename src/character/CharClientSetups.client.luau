@@ -36,10 +36,8 @@ Spawn(setup)
 
 --// Connections
 local function onDied()
-	--- sometimes the reset button did not make server thinks he is dead
+	---// sometimes the reset button did not make server thinks player is dead
 	Events.ForceReset:Fire()
-
-	musics.SFXs.Dead:Play()
 
 	for _, prompt: Instance in mapComponents:GetDescendants() do
 		if prompt:IsA("ProximityPrompt") and prompt.Name ~= "Chest" then prompt.Enabled = false end

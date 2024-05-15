@@ -5,6 +5,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
@@ -65,21 +66,18 @@ local function combatEnds()
                 end
 
                 HarukaLib:Add(player, "EXP", totalEXP)
-                HarukaLib:Add(player, "Gold", floor(totalEXP / 1.5))
-                HarukaLib:Add(player, "RP", floor(totalEXP / 5))
+                HarukaLib:Add(player, "Gold", floor(totalEXP / 2))
+                HarukaLib:Add(player, "RP", floor(totalEXP / 6))
 
                 ServerUtil:ShowText(char, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
                 ServerUtil:ShowText(char, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))
-                ServerUtil:ShowText(char, "+" .. floor(totalEXP / 5) .. " RP", fromRGB(0, 255, 255))
+                ServerUtil:ShowText(char, "+" .. floor(totalEXP / 6) .. " RP", fromRGB(0, 255, 255))
 
                 --// Clear
                 char:SetAttribute("InCombat", false)
-                char:SetAttribute("OrbAttackingTime", false)
                 charStats.TargetMonster.Value = nil
 
-                for _, buff: Script in charStats.EffectsList:GetChildren() do
-                    buff:SetAttribute("Turn", -1)
-                end
+                BuffEffectsUtil:PurifyBuff(char)
 
                 for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
                     if orbFolder.Name == player.Name then orbFolder:Destroy() end

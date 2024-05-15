@@ -22,10 +22,12 @@ local function setup()
     local monsterTree = Octree.new()
 
 	for _, monster: Model in workspace:WaitForChild("Monsters"):GetDescendants() do
-		if monster:HasTag("Monster") then monsterTree:CreateNode(monster.PrimaryPart.Position, monster) end
+		if monster:HasTag("Monster") and monster.PrimaryPart then monsterTree:CreateNode(monster.PrimaryPart.Position, monster) end
 	end
 	local function _handleMonster(monster: Model)
 		wait()
+        repeat wait() until monster.PrimaryPart --// Low-end device players, I highly respect them
+
 		monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 	end
 	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster))
@@ -44,12 +46,13 @@ local function setup()
                 wait(random(0, 5) / 10)
                 local rotating = random(5, 20)
                 local direction = random(-2, 2)
-                for _ = 1, rotating do
-                    if not monster and monster.PrimaryPart then break end
 
-                    monster.PrimaryPart.CFrame *= cfAngles(0, rad(direction * 5), 0)
-                    wait(0.01)
-                end
+                pcall(function()
+                    for _ = 1, rotating do
+                        monster.PrimaryPart.CFrame *= cfAngles(0, rad(direction * 5), 0)
+                        wait(0.01)
+                    end
+                end)
             end)
         end
     end))
