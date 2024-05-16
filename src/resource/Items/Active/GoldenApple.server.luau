@@ -3,14 +3,15 @@
 --!native
 
 local SSS = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
 
-local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent.Parent.Parent :: Model
-local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
+local plr = Players:GetPlayerFromCharacter(char)
 
-local ITEM_ATTRIBUTES = { CD = 8, HEAL_BUFF = 0.5, ATTACK_BUFF = 2, DURATION = 6 }
+local ITEM_ATTRIBUTES = { CD = 8, HEAL_BUFF = 0.35, ATTACK_BUFF = 1.5, DURATION = 5 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

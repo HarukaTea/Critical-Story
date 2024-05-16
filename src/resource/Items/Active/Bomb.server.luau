@@ -4,14 +4,15 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 
 local char = script.Parent.Parent.Parent :: Model
-local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
+local plr = Players:GetPlayerFromCharacter(char)
 local monster = char.CharStats.TargetMonster.Value :: Model
 
 local fromRGB = Color3.fromRGB

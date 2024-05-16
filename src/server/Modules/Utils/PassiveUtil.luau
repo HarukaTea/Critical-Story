@@ -114,7 +114,7 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "MaxDMGBuff", 100)
 
     elseif item == "Devilsknife" then
-        HarukaLib:Add(char, "BurnChance", 30)
+        HarukaLib:Add(char, "PoisonChance", 30)
 
     elseif item == "SharpenerRock" then
         HarukaLib:Add(char, "CriChance", 10)

@@ -167,7 +167,7 @@ local function charAttributesSetup()
     local function levelReqCheck()
         local level = plr:GetAttribute("Levels") :: number
 
-        if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 60 then
+        if plr:GetAttribute("EXP") >= floor(level ^ 1.8599) + 49 then
             if lvUpCD then return end
 
             lvUpCD = true

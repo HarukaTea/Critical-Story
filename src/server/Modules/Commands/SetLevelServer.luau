@@ -15,8 +15,8 @@ return function (_, players: table, level: number)
         return "I guess you typed incorrect level..."
     end
 
-    if levelWant > 125 then
-        return "The level cap is 125 bro!"
+    if levelWant > 150 then
+        return "The level cap is 150 bro!"
     else
         for _, plr: Player in players do
             plr:SetAttribute("EXP", 0)

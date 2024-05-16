@@ -4,7 +4,9 @@
 
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
+local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
 
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
@@ -13,7 +15,7 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent.Parent.Parent :: Model
-local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
+local plr = Players:GetPlayerFromCharacter(char)
 local monster = char.CharStats.TargetMonster.Value :: Model
 
 local wait = task.wait
@@ -45,7 +47,7 @@ Spawn(function()
 	Events.ClientTween:Fires({ lantern }, { Transparency = 1 }, "one")
 end)
 
-pcall(function()
+local success, errorMsg = pcall(function()
 	for i = 1, 4 do
 		local beamPart = RepS.Package.MagicAssets.GhostlyLantern.BeamPart:Clone() :: BasePart
 		beamPart.CFrame = char.PrimaryPart.CFrame * cfNew(random(-8,8), random(-1,10), random(-8,8))
@@ -115,5 +117,5 @@ pcall(function()
 			HarukaLib:Add(monster, "Health", -dmg)
 		end
 	end
-
 end)
+if not success and RS:IsStudio() then warn(errorMsg) end

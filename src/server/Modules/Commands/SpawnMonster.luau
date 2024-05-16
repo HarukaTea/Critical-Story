@@ -27,7 +27,7 @@ return {
         {
             Type = "number",
             Name = "level",
-            Description = "The level you want to fight",
+            Description = "The level you want to fight, max is 950",
             Default = 1
         },
         {

@@ -192,10 +192,10 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", floor(level ^ 2.35) + 99)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2.3599) + 39)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", (floor(level ^ 1.3) + 29))
-	monster:SetAttribute("Damage", (floor(level ^ 1.4) + 4))
+	monster:SetAttribute("EXP", (floor(level ^ 1.2599) + 29))
+	monster:SetAttribute("Damage", (floor(level ^ 1.4599) + 4))
 	monster:SetAttribute("InCombat", false)
 
 	local numberDisplay = RepS.Package.Effects.Display:Clone() :: BillboardGui

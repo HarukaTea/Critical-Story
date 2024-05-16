@@ -4,7 +4,9 @@
 
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
+local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
+local Players = game:GetService("Players")
 
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
@@ -12,7 +14,7 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent.Parent.Parent :: Model
-local plr = game:GetService("Players"):GetPlayerFromCharacter(char)
+local plr = Players:GetPlayerFromCharacter(char)
 local monster = char.CharStats.TargetMonster.Value :: Model
 
 local wait = task.wait
@@ -42,9 +44,9 @@ bv.Parent = luxBall
 
 --- Fireball select target
 local hit = false
-while wait(0.01) do
-	if monster and not hit then
-		if not monster or not monster.PrimaryPart then break end
+local success, errorMsg = pcall(function()
+	while wait(0.01) do
+		if hit then break end
 
 		if (luxBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
@@ -67,11 +69,10 @@ while wait(0.01) do
 			Events.ClientTween:Fires({ luxBall }, { Size = v3New(1, 1, 1) * 9, Transparency = 1 }, "one")
 
 			local dmg = char:GetAttribute("Magic")
-            HarukaLib:Add(monster, "Health", -dmg)
+			HarukaLib:Add(monster, "Health", -dmg)
 
-			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))
+			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 255, 0))
 		end
-	else
-		break
 	end
-end
+end)
+if not success and RS:IsStudio() then warn(errorMsg) end

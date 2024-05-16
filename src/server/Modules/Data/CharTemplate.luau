@@ -34,6 +34,7 @@ return {
     HealBuff = 10,
 
     BurnChance = 0,
+    PoisonChance = 0,
     DodgeChance = 0,
     CriChance = 1,
     CriDMG = 100,

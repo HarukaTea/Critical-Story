@@ -211,7 +211,7 @@ return function(plr: Player)
 		end,
 		["Attr-Levels"] = function(level: number)
 			playerData.Levels:set(level)
-			playerData.EXP[2]:set(floor(level ^ 1.85) + 60)
+			playerData.EXP[2]:set(floor(level ^ 1.8599) + 59)
 		end,
 		["Attr-Class"] = function(class: string)
 			playerData.Class:set(class)

@@ -113,13 +113,13 @@ PPS.PromptTriggered:Connect(promptsHandler)
 local LEVEL_CAP = 150
 local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
-	return if exp >= floor(level ^ 1.85) + 60 and level < LEVEL_CAP then true else false
+	return if exp >= floor(level ^ 1.8599) + 59 and level < LEVEL_CAP then true else false
 end
 local function levelUp(plr: Player)
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
 
 	if check then
-		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.85) + 60))
+		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.8599) + 59))
 		HarukaLib:Add(plr, "Levels", 1)
 		HarukaLib:Add(plr, "LvPoints", LEVEL_POINT)
 
@@ -152,8 +152,8 @@ Signals.LevelUp:Connect(levelUp)
 ]]
 local function addPoint(plr: Player, option: string, times: number)
 	if option == "Reset" then
-		local level = plr:GetAttribute("Levels") - 1
-		local cost = (level * LEVEL_POINT - plr:GetAttribute("LvPoints")) * 20
+		local level = plr:GetAttribute("Levels")
+		local cost = ((level - 1) * LEVEL_POINT - plr:GetAttribute("LvPoints")) * 20
 
 		if plr:GetAttribute("Gold") < cost then
 			Events.CreateHint:Fire(plr, "You don't have enough Gold to reset!")

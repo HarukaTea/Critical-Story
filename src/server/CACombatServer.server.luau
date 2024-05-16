@@ -144,17 +144,18 @@ local function mobTakeDMG(plr: Player, orb: Model)
 		orb:Destroy()
 
 		--- extra attack
-		local burnChance = char:GetAttribute("BurnChance") :: number
+		local extraAttacks = { "Burn", "Poison" }
+		for i = 1, 2 do
+			local chance = LootPlan.new()
+			local charCurrentChance = char:GetAttribute(extraAttacks[i].."Chance")
 
-		if burnChance > 0 then
-			local burn = LootPlan.new()
+			chance:Add(extraAttacks[i], charCurrentChance)
+			chance:Add("None", 100 - charCurrentChance)
 
-			burn:Add("Burn", burnChance)
-			burn:Add("None", 100 - burnChance)
+			local result = chance:Roll()
+			if result == extraAttacks[i] then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 6) end
 
-			if burn:Roll() == "Burn" then BuffEffectsUtil:Burn(char, monster, 6) end
-
-			burn:Destroy()
+			chance:Destroy()
 		end
 	end)
 end
