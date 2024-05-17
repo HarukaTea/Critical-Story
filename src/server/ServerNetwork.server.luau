@@ -65,8 +65,8 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 	elseif prompt.Name == "Material" then
 		local hasTool = false
-		if prompt.Parent:GetAttribute("Special") then
-			local essential = prompt.Parent:GetAttribute("Special") :: string
+		if prompt:GetAttribute("Special") then
+			local essential = prompt:GetAttribute("Special") :: string
 
 			if plr.Character:GetAttribute(essential) then hasTool = true end
 		else
@@ -86,11 +86,12 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 		local material = prompt.Parent.Parent :: Model
 		local finalMaterial = material.Name
-		if prompt.Parent:GetAttribute("Rare") then
+		if prompt:GetAttribute("Rare") then
 			local rareChance = LootPlan.new()
-			local rareMaterial = prompt.Parent:GetAttribute("Rare")
-			rareChance:Add(material.Name, 80)
-			rareChance:Add(rareMaterial, 20)
+			local rareMaterial = prompt:GetAttribute("Rare") :: string
+
+			rareChance:Add(material.Name, 85)
+			rareChance:Add(rareMaterial, 15)
 
 			finalMaterial = rareChance:Roll()
 			rareChance:Destroy()
@@ -113,13 +114,13 @@ PPS.PromptTriggered:Connect(promptsHandler)
 local LEVEL_CAP = 150
 local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
-	return if exp >= floor(level ^ 1.8599) + 59 and level < LEVEL_CAP then true else false
+	return if exp >= floor(level ^ 1.85) + 59 and level < LEVEL_CAP then true else false
 end
 local function levelUp(plr: Player)
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
 
 	if check then
-		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.8599) + 59))
+		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.85) + 59))
 		HarukaLib:Add(plr, "Levels", 1)
 		HarukaLib:Add(plr, "LvPoints", LEVEL_POINT)
 
@@ -231,8 +232,7 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 		Events.EquipItems:Fire(plr, itemSlot, item)
 
 	elseif itemType == "ClearPassive" and item ~= "" then
-		char.CharStats.Items:SetAttribute(item.."_PASSIVE", false)
-		PassiveUtil:ClearAllPassives(char)
+		PassiveUtil:UnequipPassive(char, item)
 
 		_unequipCheck(plr, item)
 
@@ -376,9 +376,6 @@ Events.NewQuest:Connect(newQuest)
 	Change player's last seen location
 ]]
 local function changeLastSeen(plr: Player, location: string)
-	local spawnPoint = ServerUtil:FindNearestSpawn(plr)
-
-	plr:SetAttribute("LastLeave", spawnPoint.Position)
 	plr:SetAttribute("LastSeenLocation", location)
 end
 Events.ChangePlayerLocation:Connect(changeLastSeen)

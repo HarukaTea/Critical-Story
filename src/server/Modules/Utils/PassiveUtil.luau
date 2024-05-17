@@ -16,9 +16,11 @@ local find, sub = string.find, string.sub
 ]]
 function PassiveUtil:EquipPassive(item: string, char: Model)
     if item == "TravellerBoots" then
-        HarukaLib:Add(char, "SpeedBuff", 5)
+        HarukaLib:Add(char, "SpeedBuff", 8)
 
     elseif item == "BurningTorch" then
+        HarukaLib:Add(char, "SpeedBuff", 4)
+
         SS.Resources.Items.Passive.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "CampfireWood" then
@@ -34,10 +36,13 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "MaxDMGBuff", 15)
 
     elseif item == "AncientHammer" then
-        HarukaLib:Add(char, "MaxDMGBuff", 20)
+        HarukaLib:Add(char, "MinDMGBuff", 20)
+        HarukaLib:Add(char, "MaxDMGBuff", 40)
         HarukaLib:Add(char, "ShieldBuff", 20)
 
     elseif item == "ManaCrystal" then
+        HarukaLib:Add(char, "ManaBuff", 100)
+
         SS.Resources.Items.Passive.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "RabbitFoot" then
@@ -45,31 +50,39 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
 
     elseif item == "ArcaneSpellbook" then
         HarukaLib:Add(char, "MagicBuff", 120)
+        HarukaLib:Add(char, "ManaBuff", 100)
 
         --// TODO: Be the member of Faction
 
     elseif item == "MagicianHat" then
+        HarukaLib:Add(char, "HealthBuff", 300)
         HarukaLib:Add(char, "MagicBuff", 120)
 
-        --//
+        --// TODO: be the member of Faction
 
     elseif item == "EnchantedBlade" then
-        HarukaLib:Add(char, "MaxDMGBuff", 120)
+        HarukaLib:Add(char, "MinDMGBuff", 25)
+        HarukaLib:Add(char, "MaxDMGBuff", 100)
         HarukaLib:Add(char, "MagicBuff", 50)
 
     elseif item == "StalkerCape" then
         HarukaLib:Add(char, "DodgeChance", 15)
+        HarukaLib:Add(char, "SpeedBuff", 5)
         HarukaLib:Add(char, "HealthBuff", 100)
 
     elseif item == "RegenerationGem" then
+        HarukaLib:Add(char, "HealthBuff", 150)
+
         SS.Resources.Items.Passive.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "BlackwolfNecklace" then
+        HarukaLib:Add(char, "MinDMGBuff", 75)
         HarukaLib:Add(char, "MaxDMGBuff", 150)
         HarukaLib:Add(char, "SpeedBuff", 10)
 
     elseif item == "FlameSword" then
-        HarukaLib:Add(char, "BurnChance", 15)
+        HarukaLib:Add(char, "BurnChance", 10)
+        HarukaLib:Add(char, "MagicBuff", 25)
         HarukaLib:Add(char, "MaxDMGBuff", 100)
 
     elseif item == "KitsuneGloves" then
@@ -77,12 +90,14 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         HarukaLib:Add(char, "MaxDMGBuff", 50)
 
     elseif item == "AquaLapis" then
-        HarukaLib:Add(char, "CriChance", 10)
+        HarukaLib:Add(char, "MagicBuff", 30)
+        HarukaLib:Add(char, "ManaBuff", 150)
 
     elseif item == "EverfrostSeed" then
         char:SetAttribute("CanEnterStronghold", true)
 
     elseif item == "HotPotato" then
+        HarukaLib:Add(char, "BurnChance", 10)
         HarukaLib:Add(char, "SpeedBuff", 15)
 
     elseif item == "NorthernerAxe" then
@@ -99,10 +114,12 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
         SS.Resources.Items.Passive.FoxSpirit:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "NorthernHalberd" then
+        HarukaLib:Add(char, "MinDMGBuff", 40)
         HarukaLib:Add(char, "MaxDMGBuff", 80)
 
     elseif item == "AbsorptionCrystal" then
         HarukaLib:Add(char, "ShieldBuff", 50)
+        HarukaLib:Add(char, "ManaBuff", 50)
         HarukaLib:Add(char, "RestoreBuff", 10)
 
     elseif item == "FireStaff" then
@@ -121,20 +138,29 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
 
     elseif item == "AdventurersKit" then
         char:SetAttribute("CanSpawnMultiOrb", true)
-
-    elseif item == "ChampionCrown" then
-        HarukaLib:Add(char, "MaxDMG", 200)
-        HarukaLib:Add(char, "CriChance", 25)
+        HarukaLib:Add(char, "HealBuff", 5)
+        HarukaLib:Add(char, "RestoreBuff", 5)
 
     elseif item == "ClimbingGear" then
         char:SetAttribute("CanClimb", true)
 
     elseif item == "CrimsonSlimeFang" then
-        HarukaLib:Add(char, "MaxDMG", 100)
+        HarukaLib:Add(char, "MinDMGBuff", 50)
+        HarukaLib:Add(char, "MaxDMGBuff", 100)
+        HarukaLib:Add(char, "JumpBuff", 5)
         HarukaLib:Add(char, "CriChance", 10)
     end
 
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", true)
+end
+
+--[[
+    Unequip a passive, and remove its buffs
+]]
+function PassiveUtil:UnequipPassive(char: Model, item: string)
+    char.CharStats.Items:SetAttribute(item.."_PASSIVE", false)
+
+    PassiveUtil:ClearAllPassives(char)
 end
 
 --[[

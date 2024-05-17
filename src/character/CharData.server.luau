@@ -28,6 +28,8 @@ local ATTRIBUTES = require(SSS.Modules.Data.CharTemplate)
 local wait = task.wait
 local floor = math.floor
 local instanceNew = Instance.new
+local v3New = Vector3.new
+local cfNew = CFrame.new
 
 repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 
@@ -68,15 +70,12 @@ local function setup()
         if char:GetAttribute("HitCD") >= 0 then HarukaLib:Add(char, "HitCD", -1) end
     end))
 
+    char:SetAttribute("CharDataLoaded", true)
+
     --// Spawn to the nearest respawn point
     if not RS:IsStudio() then
-        local spawnPoint = ServerUtil:FindNearestSpawn(plr)
-
-        char:PivotTo(spawnPoint.CFrame)
-        plr:SetAttribute("LastLeave", spawnPoint.Position)
+        if plr:GetAttribute("RespawnLocation") ~= v3New() then char:PivotTo(cfNew(plr:GetAttribute("RespawnLocation"))) end
     end
-
-    char:SetAttribute("CharDataLoaded", true)
 end
 Spawn(setup)
 
@@ -158,8 +157,10 @@ local function charAttributesSetup()
         humanoid.MaxHealth = 50 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
         humanoid.Health = humanoid.MaxHealth
     end
-    local function updateSpeed(speed: number)
-        humanoid.WalkSpeed = 30 + speed
+    local function updateSpeed()
+        local baseSpeed = if char:GetAttribute("InCombat") then 30 else 40
+
+        humanoid.WalkSpeed = baseSpeed + char:GetAttribute("SpeedBuff")
     end
     local function updateJump(jump: number)
         humanoid.JumpPower = 50 + jump
@@ -167,7 +168,7 @@ local function charAttributesSetup()
     local function levelReqCheck()
         local level = plr:GetAttribute("Levels") :: number
 
-        if plr:GetAttribute("EXP") >= floor(level ^ 1.8599) + 49 then
+        if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 49 then
             if lvUpCD then return end
 
             lvUpCD = true
@@ -197,7 +198,9 @@ local function charAttributesSetup()
     Spawn(updateSpeed, 0)
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)
-    ServerUtil:EquipWeapon(char)
+    Spawn(function()
+        ServerUtil:EquipWeapon(char)
+    end)
 
     Add(HarukaLib:Hydrate(plr, {
         ["Attr-DMGPoints"] = function()
@@ -222,7 +225,7 @@ local function charAttributesSetup()
 
         ["Attr-MinDMGBuff"] = updateMinDMG,
         ["Attr-MaxDMGBuff"] = updateMaxDMG,
-        ["Attr-MagicBuff"] = updateShield,
+        ["Attr-MagicBuff"] = updateMagic,
         ["Attr-ShieldBuff"] = updateShield,
         ["Attr-HealthBuff"] = updateHP,
         ["Attr-ManaBuff"] = updateMana,
@@ -231,6 +234,8 @@ local function charAttributesSetup()
 
         ["Attr-InCombat"] = function()
             ServerUtil:EquipWeapon(char)
+
+            updateSpeed()
         end
     }))
 end
@@ -257,7 +262,7 @@ local function onDead()
             end
         end)
     end
-    for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
+    for _, orbFolder: Folder in workspace.MapComponents.OrbHolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end
     end
 

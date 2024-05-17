@@ -20,6 +20,8 @@ local floor = math.floor
 local fromRGB = Color3.fromRGB
 
 local function combatEnds()
+    if monster.Parent:FindFirstChildOfClass("BindableEvent") then monster.Parent.CombatEnds:Fire() end
+
 	monster.Attack.Disabled = true
 
     local attackFolder = monster.AttackHolder.Value :: Folder?
@@ -79,7 +81,7 @@ local function combatEnds()
 
                 BuffEffectsUtil:PurifyBuff(char)
 
-                for _, orbFolder: Folder in workspace.MapComponents.OrbFolders:GetChildren() do
+                for _, orbFolder: Folder in workspace.MapComponents.OrbHolders:GetChildren() do
                     if orbFolder.Name == player.Name then orbFolder:Destroy() end
                 end
 

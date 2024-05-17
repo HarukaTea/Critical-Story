@@ -12,7 +12,7 @@ return {
 
 		Class = "Warrior",
 		LastSeenLocation = "InitusBay",
-		LastLeave = { "Vector3", 0, 0, 0 },
+		RespawnLocation = { "Vector3", 0, 0, 0 },
 
 		LvPoints = 0,
 		DMGPoints = 0,

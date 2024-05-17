@@ -26,7 +26,7 @@ local v3New = Vector3.new
 local random = math.random
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local ITEM_ATTRIBUTES = { CD = 10, COMBAT_REQ = true, MONSTER_REQ = true, HEAL_BUFF = 0.6 }
+local ITEM_ATTRIBUTES = { CD = 10, COMBAT_REQ = true, MONSTER_REQ = true, HEAL_BUFF = 0.2 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 

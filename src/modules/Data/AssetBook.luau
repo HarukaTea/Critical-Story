@@ -56,13 +56,6 @@ AssetBook.PromptIcons = {
     Travel = "rbxassetid://16458254833"
 }
 
-AssetBook.ActionPanelIcons = {
-    Attack = "rbxassetid://2034122114",
-    Items = "rbxassetid://2228031606",
-    Skills = "rbxassetid://2034172262",
-    Defend = "rbxassetid://4601012009"
-}
-
 AssetBook.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
@@ -154,6 +147,10 @@ AssetBook.MonsterInfo = {
         Name = "Purple Slime",
         Icon = "rbxassetid://16483649160"
     },
+    CrimsonSlime = {
+        Name = "Crimson Slime",
+        Icon = ""
+    },
     IceSlime = {
         Name = "Ice Slime",
         Icon = ""
@@ -199,37 +196,22 @@ local default = {
     FogColor = fromRGB(21, 152, 205),
     FogEnd = 2000
 }
-local tundra = {
-    Ambient = fromRGB(),
-    OutdoorAmbient = fromRGB(128, 128, 128),
-    FogColor = fromRGB(0, 196, 255),
-    FogEnd = 350
-}
 AssetBook.LocationInfo = {
-    InitusBay = {
-        Name = "Initus Bay",
-        Desc = "The start of every adventure...",
-        Music = "StepLegends",
-        MusicVolume = 0.5,
+    MonolithVillage = {
+        Name = "Monolith Village",
+        Desc = "The start of your story",
+        Music = "StoryBegins",
+        MusicVolume = 0.7,
         RecommendLevel = 1,
 
         Lighting = default
     },
-    PrimisField = {
-        Name = "Primis Field",
-        Desc = "Still filled with fond memories...",
-        Music = "Conquest",
-        MusicVolume = 0.5,
+    MonolithGrove = {
+        Name = "Monolith Grove",
+        Desc = "Where can I find the way out?",
+        Music = "HiddenForest",
+        MusicVolume = 0.7,
         RecommendLevel = 1,
-
-        Lighting = default
-    },
-    ThyrsusForest = {
-        Name = "Thyrsus Woods",
-        Desc = "In the tranquil forest, all you can hear is the howling of wolves.",
-        Music = "Conquest",
-        MusicVolume = 0.6,
-        RecommendLevel = 10,
 
         Lighting = {
             Ambient = fromRGB(),
@@ -237,12 +219,30 @@ AssetBook.LocationInfo = {
             FogEnd = 1000
         }
     },
-    AlderForest = {
-        Name = "Alder Forest",
-        Desc = "The trees in this forest seem a bit peculiar.",
+    InitusBay = {
+        Name = "Initus Bay",
+        Desc = "The start of your adventure",
+        Music = "Conquest",
+        MusicVolume = 0.5,
+        RecommendLevel = 1,
+
+        Lighting = default
+    },
+    PrimisField = {
+        Name = "Primis Field",
+        Desc = "Great place for slimes",
+        Music = "Conquest",
+        MusicVolume = 0.5,
+        RecommendLevel = 5,
+
+        Lighting = default
+    },
+    ThyrsusForest = {
+        Name = "Thyrsus Woods",
+        Desc = "All you can hear is the howling of wolves",
         Music = "Conquest",
         MusicVolume = 0.6,
-        RecommendLevel = 35,
+        RecommendLevel = 40,
 
         Lighting = {
             Ambient = fromRGB(),
@@ -252,7 +252,7 @@ AssetBook.LocationInfo = {
     },
     EnsisLake = {
         Name = "Ensis Lake",
-        Desc = "If only there were a way to get to the center...",
+        Desc = "Is there a way to get to the center?",
         Music = "FarewayLand",
         MusicVolume = 1.5,
         RecommendLevel = 20,
@@ -273,23 +273,9 @@ AssetBook.LocationInfo = {
             FogEnd = 2000
         }
     },
-    EnsisCave = {
-        Name = "Ensis Cave",
-        Desc = "Ghosts make you crazy!",
-        Music = "RoadTaken",
-        MusicVolume = 0.5,
-        RecommendLevel = 70,
-
-        Lighting = {
-            Ambient = fromRGB(),
-            OutdoorAmbient = fromRGB(),
-            FogColor = fromRGB(21, 152, 205),
-            FogEnd = 2000
-        }
-    },
     Highlands = {
         Name = "Highlands",
-        Desc = "I'd rather not fight these Slimes...",
+        Desc = "I'd rather not fight these annoying slimes",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 30,
@@ -298,7 +284,7 @@ AssetBook.LocationInfo = {
     },
     VenatorVillage = {
         Name = "Venator Village",
-        Desc = "The inevitable path to the snowy plains",
+        Desc = "The inevitable path to snowy world",
         Music = "StepLegends",
         MusicVolume = 0.5,
         RecommendLevel = 1,
@@ -310,86 +296,9 @@ AssetBook.LocationInfo = {
         Desc = "Where does the river truly originate?",
         Music = "Conquest",
         MusicVolume = 0.5,
-        RecommendLevel = 15,
-
-        Lighting = default
-    },
-    ClockTown = {
-        Name = "Clock Town",
-        Desc = "The bell tolls, echoing the ancient past.",
-        Music = "StepLegends",
-        MusicVolume = 0.5,
         RecommendLevel = 1,
 
         Lighting = default
-    },
-    AlderTown = {
-        Name = "Alder Town",
-        Desc = "The birthplace of the Alchemist.",
-        Music = "StepLegends",
-        MusicVolume = 0.5,
-        RecommendLevel = 1,
-
-        Lighting = default
-    },
-    NiximEntrance = {
-        Name = "Nixim Village",
-        Desc = "The gateway to the snowy wilderness.",
-        Music = "Tundra",
-        MusicVolume = 0.5,
-        RecommendLevel = 40,
-
-        Lighting = tundra
-    },
-    NiximCliff = {
-        Name = "Nixim Cliff",
-        Desc = "A moment's inattention could lead to a precipitous fall into the abyss...",
-        Music = "Tundra",
-        MusicVolume = 0.5,
-        RecommendLevel = 45,
-
-        Lighting = tundra
-    },
-    NiximForest = {
-        Name = "Nixim Forest",
-        Desc = "The vast white forest hides dangers that you might not detect.",
-        Music = "Tundra",
-        MusicVolume = 0.5,
-        RecommendLevel = 50,
-
-        Lighting = tundra
-    },
-    NorthernStronghold = {
-        Name = "Northern Stronghold",
-        Desc = "Facing the Abyss, this is the warriors' last stand.",
-        Music = "Stronghold",
-        MusicVolume = 0.5,
-        RecommendLevel = 1,
-
-        Lighting = default
-    },
-    AuraIsland = {
-        Name = "Aura Islands",
-        Desc = "Why is there a solitary island in the vast ocean?",
-        Music = "Conquest",
-        MusicVolume = 0.5,
-        RecommendLevel = 55,
-
-        Lighting = default
-    },
-    FirestoneIsland = {
-        Name = "Firestone Islands",
-        Desc = "The resolve of the warrior!",
-        Music = "Conquest",
-        MusicVolume = 0.5,
-        RecommendLevel = 60,
-
-        Lighting = {
-            Ambient = fromRGB(127, 127, 127),
-            OutdoorAmbient = fromRGB(198, 198, 198),
-            FogColor = fromRGB(21, 152, 205),
-            FogEnd = 10000
-        }
     }
 }
 

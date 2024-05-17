@@ -39,8 +39,8 @@ repeat wait() until char:GetAttribute("CharDataLoaded")
 
 --// Pre-functions
 local function setup()
-	for _, folder: Folder in mapComponents.CombatFolders:GetChildren() do folder:Destroy() end
-	for _, folder: Folder in mapComponents.OrbFolders:GetChildren() do folder:Destroy() end
+	for _, folder: Folder in mapComponents.CombatHolders:GetChildren() do folder:Destroy() end
+	for _, folder: Folder in mapComponents.OrbHolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
 	local monsterTree = Octree.new()
@@ -110,12 +110,9 @@ local function endCombat()
 	for _, sound: Sound in workspace.Sounds:GetChildren() do
 		if sound:IsA("Sound") then sound:Stop() end
 	end
-	if humanoid.Health <= 0 then
-		sfxs.Sad:Play()
-		return
-	end
-	sfxs.CombatEnded:Play()
+	if humanoid.Health <= 0 then return end
 
+	sfxs.CombatEnded:Play()
 	wait(2)
 	musics.Overworld:Play()
 end

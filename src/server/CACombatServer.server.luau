@@ -121,6 +121,8 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	local monster = char.CharStats.TargetMonster.Value :: Model?
 	local class = orb:GetAttribute("Style") :: string
 	local dmgType = if orb:GetAttribute("DMGType") then orb:GetAttribute("DMGType") else AssetBook.ClassInfo[class].Type
+
+	--- base damage
 	local baseDamage = 0
 	if dmgType == "DMG" then
 		local minDMG: number, maxDMG: number = char:GetAttribute("MinDMG"), char:GetAttribute("MaxDMG")
@@ -131,6 +133,12 @@ local function mobTakeDMG(plr: Player, orb: Model)
 	end
 	baseDamage = floor(baseDamage)
 
+	--- after damage
+	local defense = monster:GetAttribute("Defense") :: number
+	baseDamage -= defense
+	if baseDamage <= 0 then baseDamage = 1 end
+
+	--- attack
 	orb.Owner:Destroy()
 
 	pcall(function()
@@ -209,8 +217,8 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
     char:SetAttribute("Healing", false)
 
     --- some extra damage
-    if dmgPart:GetAttribute("Burn") then BuffEffectsUtil:Burn(char, monster, 6, true) end
-    if dmgPart:GetAttribute("Poison") then BuffEffectsUtil:Poison(char, monster, 6, true) end
+    if dmgPart:HasTag("Burn") then BuffEffectsUtil:Burn(char, monster, 6, true) end
+    if dmgPart:HasTag("Poison") then BuffEffectsUtil:Poison(char, monster, 6, true) end
 
     --- defense reduce
     dmg = floor(dmg * (100 - char:GetAttribute("Defense")) / 100)
@@ -225,7 +233,7 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 
 	--- shield
 	if shield > 0 then
-		if dmgPart:GetAttribute("Pierce") then -- "Pierce"
+		if dmgPart:HasTag("Pierce") then
 			humanoid:TakeDamage(dmg)
 			ServerUtil:ShowNumber(char, dmg)
 			return

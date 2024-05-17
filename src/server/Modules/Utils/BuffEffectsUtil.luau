@@ -32,7 +32,7 @@ function BuffEffectsUtil:RestoreManaByOrb(char: Model)
 
 	if currentMana >= char:GetAttribute("MaxMana") then return end
 
-	HarukaLib:Add(char, "Mana", ceil(100 * (char:GetAttribute("RestoreBuff") / 100)))
+	HarukaLib:Add(char, "Mana", floor(char:GetAttribute("MaxMana") * char:GetAttribute("RestoreBuff") / 100))
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
@@ -88,11 +88,13 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, duration: number, isP
 	if isPlayer then
 		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+		debuff:SetAttribute("Power", 0.5)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
-		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 2))
+		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 4))
+		debuff:SetAttribute("Power", 0.25)
 	end
-	debuff:SetAttribute("Power", 0.5)
+	debuff:SetAttribute("Power", 0.25)
 	debuff:SetAttribute("Duration", duration)
 	debuff:SetAttribute("MaxDuration", duration)
 	debuff:SetAttribute("Color", fromRGB(255, 85, 0))
@@ -112,11 +114,12 @@ function BuffEffectsUtil:Poison(char: Model, monster: Model, duration: number, i
 	if isPlayer then
 		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+		debuff:SetAttribute("Power", 0.5)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
-		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 2))
+		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 4))
+		debuff:SetAttribute("Power", 0.25)
 	end
-	debuff:SetAttribute("Power", 0.5)
 	debuff:SetAttribute("Duration", duration)
 	debuff:SetAttribute("MaxDuration", duration)
 	debuff:SetAttribute("Color", fromRGB(55, 66, 250))

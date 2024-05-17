@@ -192,10 +192,11 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", floor(level ^ 2.3599) + 39)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2.3) + 39)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", (floor(level ^ 1.2599) + 29))
-	monster:SetAttribute("Damage", (floor(level ^ 1.4599) + 4))
+	monster:SetAttribute("EXP", (floor(level ^ 1.45) + 29))
+	monster:SetAttribute("Damage", (floor(level ^ 1.4) + 4))
+	monster:SetAttribute("Defense", floor(level ^ 1.0599))
 	monster:SetAttribute("InCombat", false)
 
 	local numberDisplay = RepS.Package.Effects.Display:Clone() :: BillboardGui
@@ -235,7 +236,7 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	local folder = instanceNew("Folder")
 	folder.Name = monster.Name
 	folder:AddTag("CombatHolder")
-	folder.Parent = workspace.MapComponents.CombatFolders
+	folder.Parent = workspace.MapComponents.CombatHolders
 
 	local owner = instanceNew("ObjectValue")
 	owner.Name = "Owner"
@@ -351,14 +352,15 @@ end
 ]]
 function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 	if not monster then return end
+	if not monster.PrimaryPart then return end
 
 	local char = plr.Character
 
-	if not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then
+	if not workspace.MapComponents.OrbHolders:FindFirstChild(plr.Name) then
 		local folder = instanceNew("Folder")
 		folder.Name = plr.Name
 		folder:AddTag("OrbHolder")
-		folder.Parent = workspace.MapComponents.OrbFolders
+		folder.Parent = workspace.MapComponents.OrbHolders
 
 		local owner = instanceNew("ObjectValue")
 		owner.Name = "Owner"
@@ -470,7 +472,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	local itemInfo = ItemBook:FindItem(item)
 
 	if attributes.COMBAT_REQ then
-		if not char:GetAttribute("InCombat") or not workspace.MapComponents.OrbFolders:FindFirstChild(plr.Name) then
+		if not char:GetAttribute("InCombat") or not workspace.MapComponents.OrbHolders:FindFirstChild(plr.Name) then
 			Events.CreateHint:Fire(plr, "You can only use this during combat!")
 
 			wait()
@@ -555,29 +557,6 @@ function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Playe
 
 		ServerUtil:ShowText(plr.Character, "+"..val.." "..reward, fromRGB(212, 255, 0))
 	end
-end
-
---[[
-	Find the nearest spawn for character
-]]
-function ServerUtil:FindNearestSpawn(plr: Player) : BasePart
-	local char = plr.Character
-
-	local lastLocation = plr:GetAttribute("LastLeave") :: Vector3
-	local lastDeath = if lastLocation and lastLocation ~= v3New() then lastLocation else char.PrimaryPart.Position
-	local spawnPoint, distance = nil, 9999999999
-	for _, child: Instance in workspace.Maps:GetDescendants() do
-		if child.Name == "SpawnPoint" then
-			local tDistance = (child.Position - lastDeath).Magnitude
-
-			if tDistance < distance then
-				distance = tDistance
-				spawnPoint = child
-			end
-		end
-	end
-
-	return spawnPoint
 end
 
 --[[

@@ -74,9 +74,7 @@ function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 	HarukaLib:Add(char, "Combo", 1)
 
 	if char:GetAttribute("Combo") > 1 then
-        local combo = char:GetAttribute("Combo") :: number
-        local multiplier = if combo % 2 == 1 then (combo + 1) / 2 else combo / 2 + 0.5
-		local finalDamage = floor(baseDamage * multiplier)
+		local finalDamage = floor(baseDamage * char:GetAttribute("Combo"))
 
 		local comboEff = RepS.Package.Effects.ComboEffect:Clone() :: ParticleEmitter
 		comboEff.Parent = monster.PrimaryPart
@@ -97,7 +95,7 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
     arrow.Owner.Value = char
     arrow:PivotTo(ServerUtil:GenerateOrbPos(monster))
     arrow:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
-    arrow.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+    arrow.Parent = workspace.MapComponents.OrbHolders[plr.Name]
     Debris:AddItem(arrow, char:GetAttribute("OrbLifeTime"))
 
     if char:GetAttribute("Stack") > 0 then
@@ -137,6 +135,7 @@ function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
     if char:GetAttribute("Focus") >= 100 then
         char:SetAttribute("Focus", 0)
 
+        BuffEffectsUtil:MagicVFX(monster)
         CAAttackUtil:DealDMG(plr, monster, floor(baseDamage * 3))
     end
 
@@ -181,7 +180,7 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         repeaterOrb:PivotTo(pos)
         repeaterOrb:SetAttribute("RepeaterSpawned", true)
         repeaterOrb:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
-        repeaterOrb.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+        repeaterOrb.Parent = workspace.MapComponents.OrbHolders[plr.Name]
         Debris:AddItem(repeaterOrb, char:GetAttribute("OrbLifeTime"))
 
         local laser = instanceNew("Part")
@@ -190,11 +189,10 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         laser.CanTouch = false
         laser.CanQuery = false
         laser.Anchored = true
-        laser.Transparency = 0
         laser.Color = fromRGB(9, 137, 207)
         laser.Size = v3New(0.5, 0.5, (orb.Base.CFrame.Position - repeaterOrb.Base.CFrame.Position).Magnitude)
         laser.CFrame = cfNew((orb.Base.CFrame.Position + repeaterOrb.Base.CFrame.Position) / 2, orb.Base.CFrame.Position)
-        laser.Parent = workspace.MapComponents.OrbFolders[plr.Name]
+        laser.Parent = workspace.MapComponents.OrbHolders[plr.Name]
         Debris:AddItem(laser, 1)
 
         Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
@@ -210,7 +208,7 @@ function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
 
     Spawn(function()
         local char = plr.Character
-        local orbs = workspace.MapComponents.OrbFolders[plr.Name]:GetChildren()
+        local orbs = workspace.MapComponents.OrbHolders[plr.Name]:GetChildren()
         local strikerOrbs = {}
 
         for _, strikerOrb in orbs do

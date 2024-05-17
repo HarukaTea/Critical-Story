@@ -11,6 +11,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local SSS = game:GetService("ServerScriptService")
+local SG = game:GetService("StarterGui")
 local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
 
@@ -54,11 +55,22 @@ Spawn(cmdrRegister)
 local function mainSetup()
 	--- ray cancels
 	for _, mapPart: Instance in workspace:GetDescendants() do
+		if mapPart:HasTag("Bounce") then continue end
+		if mapPart:HasTag("Water") then continue end
+
 		if mapPart:IsA("BasePart") then
 			mapPart.CanTouch = false
 			mapPart.Locked = true
 		end
 	end
+
+	--- game setups
+	local combatFolder = instanceNew("Folder")
+	combatFolder.Name = "CombatHolders"
+	combatFolder.Parent = workspace.MapComponents
+	local orbFolder = instanceNew("Folder")
+	orbFolder.Name = "OrbHolders"
+	orbFolder.Parent = workspace.MapComponents
 
 	--- clear extra events
 	for _, link: Instance in RepS:GetDescendants() do

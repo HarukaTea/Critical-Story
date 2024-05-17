@@ -28,7 +28,9 @@ end
 local function spikeShot(target: Model)
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
 
-	local blast = RepS.Package.MonsterAttacks.Wolf.SpikeWolf1:Clone() :: Model
+	local pRandom = random(1, 2)
+
+	local blast = RepS.Package.MonsterAttacks.Wolf["SpikeWolf"..pRandom]:Clone() :: Model
 	blast.Owner.Value = monster
 	blast:PivotTo(monster.PrimaryPart.CFrame)
 	blast.Parent = monster.AttackHolder.Value

@@ -15,15 +15,12 @@ local pos = ClientUtil:GetKeyStoryLocations()
 StoryBook.Main = {
     {
         Name = "The Beginning", -- 1
-        Target = "Talk to Cyalm",
+        Target = "Learn more about this world",
         Desc = "",
-        NPC = "Cyalm",
+        NPC = "Pioxit",
         Hint = v3New(),
 
-        Rewards = {
-            EXP = 20,
-            Gold = 100
-        }
+        Rewards = {}
     },
     {
         Name = "Valiant Explorer", -- 2
@@ -62,11 +59,11 @@ StoryBook.Main = {
         }
     },
     {
-        Name = "The Abyss - Paho", -- 5
-        Target = "Talk to Cyalm again",
+        Name = "Paho - The Executor", -- 5
+        Target = "Talk to Pioxit again",
         Desc = "",
-        NPC = "Cyalm",
-        Hint = if pos.Cyalm then pos.Cyalm else v3New(),
+        NPC = "Pioxit",
+        Hint = if pos.Pioxit then pos.Pioxit else v3New(),
 
         Rewards = {
             EXP = 20,

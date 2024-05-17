@@ -20,7 +20,13 @@ for _, child in workspace.MonsterModels:GetDescendants() do
 end
 
 for _, child in workspace:GetDescendants() do
-    if child:IsA("ProximityPrompt") then child.HoldDuration = 0 end
+    if child:IsA("ProximityPrompt") then
+        child:SetAttribute("Theme", nil)
+    end
+end
+
+for _, child in workspace.MapComponents.Materials.IronOre:GetChildren() do
+    child.Giver:SetAttribute("Special", nil)
 end
 
 for _, child in workspace.MapComponents.Statues:GetChildren() do

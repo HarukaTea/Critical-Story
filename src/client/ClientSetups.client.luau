@@ -14,6 +14,7 @@ local plr = Players.LocalPlayer
 
 local cfAngles = CFrame.Angles
 local rad = math.rad
+local wait = task.wait
 
 local function openAcquiredChests()
     local chests = workspace:WaitForChild("MapComponents").Chests :: Folder
@@ -43,3 +44,11 @@ local function cmdrRegister()
     end)
 end
 Spawn(cmdrRegister)
+
+
+local function disableDefaultFreecam()
+    repeat wait() until plr.PlayerGui:WaitForChild("Freecam", 999)
+
+    plr.PlayerGui.Freecam:Destroy()
+end
+Spawn(disableDefaultFreecam)

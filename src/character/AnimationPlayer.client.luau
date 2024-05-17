@@ -29,7 +29,9 @@ local anims = {
 	StrikerAnim1 = animator:LoadAnimation(animations.StrikerAttack),
 	AlchemistAnim2 = animator:LoadAnimation(animations.AlchemistAttack),
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
-	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2)
+	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2),
+
+	Bounce = animator:LoadAnimation(animations.Bounce)
 }
 anims.RogueAnim1 = anims.WarriorAnim1
 anims.RogueAnim2 = anims.WarriorAnim2

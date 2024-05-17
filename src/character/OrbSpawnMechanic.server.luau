@@ -18,7 +18,7 @@ local random = math.random
 --// Connections
 local stopSpawn: thread, stopSpawn2: thread = nil, nil
 local function orbSpawnHandler(state: boolean)
-    local orbFolders = workspace.MapComponents.OrbFolders :: Folder
+    local orbFolders = workspace.MapComponents.OrbHolders :: Folder
 
     local function _placeOrb(orb: Model, pos: CFrame)
         orb.Owner.Value = char
