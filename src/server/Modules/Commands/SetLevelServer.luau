@@ -1,21 +1,21 @@
 --!nocheck
---!optimize 2
---!native
 
 local RepS = game:GetService("ReplicatedStorage")
 
 local Guard = require(RepS.Modules.Packages.Guard)
 
 local numberCheck = Guard.Check(Guard.NumberMinMax(0, 950))
+local numberCheck2 = Guard.Check(Guard.Integer)
 
 return function (_, players: table, level: number)
-    local levelPass, levelWant = numberCheck(level)
+    local levelPass, _ = numberCheck(level)
+    local levelPass2, levelWant2 = numberCheck2(level)
 
-    if not levelPass then
+    if not levelPass or not levelPass2 then
         return "I guess you typed incorrect level..."
     end
 
-    if levelWant > 150 then
+    if levelWant2 > 150 then
         return "The level cap is 150 bro!"
     else
         for _, plr: Player in players do
@@ -25,10 +25,10 @@ return function (_, players: table, level: number)
             plr:SetAttribute("HealthPoints", 0)
             plr:SetAttribute("ShieldPoints", 0)
             plr:SetAttribute("ManaPoints", 0)
-            plr:SetAttribute("Levels", levelWant)
-            plr:SetAttribute("LvPoints", (levelWant - 1) * 2)
+            plr:SetAttribute("Levels", levelWant2)
+            plr:SetAttribute("LvPoints", (levelWant2 - 1) * 2)
         end
 
-        return "Level has set to "..levelWant.."!"
+        return "Level has set to "..levelWant2.."!"
     end
 end

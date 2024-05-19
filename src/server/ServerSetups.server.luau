@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local BS = game:GetService("BadgeService")
 local GS = game:GetService("GroupService")
@@ -11,21 +9,16 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local SSS = game:GetService("ServerScriptService")
-local SG = game:GetService("StarterGui")
 local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
 
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
-local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
-
-local DATASTORE = require(SSS.Modules.Data.DatastoreTemplate)
 
 local instanceNew = Instance.new
 local wait = task.wait
 local sub, upper = string.sub, string.upper
-local time = os.time
 
 local function collisionRegister()
 	PS:RegisterCollisionGroup("Player")
@@ -161,37 +154,6 @@ local function mainSetup()
 		ServerUtil:CancelRaycast(orb, true)
 	end
 	SS.Resources.Unloads.BorderColorTween:Clone().Parent = RepS.Package.Unloads.CombatBorder.Border
-
-	--- ban checks
-	Spawn(function()
-		MS:SubscribeAsync("BanRequest", function(message: table)
-			local data = message.Data :: table
-			local plrName, duration, reason = data[1] :: string, data[2] :: number, data[3] :: string
-
-			if not Players:FindFirstChild(plrName) then return end
-			local cheater = Players[plrName] :: Player
-
-			local ds1, ds2, ds3 =
-				SuphiDataStore.find(DATASTORE[1], cheater.UserId) or SuphiDataStore.hidden(DATASTORE[1], cheater.UserId),
-				SuphiDataStore.find(DATASTORE[2], cheater.UserId) or SuphiDataStore.hidden(DATASTORE[2], cheater.UserId),
-				SuphiDataStore.find(DATASTORE[3], cheater.UserId) or SuphiDataStore.hidden(DATASTORE[3], cheater.UserId)
-
-			local data1, data2, data3 = ds1.Value :: table, ds2.Value :: table, ds3.Value :: table
-			local banInfo = {
-				IsBanned = true,
-				Duration = duration,
-				BannedTime = time(),
-				Reason = reason
-			}
-			data1.BanStats = banInfo; data2.BanStats = banInfo; data3.BanStats = banInfo
-
-			if ds1.Hidden then ds1:Destroy() end
-			if ds2.Hidden then ds2:Destroy() end
-			if ds3.Hidden then ds3:Destroy() end
-
-			cheater:Kick("You've got banned! Reason: "..reason..", Duration: "..duration.." Hours!")
-		end)
-	end)
 
 	--- player extra info setup
 	local joinData

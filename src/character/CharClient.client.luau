@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Lighting = game:GetService("Lighting")
 local RepS = game:GetService("ReplicatedStorage")

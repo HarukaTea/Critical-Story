@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")

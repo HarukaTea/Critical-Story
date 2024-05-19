@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -132,11 +130,6 @@ local function mobTakeDMG(plr: Player, orb: Model)
 		baseDamage = char:GetAttribute("Magic")
 	end
 	baseDamage = floor(baseDamage)
-
-	--- after damage
-	local defense = monster:GetAttribute("Defense") :: number
-	baseDamage -= defense
-	if baseDamage <= 0 then baseDamage = 1 end
 
 	--- attack
 	orb.Owner:Destroy()

@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -78,7 +76,7 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local styleFolder = RepS.Package.StyleWeapons[class] :: Folder
 
 	for _, child: Instance in char:GetChildren() do
-		if sFind(child.Name, "Weapon") then child:Destroy() end
+		if child:HasTag("Weapon") then child:Destroy() end
 	end
 
 	local function _equipWeapon(weapon: Model, defaultPart: string)
@@ -196,7 +194,6 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
 	monster:SetAttribute("EXP", (floor(level ^ 1.45) + 29))
 	monster:SetAttribute("Damage", (floor(level ^ 1.4) + 4))
-	monster:SetAttribute("Defense", floor(level ^ 1.0599))
 	monster:SetAttribute("InCombat", false)
 
 	local numberDisplay = RepS.Package.Effects.Display:Clone() :: BillboardGui

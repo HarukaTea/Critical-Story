@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 
 local SSS = game:GetService("ServerScriptService")
@@ -93,4 +91,4 @@ function slimedive2(target)
 end
 
 wait(0.5)
-attacking()		
+attacking()

@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")

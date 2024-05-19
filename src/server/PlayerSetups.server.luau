@@ -1,16 +1,17 @@
 --!nocheck
---!optimize 2
---!native
 
+local DSS = game:GetService("DataStoreService")
+local MS = game:GetService("MessagingService")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local SuphiDataStore = require(RepS.Modules.Packages.SuphiDataStore)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+
+local playerDatas = {}
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
 local DATASTORE = require(SSS.Modules.Data.DatastoreTemplate)
@@ -20,26 +21,23 @@ local wait = task.wait
 local time = os.time
 local format = string.format
 
-local function findDataStore(plr: Player) : DataStore?
+local function _findDataStore(plr: Player) : DataStore
 	local joinData = plr:GetJoinData().TeleportData :: table?
 	local slotChosen = if joinData then joinData[1] else "Slot1"
 
-	local ds: DataStore
+	local ds
 	if slotChosen == "Slot2" then
-		ds = SuphiDataStore.find(DATASTORE[2], plr.UserId)
+		ds = DSS:GetDataStore(DATASTORE[2])
 	elseif slotChosen == "Slot3" then
-		ds = SuphiDataStore.find(DATASTORE[3], plr.UserId)
+		ds = DSS:GetDataStore(DATASTORE[3])
 	else
-		ds = SuphiDataStore.find(DATASTORE[1], plr.UserId)
+		ds = DSS:GetDataStore(DATASTORE[1])
 	end
 
 	return ds
 end
-
-local function _saveData(plr: Player, ds: any)
-	local data = ds.Value :: table
-	if not data then return end
-
+local function _saveData(plr: Player)
+	local data = playerDatas[plr.Name]
 	local inventory = {}
 	local quests, townQuests = {}, {}
 
@@ -67,29 +65,11 @@ local function _saveData(plr: Player, ds: any)
 	data.QuestsV2 = quests
 end
 
+
 local function setup(plr: Player)
-	local joinData = plr:GetJoinData().TeleportData :: table?
-	local slotChosen = if joinData then joinData[1] else "Slot1"
+	local data = _findDataStore(plr):GetAsync(plr.UserId)
 
-	local ds: DataStore
-	if slotChosen == "Slot2" then
-		ds = SuphiDataStore.new(DATASTORE[2], plr.UserId)
-	elseif slotChosen == "Slot3" then
-		ds = SuphiDataStore.new(DATASTORE[3], plr.UserId)
-	else
-		ds = SuphiDataStore.new(DATASTORE[1], plr.UserId)
-	end
-
-	local function _stateChanged(_, datastore: any)
-		while datastore.State == false do
-			if datastore:Open(TEMPLATE) ~= "Success" then wait(2) end
-		end
-	end
-	ds.StateChanged:Connect(_stateChanged)
-	_stateChanged(ds.State, ds)
-
-	--- once everything is fine, we load data
-	local data = ds.Value :: table
+	playerDatas[plr.Name] = data
 
 	local backpackData = newInstance("Folder")
 	backpackData.Name = "Inventory"
@@ -135,7 +115,7 @@ local function setup(plr: Player)
 
 		local intValue = newInstance("IntConstrainedValue")
 		intValue.Name = index
-		intValue.MaxValue = ItemBook:FindItem(index).MaxAmount
+		intValue.MaxValue = if ItemBook:FindItem(index).IsSkill then 1 else 999
 		intValue.Value = info.Amount
 		if info.Equipped then
 			intValue:SetAttribute("Equipped", true)
@@ -151,7 +131,7 @@ local function setup(plr: Player)
 	--// Connections
 	local function _save()
 		wait()
-		_saveData(plr, ds)
+		_saveData(plr)
 	end
 	backpackData.ChildAdded:Connect(_save)
 	backpackData.ChildRemoved:Connect(_save)
@@ -176,25 +156,26 @@ local function setup(plr: Player)
 end
 
 local function clear(plr: Player)
-	local ds = findDataStore(plr)
-
-	if ds then
-		_saveData(plr, ds)
-		ds:Destroy()
-	end
-
 	--- check if player is combating
-	for _, monster: Instance in workspace.Monsters:GetDescendants() do
-		if monster:HasTag("Monster") and monster.PrimaryPart then
-			pcall(function()
-				if monster.TargetPlayers:FindFirstChild(plr.Name) then
-					monster.TargetPlayers[plr.Name]:Destroy()
+	pcall(function()
+		for _, monster: Instance in workspace.Monsters:GetDescendants() do
+			if monster:HasTag("Monster") and monster.PrimaryPart then
+				pcall(function()
+					if monster.TargetPlayers:FindFirstChild(plr.Name) then
+						monster.TargetPlayers[plr.Name]:Destroy()
 
-					print(plr.Name .. " left during combat with " .. monster.Name)
-				end
-			end)
+						print(plr.Name .. " left during combat with " .. monster.Name)
+					end
+				end)
+			end
 		end
-	end
+	end)
+
+	pcall(function()
+		_findDataStore(plr):SetAsync(plr.UserId, playerDatas[plr.Name])
+	end)
+
+	playerDatas[plr.Name] = nil
 end
 
 --- in case player joined before server starts
@@ -203,3 +184,22 @@ for _, plr in Players:GetPlayers() do Spawn(setup, plr) end
 --// Connections
 Players.PlayerAdded:Connect(setup)
 Players.PlayerRemoving:Connect(clear)
+
+--// Server setup
+MS:SubscribeAsync("BanRequest", function(message: table)
+	local data = message.Data :: table
+	local plrName, duration, reason = data[1] :: string, data[2] :: number, data[3] :: string
+
+	if not Players:FindFirstChild(plrName) then return end
+	local cheater = Players[plrName] :: Player
+
+	local banInfo = {
+		IsBanned = true,
+		Duration = duration,
+		BannedTime = time(),
+		Reason = reason
+	}
+	playerDatas[plrName].BanStats = banInfo
+
+	cheater:Kick("You've got banned! Reason: "..reason..", Duration: "..duration.." Hours!")
+end)

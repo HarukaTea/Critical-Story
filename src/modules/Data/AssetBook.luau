@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local newTweenInfo = TweenInfo.new
 local fromRGB = Color3.fromRGB

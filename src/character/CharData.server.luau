@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -140,7 +138,7 @@ local function charAttributesSetup()
         char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
     end
     local function updateMaxDMG()
-        char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+        char:SetAttribute("MaxDMG", 15 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
     end
     local function updateMagic()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
@@ -150,7 +148,7 @@ local function charAttributesSetup()
         char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
     end
     local function updateMana()
-        char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 60) + 50 + char:GetAttribute("ManaBuff"))
+        char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 20) + 100 + char:GetAttribute("ManaBuff"))
         char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
     end
     local function updateHP()
@@ -176,15 +174,6 @@ local function charAttributesSetup()
 
             wait(1)
             lvUpCD = false
-        end
-    end
-    local function levelCheck(level: number)
-        if not level then return end
-
-        --- to avoid bypass
-        if level > 150 then
-            plr:SetAttribute("Levels", 150)
-            plr:SetAttribute("EXP", 0)
         end
     end
 
@@ -213,7 +202,6 @@ local function charAttributesSetup()
         ["Attr-ManaPoints"] = updateMana,
 
         ["Attr-EXP"] = levelReqCheck,
-        ["Attr-Levels"] = levelCheck,
 
         ["Attr-Class"] = function()
             ServerUtil:EquipWeapon(char)
@@ -244,8 +232,6 @@ Spawn(charAttributesSetup)
 --// Connections
 local function onDead()
     if char.PrimaryPart then
-        plr:SetAttribute("LastLeave", char.PrimaryPart.Position)
-
         local defeatedEff = RepS.Package.Effects.DefeatedEffect:Clone()
         defeatedEff.CFrame = char.PrimaryPart.CFrame
         defeatedEff.Parent = char

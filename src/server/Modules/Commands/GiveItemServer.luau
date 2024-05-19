@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
@@ -9,24 +7,19 @@ local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Guard = require(RepS.Modules.Packages.Guard)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
-local stringCheck = Guard.Check(Guard.String)
 local numberCheck = Guard.Check(Guard.NumberMinMax(0, 9999))
 
 return function (_, players: table, item: string, amount: number)
-    local itemPass, itemName = stringCheck(item)
     local amountPass, amountWanted = numberCheck(amount)
 
-    if not itemPass then
-        return "I guess you typed incorrectly..."
-    end
     if not amountPass then
         return "Wrong amount!"
     end
 
-    if not ItemBook:IsItemExist(itemName) and itemName ~= "all" then
-        return "There is no item named "..itemName..", are you sure you typed correctly?"
+    if not ItemBook:IsItemExist(item) and item ~= "all" then
+        return "There is no item named "..item..", are you sure you typed correctly?"
 
-    elseif itemName == "all" then
+    elseif item == "all" then
         for _, plr: Player in players do
             for _, everyItem: table in ItemBook.Items do
                 ServerUtil:GiveItem(plr, everyItem.ItemId, everyItem.MaxAmount)
@@ -36,9 +29,9 @@ return function (_, players: table, item: string, amount: number)
         return "Gived all items!"
     else
         for _, plr: Player in players do
-            ServerUtil:GiveItem(plr, itemName, amountWanted)
+            ServerUtil:GiveItem(plr, item, amountWanted)
         end
 
-        return "Gived "..amountWanted.."x "..itemName.."!"
+        return "Gived "..amountWanted.."x "..item.."!"
     end
 end

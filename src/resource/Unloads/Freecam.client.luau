@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")

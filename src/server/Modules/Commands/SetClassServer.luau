@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 return function (_, players: table, class: string)
     for _, plr: Player in players do

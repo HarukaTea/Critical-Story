@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
@@ -48,7 +46,7 @@ Spawn(function()
 end)
 
 local success, errorMsg = pcall(function()
-	for i = 1, 4 do
+	for i = 1, 3 do
 		local beamPart = RepS.Package.MagicAssets.GhostlyLantern.BeamPart:Clone() :: BasePart
 		beamPart.CFrame = char.PrimaryPart.CFrame * cfNew(random(-8,8), random(-1,10), random(-8,8))
 		beamPart.CFrame = cfNew(beamPart.Position, monster.PrimaryPart.Position)

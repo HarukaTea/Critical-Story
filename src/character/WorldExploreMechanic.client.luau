@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
@@ -40,7 +38,6 @@ local function bounce(hit: BasePart)
 
     repeat wait() until plr:DistanceFromCharacter(hit:GetAttribute("TargetPos")) <= 5
 
-    humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
     humanoid.PlatformStand = false
     humanoid.Sit = false
 

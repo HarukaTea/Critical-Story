@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Players = game:GetService("Players")
 local SG = game:GetService("StarterGui")

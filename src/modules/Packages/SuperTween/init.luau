@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local TweenService = game:GetService("TweenService")
 

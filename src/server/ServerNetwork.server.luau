@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Debris = game:GetService("Debris")
 local PPS = game:GetService("ProximityPromptService")
@@ -102,7 +100,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		ServerUtil:GiveItem(plr, finalMaterial, #material.Items:GetChildren())
 
 		wait(120)
-		material.Parent = workspace.MapComponents.Materials[material.Name]
+		material.Parent = workspace.MapComponents.Materials
 		prompt.Enabled = true
 	end
 end
@@ -140,10 +138,6 @@ local function levelUp(plr: Player)
 		--- make character full state
 		char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
 		char.Humanoid.Health = char.Humanoid.MaxHealth
-
-	elseif not check and plr:GetAttribute("Levels") <= LEVEL_CAP then
-		plr:SetAttribute("Levels", LEVEL_CAP)
-		plr:SetAttribute("EXP", 0)
 	end
 end
 Signals.LevelUp:Connect(levelUp)
@@ -377,6 +371,7 @@ Events.NewQuest:Connect(newQuest)
 ]]
 local function changeLastSeen(plr: Player, location: string)
 	plr:SetAttribute("LastSeenLocation", location)
+	plr:SetAttribute("RespawnLocation", workspace.Maps[location].SpawnPoint.Position)
 end
 Events.ChangePlayerLocation:Connect(changeLastSeen)
 

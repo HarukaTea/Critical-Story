@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local DataTypes = require(script.Parent.DataTypes)
 

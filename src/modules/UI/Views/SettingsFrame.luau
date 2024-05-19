@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local RepS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")

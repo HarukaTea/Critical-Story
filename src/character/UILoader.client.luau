@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -21,15 +19,17 @@ local requireList = {
 	UIModules.ShiftLock,
 	UIModules.PlayerList,
 	UIModules.Hints,
-	UIModules.PostStroke,
 	UIModules.SwitchScene
 }
-for _, module in requireList do
-	Spawn(function()
-		require(module)(plr)
-	end)
-end
 
+local function setup()
+	for _, module: ModuleScript in requireList do
+		Spawn(function() require(module)(plr) end)
+	end
+end
+setup()
+
+--// Clear
 local function onDead()
 	wait(2)
 	script:Destroy()

@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
@@ -164,7 +162,7 @@ return function(plr: Player)
 		self.itemSlotClicked:Destroy()
 
 		self.Empty()
-		
+
 		Fusion.doCleanup(scope)
 
 		self = nil

@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local RunService = game:GetService("RunService")
 local Terrain = workspace:FindFirstChildOfClass("Terrain")

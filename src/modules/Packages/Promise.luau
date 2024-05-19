@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local ERROR_NON_PROMISE_IN_LIST = "Non-promise value passed into %s at index %s"
 local ERROR_NON_LIST = "Please pass a list of promises to %s"

@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local CS = game:GetService("CollectionService")
 local Players = game:GetService("Players")

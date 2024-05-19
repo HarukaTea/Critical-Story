@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")

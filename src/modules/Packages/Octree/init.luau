@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local OctreeRegionUtils = require(script.OctreeRegionUtils)
 local OctreeNode = require(script.OctreeNode)

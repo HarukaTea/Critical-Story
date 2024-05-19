@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local MS = game:GetService("MessagingService")
 local RepS = game:GetService("ReplicatedStorage")

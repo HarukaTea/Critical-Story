@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local model = script.Parent
 local char = model.Owner.Value :: Model

@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 --[=[
 	Basic node interacting with the octree. See [Octree](/api/Octree) for usage.

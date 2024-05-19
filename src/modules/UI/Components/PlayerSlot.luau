@@ -1,6 +1,4 @@
 --!nocheck
---!optimize 2
---!native
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -90,6 +88,8 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 
 					list[player.Name].BackgroundColor3 = color3New(1, 1, 1)
 					list[player.Name].PlayerName.TextColor3 = color3New()
+
+					if not player:GetAttribute("PlayerDataLoaded") then return end
 
 					self.displayName:set(player.DisplayName)
 					self.userName:set("@" .. player.Name)
