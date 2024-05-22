@@ -10,7 +10,11 @@ local Signals = {
 	EnableMapDetails = Signal(),
 	NPCChat = Signal(),
 	PlayAnimation = Signal(),
-	SwitchScene = Signal()
+	StartNPCChat = Signal(),
+
+
+	--- story
+	StoryMain1 = Signal()
 }
 
 return Signals

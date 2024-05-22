@@ -7,17 +7,16 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local OnEvent, Tween, Computed = Fusion.OnEvent, Fusion.Tween, Fusion.Computed
+local OnEvent, Children, New = Fusion.OnEvent, Fusion.Children, Fusion.New
 
 local udNew =  UDim.new
 local fromScale = UDim2.fromScale
-local fromRGB = Color3.fromRGB
 local v2New = Vector2.new
 local sub = string.sub
+local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
 local function ChatOption(option: string, icon: string, self: table, index: number, scope: table) : Frame
-    local bgColor = Fusion.Value(scope, fromRGB(30, 30, 30))
-    local contentColor = Fusion.Value(scope, fromRGB(255, 255, 255))
+    local isSelecting = Fusion.Value(scope, false)
 
     if icon ~= "Chat" then option = sub(option, #icon + 2) end
 
@@ -25,28 +24,30 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
         BackgroundTransparency = 0,
         Size = fromScale(0.9, 0.27),
 
-        BackgroundColor3 = Tween(scope, Computed(scope, function(use)
-            return use(bgColor)
-        end), AssetBook.TweenInfos.threeHalf),
-
-        [Fusion.Children] = {
-            Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+        [Children] = {
+            New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
             Components.UIStroke(scope, {
                 Thickness = 2.8,
-                Enabled = true,
 
-                Color = Tween(scope, Computed(scope, function(use)
-                    return use(contentColor)
-                end), AssetBook.TweenInfos.threeHalf)
+                Enabled = Fusion.Computed(scope, function(use)
+                    return use(isSelecting)
+                end),
+
+                [Children] = {
+                    New(scope, "UIGradient")({
+                        Transparency = nsNew({nsKPNew(0, 0), nsKPNew(0.7, 0.2), nsKPNew(1, 1)})
+                    })
+                }
+            }),
+            New(scope, "UIGradient")({
+                Transparency = nsNew({nsKPNew(0, 0), nsKPNew(0.5, 0.2), nsKPNew(1, 1)})
             }),
             Components.HoverImageButton(scope, {
                 [OnEvent("MouseEnter")] = function()
-                    bgColor:set(fromRGB(255, 255, 255))
-                    contentColor:set(fromRGB())
+                    isSelecting:set(true)
                 end,
                 [OnEvent("MouseLeave")] = function()
-                    bgColor:set(fromRGB(30, 30, 30))
-                    contentColor:set(fromRGB(255, 255, 255))
+                    isSelecting:set(false)
                 end,
                 [OnEvent("MouseButton1Click")] = function()
                     workspace.Sounds.SFXs.Next:Play()
@@ -58,25 +59,25 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
             Components.ImageLabel(scope, {
                 Name = "Icon",
                 AnchorPoint = v2New(0, 0.5),
-                Position = fromScale(0.026, 0.5),
-                Size = fromScale(0.072, 0.8),
-                Image = AssetBook.PromptIcons[icon],
-
-                ImageColor3 = Tween(scope, Computed(scope, function(use)
-                    return use(contentColor)
-                end), AssetBook.TweenInfos.threeHalf)
+                Position = fromScale(0.03, 0.5),
+                Size = fromScale(0.059, 0.6),
+                Image = AssetBook.PromptIcons[icon]
             }),
             Components.TextLabel(scope, {
                 Name = "OptionText",
-                Position = fromScale(0.528, 0.5),
-                Size = fromScale(0.8, 0.7),
+                Position = fromScale(0.687, 0.5),
+                Size = fromScale(1.118, 0.7),
                 Text = option,
                 AnchorPoint = v2New(0.5, 0.5),
 		        TextXAlignment = Enum.TextXAlignment.Left,
 
-                TextColor3 = Tween(scope, Computed(scope, function(use)
-                    return use(contentColor)
-                end), AssetBook.TweenInfos.threeHalf)
+                [Children] = {
+                    New(scope, "UIPadding")({
+                        PaddingTop = udNew(0.05, 0),
+                        PaddingBottom = udNew(0.05, 0)
+                    }),
+                    Components.TextUIStroke(scope, { Thickness = 1.5 })
+                }
             })
         }
     })

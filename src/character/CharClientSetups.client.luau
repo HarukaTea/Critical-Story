@@ -8,9 +8,9 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local char = script.Parent :: Model
 local camera = workspace.CurrentCamera
-local musics = workspace:WaitForChild("Sounds") :: Folder
+local musics = workspace:WaitForChild("Sounds", 999) :: Folder
 local effects = RepS.Package.Effects :: Folder
-local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
+local mapComponents = workspace:WaitForChild("MapComponents", 999) :: Folder
 
 local fromRGB = Color3.fromRGB
 
@@ -48,7 +48,5 @@ local function onDied()
 
 	Lighting.ColorShift_Bottom = fromRGB(255, 0, 0)
 	Lighting.ColorShift_Top = fromRGB(255, 0, 0)
-
-	script:Destroy()
 end
 char.Humanoid.Died:Once(onDied)

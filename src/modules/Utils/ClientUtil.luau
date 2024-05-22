@@ -75,7 +75,7 @@ end
 function ClientUtil:SetCharTrans(trans: number, char: Model)
     pcall(function()
         for _, child: Instance in char:GetChildren() do
-            if child:IsA("Part") and child ~= char.PrimaryPart then child.Transparency = trans end
+            if child:IsA("BasePart") and child ~= char.PrimaryPart then child.Transparency = trans end
             if child:IsA("Model") then
                 for _, descendant in child:GetChildren() do
                     if descendant.Name == "Part" then descendant.Transparency = trans end
@@ -139,6 +139,10 @@ function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
     --// In combat check
     if plr.Character:GetAttribute("InCombat") and not isForce then
         Signals.CreateHint:Fire("You can't open it in combat!")
+        return
+    end
+    if plr:GetAttribute("InChatting") and not isForce then
+        Signals.CreateHint:Fire("You can't open it right now!")
         return
     end
 

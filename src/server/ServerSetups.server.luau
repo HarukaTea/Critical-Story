@@ -46,17 +46,6 @@ end
 Spawn(cmdrRegister)
 
 local function mainSetup()
-	--- ray cancels
-	for _, mapPart: Instance in workspace:GetDescendants() do
-		if mapPart:HasTag("Bounce") then continue end
-		if mapPart:HasTag("Water") then continue end
-
-		if mapPart:IsA("BasePart") then
-			mapPart.CanTouch = false
-			mapPart.Locked = true
-		end
-	end
-
 	--- game setups
 	local combatFolder = instanceNew("Folder")
 	combatFolder.Name = "CombatHolders"
@@ -75,7 +64,6 @@ local function mainSetup()
 		npc.Humanoid.Animator:LoadAnimation(RepS.Package.Animations.NPCIdle):Play()
 
 		ServerUtil:SetCollisionGroup(npc, "NPC")
-		ServerUtil:CancelRaycast(npc, false, true)
 	end
 
 	--- sound setups
@@ -141,7 +129,6 @@ local function mainSetup()
 			SS.Resources.MonsterBlastAttacks[child:GetAttribute("LinkedScript")]:Clone().Parent = child
 		end
 	end
-	ServerUtil:CancelRaycast(RepS.Package.MonsterAttacks, true)
 
 	for _, locator: Instance in workspace.Monsters:GetDescendants() do
 		if locator:HasTag("MonsterLocation") then ServerUtil:SetupMonster(locator) end
@@ -150,8 +137,6 @@ local function mainSetup()
 	--- player attacks setups
 	for _, orb: Model in RepS.Package.PlayerAttacks:GetChildren() do
 		SS.Resources.Unloads.OrbAnim:Clone().Parent = orb
-
-		ServerUtil:CancelRaycast(orb, true)
 	end
 	SS.Resources.Unloads.BorderColorTween:Clone().Parent = RepS.Package.Unloads.CombatBorder.Border
 
@@ -180,6 +165,13 @@ local function mainSetup()
 		if plr.UserId == 1097119343 then plr:SetAttribute("Role", "CV Founder") end
 		if plr.UserId == 3563941913 then plr:SetAttribute("Role", "CO Founder") end
 		if plr.UserId == 91364976 then plr:SetAttribute("Role", "CR Founder") end
+
+		--- community custom role
+		if plr.UserId == 517042349 then plr:SetAttribute("Role", "Abyss The Executor") end
+		if plr.UserId == 850971587 then plr:SetAttribute("Role", "Alchemist User") end
+		if plr.UserId == 596899926 then plr:SetAttribute("Role", "Mayor of Carrotopia") end
+		if plr.UserId == 748297118 then plr:SetAttribute("Role", "Known Illegal Merchant") end
+		if plr.UserId == 332773444 then plr:SetAttribute("Role", "Sigma Male") end
 
 		joinData = plr:GetJoinData().TeleportData
 	end

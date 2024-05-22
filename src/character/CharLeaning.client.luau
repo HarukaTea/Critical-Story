@@ -34,7 +34,5 @@ end)
 --// Clear
 local function onDead()
 	rsConnection:Disconnect()
-
-	script:Destroy()
 end
 humanoid.Died:Once(onDead)

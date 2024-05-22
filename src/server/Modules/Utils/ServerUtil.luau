@@ -55,19 +55,6 @@ function ServerUtil:WeldPart(part: Part, welded: Model)
 end
 
 --[[
-	Disable raycasts on this object
-]]
-function ServerUtil:CancelRaycast(obj: Instance, needTouch: boolean?, needCollide: boolean?)
-	for _, part: Instance in obj:GetDescendants() do
-        if part:IsA("UnionOperation") or part:IsA("BasePart") or part:IsA("CornerWedgePart") then
-            part.CanTouch = needTouch or false
-            part.CanCollide = needCollide or false
-            part.CanQuery = false
-        end
-    end
-end
-
---[[
 	Equip player's weapon, you can only pass an class string to force equip
 ]]
 function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
@@ -83,7 +70,6 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 		local weldPos = if weapon:GetAttribute("Position") then weapon:GetAttribute("Position") else defaultPart
 
 		ServerUtil:WeldPart(char[weldPos], weapon)
-		ServerUtil:CancelRaycast(weapon)
 		ServerUtil:SetCollisionGroup(weapon, "Player")
 
 		weapon.Parent = char
@@ -158,7 +144,6 @@ function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
 		if armor:FindFirstChild("Extra") then _equipArmorPart("Extra") end
 
 		--- ray cancels
-		ServerUtil:CancelRaycast(armor)
 		ServerUtil:SetCollisionGroup(armor, "Player")
 
 		armor.Name = "Armor"
@@ -446,7 +431,7 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	else
 		local intValue = instanceNew("IntConstrainedValue")
 		intValue.Name = item
-		intValue.MaxValue = ItemBook:FindItem(item).MaxAmount
+		intValue.MaxValue = if ItemBook:FindItem(item).IsSkill then 1 else 999
 		intValue.Value = amount
 		intValue.Parent = inventoryFolder
 	end

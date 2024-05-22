@@ -22,7 +22,7 @@ return function (_, players: table, item: string, amount: number)
     elseif item == "all" then
         for _, plr: Player in players do
             for _, everyItem: table in ItemBook.Items do
-                ServerUtil:GiveItem(plr, everyItem.ItemId, everyItem.MaxAmount)
+                ServerUtil:GiveItem(plr, everyItem.ItemId, if everyItem.IsSkill then 1 else 999)
             end
         end
 

@@ -84,3 +84,6 @@ for _, child in workspace.Maps:GetChildren() do
         child:Destroy()
     end
 end
+
+local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
+ServerUtil:EquipArmor(workspace.Fallen_SakuraLY, "Chrono")

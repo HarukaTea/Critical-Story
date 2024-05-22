@@ -18,16 +18,11 @@ local format, match = string.format, string.match
 
 local function PlayerSlot(self: table, player: Player, scope: table): Frame
 	local class = Fusion.Value(scope, player:GetAttribute("Class") or "Warrior") --// This often errors lol
-	local role = Fusion.Value(scope, player:GetAttribute("Role"))
+	local role = player:GetAttribute("Role")
 
 	scope[#scope + 1] = HarukaLib:Hydrate(player, {
 		["Attr-Class"] = function(newClass: string)
 			class:set(newClass)
-		end,
-		["Attr-Role"] = function(newRole: string)
-			if newRole ~= "" or newRole == nil then return end
-
-			role:set(newRole)
 		end
 	})
 
@@ -59,9 +54,7 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Text = player.DisplayName,
 
-				TextColor3 = Fusion.Computed(scope, function(use)
-					return if use(role) then fromRGB(170, 255, 255) else color3New(1, 1, 1)
-				end),
+				TextColor3 = if role then fromRGB(170, 255, 255) else color3New(1, 1, 1),
 
 				[Children] = {
 					New(scope, "UIPadding")({

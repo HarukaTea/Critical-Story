@@ -55,7 +55,8 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
-					}),
+						FilterButton("Log", self)
+					})
 				}
 			}),
 			Components.Frame(self.scope, {
@@ -81,6 +82,11 @@ return function(plr: Player)
 	end
 	self.Add(HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
+			if state then checkIfOpened() end
+		end
+	}))
+	self.Add(HarukaLib:Hydrate(plr, {
+		["Attr-InChatting"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
 	}))

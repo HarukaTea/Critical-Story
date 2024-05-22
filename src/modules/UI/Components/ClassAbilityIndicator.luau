@@ -97,7 +97,7 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                 end),
                 TextColor3 = AssetBook.ClassInfo[class].Color,
 
-                [Children] = { Components.TextUIStroke(scope, { Thickness = 2.5 }) }
+                [Children] = { Components.TextUIStroke(scope, { Thickness = 2 }) }
             })
         }
     })

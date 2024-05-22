@@ -22,7 +22,7 @@ local function AdventurerMenuPinia(self: table) : table
     self.playerData = {
 		Levels = Value(plr:GetAttribute("Levels")),
 		LvPoints = Value(plr:GetAttribute("LvPoints")),
-		DMG = Value(plr:GetAttribute("DMGPoints")),
+		DMG = Value(plr:GetAttribute("DmgPoints")),
 		Magic = Value(plr:GetAttribute("MagicPoints")),
 		Health = Value(plr:GetAttribute("HealthPoints")),
 		Mana = Value(plr:GetAttribute("ManaPoints")),
@@ -40,12 +40,12 @@ local function AdventurerMenuPinia(self: table) : table
 	}
 
     self.playerSettings = {
-		Musics = Value(true),
-		SFXs = Value(true),
-		PublicCombat = Value(false),
-		PotatoMode = Value(false),
-		PlayerList = Value(true),
-		MapDetails = Value(true)
+		Musics = Value(plr:GetAttribute("Musics")),
+		SFXs = Value(plr:GetAttribute("SFXs")),
+		PublicCombat = Value(plr:GetAttribute("CombatMode") == "Public"),
+		PotatoMode = Value(plr:GetAttribute("PotatoMode")),
+		PlayerList = Value(plr:GetAttribute("PlayerList")),
+		MapDetails = Value(plr:GetAttribute("MapDetails"))
 	}
 end
 

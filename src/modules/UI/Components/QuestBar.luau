@@ -13,6 +13,7 @@ local fromRGB = Color3.fromRGB
 local fromScale = UDim2.fromScale
 local udNew = UDim.new
 local v2New = Vector2.new
+local fontFromName = Font.fromName
 
 local function QuestBar(quest: IntValue, scope: table) : Frame
     local questType = quest.Name
@@ -54,7 +55,8 @@ local function QuestBar(quest: IntValue, scope: table) : Frame
             Components.TextLabel(scope, {
                 Name = "Info",
                 Position = fromScale(0.041, 0.575),
-                Size = fromScale(1, 0.5),
+                Size = fromScale(1, 0.45),
+                FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Text = StoryBook[questType][quest.Value].Target,
 

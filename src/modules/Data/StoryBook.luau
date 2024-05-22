@@ -12,16 +12,28 @@ local pos = ClientUtil:GetKeyStoryLocations()
 
 StoryBook.Main = {
     {
-        Name = "The Beginning", -- 1
+        Name = "The Beginning",
         Target = "Learn more about this world",
         Desc = "",
-        NPC = "Pioxit",
+        NPC = "Pioxit1",
         Hint = v3New(),
+
+        Rewards = {
+            EXP = 20,
+            Gold = 200
+        }
+    },
+    {
+        Name = "First Steps",
+        Target = "Talk to Pioxit again",
+        Desc = "",
+        NPC = "Pioxit",
+        Hint = if pos.Pioxit then pos.Pioxit else v3New(),
 
         Rewards = {}
     },
     {
-        Name = "Valiant Explorer", -- 2
+        Name = "Valiant Explorer",
         Target = "Talk to Milk",
         Desc = "",
         NPC = "Milk",
@@ -33,7 +45,7 @@ StoryBook.Main = {
         }
     },
     {
-        Name = "First Step", -- 3
+        Name = "Critical Power",
         Target = "Learn how to combat",
         Desc = "",
         NPC = "Milk",
@@ -45,7 +57,7 @@ StoryBook.Main = {
         }
     },
     {
-        Name = "The Future", -- 4,
+        Name = "The Future",
         Target = "Talk to Milk again",
         Desc = "",
         NPC = "Milk",
@@ -57,7 +69,7 @@ StoryBook.Main = {
         }
     },
     {
-        Name = "Paho - The Executor", -- 5
+        Name = "Paho - The Executor",
         Target = "Talk to Pioxit again",
         Desc = "",
         NPC = "Pioxit",
@@ -69,53 +81,15 @@ StoryBook.Main = {
         }
     },
     {
-        Name = "Initus Bay", -- 6
+        Name = "Initus Bay",
         Target = "Start your adventure!",
         Desc = "",
         NPC = "Hehe",
-        Hint = if pos["Initus Bay"] then pos["Initus Bay"].StoryLocator1 else v3New(),
-
-        Rewards = {
-            EXP = 30,
-            Gold = 200
-        }
-    },
-    {
-        Name = "Slime Troubles", -- 7
-        Target = "Defeat Slimes to reach Level 10",
-        Desc = "",
-        NPC = "None",
-        Hint = if pos["Primis Field"] then pos["Primis Field"].StoryLocator1 else v3New(),
-
-        Script = true,
-
-        Rewards = {
-            EXP = 40,
-            Gold = 200
-        }
-    },
-    {
-        Name = "The Next Journey", -- 8
-        Target = "Talk to hehe again",
-        Desc = "",
-        NPC = "Hehe",
-        Hint = if pos.Hehe then pos.Hehe else v3New(),
-
-        Rewards = {
-            EXP = 30,
-            Gold = 200
-        }
-    },
-    {
-        Name = "Misni Port", --- 9
-        Target = "Coming Soon",
-        Desc = "",
-        NPC = "None",
         Hint = v3New(),
 
         Rewards = {
-            EXP = 100,
-            Gold = 300
+            EXP = 30,
+            Gold = 200
         }
     },
 }

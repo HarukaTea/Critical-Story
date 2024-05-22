@@ -17,6 +17,7 @@ local Events = {
 	EquipItems = Warp(true, "EquipItems"),
 	ItemCD = Warp(true, "ItemCD"),
 	ForceReset = Warp(false, "ForceReset"),
+	LockCam = Warp(true, "LockCam"),
 	GiveDrop = Warp(true, "GiveDrop"),
 	LevelUp = Warp(false, "LevelUpVFX"),
 	MobTakeDMG = Warp(true, "MobTakeDMG"),
@@ -26,7 +27,7 @@ local Events = {
 	PlaySound = Warp(false, "PlaySound"),
 	PlayAnimation = Warp(false, "PlayAnimation"),
 	RejoinRequest = Warp(false, "RejoinRequest"),
-	SwitchScene = Warp(false, "SwitchScene"),
+	StoryEvents = Warp(true, "StoryEvents"),
 	UseItem = Warp(true, "UseItem"),
 	UpdatePinnedItems = Warp(false, "UpdatePinnedItems"),
 }

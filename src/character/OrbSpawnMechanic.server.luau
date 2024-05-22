@@ -86,7 +86,5 @@ local function onDead()
     stopSpawn2 = nil
 
     Empty()
-
-    script:Destroy()
 end
 char.Humanoid.Died:Once(onDead)

@@ -19,7 +19,7 @@ local cfAngles = CFrame.Angles
 local function setup()
     local monsterTree = Octree.new()
 
-	for _, monster: Model in workspace:WaitForChild("Monsters"):GetDescendants() do
+	for _, monster: Model in workspace:WaitForChild("Monsters", 999):GetDescendants() do
 		if monster:HasTag("Monster") and monster.PrimaryPart then monsterTree:CreateNode(monster.PrimaryPart.Position, monster) end
 	end
 	local function _handleMonster(monster: Model)
@@ -41,7 +41,6 @@ local function setup()
             if monster:GetAttribute("CantRotate") then continue end
 
             Spawn(function()
-                wait(random(0, 5) / 10)
                 local rotating = random(5, 20)
                 local direction = random(-2, 2)
 
@@ -58,9 +57,4 @@ end
 setup()
 
 --// Clear
-local function onDead()
-    Empty()
-
-    script:Destroy()
-end
-char.Humanoid.Died:Once(onDead)
+char.Humanoid.Died:Once(Empty)

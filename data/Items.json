@@ -7,7 +7,6 @@
         "Desc": "A very healthy apple from a healthy tree",
         "Stat": "Recovers <green>10% Health</font>",
         "Icon": 1637563032,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 5
@@ -20,7 +19,6 @@
         "Desc": "A gift for those who are blessed by gods",
         "Stat": "Recovers <green>35% Health</font>, and gives you <blue>1.5X Attack</font> buff for <blue>5 seconds</font>",
         "Icon": 2970814988,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 10
@@ -33,7 +31,6 @@
         "Desc": "Created by great alchemists in Magic Faction",
         "Stat": "Recovers <green>30% Health</font>",
         "Icon": 2970816690,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 10
@@ -46,7 +43,6 @@
         "Desc": "Created by great alchemists in Magic Faction",
         "Stat": "Gives you <blue>2X Attack</font> buff for <blue>8 seconds</font> ",
         "Icon": 2970818097,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 30
@@ -59,7 +55,6 @@
         "Desc": "Created by great alchemists in Magic Faction",
         "Stat": "Gives you <purple>2X Magic</font> buff for <blue>8 seconds</font>",
         "Icon": 2970817110,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 30
@@ -72,7 +67,6 @@
         "Desc": "Created by great alchemists in Magic Faction",
         "Stat": "Recovers <blue>30% Mana</font>",
         "Icon": 2970816149,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 10
@@ -85,7 +79,6 @@
         "Desc": "Created by great alchemists in Magic Faction",
         "Stat": "Cures off bad status effects",
         "Icon": 2970818438,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 30
@@ -98,7 +91,6 @@
         "Desc": "A scroll that found in the ancient",
         "Stat": "Deals <purple>half magic damage</font> to the enemy and inflicts <red>Burn</font>, costs <blue>50 Mana</font>",
         "Icon": 12027128349,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 50,
         "Price": 0
@@ -111,7 +103,6 @@
         "Desc": "Refreshing sweet soda, which would give you a sugar rush",
         "Stat": "Gives you <blue>1.5X Speed</font> buff for <blue>8 seconds</font>, and recovers <green>15% Health</font>",
         "Icon": 4865339572,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 5
@@ -124,7 +115,6 @@
         "Desc": "Well cooked and tasty",
         "Stat": "Gives you <blue>1.2X Attack</font> buff for <blue>6 seconds</font>, and recovers <green>10% Health</font>",
         "Icon": 17481500518,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 5
@@ -137,7 +127,6 @@
         "Desc": "A scroll that used by great magicians",
         "Stat": "Fires a ball towards enemy, it will mark an area under it, which deals <purple>magic damage</font> five times if hits, costs <blue>100 Mana</font>",
         "Icon": 14429505922,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 100,
         "Price": 1000
@@ -150,7 +139,6 @@
         "Desc": "Kitsunes always carry these scrolls, just to find a new master",
         "Stat": "Deals <purple>decent magic damage</font> to the enemy and inflicts <red>Burn</font>, costs <blue>50 Mana</font>",
         "Icon": 4820482325,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 50,
         "Price": 1000
@@ -163,7 +151,6 @@
         "Desc": "Ghosts, hear my commands!",
         "Stat": "Deals <purple>magic damage</font> to the enemy three times and recovers <green>20% Health</font>, costs <blue>200 Mana</font>",
         "Icon": 4820486105,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 200,
         "Price": 1500
@@ -176,7 +163,6 @@
         "Desc": "A spell that calls the smite from Heaven",
         "Stat": "Strikes down a beam to deal <purple>magic damage</font> to the enemy and inflicts <red>BURN</font> for <blue>6 seconds</font>, costs <blue>200 Mana</font>",
         "Icon": 14429523818,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 200,
         "Price": 2000
@@ -189,7 +175,6 @@
         "Desc": "A great pride for Warriors",
         "Stat": "Slashs out a blade of pure raw physical energy, which deals <red>physical damage</font>, costs <blue>200 Mana</font>",
         "Icon": 17355782628,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 200,
         "Price": 2000
@@ -202,7 +187,6 @@
         "Desc": "A pair of comfortable boots for Adventurers",
         "Stat": "Makes you slightly faster in overworld",
         "Icon": 2965728606,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -215,7 +199,6 @@
         "Desc": "A magical torch which even burns in rain",
         "Stat": "Emits the firelight wherever you are, and make you slightly faster in overworld",
         "Icon": 2965771738,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -228,7 +211,6 @@
         "Desc": "Makes the campfire bigger!",
         "Stat": "Heals <green>30% more health</font> when resting at a campfire",
         "Icon": 2970559088,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -241,7 +223,6 @@
         "Desc": "A sharp dagger for hunting foxes",
         "Stat": "<red>+5 Min Damage</font>, simple",
         "Icon": 1723200131,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -254,7 +235,6 @@
         "Desc": "A pickaxe for mining ores",
         "Stat": "Allows you to mine <blue>Iron Ore</font> in the cave",
         "Icon": 12118509077,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -267,7 +247,6 @@
         "Desc": "You feel like it contains a long history",
         "Stat": "<red>+15 Max Damage</font>, simple",
         "Icon": 12192841092,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -280,7 +259,6 @@
         "Desc": "You feel those many battles it's been through",
         "Stat": "<red>+20 Min Damage</font>, <red>+40 Max Damage</font>, and <blue>+20 Shield</font>",
         "Icon": 12119868315,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -293,7 +271,6 @@
         "Desc": "A raw mana crystal, which contains some mana in it",
         "Stat": "Restores <blue>20% Mana</font> in every 15 seconds, and <blue>+100 Mana</font>",
         "Icon": 12119869276,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -306,7 +283,6 @@
         "Desc": "Originally it's a cosmetic?",
         "Stat": "<blue>+20 Jump</font>, a good passive for exploring the world",
         "Icon": 4820619821,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -319,7 +295,6 @@
         "Desc": "A magical spellbook used by the Life Faction members",
         "Stat": "<purple>+120 Magic</font>, <blue>+100 Mana</font> and be a member of <orange>Life Faction</font>",
         "Icon": 17286830798,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -332,7 +307,6 @@
         "Desc": "A hat wore by the Life Faction members",
         "Stat": "<purple>+120 Magic</font>, <green>+300 Health</font>, and be a member of <orange>Matter Faction</font>",
         "Icon": 14429547149,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -345,7 +319,6 @@
         "Desc": "A sword blessed by magic!",
         "Stat": "<red>+25 Min Damage</font>, <red>+100 Max Damage</font>, and <purple>+50 Magic</font>",
         "Icon": 4820519895,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -358,7 +331,6 @@
         "Desc": "A cape made out of stalker leaves",
         "Stat": "<blue>+15% Dodge Chance</font>, <blue>+5 Speed</font>, and <green>+100 Health</font>",
         "Icon": 12284033809,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -371,7 +343,6 @@
         "Desc": "A gem that can warmth your heart",
         "Stat": "Heals <green>10% Health</font> in every 15 seconds, and <green>+150 Health</font>",
         "Icon": 17481477951,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -384,7 +355,6 @@
         "Desc": "It's your glory!",
         "Stat": "<red>+75 Min Damage</font>, <red>+150 Max Damage</font>, and <blue>+10 Speed</font>",
         "Icon": 17481485403,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -397,7 +367,6 @@
         "Desc": "Sharp, and hot, perfect for battle",
         "Stat": "<red>+10% Burn Chance</font>, <purple>+25 Magic</font>, and <red>+100 Max Damage</font>",
         "Icon": 17481496050,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 1000
@@ -410,7 +379,6 @@
         "Desc": "It warmth your hands",
         "Stat": "<purple>+50 Magic</font>, and <red>+50 Max Damage</font>",
         "Icon": 12285229661,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -423,7 +391,6 @@
         "Desc": "An incredibly rare stone with magical properties based off water",
         "Stat": "<purple>+30 Magic</font>, <blue>+150 Mana</font>",
         "Icon": 17515925140,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -436,7 +403,6 @@
         "Desc": "An identification of being worthy to enter their stronghold",
         "Stat": "Allows you to enter <blue>Northern Stronghold</font>",
         "Icon": 14429517439,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -449,7 +415,6 @@
         "Desc": "Not actually a potato, just a piece of charcoal that has absorbed a lot of heat",
         "Stat": "<red>+10% Burn Chance</font>, <blue>+15 Speed</font>",
         "Icon": 4820525274,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -462,7 +427,6 @@
         "Desc": "Used by soldiers from the north",
         "Stat": "<red>+70 Max Damage</font>, and allows you to cut trees in certain areas",
         "Icon": 14429550726,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -475,7 +439,6 @@
         "Desc": "Used by hikers and adventurers",
         "Stat": "Allows you to immense the cold in some areas of <blue>Tundra</font>",
         "Icon": 16517557366,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 10000
@@ -488,7 +451,6 @@
         "Desc": "This is, the spirit of Kitsune, and their future",
         "Stat": "<purple>+50 Magic</font>, and <blue>+15 Speed</font> with the aid of Kitsune Spirit.",
         "Icon": 4820522841,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 3000
@@ -501,7 +463,6 @@
         "Desc": "A great halberd forged within the Northern Stronghold",
         "Stat": "<red>+40 Min Damage</font>, <red>+80 Max Damage</font>",
         "Icon": 4827596848,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -514,7 +475,6 @@
         "Desc": "A magical crystal taken from deep below from the caverns",
         "Stat": "<orange>+50 Shield</font>, <blue>+50 Mana</font>, restores <blue>10% more Mana</font> for every attack",
         "Icon": 4820513616,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 2000
@@ -527,7 +487,6 @@
         "Desc": "This little girl cannot explain this staff",
         "Stat": "Summons a fire staff orb in every 7 seconds in combat, which inflicts <red>Burn</font> for every orb attack",
         "Icon": 4820522220,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 5000
@@ -540,7 +499,6 @@
         "Desc": "A crown that belongs to an ancient king, well he is dead, now soooo grave robbing?",
         "Stat": "<green>+300 Health</font>, <orange>+60 Shield</font>, and <red>+100 Max Damage</font>",
         "Icon": 4820946334,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 10000
@@ -553,7 +511,6 @@
         "Desc": "The core of slimes, a good material for alchemy",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 12118510527,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -566,7 +523,6 @@
         "Desc": "The gel of slimes, sticky",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 2980409698,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -579,7 +535,6 @@
         "Desc": "The alternative version of Kitsune Fur",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 12118511428,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -592,7 +547,6 @@
         "Desc": "Nice material for crafting",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 2980409932,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -605,7 +559,6 @@
         "Desc": "It has stalker energy in it",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 12159550747,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -618,7 +571,6 @@
         "Desc": "Stalker makes them more lush",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 17481492369,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -631,7 +583,6 @@
         "Desc": "A soft fur that has magical coating within it",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 12191831926,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -644,7 +595,6 @@
         "Desc": "The inner spirit of Kitsune",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 14429538456,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -657,7 +607,6 @@
         "Desc": "The classic metal that everyone in the world has used",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 14429532190,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -670,7 +619,6 @@
         "Desc": "Manifesting negative energy",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 12285144842,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -683,7 +631,6 @@
         "Desc": "Without any scent on it, after all, it's just the most ordinary letter",
         "Stat": "A recommendation letter from hehe, which helps your journey to <blue>Northern Stronghold</font>.",
         "Icon": 16654291188,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -696,7 +643,6 @@
         "Desc": "A spell that is famously used for breaking hard carapaces or metals",
         "Stat": "Deals <red>max physical damage</font> to the enemy regardless of defense, costs <blue>50 Mana</font>",
         "Icon": 4820467850,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 50,
         "Price": 3000
@@ -709,7 +655,6 @@
         "Desc": "Powerful weapons created to break through the hardest defenses",
         "Stat": "Deals <red>3X min physical damage</font> to the enemy, costs <blue>50 Mana</font>",
         "Icon": 4824414829,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 50,
         "Price": 5000
@@ -722,7 +667,6 @@
         "Desc": "A skill that calls out protection from the gods",
         "Stat": "<blue>+90% Defense</font> for <blue>6 seconds</font>, costs <blue>100 Mana</font>",
         "Icon": 4820480587,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 100,
         "Price": 10000
@@ -735,7 +679,6 @@
         "Desc": "Created by great alchemists in Magic Faction",
         "Stat": "Gains <blue>10% Defense</font> for <blue>6 seconds</font>",
         "Icon": 2970818737,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 10
@@ -748,7 +691,6 @@
         "Desc": "Tastes like honey",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 4824417771,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -761,7 +703,6 @@
         "Desc": "A spell that can heal you",
         "Stat": "Recovers <green>50% Health</font> for your teammates, costs <blue>200 Mana</font>",
         "Icon": 12027131895,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 200,
         "Price": 3000
@@ -774,7 +715,6 @@
         "Desc": "Sweet treats from the north that came from slimes",
         "Stat": "Recovers <green>66% Health</font>",
         "Icon": 4806921700,
-        "MaxAmount": 30,
         "IsSkill": false,
         "Mana": 0,
         "Price": 15
@@ -787,7 +727,6 @@
         "Desc": "Kitty, you can have this burger. Smells yummy, I wonder whats the recipe?",
         "Stat": "Recovers <green>100% Health</font>",
         "Icon": 4827591686,
-        "MaxAmount": 5,
         "IsSkill": false,
         "Mana": 0,
         "Price": 300
@@ -800,7 +739,6 @@
         "Desc": "A spell that casts a ball of darkness",
         "Stat": "Deals tremendous <purple>magic damage</font> to the enemy, costs <blue>200 Mana</font>",
         "Icon": 4824383801,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 200,
         "Price": 2000
@@ -813,7 +751,6 @@
         "Desc": "A spell that casts a ball of light",
         "Stat": "Deals heavy <purple>magic damage</font> to the enemy, costs <blue>200 Mana</font>",
         "Icon": 4820492332,
-        "MaxAmount": 1,
         "IsSkill": true,
         "Mana": 200,
         "Price": 2000
@@ -826,7 +763,6 @@
         "Desc": "Deltarune?",
         "Stat": "<purple>+30% Poison Chance</font>",
         "Icon": 2970815325,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -839,7 +775,6 @@
         "Desc": "A flat rock used to sharpen blades",
         "Stat": "<yellow>+10% Critical Chance</font>",
         "Icon": 2965825317,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -852,7 +787,6 @@
         "Desc": "Dropped by Bats, bats make me crazy",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 2970814260,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -865,7 +799,6 @@
         "Desc": "Dropped by Crimson Slime, it's definitely more annoying than Purple Slime",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 4785691629,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -878,7 +811,6 @@
         "Desc": "Ghosts are made out of these weird odd substances",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 4824434937,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -891,7 +823,6 @@
         "Desc": "Expensive rare shiny material",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 4797656231,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -904,7 +835,6 @@
         "Desc": "Dropped by Ice Slime",
         "Stat": "Used for <purple>Alchemy</font>",
         "Icon": 4785692076,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -917,7 +847,6 @@
         "Desc": "I wonder if…",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 4801461630,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -930,7 +859,6 @@
         "Desc": "Must be incredibly hard to fight these things",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 4821138900,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -943,7 +871,6 @@
         "Desc": "Expensive rare ore used to create strong metals",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 4797656828,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -956,7 +883,6 @@
         "Desc": "Dropped by the Elder Wolf, an endangered species.",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 4785692666,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -969,7 +895,6 @@
         "Desc": "Dropped by the Elder Wolf, an endangered species.",
         "Stat": "Used for <orange>Crafting</font>",
         "Icon": 4785693140,
-        "MaxAmount": 999,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -982,7 +907,6 @@
         "Desc": "a trusty kit useful for adventuring, and more usefully, killing monsters",
         "Stat": "Spawns <blue>2 orbs</font> instantly whenever you enter combat, heals <green>5%</font> more in campfire, and restores <blue>5%</font> more Mana from orbs",
         "Icon": 12370527641,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -995,7 +919,6 @@
         "Desc": "An amulet made from gold, maybe you can try to add something to it",
         "Stat": "It's just good, no extra stats will be given",
         "Icon": 4834726811,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -1008,7 +931,6 @@
         "Desc": "Used by hikers and adventurers",
         "Stat": "Allows you to climb certain walls",
         "Icon": 4820516087,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0
@@ -1021,7 +943,6 @@
         "Desc": "Fangs originating from a dangerous type of slime",
         "Stat": "<red>+50 Min Damage</font>, <red>+100 Max Damage</font>, <blue>+5 Jump</font>, and <yellow>+10% Critical Chance</font>",
         "Icon": 4820517734,
-        "MaxAmount": 1,
         "IsSkill": false,
         "Mana": 0,
         "Price": 0

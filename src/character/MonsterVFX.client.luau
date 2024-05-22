@@ -195,7 +195,5 @@ local vfxConnection = CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHand
 
 local function onDead()
 	vfxConnection:Disconnect()
-
-	script:Destroy()
 end
 char.Humanoid.Died:Once(onDead)

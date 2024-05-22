@@ -15,7 +15,7 @@ local rad = math.rad
 local wait = task.wait
 
 local function openAcquiredChests()
-    local chests = workspace:WaitForChild("MapComponents").Chests :: Folder
+    local chests = workspace:WaitForChild("MapComponents", 999).Chests :: Folder
     local inventory = plr:WaitForChild("Inventory", 999) :: Folder
 
     for _, chest: Model in chests:GetChildren() do
@@ -48,5 +48,9 @@ local function disableDefaultFreecam()
     repeat wait() until plr.PlayerGui:WaitForChild("Freecam", 999)
 
     plr.PlayerGui.Freecam:Destroy()
+
+    repeat wait() until plr.PlayerGui:WaitForChild("BubbleChat", 999)
+
+    plr.PlayerGui.BubbleChat:Destroy()
 end
 Spawn(disableDefaultFreecam)

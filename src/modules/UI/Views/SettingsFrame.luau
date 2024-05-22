@@ -11,16 +11,14 @@ local Signals = require(RepS.Modules.Data.Signals)
 local SettingToggleBtn = require(RepS.Modules.UI.Components.SettingToggleBtn)
 
 local fromScale = UDim2.fromScale
-local clear = table.clear
 
 local function SettingsFrame(self: table): Frame
 	local scope = self.scope
-	local potatoStoreParts = {}
 	local playerSettings = self.playerSettings :: table
 
 	self.Add(HarukaLib:Hydrate(self.plr, {
 		["Attr-CombatMode"] = function(newMode: string)
-			playerSettings.PublicCombat:set(if newMode == "Public" then true else false)
+			playerSettings.PublicCombat:set(newMode == "Public")
 		end,
 		["Attr-Musics"] = function(state: boolean)
 			playerSettings.Musics:set(state)
@@ -36,23 +34,18 @@ local function SettingsFrame(self: table): Frame
 			playerSettings.PotatoMode:set(state)
 
 			if state == false then
-				for part: BasePart, material: Enum.Material in potatoStoreParts do
-					if part.Parent then part.Material = material end
-				end
+				for _, child: Instance in workspace.Maps:GetDescendants() do
+					if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
+						if child:GetAttribute("OriMaterial") then child.Material = child:GetAttribute("OriMaterial") end
 
-				clear(potatoStoreParts)
+						child:SetAttribute("OriMaterial", nil)
+					end
+				end
 
 			elseif state then
 				for _, child: Instance in workspace.Maps:GetDescendants() do
-					if child:IsA("BasePart") or child:IsA("UnionOperation") then
-						potatoStoreParts[child] = child.Material
-
-						child.Material = Enum.Material.Plastic
-					end
-				end
-				for _, child: Instance in workspace.MapComponents:GetDescendants() do
-					if child:IsA("BasePart") or child:IsA("UnionOperation") then
-						potatoStoreParts[child] = child.Material
+					if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
+						child:SetAttribute("OriMaterial", child.Material)
 
 						child.Material = Enum.Material.Plastic
 					end

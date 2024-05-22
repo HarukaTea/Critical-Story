@@ -16,13 +16,15 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 	local COLORS = {
 		Character = fromRGB(172, 113, 86),
 		Settings = fromRGB(53, 107, 79),
+
+		Log = fromRGB(73, 67, 167)
 	}
 
 	return Components.TextButton(scope, {
 		Name = id,
 		BackgroundColor3 = COLORS[id],
 		Text = upper(id),
-		Size = fromScale(0.14, 1),
+		Size = fromScale(0.13, 1),
 
 		[Fusion.Children] = {
 			Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),

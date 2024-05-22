@@ -9,6 +9,7 @@ local Signals = {
 	QuestComplete = Signal(),
 
 	--- story
+	StoryMain1 = Signal(),
 	FirstStepTutorial = Signal(),
 	CompletedInitusBay = Signal(),
 

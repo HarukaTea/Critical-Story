@@ -1,7 +1,6 @@
 --!nocheck
 
 local DSS = game:GetService("DataStoreService")
-local MS = game:GetService("MessagingService")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
@@ -12,6 +11,7 @@ local StoryBook = require(RepS.Modules.Data.StoryBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local playerDatas = {}
+local playerScopes = {}
 
 local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
 local DATASTORE = require(SSS.Modules.Data.DatastoreTemplate)
@@ -19,22 +19,15 @@ local DATASTORE = require(SSS.Modules.Data.DatastoreTemplate)
 local newInstance = Instance.new
 local wait = task.wait
 local time = os.time
-local format = string.format
+local format, match = string.format, string.match
+local tFind = table.find
 
 local function _findDataStore(plr: Player) : DataStore
 	local joinData = plr:GetJoinData().TeleportData :: table?
 	local slotChosen = if joinData then joinData[1] else "Slot1"
+	local realSlot = tonumber(match(slotChosen, "%d")) or 1
 
-	local ds
-	if slotChosen == "Slot2" then
-		ds = DSS:GetDataStore(DATASTORE[2])
-	elseif slotChosen == "Slot3" then
-		ds = DSS:GetDataStore(DATASTORE[3])
-	else
-		ds = DSS:GetDataStore(DATASTORE[1])
-	end
-
-	return ds
+	return DSS:GetDataStore(DATASTORE[realSlot])
 end
 local function _saveData(plr: Player)
 	local data = playerDatas[plr.Name]
@@ -61,34 +54,65 @@ local function _saveData(plr: Player)
 	end
 	quests.Town = townQuests
 
-	data.InventoryV2 = inventory
+	data.Inventory = inventory
 	data.QuestsV2 = quests
+end
+local function _deepCopyTable(t: table) : table
+	local copy = {}
+
+	for k, v in pairs(t) do
+		if type(v) == "table" then copy[k] = _deepCopyTable(v) else copy[k] = v end
+	end
+
+	return copy
+end
+local function _reconcile(data: table, template: table)
+	for k, v in pairs(template) do
+		if type(k) == "string" then --- only string keys will be reconciled
+			if data[k] == nil then
+				if type(v) == "table" then data[k] = _deepCopyTable(v) else data[k] = v end
+
+			elseif type(data[k]) == "table" and type(v) == "table" then
+				_reconcile(data[k], v)
+			end
+		end
+	end
 end
 
 
 local function setup(plr: Player)
-	local data = _findDataStore(plr):GetAsync(plr.UserId)
+	local data = _findDataStore(plr):GetAsync(plr.UserId) or TEMPLATE
+
+	_reconcile(data, TEMPLATE)
 
 	playerDatas[plr.Name] = data
+	local Add, Empty = HarukaLib.Bin()
+	playerScopes[plr.Name] = Empty
 
 	local backpackData = newInstance("Folder")
 	backpackData.Name = "Inventory"
 	backpackData.Parent = plr
+
 	local questsData = newInstance("Folder")
 	questsData.Name = "Quests"
 	questsData.Parent = plr
 
 	---// Load stats
-	for attr: string, val: any in data.StatsV2 do
-		plr:SetAttribute(attr, HarukaLib:Deserialize(val))
+	local blacklist = { "V9Transfered" }
+	for attr: string, val: any in data.Stats do
+		if tFind(blacklist, attr) then continue end
 
-		HarukaLib:Hydrate(plr, {
+		pcall(function()
+			plr:SetAttribute(attr, HarukaLib:Deserialize(val))
+		end)
+
+		Add(HarukaLib:Hydrate(plr, {
 			["Attr-"..attr] = function(newStats: any)
 				if newStats == nil then return end --// We have false boolean data
 
-				data.StatsV2[attr] = HarukaLib:Serialize(newStats)
+				data.Stats[attr] = HarukaLib:Serialize(newStats)
 			end
-		})
+		}))
 	end
 
 	--// Load quests
@@ -110,7 +134,7 @@ local function setup(plr: Player)
 	end
 
 	--// Load items
-	for index: string, info: table in data.InventoryV2 do
+	for index: string, info: table in data.Inventory do
 		if not ItemBook:IsItemExist(index) then continue end
 
 		local intValue = newInstance("IntConstrainedValue")
@@ -133,26 +157,13 @@ local function setup(plr: Player)
 		wait()
 		_saveData(plr)
 	end
-	backpackData.ChildAdded:Connect(_save)
-	backpackData.ChildRemoved:Connect(_save)
+	Add(backpackData.ChildAdded:Connect(_save))
+	Add(backpackData.ChildRemoved:Connect(_save))
+	Add(questsData.ChildAdded:Connect(_save))
+	Add(questsData.ChildRemoved:Connect(_save))
 
 	--// Finish
 	plr:SetAttribute("PlayerDataLoaded", true)
-
-	--// Check if banned
-	local banInfo = data.BanStats :: table
-	if banInfo.IsBanned then
-		local timeGap = (time() - banInfo.BannedTime) / 60 / 60
-
-		if timeGap < banInfo.Duration then
-			local durationLeft = format("%.1f", tostring(banInfo.Duration - timeGap))
-
-			plr:Kick("You got banned! Reason: "..banInfo.Reason..", unban in "..durationLeft.." hours!")
-		else
-			--// unban
-			data.BanStats = TEMPLATE.BanStats
-		end
-	end
 end
 
 local function clear(plr: Player)
@@ -170,12 +181,13 @@ local function clear(plr: Player)
 			end
 		end
 	end)
+	if not playerDatas[plr.Name] then return end
 
-	pcall(function()
-		_findDataStore(plr):SetAsync(plr.UserId, playerDatas[plr.Name])
-	end)
+	_saveData(plr)
+	_findDataStore(plr):SetAsync(plr.UserId, playerDatas[plr.Name])
 
 	playerDatas[plr.Name] = nil
+	playerScopes[plr.Name]()
 end
 
 --- in case player joined before server starts
@@ -184,22 +196,3 @@ for _, plr in Players:GetPlayers() do Spawn(setup, plr) end
 --// Connections
 Players.PlayerAdded:Connect(setup)
 Players.PlayerRemoving:Connect(clear)
-
---// Server setup
-MS:SubscribeAsync("BanRequest", function(message: table)
-	local data = message.Data :: table
-	local plrName, duration, reason = data[1] :: string, data[2] :: number, data[3] :: string
-
-	if not Players:FindFirstChild(plrName) then return end
-	local cheater = Players[plrName] :: Player
-
-	local banInfo = {
-		IsBanned = true,
-		Duration = duration,
-		BannedTime = time(),
-		Reason = reason
-	}
-	playerDatas[plrName].BanStats = banInfo
-
-	cheater:Kick("You've got banned! Reason: "..reason..", Duration: "..duration.." Hours!")
-end)

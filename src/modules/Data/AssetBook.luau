@@ -126,11 +126,11 @@ AssetBook.MonsterInfo = {
 
     Kitsune = {
         Name = "Kitsune",
-        Icon = ""
+        Icon = "rbxassetid://17543155124"
     },
     Stalker = {
         Name = "Stalker",
-        Icon = ""
+        Icon = "rbxassetid://17543156640"
     },
 
     GreenSlime = {
@@ -147,7 +147,7 @@ AssetBook.MonsterInfo = {
     },
     CrimsonSlime = {
         Name = "Crimson Slime",
-        Icon = ""
+        Icon = "rbxassetid://17543155439"
     },
     IceSlime = {
         Name = "Ice Slime",

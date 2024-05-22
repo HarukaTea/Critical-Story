@@ -7,6 +7,7 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local Children, Value, Computed = Fusion.Children, Fusion.Value, Fusion.Computed
 
@@ -17,6 +18,11 @@ local fromScale = UDim2.fromScale
 local function StatImage(id: string, self: table) : ImageLabel
     local scope = self.scope
     local isSelecting = Value(scope, false)
+
+    local function exCategoryOpened()
+        isSelecting:set(false)
+    end
+    Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
     return Components.ImageLabel(scope, {
         Name = id.."Image",

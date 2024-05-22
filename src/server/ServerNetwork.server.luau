@@ -109,16 +109,16 @@ PPS.PromptTriggered:Connect(promptsHandler)
 --[[
 	Player finally reach the requirement and level up!
 ]]
-local LEVEL_CAP = 150
+local LEVEL_CAP = 2000
 local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
-	return if exp >= floor(level ^ 1.85) + 59 and level < LEVEL_CAP then true else false
+	return if exp >= floor(level ^ 1.65) + 59 and level < LEVEL_CAP then true else false
 end
 local function levelUp(plr: Player)
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
 
 	if check then
-		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.85) + 59))
+		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.65) + 59))
 		HarukaLib:Add(plr, "Levels", 1)
 		HarukaLib:Add(plr, "LvPoints", LEVEL_POINT)
 
@@ -156,7 +156,7 @@ local function addPoint(plr: Player, option: string, times: number)
 		end
 
 		HarukaLib:Add(plr, "Gold", -cost)
-		plr:SetAttribute("DMGPoints", 0)
+		plr:SetAttribute("DmgPoints", 0)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
 		plr:SetAttribute("ShieldPoints", 0)

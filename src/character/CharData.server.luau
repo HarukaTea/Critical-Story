@@ -60,7 +60,6 @@ local function setup()
     _createStats()
 
     ServerUtil:SetCollisionGroup(char, "Player")
-    ServerUtil:CancelRaycast(char, true)
 
     Add(HarukaLib.Clock(1, function()
         HarukaLib:Add(plr, "PlayTime", 1)
@@ -88,17 +87,6 @@ local function classAttributesSetup()
         end
     end))
 
-    --- wizard
-    Add(char:GetAttributeChangedSignal("InCombat"):Connect(function()
-        if not char:GetAttribute("InCombat") then
-            char:SetAttribute("Combo", 0)
-            char:SetAttribute("Stack", 0)
-            char:SetAttribute("Focus", 0)
-            char:SetAttribute("Guard", 0)
-            char:SetAttribute("RogueCri", 0)
-        end
-    end))
-
     --- knight
     Add(HarukaLib.Clock(1, function()
         if char:GetAttribute("Guard") <= 0 then return end
@@ -107,7 +95,7 @@ local function classAttributesSetup()
     end))
 
     --- Rogue
-    Add(HarukaLib.Clock(0.7, function()
+    Add(HarukaLib.Clock(0.6, function()
         if char:GetAttribute("RogueCri") <= 0 then return end
 
         HarukaLib:Add(char, "RogueCri", -1)
@@ -135,10 +123,10 @@ local function charAttributesSetup()
     end
 
     local function updateMinDMG()
-        char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
+        char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DmgPoints") + char:GetAttribute("MinDMGBuff"))
     end
     local function updateMaxDMG()
-        char:SetAttribute("MaxDMG", 15 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+        char:SetAttribute("MaxDMG", 15 + (plr:GetAttribute("DmgPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
     end
     local function updateMagic()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
@@ -166,7 +154,7 @@ local function charAttributesSetup()
     local function levelReqCheck()
         local level = plr:GetAttribute("Levels") :: number
 
-        if plr:GetAttribute("EXP") >= floor(level ^ 1.85) + 49 then
+        if plr:GetAttribute("EXP") >= floor(level ^ 1.65) + 49 then
             if lvUpCD then return end
 
             lvUpCD = true
@@ -176,6 +164,13 @@ local function charAttributesSetup()
             lvUpCD = false
         end
     end
+    local function clearClassAttrs()
+        char:SetAttribute("Combo", 0)
+        char:SetAttribute("Stack", 0)
+        char:SetAttribute("Focus", 0)
+        char:SetAttribute("Guard", 0)
+        char:SetAttribute("RogueCri", 0)
+    end
 
     --// Setups
     Spawn(updateMinDMG)
@@ -184,15 +179,16 @@ local function charAttributesSetup()
     Spawn(updateShield)
     Spawn(updateHP)
     Spawn(updateMana)
-    Spawn(updateSpeed, 0)
+    Spawn(updateSpeed)
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)
+    Spawn(clearClassAttrs)
     Spawn(function()
         ServerUtil:EquipWeapon(char)
     end)
 
     Add(HarukaLib:Hydrate(plr, {
-        ["Attr-DMGPoints"] = function()
+        ["Attr-DmgPoints"] = function()
             updateMinDMG()
             updateMaxDMG()
         end,
@@ -224,6 +220,7 @@ local function charAttributesSetup()
             ServerUtil:EquipWeapon(char)
 
             updateSpeed()
+            clearClassAttrs()
         end
     }))
 end
@@ -251,7 +248,5 @@ local function onDead()
     for _, orbFolder: Folder in workspace.MapComponents.OrbHolders:GetChildren() do
         if orbFolder.Name == char.Name then orbFolder:Destroy() end
     end
-
-    script:Destroy()
 end
 humanoid.Died:Once(onDead)

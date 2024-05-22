@@ -6,9 +6,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local plr = Players.LocalPlayer
-local char = script.Parent :: Model
-
-local wait = task.wait
 
 --- Reload UI modules when character respawned
 local UIModules = RepS.Modules.UI
@@ -18,6 +15,7 @@ local requireList = {
 	UIModules.Backpack,
 	UIModules.ShiftLock,
 	UIModules.PlayerList,
+	UIModules.NPCChat,
 	UIModules.Hints,
 	UIModules.SwitchScene
 }
@@ -28,10 +26,3 @@ local function setup()
 	end
 end
 setup()
-
---// Clear
-local function onDead()
-	wait(2)
-	script:Destroy()
-end
-char.Humanoid.Died:Connect(onDead)

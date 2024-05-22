@@ -21,7 +21,7 @@ local sFind, upper = string.find, string.upper
 local COLORS = {
 	Passive = fromRGB(40, 98, 3),
 	Active = fromRGB(167, 111, 83),
-	Others = fromRGB(0, 130, 139),
+	Other = fromRGB(0, 130, 139),
 
 	Equip = fromRGB(131, 131, 65),
 	Use = fromRGB(103, 154, 154),

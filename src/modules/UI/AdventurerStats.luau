@@ -5,7 +5,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Events = require(RepS.Modules.Data.Events)
@@ -18,7 +17,6 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerStatsPinia)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
-local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
 local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
@@ -70,6 +68,10 @@ return function(plr: Player)
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
+				Visible = Fusion.Computed(scope, function(use)
+					return not use(self.isChatting)
+				end),
+
 				[Children] = {
 					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
@@ -112,7 +114,6 @@ return function(plr: Player)
 					}),
 
 					ClassFrame(self),
-					ChatFrame(self),
 					StatsTextsFrame(self),
 					MonsterSideList(self),
 					PlayerEffectsList(self)
@@ -205,11 +206,11 @@ return function(plr: Player)
 	self.Add(HarukaLib:Hydrate(plr, {
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
-			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.85) + 60)
+			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.65) + 59)
 		end,
 		["Attr-Levels"] = function(level: number)
 			playerData.Levels:set(level)
-			playerData.EXP[2]:set(floor(level ^ 1.85) + 59)
+			playerData.EXP[2]:set(floor(level ^ 1.65) + 59)
 		end,
 		["Attr-Class"] = function(class: string)
 			playerData.Class:set(class)
@@ -222,6 +223,10 @@ return function(plr: Player)
 		end,
 		["Attr-LvPoints"] = function(lvPoints: number)
 			playerData.LvPoints:set(lvPoints)
+		end,
+
+		["Attr-InChatting"] = function(newState: boolean)
+			self.isChatting:set(newState)
 		end
 	}))
 
@@ -286,8 +291,6 @@ return function(plr: Player)
 	}))
 
 	local function _clearGarbage()
-		ClientUtil:FreezePlayerControls("Unfreeze")
-
 		CAS:UnbindAction("ChangeMobTargetLCtrl")
 		CAS:UnbindAction("ChangeMobTargetRCtrl")
 		CAS:UnbindAction("UseItem1")
@@ -297,9 +300,7 @@ return function(plr: Player)
 		Events.EquipItems:DisconnectAll()
 		Events.GiveDrop:DisconnectAll()
 		Events.LevelUp:DisconnectAll()
-		Events.NPCChat:DisconnectAll()
 
-		Signals.NPCChat:DisconnectAll()
 		Signals.ExCategoryOpened:DisconnectAll()
 
 		self.Empty()

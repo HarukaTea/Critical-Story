@@ -1,20 +1,20 @@
 --!nocheck
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
 local SuperTween = require(RepS.Modules.Packages.SuperTween)
+local Signals = require(RepS.Modules.Data.Signals)
+
+local plr = Players.LocalPlayer
 
 local wait = task.wait
 local cfAngles = CFrame.Angles
 local rad = math.rad
 
---[[
-	Play the sound when server requests, usually used for
-	client-only SFXs
-]]
 local function playSound(sound: Sound | string, pos: number?)
 	if sound == "StopAll" then
 		for _, music: Sound in workspace.Sounds:GetChildren() do
@@ -39,9 +39,6 @@ end
 Events.PlaySound:Connect(playSound)
 
 
---[[,
-	Used to perform client-only tweens
-]]
 local function clientTweenPlayer(objs: table, goal: table, style: string)
 	style = AssetBook.TweenInfos[style]
 
@@ -54,12 +51,31 @@ end
 Events.ClientTween:Connect(clientTweenPlayer)
 
 
---[[
-	Play VFX when a chest is unlocked
-]]
 local function vfxChestUnlock(chest: Model)
 	workspace.Sounds.SFXs.ChestOpened:Play()
 
 	SuperTween.new(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) }):Play()
 end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
+
+
+local function lockCam(cam: BasePart | string)
+	local camera = workspace.CurrentCamera
+
+	if cam == "Reset" then
+		camera.CameraType = Enum.CameraType.Custom
+		return
+	end
+
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CFrame = cam.CFrame
+end
+Events.LockCam:Connect(lockCam)
+
+
+local function storySignals(symbol: string)
+	if not Signals[symbol] then warn("No signal found: "..symbol) return end
+
+	Signals[symbol]:Fire(plr)
+end
+Events.StoryEvents:Connect(storySignals)

@@ -61,7 +61,7 @@ local function CharacterFrame(self: table): Frame
 		["Attr-LvPoints"] = function(points: number)
 			playerData.LvPoints:set(points)
 		end,
-		["Attr-DMGPoints"] = function(points: number)
+		["Attr-DmgPoints"] = function(points: number)
 			playerData.DMG:set(points)
 		end,
 		["Attr-MagicPoints"] = function(points: number)
@@ -163,10 +163,11 @@ local function CharacterFrame(self: table): Frame
 			}),
 			Components.TextLabel(scope, {
 				Name = "PointsLeft",
-				Position = fromScale(0.61, 1.013),
-				Size = fromScale(0.374, 0.08),
+				Position = fromScale(0.775, 1.013),
+				Size = fromScale(0.209, 0.08),
 				TextXAlignment = Enum.TextXAlignment.Right,
 				RichText = true,
+
 				Text = Computed(scope, function(use)
 					return [[SKILL POINTS LEFT:  <font color="#f6e58d">]]..use(playerData.LvPoints).."</font>"
 				end)

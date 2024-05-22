@@ -1,7 +1,7 @@
 --!nocheck
 
 return {
-    StatsV2 = {
+    Stats = {
 		Levels = 1,
 		EXP = 0,
 		Gold = 0,
@@ -9,25 +9,17 @@ return {
 		PlayTime = 0,
 
 		Class = "Warrior",
-		LastSeenLocation = "InitusBay",
+		LastSeenLocation = "MonolithVillage",
 		RespawnLocation = { "Vector3", 0, 0, 0 },
 
 		LvPoints = 0,
-		DMGPoints = 0,
+		DmgPoints = 0,
 		MagicPoints = 0,
 		ManaPoints = 0,
 		ShieldPoints = 0,
 		HealthPoints = 0
 	},
 
-	BanStats = {
-		IsBanned = false,
-		Duration = 0,
-		BannedTime = 0,
-		Reason = ""
-	},
-
-	InventoryV2 = {},
 	QuestsV2 = {
 		Main = 1,
 		Town = {}
@@ -40,5 +32,8 @@ return {
 		PlayerList = true,
 		MapDetails = true,
 		CombatMode = "Solo"
-	}
+	},
+
+	--// old data
+	Inventory = {},
 }

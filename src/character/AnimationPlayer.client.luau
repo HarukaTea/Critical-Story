@@ -22,23 +22,24 @@ local anims = {
 	WizardAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 	KnightAnim1 = animator:LoadAnimation(animations.KnightAttack),
 	KnightAnim2 = animator:LoadAnimation(animations.KnightAttack2),
+	RogueAnim1 = animator:LoadAnimation(animations.WarriorAttack),
+	RogueAnim2 = animator:LoadAnimation(animations.WarriorAttack2),
 	RepeaterAnim1 = animator:LoadAnimation(animations.RepeaterAttack),
 	RepeaterAnim2 = animator:LoadAnimation(animations.RepeaterAttack2),
 	StrikerAnim1 = animator:LoadAnimation(animations.StrikerAttack),
+	StrikerAnim2 = animator:LoadAnimation(animations.WarriorAttack2),
+	AlchemistAnim1 = animator:LoadAnimation(animations.ArcherAttack),
 	AlchemistAnim2 = animator:LoadAnimation(animations.AlchemistAttack),
+	IllusionistAnim1 = animator:LoadAnimation(animations.WizardAttack),
+	IllusionistAnim2 = animator:LoadAnimation(animations.WizardAttack2),
+
+	FireStaffAnim1 = animator:LoadAnimation(animations.WizardAttack),
+	FireStaffAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
 	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2),
 
 	Bounce = animator:LoadAnimation(animations.Bounce)
 }
-anims.RogueAnim1 = anims.WarriorAnim1
-anims.RogueAnim2 = anims.WarriorAnim2
-anims.StrikerAnim2 = anims.WarriorAnim2
-anims.AlchemistAnim1 = anims.ArcherAnim2
-anims.IllusionistAnim1 = anims.WizardAnim1
-anims.IllusionistAnim2 = anims.WizardAnim2
-anims.FireStaffAnim1 = anims.WizardAnim1
-anims.FireStaffAnim2 = anims.WizardAnim2
 
 --// Connections
 local function playAnim(anim: string)
@@ -59,10 +60,15 @@ local function onDead()
 	Events.PlayAnimation:DisconnectAll()
 	Signals.PlayAnimation:DisconnectAll()
 
+	--// 256 limit still happens, idk
 	for _, anim: AnimationTrack in anims do
-		if anim then anim:Destroy() end
+		anim:Stop(0)
+		anim:Destroy()
 	end
-
-	script:Destroy()
+	local animTracks = animator:GetPlayingAnimationTracks()
+	for _, track: AnimationTrack in animTracks do
+		track:Stop(0)
+		track:Destroy()
+	end
 end
 humanoid.Died:Once(onDead)

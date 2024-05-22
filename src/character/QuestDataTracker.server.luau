@@ -46,9 +46,4 @@ end
 questDataSetup()
 
 --// Clear
-local function onDead()
-    Empty()
-
-    script:Destroy()
-end
-char.Humanoid.Died:Once(onDead)
+char.Humanoid.Died:Once(Empty)

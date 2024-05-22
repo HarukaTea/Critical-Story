@@ -4,7 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local map = workspace:WaitForChild("Maps") :: Folder
+local map = workspace:WaitForChild("Maps", 999) :: Folder
 
 local yAxis = Vector3.yAxis
 local cfAngles = CFrame.Angles

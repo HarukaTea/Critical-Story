@@ -8,8 +8,8 @@ return {
 	Args = {},
 	ClientRun = function()
 		local player = Players.LocalPlayer
-		local gui = player:WaitForChild("PlayerGui"):WaitForChild("Cmdr")
-		local frame = gui:WaitForChild("Frame")
+		local gui = player.PlayerGui.Cmdr
+		local frame = gui.Frame
 
 		if gui and frame then
 			for _, child in pairs(frame:GetChildren()) do

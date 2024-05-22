@@ -48,7 +48,7 @@ return function(plr: Player)
 			Components.Frame(scope, {
 				Name = "Top",
 				AnchorPoint = v2New(),
-				Position = fromOffset(0, 30),
+				Position = fromOffset(0, 36),
 				Size = fromScale(1, 0.1),
 
 				[Children] = {
@@ -134,14 +134,14 @@ return function(plr: Player)
 	self.players:set(Players:GetPlayers())
 
 	---// Listening events
-	Players.PlayerAdded:Connect(function(player)
+	self.Add(Players.PlayerAdded:Connect(function(player)
 		repeat wait() until player:GetAttribute("PlayerDataLoaded")
 
 		self.players:set(Players:GetPlayers())
-	end)
-	Players.PlayerRemoving:Connect(function()
+	end))
+	self.Add(Players.PlayerRemoving:Connect(function()
 		self.players:set(Players:GetPlayers())
-	end)
+	end))
 	self.Add(HarukaLib:Hydrate(plr, {
 		["Attr-PlayerList"] = function(state: boolean)
 			self.isOpen:set(state)

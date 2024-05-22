@@ -1,20 +1,20 @@
 {
-  "robloxLsp.workspace.ignoreDir": [
-    ".vscode",
-    "**/_Index/**",
-    "src/modules/Packages/Cmdr/Shared/Util.lua",
-    "src/modules/Packages/Warp/Util/Buffer"
-  ],
+    "robloxLsp.workspace.ignoreDir": [
+        ".vscode",
+        "**/_Index/**",
+        "src/modules/Packages/Cmdr/Shared/Util.lua",
+        "src/modules/Packages/Warp/Util/Buffer"
+    ],
 
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
 
-    "src/character/Animate.client.luau": true,
-    "src/character/Health.server.luau": true
-  }
+        "src/character/Animate.client.luau": true,
+        "src/character/Health.server.luau": true
+    }
 }

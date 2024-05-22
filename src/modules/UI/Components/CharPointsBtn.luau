@@ -34,7 +34,7 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 		Magic = fromScale(0.106, 0.556),
 	}
 	local POINTS = {
-		DMG = "DMGPoints",
+		DMG = "DmgPoints",
 		Health = "HealthPoints",
 		Mana = "ManaPoints",
 		Shield = "ShieldPoints",

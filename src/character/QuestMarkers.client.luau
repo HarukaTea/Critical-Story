@@ -11,7 +11,7 @@ local StoryBook = require(RepS.Modules.Data.StoryBook)
 local char = script.Parent :: Model
 local plr = Players:GetPlayerFromCharacter(char)
 local camera = workspace.CurrentCamera
-local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
+local mapComponents = workspace:WaitForChild("MapComponents", 999) :: Folder
 
 local Add, Empty = HarukaLib.Bin()
 
@@ -69,9 +69,4 @@ Add(quests.ChildRemoved:Connect(targetCurrentQuest))
 Add(RS.Heartbeat:Connect(__distanceCheck))
 
 --// Clear
-local function onDead()
-    Empty()
-
-    script:Destroy()
-end
-char.Humanoid.Died:Once(onDead)
+char.Humanoid.Died:Once(Empty)

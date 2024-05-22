@@ -26,6 +26,8 @@ local function AdventurerStatsPinia(self: table)
 	self.charData = char:WaitForChild("CharStats", 999)
 	self.humanoid = char.Humanoid
 
+	self.isChatting = Value(false)
+
 	self.playerData = {
 		EXP = {
 			Value(plr:GetAttribute("EXP")),
@@ -63,13 +65,6 @@ local function AdventurerStatsPinia(self: table)
 		Knight = Value(0),
 		Rogue = Value(0)
 	}
-
-    self.chatDialogueAbsSize = Value(24)
-    self.chatText = Value("")
-    self.chatSpeaker = Value("")
-    self.chatChoices = Value({})
-    self.triangleVisible = Value(true)
-    self.isChatting = Value(false)
 
     self.newAddedItems = Value({})
 

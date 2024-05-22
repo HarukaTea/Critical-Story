@@ -11,6 +11,7 @@ local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
 
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
+local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
 local function Prompt(prompt: ProximityPrompt, index: number, scope: table) : Frame
     return Components.Frame(scope, {
@@ -21,10 +22,10 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: table) : Fr
 
         [Fusion.Children] = {
             Components.RoundUICorner(scope),
-            Components.UIStroke(scope, {
-                Thickness = 2.5,
-                Enabled = if index == 1 then true else false
+            Fusion.New(scope, "UIGradient")({
+                Transparency = nsNew({ nsKPNew(0, 0), nsKPNew(0.5, 0.2), nsKPNew(1, 1) }),
             }),
+
             Components.ImageLabel(scope, {
                 Name = "Icon",
                 AnchorPoint = v2New(0, 0.5),
@@ -42,13 +43,14 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: table) : Fr
             }),
             Components.TextLabel(scope, {
                 Name = "Key",
-                Position = fromScale(-0.22, 0),
-                Size = fromScale(0.17, 1),
+                AnchorPoint = v2New(0, 0.5),
+                Position = fromScale(-0.18, 0.5),
+                Size = fromScale(0.145, 0.8),
                 Text = "E",
                 Visible = if index == 1 and not isMobile then true else false,
 
                 [Fusion.Children] = {
-                    Components.TextUIStroke(scope, { Thickness = 4 })
+                    Components.TextUIStroke(scope, { Thickness = 3 })
                 }
             }),
             Components.HoverImageButton(scope, {

@@ -18,10 +18,10 @@ local Add, Empty = HarukaLib.Bin()
 local char = script.Parent :: Model
 local humanoid = char:WaitForChild("Humanoid") :: Humanoid
 
-local musics = workspace:WaitForChild("Sounds") :: Folder
+local musics = workspace:WaitForChild("Sounds", 999) :: Folder
 local sfxs = musics.SFXs :: Folder
-local mapComponents = workspace:WaitForChild("MapComponents") :: Folder
-local monsterLocations = workspace:WaitForChild("Monsters") :: Folder
+local mapComponents = workspace:WaitForChild("MapComponents", 999) :: Folder
+local monsterLocations = workspace:WaitForChild("Monsters", 999) :: Folder
 
 local isInCombat = false
 local orbTouchCD, animStep = false, 1
@@ -224,8 +224,4 @@ Add(CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler))
 setup()
 
 --// Clear
-humanoid.Died:Once(function()
-	Empty()
-
-	script:Destroy()
-end)
+humanoid.Died:Once(Empty)

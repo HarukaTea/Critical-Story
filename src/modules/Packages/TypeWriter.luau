@@ -7,8 +7,6 @@ local Signal = require(RepS.Modules.Packages.Signal)
 
 local TypeWriter = {}
 TypeWriter.__index = TypeWriter
-TypeWriter.onTextUpdated = Signal()
-TypeWriter.onTyperFinished = Signal()
 
 local sFind, sub, match = string.find, string.sub, string.match
 local wait = task.wait
@@ -46,6 +44,9 @@ function TypeWriter.new()
 	self.paused = false
 	self.running = false
 	self.speed = 0.01
+
+	self.onTextUpdated = Signal()
+	self.onTyperFinished = Signal()
 
 	return self
 end
@@ -221,6 +222,7 @@ end
 function TypeWriter:Destroy()
 	self.paused = false
 	self.stopped = true
+
 	self.onTextUpdated:Destroy()
 	self.onTyperFinished:Destroy()
 

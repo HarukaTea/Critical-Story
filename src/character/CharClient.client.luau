@@ -1,6 +1,7 @@
 --!nocheck
 
 local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
@@ -12,9 +13,9 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 local Add, Empty = HarukaLib.Bin()
 
 local char = script.Parent :: Model
+local plr = Players.LocalPlayer
 
 local wait = task.wait
-local sFind = string.find
 
 local function changeLocation(location: string)
     if not location or location == "" then return end
@@ -42,8 +43,9 @@ local function changeLocation(location: string)
 
     --- lighting
     Spawn(function()
-        local lightingInfo = AssetBook.LocationInfo[location].Lighting
+        if plr:GetAttribute("InCutscene") then return end
 
+        local lightingInfo = AssetBook.LocationInfo[location].Lighting
         if lightingInfo then TS:Create(Lighting, AssetBook.TweenInfos.one, lightingInfo):Play() end
     end)
 end
@@ -56,16 +58,14 @@ end))
 
 
 local function dayNightCycle()
+    if workspace:GetAttribute("WorldType") == "Everfrost" then return end
+
     local cycleTime, minutesInADay = 12 * 60, 24 * 60
     local startTime = tick() - (Lighting:GetMinutesAfterMidnight() / minutesInADay) * cycleTime
     local endTime = startTime + cycleTime
     local timeRatio, currentTime = minutesInADay / cycleTime, nil
 
     Add(HarukaLib.Clock(0.05, function()
-        --// Tundra
-        local currentRegion = char:GetAttribute("CurrentRegion") or "None"
-        if sFind(currentRegion, "Nixim") then Lighting:SetMinutesAfterMidnight(0) return end
-
         currentTime = tick()
 
         if currentTime > endTime then
@@ -79,8 +79,4 @@ end
 Spawn(dayNightCycle)
 
 --// Clear
-char.Humanoid.Died:Once(function()
-    Empty()
-
-    script:Destroy()
-end)
+char.Humanoid.Died:Once(Empty)

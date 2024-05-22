@@ -1,5 +1,6 @@
 --!nocheck
 
+local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
@@ -7,8 +8,8 @@ local Components = require(RepS.Modules.UI.Vanilla)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
-local StoryBook = require(RepS.Modules.Data.StoryBook)
 local TypeWriter = require(RepS.Modules.Packages.TypeWriter)
 
 local ChatOption = require(RepS.Modules.UI.Components.ChatOption)
@@ -20,7 +21,7 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local v2New = Vector2.new
 local tFind, insert = table.find, table.insert
-local match, sFind = string.match, string.find
+local match, sFind, gsub = string.match, string.find, string.gsub
 
 local function ChatFrame(self: table) : Frame
     local scope = self.scope
@@ -51,6 +52,7 @@ local function ChatFrame(self: table) : Frame
 
     local function __endChatting()
         self.isChatting:set(false)
+        self.plr:SetAttribute("InChatting", false)
 
         ---// revert back to initial state
         originDialoguesChatting = nil
@@ -60,6 +62,7 @@ local function ChatFrame(self: table) : Frame
         canContinueChat = true
 
         ClientUtil:FreezePlayerControls("Unfreeze")
+        CAS:UnbindAction("NextDialogue")
 
         promptChatting.Enabled = true
 
@@ -73,7 +76,7 @@ local function ChatFrame(self: table) : Frame
         if method == "Skip" then
             Typer:Stop()
 
-            self.chatText:set(dialoguesChatting[dialogueIndexChatting])
+            self.chatText:set(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
             return
         end
 
@@ -115,9 +118,10 @@ local function ChatFrame(self: table) : Frame
             return
         end
 
-        Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
+        Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
     end
-    local function _nextDialogue()
+    local function _nextDialogue(_, inputState: Enum.UserInputState)
+        if inputState ~= Enum.UserInputState.Begin then return end
         if not canContinueChat then return end
 
         __nextText(if Typer:IsTyping() then "Skip" else "Continue")
@@ -128,11 +132,13 @@ local function ChatFrame(self: table) : Frame
         promptChatting = prompt
         npcChatting = npc
 
-        local speaker = StoryBook.NPCs[npc.Name]
-        self.chatSpeaker:set(speaker)
+        local speaker = npc.Name
+        self.chatSpeaker:set(gsub(speaker, "%d+", ""))
         self.isChatting:set(true)
+        self.plr:SetAttribute("InChatting", true)
 
         ClientUtil:FreezePlayerControls("Freeze")
+        CAS:BindAction("NextDialogue", _nextDialogue, false, Enum.KeyCode.E)
 
         local quests = self.plr.Quests:GetChildren() :: Folder
 
@@ -147,7 +153,7 @@ local function ChatFrame(self: table) : Frame
                     originDialoguesChatting = DialogueBook[speaker][series..quest.Value]
                     dialoguesChatting = DialogueBook[speaker][series..quest.Value]
 
-                    Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
+                    Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
 
                     found = true
                     seriesDoing = series
@@ -165,9 +171,10 @@ local function ChatFrame(self: table) : Frame
         originDialoguesChatting = DialogueBook[speaker].Else
         dialoguesChatting = DialogueBook[speaker].Else
 
-        Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
+        Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
     end
     Events.NPCChat:Connect(_startChatting)
+    Signals.StartNPCChat:Connect(_startChatting)
 
     local function _chooseOption(series: number)
         dialoguesChatting = originDialoguesChatting["Choice"..dialogueChoiceIndex]["Option"..series]
@@ -175,7 +182,7 @@ local function ChatFrame(self: table) : Frame
 
         canContinueChat = true
 
-        Typer:TypeText(dialoguesChatting[dialogueIndexChatting])
+        Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
     end
     Signals.NPCChat:Connect(_chooseOption)
 
@@ -183,7 +190,8 @@ local function ChatFrame(self: table) : Frame
     return Components.Frame(scope, {
         BackgroundTransparency = 0,
         Name = "ChatFrame",
-        Position = fromScale(0.5, -2.1),
+        AnchorPoint = v2New(0.5, 0.9),
+        Position = fromScale(0.5, -0.1),
         Size = fromScale(0.585, 2.5),
 
         Visible = Computed(scope, function(use)
@@ -193,14 +201,16 @@ local function ChatFrame(self: table) : Frame
         [Fusion.Children] = {
             Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.07, 0)  }),
             Components.UIStroke(scope, {
-                Thickness = 3.5,
+                Thickness = 3,
                 Color = fromRGB(254, 254, 254),
                 Enabled = true
             }),
             Components.HoverImageButton(scope, {
                 ZIndex = 2,
 
-                [Fusion.OnEvent("MouseButton1Click")] = _nextDialogue
+                [Fusion.OnEvent("MouseButton1Click")] = function()
+                    _nextDialogue(nil, Enum.UserInputState.Begin)
+                end
             }),
             Components.ImageLabel(scope, {
                 Name = "Triangle",
