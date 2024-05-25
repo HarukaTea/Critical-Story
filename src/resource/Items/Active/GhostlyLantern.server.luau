@@ -39,10 +39,10 @@ lantern.CFrame = char.Torso.CFrame * cfNew(0,0,-4)
 lantern.Parent = workspace
 Debris:AddItem(lantern, 3)
 
-Events.ClientTween:Fires({ lantern }, { Transparency = 0 }, "twiceHalfOne")
+Events.ClientTween:FireAll({ lantern }, { Transparency = 0 }, "twiceHalfOne")
 Spawn(function()
 	wait(1.8)
-	Events.ClientTween:Fires({ lantern }, { Transparency = 1 }, "one")
+	Events.ClientTween:FireAll({ lantern }, { Transparency = 1 }, "one")
 end)
 
 local success, errorMsg = pcall(function()
@@ -83,10 +83,10 @@ local success, errorMsg = pcall(function()
 		explosion.Parent = char
 		Debris:AddItem(explosion, 1)
 
-		Events.ClientTween:Fires({ explosion }, { Size = v3New(16, 16, 16), Transparency = 0.4 }, "twiceHalf")
+		Events.ClientTween:FireAll({ explosion }, { Size = v3New(16, 16, 16), Transparency = 0.4 }, "twiceHalf")
 		Spawn(function()
 			wait(0.2)
-			Events.ClientTween:Fires({ explosion }, { Size = v3New(19, 19, 19), Transparency = 1 }, "half")
+			Events.ClientTween:FireAll({ explosion }, { Size = v3New(19, 19, 19), Transparency = 1 }, "half")
 		end)
 
 		local ghost = RepS.Package.MagicAssets.GhostlyLantern.Ghost:Clone() :: MeshPart
@@ -100,10 +100,10 @@ local success, errorMsg = pcall(function()
 		bv.Velocity = ghost.CFrame.LookVector * 50
 		bv.Parent = ghost
 
-		Events.ClientTween:Fires({ ghost }, { Size = v3New(12,12,12) }, "twiceHalfOne")
+		Events.ClientTween:FireAll({ ghost }, { Size = v3New(12,12,12) }, "twiceHalfOne")
 		Spawn(function()
 			wait(0.8)
-			Events.ClientTween:Fires({ ghost }, { Size = v3New(22, 22, 22), Transparency = 1 }, "half")
+			Events.ClientTween:FireAll({ ghost }, { Size = v3New(22, 22, 22), Transparency = 1 }, "half")
 		end)
 
 		wait(0.5)

@@ -58,7 +58,7 @@ function BuffEffectsUtil:MagicVFX(monster: Model)
 	eff.Parent = workspace
 	Debris:AddItem(eff, 0.25)
 
-	Events.ClientTween:Fires({ eff }, { Size = v3New(1, 1, 1) * 24, Transparency = 1 }, "twiceHalf")
+	Events.ClientTween:FireAll({ eff }, { Size = v3New(1, 1, 1) * 24, Transparency = 1 }, "twiceHalf")
 end
 
 --[[

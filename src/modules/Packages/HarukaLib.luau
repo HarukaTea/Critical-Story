@@ -259,20 +259,17 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 			return a:Lerp(b, t)
 		end
 	}
-	dataTypes.CFrame = dataTypes.Vector3
-	dataTypes.Vector2 = dataTypes.Vector3
-	dataTypes.Color3 = dataTypes.Vector3
 	dataTypes.NumberSequence = function(a, b, t)
 		local keyPoints = {}
 
 		for index: number, keypoint: NumberSequenceKeypoint in a.Keypoints do
 			local nextKeypoint = b.Keypoints[index] :: NumberSequenceKeypoint
 
-			keyPoints[#keyPoints + 1] = NumberSequence.new({ NumberSequenceKeypoint.new(
+			table.insert(keyPoints, NumberSequenceKeypoint.new(
 				dataTypes.number(keypoint.Time, nextKeypoint.Time, t),
 				dataTypes.number(keypoint.Value, nextKeypoint.Value, t),
 				dataTypes.number(keypoint.Envelope, nextKeypoint.Envelope, t)
-			)})
+			))
 		end
 
 		return NumberSequence.new(keyPoints)
@@ -283,10 +280,10 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 		for index: number, keypoint: ColorSequenceKeypoint in a.KeyPoints do
 			local nextKeypoint = b.Keypoints[index] :: ColorSequenceKeypoint
 
-			keyPoints[#keyPoints + 1] = ColorSequenceKeypoint.new({ ColorSequenceKeypoint.new(
+			table.insert(keyPoints, ColorSequenceKeypoint.new(
 				dataTypes.number(keypoint.Time, nextKeypoint.Time, t),
-				dataTypes.Color3(keypoint.Value, nextKeypoint.Value, math.clamp(t, 0, 1))
-			)})
+				dataTypes.Vector3(keypoint.Value, nextKeypoint.Value, math.clamp(t, 0, 1))
+			))
 		end
 
 		return ColorSequence.new(keyPoints)
@@ -301,7 +298,7 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 	--// fill properties
 	for name: string, _: any in goal do
 		if name == "Pivot" then
-			if object.ClassName ~= "PVInstance" then
+			if not object:IsA("PVInstance") then
 				warn(name.." is not allowed for this object! "..object:GetFullName())
 				return
 			end
@@ -318,7 +315,7 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 		local reverse = false
 		local repeated = 0
 
-		while task.wait() do
+		while true do
 			if not object.Parent then break end
 
 			local alpha = (tick() - startTime) / style.Time
@@ -327,9 +324,9 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 			if style.Reverses then alpha = 1 - t end
 
 			-- Update
-			local lerp = TweenService:GetValue(t, style.EasingStyle, style.EasingDirection)
+			local lerp = TweenService:GetValue(alpha, style.EasingStyle, style.EasingDirection)
 
-			for name: string, val: any in properties do
+			for name: string, val: any in goal do
 				local original = properties[name]
 
 				if name == "Pivot" then
@@ -353,6 +350,8 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 					break
 				end
 			end
+
+			task.wait()
 		end
 	end)
 end

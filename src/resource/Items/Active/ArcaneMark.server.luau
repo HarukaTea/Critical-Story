@@ -41,11 +41,11 @@ for _ = 1, 5 do
 		end
 
 		mark.Transparency = 0.4
-		Events.ClientTween:Fires({ mark }, { Transparency = 0.9 }, "threeHalf")
+		Events.ClientTween:FireAll({ mark }, { Transparency = 0.9 }, "threeHalf")
 
 		wait(0.35)
 	end)
 
 	if not success and RS:IsStudio() then warn(errorMsg) end
 end
-Events.ClientTween:Fires({ mark }, { Transparency = 1 }, "half")
+Events.ClientTween:FireAll({ mark }, { Transparency = 1 }, "half")

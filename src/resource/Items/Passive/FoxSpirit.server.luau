@@ -32,5 +32,5 @@ while wait(1) do
             parts[#parts + 1] = child
 		end
 	end
-    Events.ClientTween:Fires(parts, { Transparency = 1 }, "twiceHalfOne")
+    Events.ClientTween:FireAll(parts, { Transparency = 1 }, "twiceHalfOne")
 end

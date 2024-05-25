@@ -59,7 +59,7 @@ local success, errorMsg = pcall(function()
 			fireBall.Anchored = true
 			Debris:AddItem(fireBall, 1)
 
-			Events.ClientTween:Fires({ fireBall }, { Size = one * 9, Transparency = 1 }, "one")
+			Events.ClientTween:FireAll({ fireBall }, { Size = one * 9, Transparency = 1 }, "one")
 
 			local dmg = floor(char:GetAttribute("Magic") / 2)
 			HarukaLib:AddAttr(monster, "Health", -dmg)

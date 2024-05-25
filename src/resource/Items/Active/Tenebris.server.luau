@@ -57,14 +57,14 @@ local success, errorMsg = pcall(function()
 			eff.Parent = workspace
 			Debris:AddItem(eff, 1)
 
-			Events.ClientTween:Fires({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
+			Events.ClientTween:FireAll({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
 
 			tenebrisBall.Spirit.Enabled = false
 			tenebrisBall.CFrame = monster.PrimaryPart.CFrame
 			tenebrisBall.Anchored = true
 			Debris:AddItem(tenebrisBall, 1)
 
-			Events.ClientTween:Fires({ tenebrisBall }, { Size = v3New(1, 1, 1) * 9, Transparency = 1 }, "one")
+			Events.ClientTween:FireAll({ tenebrisBall }, { Size = v3New(1, 1, 1) * 9, Transparency = 1 }, "one")
 
 			local dmg = char:GetAttribute("Magic")
 			HarukaLib:AddAttr(monster, "Health", -dmg)

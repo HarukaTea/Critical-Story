@@ -358,7 +358,7 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 		encounterHighlight.Parent = char
 		Debris:AddItem(encounterHighlight, 2)
 
-		Events.ClientTween:Fires({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
+		Events.ClientTween:FireAll({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
 	end
 end
 

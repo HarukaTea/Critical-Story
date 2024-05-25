@@ -38,8 +38,8 @@ holyBeam.CFrame = monster.PrimaryPart.CFrame
 holyBeam.Parent = workspace
 Debris:AddItem(holyBeam, 1)
 
-Events.ClientTween:Fires({ explosion }, { Size = v3New(254, 254, 254), Transparency = 1 }, "half")
-Events.ClientTween:Fires({ holyBeam }, { Size = v3New(), Transparency = 1 }, "onceHalf")
+Events.ClientTween:FireAll({ explosion }, { Size = v3New(254, 254, 254), Transparency = 1 }, "half")
+Events.ClientTween:FireAll({ holyBeam }, { Size = v3New(), Transparency = 1 }, "onceHalf")
 
 local dmg = char:GetAttribute("Magic") :: number
 

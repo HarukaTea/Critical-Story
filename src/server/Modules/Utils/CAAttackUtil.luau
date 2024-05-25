@@ -226,7 +226,7 @@ function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
                 shockwave.Parent = char
                 Debris:AddItem(shockwave, 1)
 
-                Events.ClientTween:Fires({ shockwave }, { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
+                Events.ClientTween:FireAll({ shockwave }, { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
 
                 local bp = instanceNew("BodyPosition")
                 bp.Name = "DashVel"

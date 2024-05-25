@@ -59,14 +59,14 @@ local success, errorMsg = pcall(function()
 			eff.Parent = workspace
 			Debris:AddItem(eff, 1)
 
-			Events.ClientTween:Fires({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
+			Events.ClientTween:FireAll({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
 
 			fireBall.Spirit.Enabled = false
 			fireBall.CFrame = monster.PrimaryPart.CFrame
 			fireBall.Anchored = true
 			Debris:AddItem(fireBall, 1)
 
-			Events.ClientTween:Fires({ fireBall }, { Size = v3New(9,9,9), Transparency = 1 }, "one")
+			Events.ClientTween:FireAll({ fireBall }, { Size = v3New(9,9,9), Transparency = 1 }, "one")
 
 			local dmg = floor(char:GetAttribute("Magic") * 1.5) :: number
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))
