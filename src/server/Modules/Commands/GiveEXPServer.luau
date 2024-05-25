@@ -3,22 +3,18 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Guard = require(RepS.Modules.Packages.Guard)
-
-local numberCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
-local numberCheck2 = Guard.Check(Guard.Integer)
 
 return function (_, players: table, exp: number)
-    local expPass, _ = numberCheck(exp)
-    local expPass2, expWant2 = numberCheck2(exp)
+    local check = HarukaLib:TypeCheck("MinMax", exp, 0, 99999999)
+    local check2 = HarukaLib:TypeCheck("Integer", exp)
 
-    if not expPass or not expPass2 then
+    if not check or not check2 then
         return "I guess you typed incorrect exp amount..."
     end
 
     for _, plr: Player in players do
-        HarukaLib:Add(plr, "EXP", expWant2)
+        HarukaLib:AddAttr(plr, "EXP", exp)
     end
 
-    return "EXP Added: "..HarukaLib:NumberConvert(expWant2, "%.1f").."!"
+    return "EXP Added: "..HarukaLib:NumberConvert(exp, "%.1f").."!"
 end

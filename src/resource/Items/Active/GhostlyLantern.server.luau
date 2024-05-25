@@ -112,7 +112,7 @@ local success, errorMsg = pcall(function()
 
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(170, 255, 255))
 
-			HarukaLib:Add(monster, "Health", -dmg)
+			HarukaLib:AddAttr(monster, "Health", -dmg)
 		end
 	end
 end)

@@ -4,10 +4,10 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
-local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
+local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 local MobileShiftLock = {}
 MobileShiftLock.__index = MobileShiftLock

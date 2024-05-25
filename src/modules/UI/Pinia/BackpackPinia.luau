@@ -36,7 +36,7 @@ local function BackpackPinia(self: table)
 	self.absCellSize = Value(peek(self.absSize)[1] / 15.58)
 	self.absScrollSize, self.absContentSize = Value(90), Value(30)
 
-    self.itemSlotClicked = Signal()
+    self.itemSlotClicked = Signal.new()
 
     self.filterInfo = {
         Equip = {

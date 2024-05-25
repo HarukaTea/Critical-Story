@@ -6,7 +6,6 @@ local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
@@ -189,7 +188,7 @@ return function(plr: Player)
 		end
 	end
 	local function moveUpJumpBtn()
-		local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
+		local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 		if isMobile then
 			local touchGui = plr.PlayerGui:WaitForChild("TouchGui", 999) :: ScreenGui

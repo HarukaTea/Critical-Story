@@ -6,7 +6,7 @@ local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
-local SuperTween = require(RepS.Modules.Packages.SuperTween)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local plr = Players.LocalPlayer
@@ -43,9 +43,7 @@ local function clientTweenPlayer(objs: table, goal: table, style: string)
 	style = AssetBook.TweenInfos[style]
 
 	for _, obj: Instance in objs do
-		pcall(function()
-			TS:Create(obj, style, goal):Play()
-		end)
+		pcall(function() TS:Create(obj, style, goal):Play() end)
 	end
 end
 Events.ClientTween:Connect(clientTweenPlayer)
@@ -54,7 +52,7 @@ Events.ClientTween:Connect(clientTweenPlayer)
 local function vfxChestUnlock(chest: Model)
 	workspace.Sounds.SFXs.ChestOpened:Play()
 
-	SuperTween.new(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) }):Play()
+	HarukaLib:Tween(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) })
 end
 Events.ChestUnlocked:Connect(vfxChestUnlock)
 

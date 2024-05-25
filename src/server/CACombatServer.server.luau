@@ -9,7 +9,6 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Promise = require(RepS.Modules.Packages.Promise)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
@@ -49,7 +48,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 
 			resolve()
 
-		end):andThen(function()
+		end):Then(function()
 			local maxPlayer = 0
 			for _, player: Player in Players:GetPlayers() do
 				if maxPlayer >= 4 then break end
@@ -65,7 +64,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 							if mob:HasTag("Monster") and mob.PrimaryPart then
 								ServerUtil:AddTargetForMonster(player, mob)
 
-								HarukaLib:Add(monster, "MaxHealth", monster:GetAttribute("Health"))
+								HarukaLib:AddAttr(monster, "MaxHealth", monster:GetAttribute("Health"))
 							end
 						end
 					end
@@ -75,7 +74,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 			border:Destroy()
 			char.PrimaryPart.Anchored = false
 
-		end):catch(function()
+		end):Catch(function()
 			monster:SetAttribute("InCombat", false)
 
 			check = false
@@ -110,7 +109,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 		if orb.Owner.Value ~= char then reject() end
 		if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
 
-	end):catch(function()
+	end):Catch(function()
 		check = false
 	end)
 	if not check then return end
@@ -147,16 +146,13 @@ local function mobTakeDMG(plr: Player, orb: Model)
 		--- extra attack
 		local extraAttacks = { "Burn", "Poison" }
 		for i = 1, 2 do
-			local chance = LootPlan.new()
 			local charCurrentChance = char:GetAttribute(extraAttacks[i].."Chance")
+			local result = HarukaLib:RollLoot({
+				[extraAttacks[i].."Chance"] = charCurrentChance,
+				["None"] = 100 - charCurrentChance
+			})
 
-			chance:Add(extraAttacks[i], charCurrentChance)
-			chance:Add("None", 100 - charCurrentChance)
-
-			local result = chance:Roll()
 			if result == extraAttacks[i] then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 6) end
-
-			chance:Destroy()
 		end
 	end)
 end
@@ -180,24 +176,21 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 	--- dodge roll
 	local dodgeChance = char:GetAttribute("DodgeChance") :: number
 	if dodgeChance > 0 then
-		local dodge = LootPlan.new()
+		local result = HarukaLib:RollLoot({
+			["Dodge"] = dodgeChance,
+			["None"] = 100 - dodgeChance
+		})
 
-		dodge:Add("Dodge", dodgeChance)
-		dodge:Add("None", 100 - dodgeChance)
-
-		if dodge:Roll() == "Dodge" then
+		if result == "Dodge" then
 			ServerUtil:ShowText(char, "BLOCKED!", fromRGB(255, 255, 255))
 
 			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Blocked)
-
-			dodge:Destroy()
 			return
 		end
-		dodge:Destroy()
 	end
 
 	--- some hit cd detections
-    HarukaLib:Add(char, "HitCD", 6)
+    HarukaLib:AddAttr(char, "HitCD", 6)
     if char:GetAttribute("HitCD") > 6 then char:SetAttribute("HitCD", 6) end
 
     if not char:FindFirstChild("RepairShield") then
@@ -240,7 +233,7 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 			return
 		end
 
-		HarukaLib:Add(char, "Shield", -dmg)
+		HarukaLib:AddAttr(char, "Shield", -dmg)
 		ServerUtil:ShowNumber(char, dmg, fromRGB(122, 122, 122))
 		return
 	end

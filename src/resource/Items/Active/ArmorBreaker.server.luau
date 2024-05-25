@@ -29,4 +29,4 @@ local dmg = floor(char:GetAttribute("MaxDMG")) :: number
 
 ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 0, 127))
 
-HarukaLib:Add(monster, "Health", -dmg)
+HarukaLib:AddAttr(monster, "Health", -dmg)

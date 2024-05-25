@@ -65,9 +65,9 @@ local function combatEnds()
                     ServerUtil:GiveDrop(player, RepS.Package.MonsterModels[defeated.Name])
                 end
 
-                HarukaLib:Add(player, "EXP", totalEXP)
-                HarukaLib:Add(player, "Gold", floor(totalEXP / 2))
-                HarukaLib:Add(player, "RP", floor(totalEXP / 6))
+                HarukaLib:AddAttr(player, "EXP", totalEXP)
+                HarukaLib:AddAttr(player, "Gold", floor(totalEXP / 2))
+                HarukaLib:AddAttr(player, "RP", floor(totalEXP / 6))
 
                 ServerUtil:ShowText(char, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
                 ServerUtil:ShowText(char, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))

@@ -8,10 +8,6 @@ local Signal = require(RepS.Modules.Packages.Signal)
 local TypeWriter = {}
 TypeWriter.__index = TypeWriter
 
-local sFind, sub, match = string.find, string.sub, string.match
-local wait = task.wait
-local tFind, remove, insert = table.find, table.remove, table.insert
-
 local RichTextTags = {
 	["<b>"] = "</b>",
 	["<i>"] = "</i>",
@@ -45,8 +41,8 @@ function TypeWriter.new()
 	self.running = false
 	self.speed = 0.01
 
-	self.onTextUpdated = Signal()
-	self.onTyperFinished = Signal()
+	self.onTextUpdated = Signal.new()
+	self.onTyperFinished = Signal.new()
 
 	return self
 end
@@ -58,7 +54,7 @@ local checkTag do
 		local tag = RichTextTags[text]
 		if not tag then
 			for index, chosenTag in RichTextTags do
-				if not sFind(text, index) then continue end
+				if not string.find(text, index) then continue end
 
 				tag = chosenTag
 				break
@@ -94,7 +90,7 @@ function TypeWriter:TypeText(text: string)
 		end
 
 		--- Normally
-		local cChar = sub(text, index, index)
+		local cChar = string.sub(text, index, index)
 		if cChar == " " then --- blank space
 			cText ..= cChar
 			index += 1
@@ -102,11 +98,11 @@ function TypeWriter:TypeText(text: string)
 			continue
 
 		elseif cChar == "<" then
-			local possibleTag = match(text, "<.->", index)
-			local found = tFind(richTagsTable, possibleTag)
+			local possibleTag = string.match(text, "<.->", index)
+			local found = table.find(richTagsTable, possibleTag)
 
 			if found then
-				remove(richTagsTable, found)
+				table.remove(richTagsTable, found)
 				richTags -= 1
 
 				cText ..= possibleTag
@@ -117,7 +113,7 @@ function TypeWriter:TypeText(text: string)
 
 			local endTag = checkTag(possibleTag)
 			if endTag then
-				insert(richTagsTable, 1, endTag)
+				table.insert(richTagsTable, 1, endTag)
 				richTags += 1
 
 				cText ..= possibleTag
@@ -133,7 +129,7 @@ function TypeWriter:TypeText(text: string)
 			end
 
 		elseif cChar == "&" then
-			local possibleTag = match(text, "&.-;", index)
+			local possibleTag = string.match(text, "&.-;", index)
 
 			if checkTag(possibleTag) then
 				cText ..= possibleTag
@@ -146,13 +142,13 @@ function TypeWriter:TypeText(text: string)
 				end
 				self.onTextUpdated:Fire(actualText)
 
-				wait(self.speed)
+				task.wait(self.speed)
 				continue
 			end
 		end
 
 		--- Almost done, show original text, with tags
-		cText ..= sub(text, index, index)
+		cText ..= string.sub(text, index, index)
 
 		local actualText = cText
 		for i = 1, richTags do
@@ -161,7 +157,7 @@ function TypeWriter:TypeText(text: string)
 		self.onTextUpdated:Fire(actualText)
 
 		index += 1
-		wait(self.speed)
+		task.wait(self.speed)
 	end
 
 	--- End Typing
@@ -179,13 +175,6 @@ function TypeWriter:Stop()
 	while self.running do
 		RS.Heartbeat:Wait()
 	end
-end
-
---[[
-	Adjust the speed of the typewriter
-]]
-function TypeWriter:AdjustSpeed(newSpeed: number)
-	self.speed = newSpeed
 end
 
 --[[

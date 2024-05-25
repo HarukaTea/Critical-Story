@@ -16,8 +16,7 @@ local requireList = {
 	UIModules.ShiftLock,
 	UIModules.PlayerList,
 	UIModules.NPCChat,
-	UIModules.Hints,
-	UIModules.SwitchScene
+	UIModules.Hints
 }
 
 local function setup()

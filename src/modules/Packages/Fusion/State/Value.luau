@@ -11,8 +11,7 @@ local task = nil -- Disable usage of Roblox's task scheduler
 local Package = script.Parent.Parent
 local Types = require(Package.Types)
 local InternalTypes = require(Package.InternalTypes)
--- Logging
-local logError = require(Package.Logging.logError)
+local External = require(Package.External)
 -- State
 local updateAll = require(Package.State.updateAll)
 -- Utility
@@ -52,15 +51,7 @@ function class:_peek(): any
 end
 
 function class:get()
-	logError("stateGetWasRemoved")
-end
-
-function class:destroy()
-	local self = self :: InternalTypes.Value<any, any>
-	if self.scope == nil then
-		logError("destroyedTwice", nil, "Value")
-	end
-	self.scope = nil
+	External.logError("stateGetWasRemoved")
 end
 
 local function Value<T>(
@@ -68,7 +59,7 @@ local function Value<T>(
 	initialValue: T
 ): Types.Value<T, any>
 	if initialValue == nil and (typeof(scope) ~= "table" or (scope[1] == nil and next(scope) ~= nil)) then
-		logError("scopeMissing", nil, "Value", "myScope:Value(initialValue)")
+		External.logError("scopeMissing", nil, "Value", "myScope:Value(initialValue)")
 	end
 
 	local self = setmetatable({
@@ -78,7 +69,11 @@ local function Value<T>(
 	}, CLASS_METATABLE)
 	local self = (self :: any) :: InternalTypes.Value<T, any>
 
-	table.insert(scope, self)
+	local destroy = function()
+		self.scope = nil
+	end
+	self.oldestTask = destroy
+	table.insert(scope, destroy)
 
 	return self
 end

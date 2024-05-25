@@ -17,9 +17,9 @@ local wait = task.wait
 ServerUtil:ShowText(char, text, color)
 
 local afterSpeed = 30 * power - 30
-HarukaLib:Add(char, "SpeedBuff", afterSpeed)
+HarukaLib:AddAttr(char, "SpeedBuff", afterSpeed)
 
 wait(duration)
 
-HarukaLib:Add(char, "SpeedBuff", -afterSpeed)
+HarukaLib:AddAttr(char, "SpeedBuff", -afterSpeed)
 script:Destroy()

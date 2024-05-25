@@ -4,31 +4,46 @@ local CS = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Octree = require(RepS.Modules.Packages.Octree)
+local Octree = require(RepS.Modules.Packages.DataLibs.Octree)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
+local monsterTree = Octree.new()
 
 local char = script.Parent :: Model
+local monsterNodes = {}
 
 local wait = task.wait
 local random, rad = math.random, math.rad
 local cfAngles = CFrame.Angles
 
+
 ---// Setup
 local function setup()
-    local monsterTree = Octree.new()
-
-	for _, monster: Model in workspace:WaitForChild("Monsters", 999):GetDescendants() do
-		if monster:HasTag("Monster") and monster.PrimaryPart then monsterTree:CreateNode(monster.PrimaryPart.Position, monster) end
+	for _, monster: Model in workspace:WaitForChild("MapComponents", 999):GetDescendants() do
+		if monster:HasTag("Monster") and monster.PrimaryPart and not monster:GetAttribute("SubMonster") then
+			monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+		end
 	end
-	local function _handleMonster(monster: Model)
+	local function _addMonster(monster: Model)
 		wait()
-        repeat wait() until monster.PrimaryPart --// Low-end device players, I highly respect them
+		if monster:GetAttribute("SubMonster") then return end
 
-		monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
+
+		monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 	end
-	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster))
+	local function _removeMonster(monster: Model)
+		for index: number, node: any in monsterNodes do
+			if node:GetObject() == monster then
+				node:Destroy()
+
+				table.remove(monsterNodes, index)
+			end
+		end
+	end
+	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
+	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_removeMonster))
 
     Add(HarukaLib.Clock(1.5, function()
         if not char.PrimaryPart then return end
@@ -57,4 +72,12 @@ end
 setup()
 
 --// Clear
-char.Humanoid.Died:Once(Empty)
+char.Humanoid.Died:Once(function()
+	Empty()
+
+	for _, node: any in monsterNodes do
+		node:Destroy()
+	end
+	monsterTree = nil
+	monsterNodes = nil
+end)

@@ -21,12 +21,12 @@ local nowMinDMGBuff, nowMaxDMGBuff = char:GetAttribute("MinDMGBuff") :: number, 
 local nowMinDMG, nowMaxDMG = char:GetAttribute("MinDMG") - nowMinDMGBuff :: number, char:GetAttribute("MaxDMG") - nowMaxDMGBuff :: number
 local theoryMinDMG, theoryMaxDMG = floor(nowMinDMG * power - nowMinDMG), floor(nowMaxDMG * power - nowMaxDMG)
 
-HarukaLib:Add(char, "MinDMGBuff", theoryMinDMG)
-HarukaLib:Add(char, "MaxDMGBuff", theoryMaxDMG)
+HarukaLib:AddAttr(char, "MinDMGBuff", theoryMinDMG)
+HarukaLib:AddAttr(char, "MaxDMGBuff", theoryMaxDMG)
 
 wait(duration)
 
-HarukaLib:Add(char, "MinDMGBuff", -theoryMinDMG)
-HarukaLib:Add(char, "MaxDMGBuff", -theoryMaxDMG)
+HarukaLib:AddAttr(char, "MinDMGBuff", -theoryMinDMG)
+HarukaLib:AddAttr(char, "MaxDMGBuff", -theoryMaxDMG)
 
 script:Destroy()

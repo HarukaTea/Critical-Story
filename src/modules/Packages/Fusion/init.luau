@@ -34,10 +34,10 @@ export type Version = Types.Version
 -- compiled for Roblox.
 do
 	local RobloxExternal = require(script.RobloxExternal)
-	External.setExternalScheduler(RobloxExternal)
+	External.setExternalProvider(RobloxExternal)
 end
 
-local Fusion: Types.Fusion = {
+local Fusion: Types.Fusion = table.freeze {
 	-- General
 	version = {major = 0, minor = 3, isRelease = false},
 	Contextual = require(script.Utility.Contextual),
@@ -49,7 +49,7 @@ local Fusion: Types.Fusion = {
 	doCleanup = require(script.Memory.doCleanup),
 	innerScope = require(script.Memory.innerScope),
 	scoped = require(script.Memory.scoped),
-	
+
 	-- State
 	Computed = require(script.State.Computed),
 	ForKeys = require(script.State.ForKeys) :: Types.ForKeysConstructor,
@@ -64,7 +64,6 @@ local Fusion: Types.Fusion = {
 	AttributeChange = require(script.Instances.AttributeChange),
 	AttributeOut = require(script.Instances.AttributeOut),
 	Children = require(script.Instances.Children),
-	Hydrate = require(script.Instances.Hydrate),
 	New = require(script.Instances.New),
 	OnChange = require(script.Instances.OnChange),
 	OnEvent = require(script.Instances.OnEvent),

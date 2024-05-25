@@ -14,139 +14,139 @@ local find, sub = string.find, string.sub
 ]]
 function PassiveUtil:EquipPassive(item: string, char: Model)
     if item == "TravellerBoots" then
-        HarukaLib:Add(char, "SpeedBuff", 8)
+        HarukaLib:AddAttr(char, "SpeedBuff", 8)
 
     elseif item == "BurningTorch" then
-        HarukaLib:Add(char, "SpeedBuff", 4)
+        HarukaLib:AddAttr(char, "SpeedBuff", 4)
 
         SS.Resources.Items.Passive.BurningTorch:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "CampfireWood" then
-        HarukaLib:Add(char, "HealBuff", 30)
+        HarukaLib:AddAttr(char, "HealBuff", 30)
 
     elseif item == "HuntingDagger" then
-        HarukaLib:Add(char, "MinDMGBuff", 5)
+        HarukaLib:AddAttr(char, "MinDMGBuff", 5)
 
     elseif item == "MiningPickaxe" then
         char:SetAttribute("CanMine", true)
 
     elseif item == "CopperSword" then
-        HarukaLib:Add(char, "MaxDMGBuff", 15)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 15)
 
     elseif item == "AncientHammer" then
-        HarukaLib:Add(char, "MinDMGBuff", 20)
-        HarukaLib:Add(char, "MaxDMGBuff", 40)
-        HarukaLib:Add(char, "ShieldBuff", 20)
+        HarukaLib:AddAttr(char, "MinDMGBuff", 20)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 40)
+        HarukaLib:AddAttr(char, "ShieldBuff", 20)
 
     elseif item == "ManaCrystal" then
-        HarukaLib:Add(char, "ManaBuff", 100)
+        HarukaLib:AddAttr(char, "ManaBuff", 100)
 
         SS.Resources.Items.Passive.ManaCrystal:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "RabbitFoot" then
-        HarukaLib:Add(char, "JumpBuff", 20)
+        HarukaLib:AddAttr(char, "JumpBuff", 20)
 
     elseif item == "ArcaneSpellbook" then
-        HarukaLib:Add(char, "MagicBuff", 120)
-        HarukaLib:Add(char, "ManaBuff", 100)
+        HarukaLib:AddAttr(char, "MagicBuff", 120)
+        HarukaLib:AddAttr(char, "ManaBuff", 100)
 
         --// TODO: Be the member of Faction
 
     elseif item == "MagicianHat" then
-        HarukaLib:Add(char, "HealthBuff", 300)
-        HarukaLib:Add(char, "MagicBuff", 120)
+        HarukaLib:AddAttr(char, "HealthBuff", 300)
+        HarukaLib:AddAttr(char, "MagicBuff", 120)
 
         --// TODO: be the member of Faction
 
     elseif item == "EnchantedBlade" then
-        HarukaLib:Add(char, "MinDMGBuff", 25)
-        HarukaLib:Add(char, "MaxDMGBuff", 100)
-        HarukaLib:Add(char, "MagicBuff", 50)
+        HarukaLib:AddAttr(char, "MinDMGBuff", 25)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 100)
+        HarukaLib:AddAttr(char, "MagicBuff", 50)
 
     elseif item == "StalkerCape" then
-        HarukaLib:Add(char, "DodgeChance", 15)
-        HarukaLib:Add(char, "SpeedBuff", 5)
-        HarukaLib:Add(char, "HealthBuff", 100)
+        HarukaLib:AddAttr(char, "DodgeChance", 15)
+        HarukaLib:AddAttr(char, "SpeedBuff", 5)
+        HarukaLib:AddAttr(char, "HealthBuff", 100)
 
     elseif item == "RegenerationGem" then
-        HarukaLib:Add(char, "HealthBuff", 150)
+        HarukaLib:AddAttr(char, "HealthBuff", 150)
 
         SS.Resources.Items.Passive.RegenerationGem:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "BlackwolfNecklace" then
-        HarukaLib:Add(char, "MinDMGBuff", 75)
-        HarukaLib:Add(char, "MaxDMGBuff", 150)
-        HarukaLib:Add(char, "SpeedBuff", 10)
+        HarukaLib:AddAttr(char, "MinDMGBuff", 75)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 150)
+        HarukaLib:AddAttr(char, "SpeedBuff", 10)
 
     elseif item == "FlameSword" then
-        HarukaLib:Add(char, "BurnChance", 10)
-        HarukaLib:Add(char, "MagicBuff", 25)
-        HarukaLib:Add(char, "MaxDMGBuff", 100)
+        HarukaLib:AddAttr(char, "BurnChance", 10)
+        HarukaLib:AddAttr(char, "MagicBuff", 25)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 100)
 
     elseif item == "KitsuneGloves" then
-        HarukaLib:Add(char, "MagicBuff", 50)
-        HarukaLib:Add(char, "MaxDMGBuff", 50)
+        HarukaLib:AddAttr(char, "MagicBuff", 50)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 50)
 
     elseif item == "AquaLapis" then
-        HarukaLib:Add(char, "MagicBuff", 30)
-        HarukaLib:Add(char, "ManaBuff", 150)
+        HarukaLib:AddAttr(char, "MagicBuff", 30)
+        HarukaLib:AddAttr(char, "ManaBuff", 150)
 
     elseif item == "EverfrostSeed" then
         char:SetAttribute("CanEnterStronghold", true)
 
     elseif item == "HotPotato" then
-        HarukaLib:Add(char, "BurnChance", 10)
-        HarukaLib:Add(char, "SpeedBuff", 15)
+        HarukaLib:AddAttr(char, "BurnChance", 10)
+        HarukaLib:AddAttr(char, "SpeedBuff", 15)
 
     elseif item == "NorthernerAxe" then
-        HarukaLib:Add(char, "MaxDMGBuff", 70)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 70)
         char:SetAttribute("CanCutTrees", true)
 
     elseif item == "TundraGear" then
         char:SetAttribute("CanImmenseCold", true)
 
     elseif item == "FoxSpirit" then
-        HarukaLib:Add(char, "MagicBuff", 50)
-        HarukaLib:Add(char, "SpeedBuff", 15)
+        HarukaLib:AddAttr(char, "MagicBuff", 50)
+        HarukaLib:AddAttr(char, "SpeedBuff", 15)
 
         SS.Resources.Items.Passive.FoxSpirit:Clone().Parent = char.CharStats.ExtraOrbs
 
     elseif item == "NorthernHalberd" then
-        HarukaLib:Add(char, "MinDMGBuff", 40)
-        HarukaLib:Add(char, "MaxDMGBuff", 80)
+        HarukaLib:AddAttr(char, "MinDMGBuff", 40)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 80)
 
     elseif item == "AbsorptionCrystal" then
-        HarukaLib:Add(char, "ShieldBuff", 50)
-        HarukaLib:Add(char, "ManaBuff", 50)
-        HarukaLib:Add(char, "RestoreBuff", 10)
+        HarukaLib:AddAttr(char, "ShieldBuff", 50)
+        HarukaLib:AddAttr(char, "ManaBuff", 50)
+        HarukaLib:AddAttr(char, "RestoreBuff", 10)
 
     elseif item == "FireStaff" then
         char.CharStats.ExtraOrbs:SetAttribute("FireStaffOrb", true)
 
     elseif item == "MountainKingCrown" then
-        HarukaLib:Add(char, "HealthBuff", 300)
-        HarukaLib:Add(char, "ShieldBuff", 60)
-        HarukaLib:Add(char, "MaxDMGBuff", 100)
+        HarukaLib:AddAttr(char, "HealthBuff", 300)
+        HarukaLib:AddAttr(char, "ShieldBuff", 60)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 100)
 
     elseif item == "Devilsknife" then
-        HarukaLib:Add(char, "PoisonChance", 30)
+        HarukaLib:AddAttr(char, "PoisonChance", 30)
 
     elseif item == "SharpenerRock" then
-        HarukaLib:Add(char, "CriChance", 10)
+        HarukaLib:AddAttr(char, "CriChance", 10)
 
     elseif item == "AdventurersKit" then
         char:SetAttribute("CanSpawnMultiOrb", true)
-        HarukaLib:Add(char, "HealBuff", 5)
-        HarukaLib:Add(char, "RestoreBuff", 5)
+        HarukaLib:AddAttr(char, "HealBuff", 5)
+        HarukaLib:AddAttr(char, "RestoreBuff", 5)
 
     elseif item == "ClimbingGear" then
         char:SetAttribute("CanClimb", true)
 
     elseif item == "CrimsonSlimeFang" then
-        HarukaLib:Add(char, "MinDMGBuff", 50)
-        HarukaLib:Add(char, "MaxDMGBuff", 100)
-        HarukaLib:Add(char, "JumpBuff", 5)
-        HarukaLib:Add(char, "CriChance", 10)
+        HarukaLib:AddAttr(char, "MinDMGBuff", 50)
+        HarukaLib:AddAttr(char, "MaxDMGBuff", 100)
+        HarukaLib:AddAttr(char, "JumpBuff", 5)
+        HarukaLib:AddAttr(char, "CriChance", 10)
     end
 
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", true)

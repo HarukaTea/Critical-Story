@@ -16,10 +16,10 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-HarukaLib:Add(char, "Defense", power)
+HarukaLib:AddAttr(char, "Defense", power)
 
 wait(duration)
 
-HarukaLib:Add(char, "Defense", -power)
+HarukaLib:AddAttr(char, "Defense", -power)
 
 script:Destroy()

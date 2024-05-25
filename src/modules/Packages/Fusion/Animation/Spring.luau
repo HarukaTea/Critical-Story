@@ -11,15 +11,13 @@ local task = nil -- Disable usage of Roblox's task scheduler
 local Package = script.Parent.Parent
 local Types = require(Package.Types)
 local InternalTypes = require(Package.InternalTypes)
-local logError = require(Package.Logging.logError)
-local logErrorNonFatal = require(Package.Logging.logErrorNonFatal)
+local External = require(Package.External)
 local unpackType = require(Package.Animation.unpackType)
 local SpringScheduler = require(Package.Animation.SpringScheduler)
 local updateAll = require(Package.State.updateAll)
 local isState = require(Package.State.isState)
 local peek = require(Package.State.peek)
 local whichLivesLonger = require(Package.Memory.whichLivesLonger)
-local logWarn = require(Package.Logging.logWarn)
 
 local class = {}
 class.type = "State"
@@ -40,7 +38,7 @@ function class:setPosition(
 	local self = self :: InternalTypes.Spring<any>
 	local newType = typeof(newValue)
 	if newType ~= self._currentType then
-		logError("springTypeMismatch", nil, newType, self._currentType)
+		External.logError("springTypeMismatch", nil, newType, self._currentType)
 	end
 
 	self._springPositions = unpackType(newValue, newType)
@@ -62,7 +60,7 @@ function class:setVelocity(
 	local self = self :: InternalTypes.Spring<any>
 	local newType = typeof(newValue)
 	if newType ~= self._currentType then
-		logError("springTypeMismatch", nil, newType, self._currentType)
+		External.logError("springTypeMismatch", nil, newType, self._currentType)
 	end
 
 	self._springVelocities = unpackType(newValue, newType)
@@ -82,7 +80,7 @@ function class:addVelocity(
 	local self = self :: InternalTypes.Spring<any>
 	local deltaType = typeof(deltaValue)
 	if deltaType ~= self._currentType then
-		logError("springTypeMismatch", nil, deltaType, self._currentType)
+		External.logError("springTypeMismatch", nil, deltaType, self._currentType)
 	end
 
 	local springDeltas = unpackType(deltaValue, deltaType)
@@ -105,18 +103,18 @@ function class:update(): boolean
 		-- speed/damping change
 		local damping = peek(self._damping)
 		if typeof(damping) ~= "number" then
-			logErrorNonFatal("mistypedSpringDamping", nil, typeof(damping))
+			External.logErrorNonFatal("mistypedSpringDamping", nil, typeof(damping))
 		elseif damping < 0 then
-			logErrorNonFatal("invalidSpringDamping", nil, damping)
+			External.logErrorNonFatal("invalidSpringDamping", nil, damping)
 		else
 			self._currentDamping = damping
 		end
 
 		local speed = peek(self._speed)
 		if typeof(speed) ~= "number" then
-			logErrorNonFatal("mistypedSpringSpeed", nil, typeof(speed))
+			External.logErrorNonFatal("mistypedSpringSpeed", nil, typeof(speed))
 		elseif speed < 0 then
-			logErrorNonFatal("invalidSpringSpeed", nil, speed)
+			External.logErrorNonFatal("invalidSpringSpeed", nil, speed)
 		else
 			self._currentSpeed = speed
 		end
@@ -174,19 +172,7 @@ function class:_peek(): any
 end
 
 function class:get()
-	logError("stateGetWasRemoved")
-end
-
-function class:destroy()
-	local self = self :: InternalTypes.Spring<any>
-	if self.scope == nil then
-		logError("destroyedTwice", nil, "Spring")
-	end
-	SpringScheduler.remove(self)
-	self.scope = nil
-	for dependency in pairs(self.dependencySet) do
-		dependency.dependentSet[self] = nil
-	end
+	External.logError("stateGetWasRemoved")
 end
 
 local function Spring<T>(
@@ -196,7 +182,7 @@ local function Spring<T>(
 	damping: Types.UsedAs<number>?
 ): Types.Spring<T>
 	if typeof(scope) ~= "table" or isState(scope) then
-		logError("scopeMissing", nil, "Springs", "myScope:Spring(goalState, speed, damping)")
+		External.logError("scopeMissing", nil, "Springs", "myScope:Spring(goalState, speed, damping)")
 	end
 	-- apply defaults for speed and damping
 	if speed == nil then
@@ -246,14 +232,22 @@ local function Spring<T>(
 	}, CLASS_METATABLE)
 	local self = (self :: any) :: InternalTypes.Spring<T>
 
-	table.insert(scope, self)
+	local destroy = function()
+		SpringScheduler.remove(self :: any)
+		self.scope = nil
+		for dependency in pairs(self.dependencySet) do
+			dependency.dependentSet[self] = nil
+		end
+	end
+	self.oldestTask = destroy
+	table.insert(scope, destroy)
 
 	if goalIsState then
 		local goal = goal :: Types.StateObject<T>
 		if goal.scope == nil then
-			logError("useAfterDestroy", nil, `The {goal.kind} object`, `the Spring that is following it`)
-		elseif whichLivesLonger(scope, self, goal.scope, goal) == "definitely-a" then
-			logWarn("possiblyOutlives", `The {goal.kind} object`, `the Spring that is following it`)
+			External.logError("useAfterDestroy", nil, `The {goal.kind} object`, `the Spring that is following it`)
+		elseif whichLivesLonger(scope, self.oldestTask, goal.scope, goal.oldestTask) == "definitely-a" then
+			External.logWarn("possiblyOutlives", `The {goal.kind} object`, `the Spring that is following it`)
 		end
 		-- add this object to the goal state's dependent set
 		goal.dependentSet[self] = true

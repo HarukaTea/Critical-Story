@@ -28,7 +28,7 @@ particle.Color = csNew(color)
 particle.Parent = char.PrimaryPart
 
 for _ = duration, 0, -1 do
-    HarukaLib:Add(char, "Health", -dmg)
+    HarukaLib:AddAttr(char, "Health", -dmg)
 
     ServerUtil:ShowNumber(char, dmg, color)
     wait(1)

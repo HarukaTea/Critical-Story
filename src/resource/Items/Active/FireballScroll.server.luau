@@ -62,7 +62,7 @@ local success, errorMsg = pcall(function()
 			Events.ClientTween:Fires({ fireBall }, { Size = one * 9, Transparency = 1 }, "one")
 
 			local dmg = floor(char:GetAttribute("Magic") / 2)
-			HarukaLib:Add(monster, "Health", -dmg)
+			HarukaLib:AddAttr(monster, "Health", -dmg)
 
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))
 		end

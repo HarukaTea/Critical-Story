@@ -1,15 +1,12 @@
 --!strict
+
 local RateLimit = {}
 
 local RunService = game:GetService("RunService")
-local Assert = require(script.Parent.Assert)
 local Event = require(script.Parent.Parent.Event).Reliable
 
 function RateLimit.create(Identifier: string, entrance: number?, interval: number?)
-	Assert(typeof(Identifier) == "string", "Identifier must a string type.")
 	if RunService:IsServer() then
-		Assert(typeof(entrance) == "number", "entrance must a number type.")
-		Assert(entrance :: number > 0, "entrance must above 0.")
 		Event:SetAttribute(Identifier.."_ent", entrance)
 		Event:SetAttribute(Identifier.."_int", interval)
 	else

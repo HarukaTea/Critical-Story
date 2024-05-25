@@ -1,6 +1,4 @@
---!optimize 2
 --!nocheck
---!native
 
 export type Connection<U...> = {
 	Connected: boolean,
@@ -239,6 +237,14 @@ function Signal.new<T...>(): Signal<T...>
 	return setmetatable({ _head = false }, Signal)
 end
 
+function Signal.wrap<T...>(signal: RBXScriptSignal): Signal<T...>
+	local wrapper = setmetatable({ _head = false }, Signal)
+	wrapper.RBXScriptConnection = rbxConnect(signal, function(...)
+		fire(wrapper, ...)
+	end)
+	return wrapper
+end
+
 --\\ Methods
 Signal.Connect = connect
 Signal.Once = once
@@ -247,4 +253,4 @@ Signal.Fire = fire
 Signal.DisconnectAll = disconnectAll
 Signal.Destroy = destroy
 
-return Signal.new
+return { new = Signal.new, wrap = Signal.wrap }

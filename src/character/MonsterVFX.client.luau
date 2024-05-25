@@ -7,7 +7,7 @@ local RS = game:GetService("RunService")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local SuperTween = require(RepS.Modules.Packages.SuperTween)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local char = script.Parent :: Model
 
@@ -36,7 +36,7 @@ local function spikeRain(blast: Model)
 	blast.Spike:Play()
 	blast:PivotTo(blast.PrimaryPart.CFrame * cfNew(0, 30, 0))
 
-	SuperTween.new(blast, AssetBook.TweenInfos.half, { Pivot = blast.PrimaryPart.CFrame * cfNew(0, -30, 0) }):Play()
+	HarukaLib:Tween(blast, AssetBook.TweenInfos.half, { Pivot = blast.PrimaryPart.CFrame * CFrame.new(0, -30, 0) })
 end
 
 local function wolfBite(blast: Model)
@@ -46,15 +46,15 @@ local function wolfBite(blast: Model)
 	TS:Create(blast.Fang2.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
 
 	wait(0.5)
-	SuperTween.new(blast.Fang1, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang1.Base.CFrame * cfNew(0, 0, -6) }):Play()
-	SuperTween.new(blast.Fang2, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang2.Base.CFrame * cfNew(0, 0, -6) }):Play()
+	HarukaLib:Tween(blast.Fang1, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang1.Base.CFrame * CFrame.new(0, 0, -6) })
+	HarukaLib:Tween(blast.Fang2, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang2.Base.CFrame * CFrame.new(0, 0, -6) })
 end
 
 
 --// Slimes
 local function slimeShot(blast: Model, mob: Model)
 	wait(0.3)
-	TS:Create(blast.Base, AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
+	TS:Create(blast.Base, AssetBook.TweenInfos.twiceHalf, { Size = Vector3.new(4, 1, 4) }):Play()
 
 	local length = (mob.PrimaryPart.Position - blast.Base.Position).Magnitude
 	local radius = (mob.PrimaryPart.Position - blast.Shot.Base.Position).Magnitude
@@ -66,7 +66,7 @@ local function slimeShot(blast: Model, mob: Model)
 	Debris:AddItem(blast, 0.2)
 
 	local rotatingangle = angle * 2 /10
-	SuperTween.new(blast.Shot, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Shot.Base.CFrame * cfAngles(-rotatingangle * 10, 0, 0) }):Play()
+	HarukaLib:Tween(blast.Shot, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Shot.Base.CFrame * CFrame.Angles(-rotatingangle * 10, 0, 0) })
 end
 
 local function slimeWave(blast: Model)
@@ -121,7 +121,7 @@ local function slimeDive(blast: Model)
 	blast.SlimeAttack:Play()
 
 	for i = 1, 2 do
-		local size = if i == 1 then v3New(20, 1, 20) else v3New(4, 1, 4)
+		local size = if i == 1 then Vector3.new(20, 1, 20) else Vector3.new(4, 1, 4)
 
 		TS:Create(blast["Position" .. i], AssetBook.TweenInfos.twiceHalf, { Size = size }):Play()
 	end

@@ -1,19 +1,3 @@
---!nocheck
-
---[=[
-	Basic node interacting with the octree. See [Octree](/api/Octree) for usage.
-
-	```lua
-	local octree = Octree.new()
-	local node = octree:CreateNode(Vector3.zero, "A")
-	print(octree:RadiusSearch(Vector3.zero, 100)) --> { "A" }
-
-	node:Destroy() -- Remove node from octree
-
-	print(octree:RadiusSearch(Vector3.zero, 100)) --> { }
-	```
-	@class OctreeNode
-]=]
 
 local OctreeRegionUtils = require(script.Parent.OctreeRegionUtils)
 
@@ -47,25 +31,6 @@ function OctreeNode.new(octree, object)
 end
 
 --[=[
-	Finds the nearest neighbors to this node within the radius
-
-	```lua
-	local octree = Octree.new()
-	local node = octree:CreateNode(Vector3.zero, "A")
-	octree:CreateNode(Vector3.new(0, 0, 5), "B")
-	print(octree:KNearestNeighborsSearch(10, 100)) --> { "A", "B" } { 0, 25 }
-	```
-
-	@param k number -- The number to retrieve
-	@param radius number -- The radius to search in
-	@return { T } -- Objects found, including self
-	@return { number } -- Distances squared
-]=]
-function OctreeNode:KNearestNeighborsSearch(k, radius)
-	return self._octree:KNearestNeighborsSearch(self._position, k, radius)
-end
-
---[=[
 	Returns the object stored in the octree
 
 	```lua
@@ -73,8 +38,6 @@ end
 	local node = octree:CreateNode(Vector3.zero, "A")
 	print(octree:GetObject()) --> "A"
 	```
-
-	@return T
 ]=]
 function OctreeNode:GetObject()
 	return self._object
@@ -82,10 +45,6 @@ end
 
 --[=[
 	Finds the nearest neighbors to the octree node
-
-	@param radius number -- The radius to search in
-	@return { any } -- Objects found
-	@return { number } -- Distances squared
 ]=]
 function OctreeNode:RadiusSearch(radius)
 	return self._octree:RadiusSearch(self._position, radius)
@@ -122,8 +81,6 @@ end
 	node:SetPosition(Vector3.new(1000, 0, 0))
 	print(octree:RadiusSearch(Vector3.zero, 100)) --> {}
 	```
-
-	@param position Vector3
 ]=]
 function OctreeNode:SetPosition(position)
 	if self._position == position then

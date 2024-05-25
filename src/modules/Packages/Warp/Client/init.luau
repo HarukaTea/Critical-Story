@@ -1,19 +1,18 @@
 --!strict
 --!native
 --!optimize 2
+
 local Client = {}
 Client.__index = Client
 
-local Util = script.Parent.Parent.Util
+local Util = script.Parent.Util
 
-local Type = require(script.Parent.Parent.Type)
-local ClientProcess = require(script.Parent.ClientProcess)
-local Assert = require(Util.Assert)
+local ClientProcess = require(script.ClientProcess)
 local Key = require(Util.Key)
 local Serdes = require(Util.Serdes)
 local Buffer = require(Util.Buffer)
 
-function Client.new(isReliable: boolean, Identifier: string, conf: Type.ClientConf?)
+function Client.new(isReliable: boolean, Identifier: string, conf: table)
 	local self = setmetatable({}, Client)
 
 	self._buffer = Buffer.new()
@@ -30,11 +29,6 @@ function Client.new(isReliable: boolean, Identifier: string, conf: Type.ClientCo
 	return self
 end
 
-function Client:logs()
-	Assert(self._conf.logging, "[Client]: Event is not configured with logging.")
-	return ClientProcess.getlogs(self.id)
-end
-
 function Client:Fire(...: any)
 	ClientProcess.insertQueue(self.id, self.isReliable, ...)
 end
@@ -44,6 +38,7 @@ function Client:Connect(callback: (args: any) -> ()): string
 	table.insert(self.fn, key)
 	self.IsConnected = #self.fn > 0
 	ClientProcess.addCallback(self.id, key, callback)
+
 	return key
 end
 
@@ -73,8 +68,8 @@ function Client:DisconnectAll()
 end
 
 function Client:Disconnect(key: string): boolean
-	Assert(typeof(key) == "string", "Key must be a string type.")
 	ClientProcess.removeCallback(self.id, key)
+
 	table.remove(self.fn, table.find(self.fn, key))
 	self.IsConnected = #self.fn > 0
 	return table.find(self.fn, key) == nil

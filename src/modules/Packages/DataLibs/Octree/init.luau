@@ -1,4 +1,3 @@
---!nocheck
 
 local OctreeRegionUtils = require(script.OctreeRegionUtils)
 local OctreeNode = require(script.OctreeNode)
@@ -35,12 +34,6 @@ end
 	```
 
 	Order is not guaranteed.
-
-	:::warning
-	If you have 100,000 nodes in your octree, this is going to be very slow.
-	:::
-
-	@return { OctreeNode<T> }
 ]=]
 function Octree:GetAllNodes()
 	local options = {}
@@ -69,10 +62,6 @@ end
 	octree:CreateNode(Vector3.zero, "A")
 	octree:CreateNode(Vector3.zero, "B")
 	```
-
-	@param position Vector3
-	@param object T
-	@return OctreeNode<T>
 ]=]
 function Octree:CreateNode(position, object)
 	assert(typeof(position) == "Vector3", "Bad position value")
@@ -96,11 +85,6 @@ end
 	octree:CreateNode(Vector3.new(0, 0, 1000), "C")
 	print(octree:RadiusSearch(Vector3.zero, 100)) --> { "A", "B" }
 	```
-
-	@param position Vector3
-	@param radius number
-	@return { T } -- Objects found
-	@return { number } -- Distances squared
 ]=]
 function Octree:RadiusSearch(position, radius)
 	assert(typeof(position) == "Vector3", "Bad position")
@@ -110,57 +94,8 @@ function Octree:RadiusSearch(position, radius)
 	return self:_radiusSearch(px, py, pz, radius)
 end
 
---[=[
-	Searches at the position and radius for any objects that may be within
-	this radius. Returns the knearest entries.
+--// Private
 
-	The closest entities will be first in the list.
-
-	@param position Vector3
-	@param k number -- Number of objects to find
-	@param radius number
-	@return { any } -- Objects found
-	@return { number } -- Distances squared
-]=]
-function Octree:KNearestNeighborsSearch(position, k, radius)
-	assert(typeof(position) == "Vector3", "Bad position")
-	assert(type(radius) == "number", "Bad radius")
-
-	local px, py, pz = position.x, position.y, position.z
-	local objects, nodeDistances2 = self:_radiusSearch(px, py, pz, radius)
-
-	local sortable = {}
-	for index, dist2 in pairs(nodeDistances2) do
-		table.insert(sortable, {
-			dist2 = dist2;
-			index = index;
-		})
-	end
-
-	table.sort(sortable, function(a, b)
-		return a.dist2 < b.dist2
-	end)
-
-	local knearest = {}
-	local knearestDist2 = {}
-	for i = 1, math.min(#sortable, k) do
-		local sorted = sortable[i]
-		knearestDist2[#knearestDist2 + 1] = sorted.dist2
-		knearest[#knearest + 1] = objects[sorted.index]
-	end
-
-	return knearest, knearestDist2
-end
-
---[=[
-	Internal API to create lowest subregion
-
-	@private
-	@param px number
-	@param py number
-	@param pz number
-	@return OctreeSubregion
-]=]
 function Octree:GetOrCreateLowestSubRegion(px, py, pz)
 	local region = self:_getOrCreateRegion(px, py, pz)
 	return OctreeRegionUtils.getOrCreateSubRegionAtDepth(region, px, py, pz, self._maxDepth)

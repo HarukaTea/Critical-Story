@@ -30,7 +30,7 @@ function BuffEffectsUtil:RestoreManaByOrb(char: Model)
 
 	if currentMana >= char:GetAttribute("MaxMana") then return end
 
-	HarukaLib:Add(char, "Mana", floor(char:GetAttribute("MaxMana") * char:GetAttribute("RestoreBuff") / 100))
+	HarukaLib:AddAttr(char, "Mana", floor(char:GetAttribute("MaxMana") * char:GetAttribute("RestoreBuff") / 100))
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart
@@ -41,7 +41,7 @@ end
 	Restore mana, by script lol
 ]]
 function BuffEffectsUtil:RestoreMana(char: Model, restoreVal: number)
-	HarukaLib:Add(char, "Mana", restoreVal)
+	HarukaLib:AddAttr(char, "Mana", restoreVal)
 
 	local restoreEff = RepS.Package.Effects.RestoreEffect:Clone() :: ParticleEmitter
 	restoreEff.Parent = char.PrimaryPart

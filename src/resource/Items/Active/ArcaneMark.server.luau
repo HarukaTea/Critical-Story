@@ -37,7 +37,7 @@ for _ = 1, 5 do
 			local dmg = char:GetAttribute("Magic") :: number
 
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(85, 255, 255))
-			HarukaLib:Add(monster, "Health", -dmg)
+			HarukaLib:AddAttr(monster, "Health", -dmg)
 		end
 
 		mark.Transparency = 0.4

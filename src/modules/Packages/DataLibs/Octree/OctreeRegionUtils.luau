@@ -1,16 +1,5 @@
 --!nocheck
 
---!native
---[=[
-	Octree implementation utilities. Primarily this utility code
-	should not be used directly and should be considered private to
-	the library.
-
-	Use [Octree](/api/Octree) instead of this library directly.
-
-	@class OctreeRegionUtils
-]=]
-
 local EPSILON = 1e-6
 local SQRT_3_OVER_2 = math.sqrt(3)/2
 local SUB_REGION_POSITION_OFFSET = {
@@ -27,42 +16,7 @@ local SUB_REGION_POSITION_OFFSET = {
 local OctreeRegionUtils = {}
 
 --[=[
-	A Vector3 equivalent for octrees. This type is primarily internal and
-	used for faster access than a Vector3.
-
-	@type OctreeVector3 { [1]: number, [2]: number, [3]: number }
-	@within OctreeRegionUtils
-]=]
-
---[=[
-	An internal region which stores the data.
-
-	@interface OctreeRegion<T>
-	.subRegions { OctreeRegion<T> }
-	.lowerBounds OctreeVector3
-	.upperBounds OctreeVector3
-	.position OctreeVector3
-	.size OctreeVector3
-	.parent OctreeRegion<T>?
-	.parentIndex number
-	.depth number
-	.nodes { OctreeNode<T> }
-	.node_count number
-	@within OctreeRegionUtils
-]=]
-
---[=[
 	Creates a new OctreeRegion<T>
-
-	@param px number
-	@param py number
-	@param pz number
-	@param sx number
-	@param sy number
-	@param sz number
-	@param parent OctreeRegion<T>?
-	@param parentIndex number?
-	@return OctreeRegion<T>
 ]=]
 function OctreeRegionUtils.create(px, py, pz, sx, sy, sz, parent, parentIndex)
 	local hsx, hsy, hsz = sx/2, sy/2, sz/2

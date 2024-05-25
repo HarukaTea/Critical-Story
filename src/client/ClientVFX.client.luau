@@ -1,15 +1,13 @@
 --!nocheck
 
 local CS = game:GetService("CollectionService")
-local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local Atmosphere = require(RepS.Modules.Packages.Atmosphere)
 local Signals = require(RepS.Modules.Data.Signals)
-
-local plr = Players.LocalPlayer
+local WindLines = require(RepS.Modules.Packages.Atmosphere.WindLines)
+local WindShake = require(RepS.Modules.Packages.Atmosphere.WindShake)
 
 local instanceNew = Instance.new
 local v3New = Vector3.new
@@ -20,9 +18,7 @@ local wait = task.wait
 --- effects fade
 local function fadeEffect(effect: ParticleEmitter)
     wait(0.4)
-    pcall(function()
-        effect.Enabled = false
-    end)
+    if effect then effect.Enabled = false end
 end
 CS:GetInstanceAddedSignal("GlobalEffects"):Connect(fadeEffect)
 
@@ -44,7 +40,7 @@ CS:GetInstanceAddedSignal("TextEffects"):Connect(fadeText)
 --// Atmopshere init
 
 local function enableWinds()
-    Atmosphere.WindLines:Init({
+    WindLines:Init({
         Direction = v3New(1, 0, 0.3),
         Speed = 25,
         LifeTime = 0.8,
@@ -52,16 +48,15 @@ local function enableWinds()
     })
 
     --- wind shakes
-    Atmosphere.WindShake:SetDefaultSettings({
+    WindShake:Init({
         WindSpeed = 20,
         WindDirection = v3New(1, 0, 0.3),
         WindPower = 0.5
     })
-    Atmosphere.WindShake:Init()
     for _, child: Instance in workspace:GetDescendants() do
         if child:IsA("Model") and child.Name == "Tree" then
             for _, treePart: BasePart in child:GetChildren() do
-                if treePart.Material == Enum.Material.Grass then Atmosphere.WindShake:AddObjectShake(treePart) end
+                if treePart.Material == Enum.Material.Grass then WindShake:AddObjectShake(treePart) end
             end
         end
     end
@@ -73,8 +68,8 @@ local function toggleWinds(action: string)
     if action == "Enable" then
         enableWinds()
     else
-        Atmosphere.WindLines:Cleanup()
-        Atmosphere.WindShake:Cleanup()
+        WindLines:Cleanup()
+        WindShake:Cleanup()
     end
 end
 Signals.EnableMapDetails:Connect(toggleWinds)

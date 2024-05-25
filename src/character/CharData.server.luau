@@ -62,9 +62,9 @@ local function setup()
     ServerUtil:SetCollisionGroup(char, "Player")
 
     Add(HarukaLib.Clock(1, function()
-        HarukaLib:Add(plr, "PlayTime", 1)
+        HarukaLib:AddAttr(plr, "PlayTime", 1)
 
-        if char:GetAttribute("HitCD") >= 0 then HarukaLib:Add(char, "HitCD", -1) end
+        if char:GetAttribute("HitCD") >= 0 then HarukaLib:AddAttr(char, "HitCD", -1) end
     end))
 
     char:SetAttribute("CharDataLoaded", true)
@@ -91,14 +91,14 @@ local function classAttributesSetup()
     Add(HarukaLib.Clock(1, function()
         if char:GetAttribute("Guard") <= 0 then return end
 
-        HarukaLib:Add(char, "Guard", -1)
+        HarukaLib:AddAttr(char, "Guard", -1)
     end))
 
     --- Rogue
     Add(HarukaLib.Clock(0.6, function()
         if char:GetAttribute("RogueCri") <= 0 then return end
 
-        HarukaLib:Add(char, "RogueCri", -1)
+        HarukaLib:AddAttr(char, "RogueCri", -1)
     end))
 end
 Spawn(classAttributesSetup)

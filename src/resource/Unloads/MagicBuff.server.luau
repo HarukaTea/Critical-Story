@@ -21,10 +21,10 @@ local nowMagicBuff = char:GetAttribute("MagicBuff") :: number
 local nowMagic = char:GetAttribute("Magic") - nowMagicBuff :: number
 
 local theoryMagic = floor(nowMagic * power - nowMagic)
-HarukaLib:Add(char, "MagicBuff", theoryMagic)
+HarukaLib:AddAttr(char, "MagicBuff", theoryMagic)
 
 wait(duration)
 
-HarukaLib:Add(char, "MagicBuff", -theoryMagic)
+HarukaLib:AddAttr(char, "MagicBuff", -theoryMagic)
 
 script:Destroy()

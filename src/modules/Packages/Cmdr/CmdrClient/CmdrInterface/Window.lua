@@ -159,7 +159,7 @@ function Window:LoseFocus(submit)
 	end
 
 	if submit and self.Valid then
-		wait()
+		task.wait()
 		self:SetEntryText("")
 		self.ProcessEntry(text)
 	elseif submit then
@@ -223,7 +223,7 @@ function Window:BeginInput(input, gameProcessed)
 			lastPressTime = tick()
 		elseif self.Cmdr.Enabled then
 			self:SetVisible(not self:IsVisible())
-			wait()
+			task.wait()
 			self:SetEntryText("")
 
 			if GuiService.MenuIsOpen then -- Special case for menu getting stuck open (roblox bug)
@@ -254,7 +254,7 @@ function Window:BeginInput(input, gameProcessed)
 	elseif input.KeyCode == Enum.KeyCode.Up then -- Auto Complete Up
 		self:SelectVertical(-1)
 	elseif input.KeyCode == Enum.KeyCode.Return then -- Eat new lines
-		wait()
+		task.wait()
 		self:SetEntryText(self:GetEntryText():gsub("\n", ""):gsub("\r", ""))
 	elseif input.KeyCode == Enum.KeyCode.Tab then -- Auto complete
 		local item = self.AutoComplete:GetSelectedItem()
@@ -297,12 +297,12 @@ function Window:BeginInput(input, gameProcessed)
 				newText = replace
 			end
 			-- need to wait a frame so we can eat the \t
-			wait()
+			task.wait()
 			-- Update the text box
 			self:SetEntryText(newText .. (insertSpace and " " or ""))
 		else
 			-- Still need to eat the \t even if there is no auto-complete to show
-			wait()
+			task.wait()
 			self:SetEntryText(self:GetEntryText())
 		end
 	else

@@ -7,9 +7,13 @@ local task = nil -- Disable usage of Roblox's task scheduler
 	Stores common public-facing type information for Fusion APIs.
 ]]
 
---[[
-	General use types
-]]
+export type Error = {
+	type: "Error",
+	raw: string,
+	message: string,
+	trace: string,
+	context: string?
+}
 
 -- Types that can be expressed as vectors of numbers, and so can be animated.
 export type Animatable =
@@ -42,12 +46,12 @@ export type Task =
 	{Task}
 
 -- A scope of tasks to clean up.
-export type Scope<Constructors> = {any} & Constructors
+export type Scope<Constructors> = {Task} & Constructors
 
 -- An object which uses a scope to dictate how long it lives.
 export type ScopedObject = {
 	scope: Scope<any>?,
-	destroy: (any) -> ()
+	oldestTask: any
 }
 
 -- Script-readable version information.
@@ -67,10 +71,6 @@ export type Contextual<T> = {
 type ContextualIsMethods = {
 	during: <R, A...>(ContextualIsMethods, (A...) -> R, A...) -> R
 }
-
---[[
-	Generic reactive graph types
-]]
 
 -- A graph object which can have dependents.
 export type Dependency = ScopedObject & {
@@ -95,10 +95,6 @@ export type UsedAs<T> = StateObject<T> | T
 
 -- Function signature for use callbacks.
 export type Use = <T>(target: UsedAs<T>) -> T
-
---[[
-	Specific reactive graph types
-]]
 
 -- A state object whose value can be set at any time by the user.
 export type Value<T, S = T> = StateObject<T> & {
@@ -175,10 +171,6 @@ export type SpringConstructor = <T>(
 	damping: UsedAs<number>?
 ) -> Spring<T>
 
---[[
-	Instance related types
-]]
-
 -- Denotes children instances in an instance or component's property table.
 export type SpecialKey = {
 	type: "SpecialKey",
@@ -245,9 +237,10 @@ export type Fusion = {
 	version: Version,
 	Contextual: ContextualConstructor,
 
-	doCleanup: (...any) -> (),
+	doCleanup: (Task) -> (),
 	scoped: ScopedConstructor,
 	deriveScope: <T>(existing: Scope<T>) -> Scope<T>,
+	innerScope: <T>(existing: Scope<T>) -> Scope<T>,
 
 	peek: Use,
 	Value: ValueConstructor,
@@ -271,7 +264,28 @@ export type Fusion = {
 	Attribute: (attributeName: string) -> SpecialKey,
 	AttributeChange: (attributeName: string) -> SpecialKey,
 	AttributeOut: (attributeName: string) -> SpecialKey,
+}
 
+export type ExternalProvider = {
+	policies: {
+		allowWebLinks: boolean
+	},
+
+	logErrorNonFatal: (
+		errorString: string
+	) -> (),
+	logWarn: (
+		errorString: string
+	) -> (),
+
+	doTaskImmediate: (
+		resume: () -> ()
+	) -> (),
+	doTaskDeferred: (
+		resume: () -> ()
+	) -> (),
+	startScheduler: () -> (),
+	stopScheduler: () -> ()
 }
 
 return nil

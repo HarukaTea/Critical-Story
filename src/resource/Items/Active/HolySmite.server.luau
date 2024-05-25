@@ -45,4 +45,4 @@ local dmg = char:GetAttribute("Magic") :: number
 
 ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 85, 0))
 
-HarukaLib:Add(monster, "Health", -dmg)
+HarukaLib:AddAttr(monster, "Health", -dmg)

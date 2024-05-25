@@ -13,29 +13,34 @@ local task = nil -- Disable usage of Roblox's task scheduler
 	- a table with a `Destroy` or `destroy` function - will be called
 	- an array - `cleanup` will be called on each item
 ]]
+local Package = script.Parent.Parent
+local Types = require(Package.Types)
+local External = require(Package.External)
 
-local function doCleanupOne(
-	task: any
-)
-	local taskType = typeof(task)
+local alreadyDestroying: {[Types.Task]: true} = {}
+
+local function doCleanup(
+	task: Types.Task
+): ()
+	if alreadyDestroying[task] then
+		return External.logError("destroyedTwice")
+	end
+	alreadyDestroying[task] = true
 
 	-- case 1: Instance
-	if taskType == "Instance" then
-		local task = task :: Instance
+	if typeof(task) == "Instance" then
 		task:Destroy()
 
 	-- case 2: RBXScriptConnection
-	elseif taskType == "RBXScriptConnection" then
-		local task = task :: RBXScriptConnection
+	elseif typeof(task) == "RBXScriptConnection" then
 		task:Disconnect()
 
 	-- case 3: callback
-	elseif taskType == "function" then
-		local task = task :: (...any) -> (...any)
+	elseif typeof(task) == "function" then
 		task()
 
-	elseif taskType == "table" then
-		local task = task :: {destroy: any?, Destroy: any?}
+	elseif typeof(task) == "table" then
+		local task = (task :: any) :: {Destroy: (...any) -> (...any)?, destroy: (...any) -> (...any)?}
 
 		-- case 4: destroy() function
 		if typeof(task.destroy) == "function" then
@@ -49,23 +54,17 @@ local function doCleanupOne(
 
 		-- case 6: array of tasks
 		elseif task[1] ~= nil then
-			local task = task :: {any}
+			local task = task :: {Types.Task}
 			-- It is important to iterate backwards through the table, since
 			-- objects are added in order of construction.
 			for index = #task, 1, -1 do
-				doCleanupOne(task[index])
+				doCleanup(task[index])
 				task[index] = nil
 			end
 		end
 	end
-end
 
-local function doCleanup(
-	...: any
-)
-	for index = 1, select("#", ...) do
-		doCleanupOne(select(index, ...))
-	end
+	alreadyDestroying[task] = nil
 end
 
 return doCleanup

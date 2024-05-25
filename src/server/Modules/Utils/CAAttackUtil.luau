@@ -7,7 +7,6 @@ local SSS = game:GetService("ServerScriptService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -29,15 +28,14 @@ function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, f
     local char = plr.Character
     local criChanceRarity = forceRarity or char:GetAttribute("CriChance")
 
-    local criChance = LootPlan.new()
-	criChance:Add("CriticalHit", criChanceRarity)
-	criChance:Add("None", 100 - criChanceRarity)
-
-    local result = criChance:Roll()
+    local result = HarukaLib:RollLoot({
+        ["CriticalHit"] = criChanceRarity,
+        ["None"] = 100 - criChanceRarity
+    })
 
 	if result == "CriticalHit" then
 		local dmg = maxDmg * 2
-        HarukaLib:Add(monster, "Health", -dmg)
+        HarukaLib:AddAttr(monster, "Health", -dmg)
 
         ServerUtil:ShowNumber(monster, dmg, fromRGB(230, 241, 3))
 
@@ -49,8 +47,6 @@ function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, f
 		ServerUtil:ShowText(char, "CRITICAL!", fromRGB(230, 241, 3))
 	end
 
-	criChance:Destroy()
-
     return result
 end
 
@@ -60,7 +56,7 @@ end
 function CAAttackUtil:DealDMG(plr: Player, monster: Model, dmg: number)
     ServerUtil:ShowNumber(monster, dmg, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
 
-    HarukaLib:Add(monster, "Health", -dmg)
+    HarukaLib:AddAttr(monster, "Health", -dmg)
 
     CAAttackUtil:CriticalHit(plr, monster, dmg)
 end
@@ -69,7 +65,7 @@ end
 function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
-	HarukaLib:Add(char, "Combo", 1)
+	HarukaLib:AddAttr(char, "Combo", 1)
 
 	if char:GetAttribute("Combo") > 1 then
 		local finalDamage = floor(baseDamage * char:GetAttribute("Combo"))
@@ -104,7 +100,7 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
         for _ = char:GetAttribute("Stack"), 1, -1 do
             if monster:GetAttribute("Health") <= 0 then break end
 
-            HarukaLib:Add(char, "Stack", -1)
+            HarukaLib:AddAttr(char, "Stack", -1)
 
             CAAttackUtil:DealDMG(plr, monster, baseDamage)
         end
@@ -118,7 +114,7 @@ end
 function CAAttackUtil.ArcherArrow(plr: Player)
     local char = plr.Character
 
-    HarukaLib:Add(char, "Stack", 1)
+    HarukaLib:AddAttr(char, "Stack", 1)
 
     if char:GetAttribute("Stack") > 10 then char:SetAttribute("Stack", 10) end
 end
@@ -127,7 +123,7 @@ function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
     local magicDmg = char:GetAttribute("Magic")
 
-    HarukaLib:Add(char, "Focus", 35)
+    HarukaLib:AddAttr(char, "Focus", 35)
     CAAttackUtil:DealDMG(plr, monster, magicDmg)
 
     if char:GetAttribute("Focus") >= 100 then
@@ -143,7 +139,7 @@ end
 function CAAttackUtil.Knight(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
-    HarukaLib:Add(char, "Guard", 15)
+    HarukaLib:AddAttr(char, "Guard", 15)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     if char:GetAttribute("Guard") > 100 then char:SetAttribute("Guard", 100) end
@@ -154,7 +150,7 @@ end
 function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
-    HarukaLib:Add(char, "RogueCri", 10)
+    HarukaLib:AddAttr(char, "RogueCri", 10)
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     if char:GetAttribute("RogueCri") > 100 then char:SetAttribute("RogueCri", 100) end
@@ -217,16 +213,8 @@ function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
             end
         end
 
-        wait(0.2)
-        HarukaLib:Add(char, "SpeedBuff", -999)
-        HarukaLib:Add(char, "JumpBuff", -999)
-
-        Spawn(function()
-            for _ = 1, #strikerOrbs do
-                CAAttackUtil:DealDMG(plr, monster, baseDamage)
-                wait(0.3)
-            end
-        end)
+        CAAttackUtil:DealDMG(plr, monster, baseDamage)
+        wait(0.3)
 
         for _, orb in strikerOrbs do
             if orb:FindFirstChild("Base") then
@@ -252,9 +240,6 @@ function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
                 bp:Destroy()
             end
         end
-
-        HarukaLib:Add(char, "SpeedBuff", 999)
-        HarukaLib:Add(char, "JumpBuff", 999)
     end)
 end
 

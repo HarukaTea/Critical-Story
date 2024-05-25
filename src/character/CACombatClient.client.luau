@@ -8,12 +8,13 @@ local RepS = game:GetService("ReplicatedStorage")
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Events = require(RepS.Modules.Data.Events)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Octree = require(RepS.Modules.Packages.Octree)
+local Octree = require(RepS.Modules.Packages.DataLibs.Octree)
 local Promise = require(RepS.Modules.Packages.Promise)
 local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
+local monsterTree = Octree.new()
 
 local char = script.Parent :: Model
 local humanoid = char:WaitForChild("Humanoid") :: Humanoid
@@ -26,6 +27,7 @@ local monsterLocations = workspace:WaitForChild("Monsters", 999) :: Folder
 local isInCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
+local monsterNodes = {}
 
 local wait = task.wait
 local newInstance = Instance.new
@@ -41,28 +43,37 @@ local function setup()
 	for _, folder: Folder in mapComponents.OrbHolders:GetChildren() do folder:Destroy() end
 
 	--- add all mobs
-	local monsterTree = Octree.new()
 	for _, monster: Model in monsterLocations:GetDescendants() do
 		if monster:HasTag("Monster") and monster.PrimaryPart and not monster:GetAttribute("SubMonster") then
-			monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+			monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 		end
 	end
-	local function _handleMonster(monster: Model)
+	local function _addMonster(monster: Model)
 		wait()
 		if monster:GetAttribute("SubMonster") then return end
 
 		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
 
-		monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+		monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 	end
-	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_handleMonster))
+	local function _removeMonster(monster: Model)
+		for index: number, node: any in monsterNodes do
+			if node:GetObject() == monster then
+				node:Destroy()
+
+				table.remove(monsterNodes, index)
+			end
+		end
+	end
+	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
+	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_removeMonster))
 
 	--- detect mobs when player is near them
     Add(HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
 		if not char.PrimaryPart then return end
 
-		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 22)
+		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 20)
 		for _, monster: Model in nearbyMonsters do
 			if not monster then continue end
 			if not monster.PrimaryPart then continue end
@@ -128,7 +139,7 @@ local function onTouched(hit: BasePart)
 			if orb.Owner.Value ~= char then reject() end
 			if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
 
-		end):catch(function()
+		end):Catch(function()
 			check = false
 		end)
 		if not check then return end
@@ -150,7 +161,7 @@ local function onTouched(hit: BasePart)
 			local floatWeight: number = if weight then weight else 35
 
 			local bv = newInstance("BodyVelocity")
-			bv.MaxForce = v3New(1, 1, 1) * 99999999
+			bv.MaxForce = Vector3.one * 99999999
 			bv.Velocity = char.PrimaryPart.CFrame.LookVector + v3New(0, 1, 0) * floatWeight
 			bv.Parent = char.PrimaryPart
 			Debris:AddItem(bv, 0.05)
@@ -198,7 +209,7 @@ local function combatHolderHandler(folder: Folder)
 	_destroyInCombat(owner.Value, folder)
 end
 local function orbFolderHandler(folder: Folder)
-	---// the purpose is to yield enough time, cuz `wait()` isn't long enough
+	---// the purpose is to yield enough time, cuz `task.wait()` isn't long enough
 	local owner = folder:WaitForChild("Owner") :: ObjectValue
 	repeat wait() until owner.Value
 
@@ -224,4 +235,12 @@ Add(CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler))
 setup()
 
 --// Clear
-humanoid.Died:Once(Empty)
+humanoid.Died:Once(function()
+	Empty()
+
+	for _, node: any in monsterNodes do
+		node:Destroy()
+	end
+	monsterTree = nil
+	monsterNodes = nil
+end)

@@ -1,6 +1,10 @@
 --!strict
 --!native
 --!optimize 2
+local Buffer = {}
+Buffer.__index = Buffer
+
+
 local DedicatedBuffer = {}
 DedicatedBuffer.__index = DedicatedBuffer
 
@@ -34,7 +38,6 @@ end
 function DedicatedBuffer.alloc(self: any, byte: number)
 	local size: number = self.size
 	local b: buffer = self.buffer
-
 
 	while self.point + byte >= size do
 		size = math.floor(size * 1.5)
@@ -132,4 +135,19 @@ function DedicatedBuffer.remove(self: any)
 	setmetatable(self, nil)
 end
 
-return DedicatedBuffer.new :: typeof(DedicatedBuffer.new)
+local tostring = buffer.tostring
+local fromstring = buffer.fromstring
+
+function Buffer.new()
+	return DedicatedBuffer.new()
+end
+
+function Buffer.convert(b: buffer): string
+	return tostring(b)
+end
+
+function Buffer.revert(s: string): buffer
+	return fromstring(s)
+end
+
+return Buffer :: typeof(Buffer)

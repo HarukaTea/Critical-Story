@@ -1,13 +1,11 @@
 --!strict
+
 local RunService = game:GetService("RunService")
 local SerInt = 0
 
 local Event = require(script.Parent.Parent.Event).Reliable
-local Assert = require(script.Parent.Assert)
 
 return function(Identifier: string, timeout: number?): number
-	Assert(typeof(Identifier) == "string", "Identifier must be a string type.")
-	Assert(SerInt < 255, "reached max 255 identifiers.")
 	if RunService:IsServer() then
 		if not Event:GetAttribute(Identifier) then
 			SerInt += 1

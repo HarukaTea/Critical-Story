@@ -17,7 +17,7 @@ while wait(0.15) do
     if char:GetAttribute("HitCD") <= 0 then
         char:SetAttribute("Repairing", true)
 
-        HarukaLib:Add(char, "Shield", 1)
+        HarukaLib:AddAttr(char, "Shield", 1)
     end
 end
 

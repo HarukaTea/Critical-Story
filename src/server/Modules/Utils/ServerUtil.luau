@@ -11,7 +11,6 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
-local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local Promise = require(RepS.Modules.Packages.Promise)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
@@ -22,7 +21,6 @@ local cfAngles = CFrame.Angles
 local fromRGB = Color3.fromRGB
 local insert = table.insert
 local yAxis = Vector3.yAxis
-local sFind = string.find
 
 local ServerUtil = {}
 
@@ -302,10 +300,10 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 
 		resolve(position, pos)
 
-	end):andThen(function(position: Vector3, pos: Vector3)
+	end):Then(function(position: Vector3, pos: Vector3)
 		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
 
-	end):catch(function()
+	end):Catch(function()
 		orbLocation = cfNew(0, 0, 0)
 
 		warn("Can not give a proper position for orbs!")
@@ -408,15 +406,12 @@ end
 	Give drops after monsters are defeated by players
 ]]
 function ServerUtil:GiveDrop(plr: Player, monster: Model)
-	local dropChance = LootPlan.new()
-	dropChance:Add(monster:GetAttribute("CommonDrop"), 85)
-	dropChance:Add(monster:GetAttribute("RareDrop"), 15)
-
-	local drop = dropChance:Roll() :: string
+	local drop = HarukaLib:RollLoot({
+		[monster:GetAttribute("CommonDrop")] = 85,
+		[monster:GetAttribute("RareDrop")] = 15
+	})
 
 	ServerUtil:GiveItem(plr, drop, 1)
-
-	dropChance:Destroy()
 end
 
 --[[
@@ -471,7 +466,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 			return false
 		end
 
-		HarukaLib:Add(char, "Mana", -itemInfo.Mana)
+		HarukaLib:AddAttr(char, "Mana", -itemInfo.Mana)
 	end
 	if attributes.MONSTER_REQ then
 		if not monster or not monster.PrimaryPart or not char.PrimaryPart then
@@ -535,7 +530,7 @@ end
 ]]
 function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Player)
 	for reward: string, val: number in StoryBook[series][questId].Rewards do
-		HarukaLib:Add(plr, reward, val)
+		HarukaLib:AddAttr(plr, reward, val)
 
 		ServerUtil:ShowText(plr.Character, "+"..val.." "..reward, fromRGB(212, 255, 0))
 	end

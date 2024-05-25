@@ -4,12 +4,12 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local DeviceGetter = require(RepS.Modules.Packages.DeviceGetter)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local isMobile = DeviceGetter:IsPhone() or DeviceGetter:IsTablet()
+local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 local Value = Fusion.Value
 

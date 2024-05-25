@@ -3,22 +3,18 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Guard = require(RepS.Modules.Packages.Guard)
-
-local numberCheck = Guard.Check(Guard.NumberMinMax(0, 99999999))
-local numberCheck2 = Guard.Check(Guard.Integer)
 
 return function (_, players: table, gold: number)
-    local goldPass, _ = numberCheck(gold)
-    local goldPass2, goldWant2 = numberCheck2(gold)
+    local check = HarukaLib:TypeCheck("MinMax", gold, 0, 99999999)
+    local check2 = HarukaLib:TypeCheck("Integer", gold)
 
-    if not goldPass or not goldPass2 then
+    if not check or not check2 then
         return "I guess you typed incorrect gold amount..."
     end
 
     for _, plr: Player in players do
-        HarukaLib:Add(plr, "Gold", goldWant2)
+        HarukaLib:AddAttr(plr, "Gold", gold)
     end
 
-    return "Gold Added: "..HarukaLib:NumberConvert(goldWant2, "%.1f").."!"
+    return "Gold Added: "..HarukaLib:NumberConvert(gold, "%.1f").."!"
 end

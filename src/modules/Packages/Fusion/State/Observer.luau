@@ -13,8 +13,6 @@ local Types = require(Package.Types)
 local InternalTypes = require(Package.InternalTypes)
 local External = require(Package.External)
 local whichLivesLonger = require(Package.Memory.whichLivesLonger)
-local logWarn = require(Package.Logging.logWarn)
-local logError = require(Package.Logging.logError)
 
 local class = {}
 class.type = "Observer"
@@ -63,23 +61,12 @@ function class:onBind(
 	return self:onChange(callback)
 end
 
-function class:destroy()
-	local self = self :: InternalTypes.Observer
-	if self.scope == nil then
-		logError("destroyedTwice", nil, "Observer")
-	end
-	self.scope = nil
-	for dependency in pairs(self.dependencySet) do
-		dependency.dependentSet[self] = nil
-	end
-end
-
 local function Observer(
 	scope: Types.Scope<any>,
 	watching: any
 ): Types.Observer
 	if watching == nil then
-		logError("scopeMissing", nil, "Observers", "myScope:Observer(watching)")
+		External.logError("scopeMissing", nil, "Observers", "myScope:Observer(watching)")
 	end
 
 	local watchingState = typeof(watching) == "table" and (watching :: any).dependentSet ~= nil
@@ -92,20 +79,27 @@ local function Observer(
 	}, CLASS_METATABLE)
 	local self = (self :: any) :: InternalTypes.Observer
 
-	table.insert(scope, self)
+	local destroy = function()
+		self.scope = nil
+		for dependency in pairs(self.dependencySet) do
+			dependency.dependentSet[self] = nil
+		end
+	end
+	self.oldestTask = destroy
+	table.insert(scope, destroy)
 
 	if watchingState then
 		local watching: any = watching
 		if watching.scope == nil then
-			logError(
+			External.logError(
 				"useAfterDestroy",
 				nil,
 				`The {watching.kind or watching.type or "watched"} object`,
 				`the Observer that is watching it`
 			)
-		elseif whichLivesLonger(scope, self, watching.scope, watching) == "definitely-a" then
+		elseif whichLivesLonger(scope, self.oldestTask, watching.scope, watching.oldestTask) == "definitely-a" then
 			local watching: any = watching
-			logWarn(
+			External.logWarn(
 				"possiblyOutlives",
 				`The {watching.kind or watching.type or "watched"} object`,
 				`the Observer that is watching it`

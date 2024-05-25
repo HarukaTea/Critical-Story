@@ -71,7 +71,7 @@ local success, errorMsg = pcall(function()
 			local dmg = floor(char:GetAttribute("Magic") * 1.5) :: number
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))
 
-			HarukaLib:Add(monster, "Health", -dmg)
+			HarukaLib:AddAttr(monster, "Health", -dmg)
 		end
 	end
 end)

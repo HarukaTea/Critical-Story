@@ -177,6 +177,15 @@ local function mainSetup()
 	end
 	Players.PlayerAdded:Connect(_playerAdded)
 
+	--- friends check
+	Spawn(function()
+		MS:SubscribeAsync("JoinFriendRequest", function(message: table)
+			for _, plr: Player in Players:GetPlayers() do
+				if plr.UserId == message.Data then MS:PublishAsync("JoinFriendReturn", { plr.UserId, game.JobId }) break end
+			end
+		end)
+	end)
+
 	--- private server setup
 	local function _privateServerSetup()
 		local privateId, code = game.PrivateServerId, nil

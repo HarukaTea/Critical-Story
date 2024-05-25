@@ -4,15 +4,13 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local ItemBook = require(RepS.Modules.Data.ItemBook)
-local Guard = require(RepS.Modules.Packages.Guard)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
-local numberCheck = Guard.Check(Guard.NumberMinMax(0, 9999))
-
 return function (_, players: table, item: string, amount: number)
-    local amountPass, amountWanted = numberCheck(amount)
+    local check = HarukaLib:TypeCheck("MinMax", amount, 0, 999)
 
-    if not amountPass then
+    if not check then
         return "Wrong amount!"
     end
 
@@ -29,9 +27,9 @@ return function (_, players: table, item: string, amount: number)
         return "Gived all items!"
     else
         for _, plr: Player in players do
-            ServerUtil:GiveItem(plr, item, amountWanted)
+            ServerUtil:GiveItem(plr, item, amount)
         end
 
-        return "Gived "..amountWanted.."x "..item.."!"
+        return "Gived "..amount.."x "..item.."!"
     end
 end

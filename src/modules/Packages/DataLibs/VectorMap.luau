@@ -1,6 +1,4 @@
---!strict
---!optimize 2
---!native
+--!nocheck
 
 local VectorMap = {}
 VectorMap.__index = VectorMap
@@ -10,24 +8,6 @@ function VectorMap.new(voxelSize: number?)
 		_voxelSize = voxelSize or 50,
 		_voxels = {},
 	}, VectorMap)
-end
-
-function VectorMap:_debugDrawVoxel(voxelKey: Vector3)
-	local box = Instance.new("Part")
-	box.Name = tostring(voxelKey)
-	box.Anchored = true
-	box.CanCollide = false
-	box.Transparency = 1
-	box.Size = Vector3.one * self._voxelSize
-	box.Position = (voxelKey * self._voxelSize) + (Vector3.one * (self._voxelSize / 2))
-	box.Parent = workspace
-
-	local selection = Instance.new("SelectionBox")
-	selection.Color3 = Color3.new(0, 0, 1)
-	selection.Adornee = box
-	selection.Parent = box
-
-	task.delay(1 / 30, box.Destroy, box)
 end
 
 function VectorMap:AddObject(position: Vector3, object: any)
@@ -53,67 +33,6 @@ function VectorMap:AddObject(position: Vector3, object: any)
 	end
 
 	return voxelKey
-end
-
-function VectorMap:RemoveObject(voxelKey: Vector3, object: any)
-	local voxel = self._voxels[voxelKey]
-
-	if voxel == nil then
-		return
-	end
-
-	local className = object.ClassName
-	if voxel[className] == nil then
-		return
-	end
-
-	local classBucket = voxel[className]
-	for index, storedObject in classBucket do
-		if storedObject == object then
-			-- Swap remove to avoid shifting
-			local n = #classBucket
-			classBucket[index] = classBucket[n]
-			classBucket[n] = nil
-			break
-		end
-	end
-
-	-- Remove empty class bucket
-	if #classBucket == 0 then
-		voxel[className] = nil
-
-		-- Remove empty voxel
-		if next(voxel) == nil then
-			self._voxels[voxelKey] = nil
-		end
-	end
-end
-
-function VectorMap:GetVoxel(voxelKey: Vector3)
-	return self._voxels[voxelKey]
-end
-
-function VectorMap:ForEachObjectInRegion(top: Vector3, bottom: Vector3, callback: (string, any) -> ())
-	local voxelSize = self._voxelSize
-	local xMin, yMin, zMin = math.min(bottom.X, top.X), math.min(bottom.Y, top.Y), math.min(bottom.Z, top.Z)
-	local xMax, yMax, zMax = math.max(bottom.X, top.X), math.max(bottom.Y, top.Y), math.max(bottom.Z, top.Z)
-
-	for x = math.floor(xMin / voxelSize), math.floor(xMax / voxelSize) do
-		for z = math.floor(zMin / voxelSize), math.floor(zMax / voxelSize) do
-			for y = math.floor(yMin / voxelSize), math.floor(yMax / voxelSize) do
-				local voxel = self._voxels[Vector3.new(x, y, z)]
-				if not voxel then
-					continue
-				end
-
-				for className, objects in voxel do
-					for _, object in objects do
-						callback(className, object)
-					end
-				end
-			end
-		end
-	end
 end
 
 function VectorMap:ForEachObjectInView(camera: Camera, distance: number, callback: (string, any) -> ())
@@ -222,10 +141,8 @@ function VectorMap:ForEachObjectInView(camera: Camera, distance: number, callbac
 					for fillZ = entry, exit do
 						local voxel = self._voxels[Vector3.new(x, y, fillZ)]
 						if voxel then
-							for className, objects in voxel do
-								for _, object in objects do
-									callback(className, object)
-								end
+							for _, objects in voxel do
+								for _, object in objects do callback(object) end
 							end
 						end
 					end

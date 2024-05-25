@@ -1,117 +1,27 @@
 --!nocheck
 
 local RunService = game:GetService("RunService")
+
 local Terrain = workspace:FindFirstChildOfClass("Terrain")
 
-local EMPTY_TABLE = {}
 local OFFSET = Vector3.new(0, 0.1, 0)
 
-local module = {}
+local WindLines = {}
 
-module.UpdateConnection = nil
-module.UpdateQueue = table.create(10)
+WindLines.UpdateConnection = nil
+WindLines.UpdateQueue = table.create(10)
 
-function module:Init(Settings)
-	-- Set defaults
-	module.Lifetime = Settings.Lifetime or 3
-	module.Direction = Settings.Direction or Vector3.new(1, 0, 0)
-	module.Speed = Settings.Speed or 6
+function WindLines:_create()
+	local Lifetime = WindLines.Lifetime
+	local Position = (workspace.CurrentCamera.CFrame
+		* CFrame.Angles(
+			math.rad(math.random(-30, 70)),
+			math.rad(math.random(-80, 80)),
+			0))
+		* CFrame.new(0, 0, math.random(200, 600) * -0.1).Position
 
-	-- Clear any old stuff
-	if module.UpdateConnection then
-		module.UpdateConnection:Disconnect()
-		module.UpdateConnection = nil
-	end
-
-	for _, WindLine in module.UpdateQueue do
-		WindLine.Attachment0:Destroy()
-		WindLine.Attachment1:Destroy()
-		WindLine.Trail:Destroy()
-	end
-	table.clear(module.UpdateQueue)
-
-	module.LastSpawned = os.clock()
-	local SpawnRate = 1 / (Settings.SpawnRate or 25)
-
-	-- Setup logic loop
-	module.UpdateConnection = RunService.Heartbeat:Connect(function()
-		local Clock = os.clock()
-
-		-- Spawn handler
-		if Clock - module.LastSpawned > SpawnRate then
-			module:Create()
-			module.LastSpawned = Clock
-		end
-
-		-- Update queue handler
-		debug.profilebegin("Wind Lines")
-		for i, WindLine in module.UpdateQueue do
-			local AliveTime = Clock - WindLine.StartClock
-			if AliveTime >= WindLine.Lifetime then
-				-- Destroy the objects
-				WindLine.Attachment0:Destroy()
-				WindLine.Attachment1:Destroy()
-				WindLine.Trail:Destroy()
-
-				-- unordered remove at this index
-				local Length = #module.UpdateQueue
-				module.UpdateQueue[i] = module.UpdateQueue[Length]
-				module.UpdateQueue[Length] = nil
-
-				continue
-			end
-
-			WindLine.Trail.MaxLength = 20 - (20 * (AliveTime / WindLine.Lifetime))
-
-			local SeededClock = (Clock + WindLine.Seed) * (WindLine.Speed * 0.2)
-			local StartPos = WindLine.Position
-			WindLine.Attachment0.WorldPosition = (CFrame.new(StartPos, StartPos + WindLine.Direction) * CFrame.new(
-				0,
-				0,
-				WindLine.Speed * -AliveTime
-			)).Position + Vector3.new(
-				math.sin(SeededClock) * 0.5,
-				math.sin(SeededClock) * 0.8,
-				math.sin(SeededClock) * 0.5
-			)
-
-			WindLine.Attachment1.WorldPosition = WindLine.Attachment0.WorldPosition + OFFSET
-		end
-		debug.profileend()
-	end)
-end
-
-function module:Cleanup()
-	if module.UpdateConnection then
-		module.UpdateConnection:Disconnect()
-		module.UpdateConnection = nil
-	end
-
-	for _, WindLine in module.UpdateQueue do
-		WindLine.Attachment0:Destroy()
-		WindLine.Attachment1:Destroy()
-		WindLine.Trail:Destroy()
-	end
-	table.clear(module.UpdateQueue)
-end
-
-function module:Create(Settings)
-	debug.profilebegin("Add Wind Line")
-
-	Settings = Settings or EMPTY_TABLE
-
-	local Lifetime = Settings.Lifetime or module.Lifetime
-	local Position = Settings.Position
-		or (
-				workspace.CurrentCamera.CFrame
-				* CFrame.Angles(math.rad(math.random(-30, 70)), math.rad(math.random(-80, 80)), 0)
-			)
-			* CFrame.new(0, 0, math.random(200, 600) * -0.1).Position
-	local Direction = Settings.Direction or module.Direction
-	local Speed = Settings.Speed or module.Speed
-	if Speed <= 0 then
-		return
-	end
+	local Direction = WindLines.Direction
+	local Speed = WindLines.Speed
 
 	local Attachment0 = Instance.new("Attachment")
 	local Attachment1 = Instance.new("Attachment")
@@ -143,13 +53,76 @@ function module:Create(Settings)
 		StartClock = os.clock(),
 		Seed = math.random(1, 1000) * 0.1,
 	}
-
-	module.UpdateQueue[#module.UpdateQueue + 1] = WindLine
+	WindLines.UpdateQueue[#WindLines.UpdateQueue + 1] = WindLine
 
 	Attachment0.Parent = Terrain
 	Attachment1.Parent = Terrain
-
-	debug.profileend()
 end
 
-return module
+function WindLines:Init(Settings: table)
+	-- Set defaults
+	WindLines.Lifetime = Settings.Lifetime or 3
+	WindLines.Direction = Settings.Direction or Vector3.new(1, 0, 0)
+	WindLines.Speed = Settings.Speed or 6
+	WindLines.LastSpawned = os.clock()
+
+	local SpawnRate = 1 / (Settings.SpawnRate or 25)
+
+	-- Setup logic loop
+	WindLines.UpdateConnection = RunService.Heartbeat:Connect(function()
+		local Clock = os.clock()
+
+		-- Spawn handler
+		if Clock - WindLines.LastSpawned > SpawnRate then
+			WindLines:_create()
+			WindLines.LastSpawned = Clock
+		end
+
+		-- Update queue handler
+		for i, WindLine in WindLines.UpdateQueue do
+			local AliveTime = Clock - WindLine.StartClock
+			if AliveTime >= WindLine.Lifetime then
+				-- Destroy the objects
+				WindLine.Attachment0:Destroy()
+				WindLine.Attachment1:Destroy()
+				WindLine.Trail:Destroy()
+
+				-- unordered remove at this index
+				local Length = #WindLines.UpdateQueue
+				WindLines.UpdateQueue[i] = WindLines.UpdateQueue[Length]
+				WindLines.UpdateQueue[Length] = nil
+
+				continue
+			end
+
+			WindLine.Trail.MaxLength = 20 - (20 * (AliveTime / WindLine.Lifetime))
+
+			local SeededClock = (Clock + WindLine.Seed) * (WindLine.Speed * 0.2)
+			local StartPos = WindLine.Position
+			WindLine.Attachment0.WorldPosition = (CFrame.new(StartPos, StartPos + WindLine.Direction) * CFrame.new(0, 0, WindLine.Speed * -AliveTime
+			)).Position + Vector3.new(
+				math.sin(SeededClock) * 0.5,
+				math.sin(SeededClock) * 0.8,
+				math.sin(SeededClock) * 0.5
+			)
+
+			WindLine.Attachment1.WorldPosition = WindLine.Attachment0.WorldPosition + OFFSET
+		end
+	end)
+end
+
+function WindLines:Cleanup()
+	if WindLines.UpdateConnection then
+		WindLines.UpdateConnection:Disconnect()
+		WindLines.UpdateConnection = nil
+	end
+
+	for _, WindLine in WindLines.UpdateQueue do
+		WindLine.Attachment0:Destroy()
+		WindLine.Attachment1:Destroy()
+		WindLine.Trail:Destroy()
+	end
+	table.clear(WindLines.UpdateQueue)
+end
+
+return WindLines

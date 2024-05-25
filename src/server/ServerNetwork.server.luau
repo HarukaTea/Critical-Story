@@ -11,7 +11,6 @@ local TestS = game:GetService("TestService")
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
-local LootPlan = require(RepS.Modules.Packages.LootPlan)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
@@ -85,14 +84,10 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		local material = prompt.Parent.Parent :: Model
 		local finalMaterial = material.Name
 		if prompt:GetAttribute("Rare") then
-			local rareChance = LootPlan.new()
-			local rareMaterial = prompt:GetAttribute("Rare") :: string
-
-			rareChance:Add(material.Name, 85)
-			rareChance:Add(rareMaterial, 15)
-
-			finalMaterial = rareChance:Roll()
-			rareChance:Destroy()
+			finalMaterial = HarukaLib:RollLoot({
+				[prompt:GetAttribute("Rare")] = 85,
+				[material.Name] = 15
+			})
 		end
 
 		material.Parent = TestS
@@ -118,9 +113,9 @@ local function levelUp(plr: Player)
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
 
 	if check then
-		HarukaLib:Add(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.65) + 59))
-		HarukaLib:Add(plr, "Levels", 1)
-		HarukaLib:Add(plr, "LvPoints", LEVEL_POINT)
+		HarukaLib:AddAttr(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.65) + 59))
+		HarukaLib:AddAttr(plr, "Levels", 1)
+		HarukaLib:AddAttr(plr, "LvPoints", LEVEL_POINT)
 
 		if _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels")) then levelUp(plr) return end
 
@@ -155,7 +150,7 @@ local function addPoint(plr: Player, option: string, times: number)
 			return
 		end
 
-		HarukaLib:Add(plr, "Gold", -cost)
+		HarukaLib:AddAttr(plr, "Gold", -cost)
 		plr:SetAttribute("DmgPoints", 0)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
@@ -168,8 +163,8 @@ local function addPoint(plr: Player, option: string, times: number)
 	--// Add points
 	for _ = 1, times do
 		if plr:GetAttribute("LvPoints") > 0 then
-			HarukaLib:Add(plr, option, 1)
-			HarukaLib:Add(plr, "LvPoints", -1)
+			HarukaLib:AddAttr(plr, option, 1)
+			HarukaLib:AddAttr(plr, "LvPoints", -1)
 		end
 	end
 end
