@@ -303,10 +303,11 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	end):Then(function(position: Vector3, pos: Vector3)
 		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
 
-	end):Catch(function()
+	end):Catch(function(error)
 		orbLocation = cfNew(0, 0, 0)
 
 		warn("Can not give a proper position for orbs!")
+		warn("ORB: "..error)
 	end)
 
 	return orbLocation

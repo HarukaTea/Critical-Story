@@ -20,11 +20,11 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
         Name = class.."Style",
         Position = fromScale(0.5, 1.85),
         Visible = Computed(scope, function(use)
-            local plrClass = use(self.playerData.Class) :: string
-            local inCombat = use(self.charStatsDict.IsInCombat) :: boolean
-
             --- in combat condition
-            if inCombat and plrClass == class and use(self.charClassInfo[plrClass]) > 0 then
+            if use(self.charStatsDict.IsInCombat)
+                and use(self.playerData.Class) == class
+                and use(self.charClassInfo[class]) > 0 then
+
                 return true
             end
 
@@ -93,6 +93,9 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
 
                     elseif class == "Rogue" then
                         return use(self.charClassInfo.Rogue).."% CHANCE"
+
+                    elseif class == "Juggernaut" then
+                        return "RAGE 33%"
                     end
                 end),
                 TextColor3 = AssetBook.ClassInfo[class].Color,

@@ -92,7 +92,7 @@ AssetBook.ClassInfo = {
 	},
 	Alchemist = {
 		Image = "rbxassetid://12236618949",
-		Color = fromRGB(0, 255, 22),
+		Color = fromRGB(43, 188, 93),
         Type = "Magic"
 	},
 	Illusionist = {

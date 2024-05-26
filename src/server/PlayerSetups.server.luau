@@ -9,6 +9,7 @@ local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
 local ProfileService = require(ServerScriptService.Modules.Packages.ProfileService)
 local StoryBook = require(ReplicatedStorage.Modules.Data.StoryBook)
 local Spawn = require(ReplicatedStorage.Modules.Packages.Spawn)
+local Signals = require(ServerScriptService.Modules.Data.ServerSignals)
 
 local profiles = {}
 local scopes = {}
@@ -142,7 +143,17 @@ local function setup(plr: Player)
 			Add(questsData.ChildRemoved:Connect(_save))
 
 			--// Finish
+			plr:SetAttribute("LastSeenWorld", workspace:GetAttribute("WorldType") or "Mainworld")
 			plr:SetAttribute("PlayerDataLoaded", true)
+
+			--// Check if banned
+			task.wait(5)
+			local banInfo = profile.Data[slot].BanStats :: table
+			if banInfo.EndTime - os.time() > 0 then
+				local timeLeft = (banInfo.EndTime - os.time()) / 60 / 60
+
+				plr:Kick("You got banned! Reason: "..banInfo.Reason..", unban in "..HarukaLib:NumberConvert(timeLeft).." hours!")
+			end
 		else
 			profile:Release()
 		end
@@ -179,3 +190,18 @@ for _, plr in Players:GetPlayers() do Spawn(setup, plr) end
 --// Connections
 Players.PlayerAdded:Connect(setup)
 Players.PlayerRemoving:Connect(clear)
+
+
+local function banRequest(plr: Player, duration: number, reason: string)
+	local profile = profiles[plr]
+	if not profile then return end
+
+	local slot = _getSlot(plr)
+	local banInfo = {
+		Duration = os.time() + (duration * 60 * 60),
+		Reason = reason
+	}
+
+	profile.Data[slot].BanStats = banInfo
+end
+Signals.BanRequest:Connect(banRequest)

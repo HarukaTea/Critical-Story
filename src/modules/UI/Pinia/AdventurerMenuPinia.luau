@@ -22,7 +22,7 @@ local function AdventurerMenuPinia(self: table) : table
     self.playerData = {
 		Levels = Value(plr:GetAttribute("Levels")),
 		LvPoints = Value(plr:GetAttribute("LvPoints")),
-		DMG = Value(plr:GetAttribute("DmgPoints")),
+		DMG = Value(plr:GetAttribute("DMGPoints")),
 		Magic = Value(plr:GetAttribute("MagicPoints")),
 		Health = Value(plr:GetAttribute("HealthPoints")),
 		Mana = Value(plr:GetAttribute("ManaPoints")),

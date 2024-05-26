@@ -14,7 +14,7 @@ return {
 			RespawnLocation = { "Vector3", 0, 0, 0 },
 
 			LvPoints = 0,
-			DmgPoints = 0,
+			DMGPoints = 0,
 			MagicPoints = 0,
 			ManaPoints = 0,
 			ShieldPoints = 0,
@@ -33,6 +33,11 @@ return {
 			PlayerList = true,
 			MapDetails = true,
 			CombatMode = "Solo"
+		},
+
+		BanStats = {
+			EndTime = 0,
+			Reason = "None"
 		},
 
 		Inventory = {},
@@ -50,7 +55,7 @@ return {
 			RespawnLocation = { "Vector3", 0, 0, 0 },
 
 			LvPoints = 0,
-			DmgPoints = 0,
+			DMGPoints = 0,
 			MagicPoints = 0,
 			ManaPoints = 0,
 			ShieldPoints = 0,
@@ -69,6 +74,11 @@ return {
 			PlayerList = true,
 			MapDetails = true,
 			CombatMode = "Solo"
+		},
+
+		BanStats = {
+			EndTime = 0,
+			Reason = "None"
 		},
 
 		Inventory = {},
@@ -86,7 +96,7 @@ return {
 			RespawnLocation = { "Vector3", 0, 0, 0 },
 
 			LvPoints = 0,
-			DmgPoints = 0,
+			DMGPoints = 0,
 			MagicPoints = 0,
 			ManaPoints = 0,
 			ShieldPoints = 0,
@@ -105,6 +115,11 @@ return {
 			PlayerList = true,
 			MapDetails = true,
 			CombatMode = "Solo"
+		},
+
+		BanStats = {
+			EndTime = 0,
+			Reason = "None"
 		},
 
 		Inventory = {},

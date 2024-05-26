@@ -13,7 +13,7 @@ while wait(0.5) do
     if char:GetAttribute("HitCD") <= 0 then
         char:SetAttribute("Healing", true)
 
-        humanoid.Health += 1
+        humanoid.Health += math.ceil(humanoid.MaxHealth * 0.01)
     end
 end
 

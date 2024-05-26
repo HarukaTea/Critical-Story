@@ -177,11 +177,32 @@ local function mainSetup()
 	end
 	Players.PlayerAdded:Connect(_playerAdded)
 
-	--- friends check
+	--- messages
 	Spawn(function()
 		MS:SubscribeAsync("JoinFriendRequest", function(message: table)
 			for _, plr: Player in Players:GetPlayers() do
-				if plr.UserId == message.Data then MS:PublishAsync("JoinFriendReturn", { plr.UserId, game.JobId }) break end
+				if plr.UserId == message.Data then
+					MS:PublishAsync("JoinFriendReturn", { plr.UserId, game.JobId })
+					break
+				end
+			end
+		end)
+
+		MS:SubscribeAsync("JoinUserRequest", function(message: table)
+			for _, plr: Player in Players:GetPlayers() do
+				if plr.UserId == message.Data then
+					MS:PublishAsync("JoinUserReturn", { plr.UserId, game.JobId, game.PlaceId })
+					break
+				end
+			end
+		end)
+
+		MS:SubscribeAsync("BanRequest", function(message: table)
+			for _, plr: Player in Players:GetPlayers() do
+				if plr.UserId == message.Data[1] then
+					plr:Kick("You got banned! Reason: "..message.Data[3]..", unban in "..message.Data[2].." hours!")
+					break
+				end
 			end
 		end)
 	end)

@@ -14,7 +14,6 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 local CAAttackUtil = {}
 
 local wait = task.wait
-local insert = table.insert
 local instanceNew = Instance.new
 local fromRGB = Color3.fromRGB
 local cfNew, v3New = CFrame.new, Vector3.new
@@ -184,8 +183,8 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         laser.CanQuery = false
         laser.Anchored = true
         laser.Color = fromRGB(9, 137, 207)
-        laser.Size = v3New(0.5, 0.5, (orb.Base.CFrame.Position - repeaterOrb.Base.CFrame.Position).Magnitude)
-        laser.CFrame = cfNew((orb.Base.CFrame.Position + repeaterOrb.Base.CFrame.Position) / 2, orb.Base.CFrame.Position)
+        laser.Size = v3New(0.5, 0.5, (orb.PrimaryPart.CFrame.Position - repeaterOrb.PrimaryPart.CFrame.Position).Magnitude)
+        laser.CFrame = cfNew((orb.PrimaryPart.CFrame.Position + repeaterOrb.PrimaryPart.CFrame.Position) / 2, orb.PrimaryPart.CFrame.Position)
         laser.Parent = workspace.MapComponents.OrbHolders[plr.Name]
         Debris:AddItem(laser, 1)
 
@@ -198,71 +197,142 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
 end
 
 function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
-    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
+    local char = plr.Character
+    local count = 0
+    local orbs = workspace.MapComponents.OrbHolders[plr.Name]:GetChildren()
 
-    Spawn(function()
-        local char = plr.Character
-        local orbs = workspace.MapComponents.OrbHolders[plr.Name]:GetChildren()
-        local strikerOrbs = {}
-
-        for _, strikerOrb in orbs do
-            if strikerOrb.Name == "StrikerOrb" and not strikerOrb:GetAttribute("Obtained") then
-                insert(strikerOrbs, strikerOrb)
-
-                strikerOrb:SetAttribute("Obtained", true)
-            end
-        end
-
-        CAAttackUtil:DealDMG(plr, monster, baseDamage)
-        wait(0.3)
-
-        for _, orb in strikerOrbs do
-            if orb:FindFirstChild("Base") then
-                char.Humanoid.AutoRotate = false
+    for _, orb: Model in orbs do
+        if orb.Name == "StrikerOrb" then count += 1 end
+    end
+    if count > 0 then
+        Spawn(function()
+            for _, orb: Model in orbs do
+                if orb.Name ~= "StrikerOrb" then continue end
 
                 local shockwave = RepS.Package.MagicAssets.Shockwave:Clone()
                 shockwave.Transparency = 0.6
                 shockwave.CFrame = char.PrimaryPart.CFrame * cfNew(0,0,-2) * cfAngles(0, rad(90), rad(90))
-                shockwave.Parent = char
+                shockwave.Parent = workspace
                 Debris:AddItem(shockwave, 1)
 
                 Events.ClientTween:FireAll({ shockwave }, { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
 
-                local bp = instanceNew("BodyPosition")
-                bp.Name = "DashVel"
-                bp.D = 500
-                bp.MaxForce = v3New(1, 1, 1) * 100000
-                bp.Position = orb.Base.Position
-                bp.Parent = char.PrimaryPart
-
-                wait(0.3)
-                char.Humanoid.AutoRotate = true
-                bp:Destroy()
+                wait(0.25)
+                if orb and orb.PrimaryPart then plr.Character:PivotTo(orb.PrimaryPart.CFrame) end
             end
-        end
-    end)
+        end)
+    end
+
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
+
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
+local function _createAlchemy(char: Model, color: string)
+    local creation = instanceNew("BoolValue")
+    creation.Name = color
+    creation.Parent = char.AlchemistCreations
+
+    local creations = char.AlchemistCreations:GetChildren()
+    if #creations >= 3 then
+        local r, g, b = 0, 0, 0
+        for _, created: BoolValue in creations do
+            if created.Name == "Red" then r += 1 end
+            if created.Name == "Blue" then b += 1 end
+            if created.Name == "Green" then g += 1 end
+        end
+
+        char.AlchemistCreations:ClearAllChildren()
+
+        if r >= 3 then
+            if not char.CharStats.TargetMonster.Value then return end
+
+            BuffEffectsUtil:Burn(char, char.CharStats.TargetMonster.Value, 12)
+
+        elseif b >= 3 then
+            BuffEffectsUtil:RestoreMana(char, char:GetAttribute("MaxMana"))
+
+        elseif g >= 3 then
+            BuffEffectsUtil:Heal(char, char.Humanoid.MaxHealth)
+
+        elseif r == 1 and g == 1 and b == 1 then
+            BuffEffectsUtil:MagicBuff(char, 3, 6)
+
+        else
+            BuffEffectsUtil:DefenseBuff(char, 30, 12)
+        end
+    end
+end
 function CAAttackUtil.AlchemistRed(plr: Player, monster: Model, baseDamage: number)
+    _createAlchemy(plr.Character, "Red")
+
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 function CAAttackUtil.AlchemistBlue(plr: Player, monster: Model, baseDamage: number)
+    _createAlchemy(plr.Character, "Blue")
+
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 function CAAttackUtil.AlchemistGreen(plr: Player, monster: Model, baseDamage: number)
+    _createAlchemy(plr.Character, "Green")
+
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: number)
+    local char = plr.Character
+
+    --// leave a clone
+    local clone = RepS.Package.MagicAssets.IllusionClone:Clone() :: Model
+    clone.PrimaryPart.CFrame = char.PrimaryPart.CFrame
+	clone.Parent = workspace.MapComponents.OrbHolders[plr.Name]
+
+	for _, child: BasePart in clone:GetChildren() do
+        child.CFrame = char[child.Name].CFrame
+
+        if child.Name == "Head" then
+            child.CFrame = char.Head.CFrame * cfNew(0, 0.75, 0)
+            child.CFrame = char.Head.CFrame * CFrame.fromEulerAnglesXYZ(0, 90, 0)
+        end
+	end
+
+    --// explode
+    local count = 0
+    for _, child: Model in workspace.MapComponents.OrbHolders[plr.Name]:GetChildren() do
+        if child.Name == "IllusionClone" then count += 1 end
+    end
+
+    if count >= 3 then
+        for _, child: Model in workspace.MapComponents.OrbHolders[plr.Name]:GetChildren() do
+            if child.Name == "IllusionClone" then
+                local ignited = RepS.Package.MagicAssets.Ignited:Clone() :: BasePart
+                ignited.Color = fromRGB(255, 255, 255)
+                ignited.Transparency = 0.5
+                ignited.CFrame = child.PrimaryPart.CFrame
+                ignited.Parent = workspace
+                Debris:AddItem(ignited, 1)
+
+                Events.ClientTween:Fire(plr, { ignited }, { Size = Vector3.one * 77, Transparency = 1 }, "one")
+
+                child:Destroy()
+
+                ServerUtil:ShowNumber(monster, baseDamage, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
+                HarukaLib:AddAttr(monster, "Health", -baseDamage)
+            end
+        end
+
+        BuffEffectsUtil:MagicBuff(char, 2, 6)
+    end
+
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
+    BuffEffectsUtil:RestoreManaByOrb(char)
 end
 
 function CAAttackUtil.FireStaff(plr: Player, monster: Model)

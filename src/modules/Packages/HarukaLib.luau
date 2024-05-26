@@ -410,6 +410,8 @@ function HarukaLib:RollLoot(loots: { [string]: number }) : string
 		local chance = loot.Weight :: number
 
 		if result < (chance + aggregate) / 100 then
+			lootList = nil --// GC
+
 			return loot.Name
 		end
 

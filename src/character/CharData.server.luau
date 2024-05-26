@@ -31,16 +31,17 @@ local cfNew = CFrame.new
 
 repeat wait() until plr:GetAttribute("PlayerDataLoaded")
 
+
+local function _createFolder(name: string, parent: Folder) : Folder
+    local folder = instanceNew("Folder")
+    folder.Name = name
+    folder.Parent = parent
+
+    return folder
+end
 local function setup()
     char.PrimaryPart = char.Humanoid.RootPart
 
-    local function _createFolder(name: string, parent: Folder) : Folder
-        local folder = instanceNew("Folder")
-        folder.Name = name
-        folder.Parent = parent
-
-        return folder
-    end
     local function _createStats()
         local charStats = _createFolder("CharStats", char)
 
@@ -100,6 +101,8 @@ local function classAttributesSetup()
 
         HarukaLib:AddAttr(char, "RogueCri", -1)
     end))
+
+    _createFolder("AlchemistCreations", char)
 end
 Spawn(classAttributesSetup)
 
@@ -123,10 +126,10 @@ local function charAttributesSetup()
     end
 
     local function updateMinDMG()
-        char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DmgPoints") + char:GetAttribute("MinDMGBuff"))
+        char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
     end
     local function updateMaxDMG()
-        char:SetAttribute("MaxDMG", 15 + (plr:GetAttribute("DmgPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+        char:SetAttribute("MaxDMG", 15 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
     end
     local function updateMagic()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
@@ -170,6 +173,7 @@ local function charAttributesSetup()
         char:SetAttribute("Focus", 0)
         char:SetAttribute("Guard", 0)
         char:SetAttribute("RogueCri", 0)
+        char.AlchemistCreations:ClearAllChildren()
     end
 
     --// Setups
@@ -188,7 +192,7 @@ local function charAttributesSetup()
     end)
 
     Add(HarukaLib:Hydrate(plr, {
-        ["Attr-DmgPoints"] = function()
+        ["Attr-DMGPoints"] = function()
             updateMinDMG()
             updateMaxDMG()
         end,

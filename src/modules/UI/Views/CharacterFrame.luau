@@ -61,7 +61,7 @@ local function CharacterFrame(self: table): Frame
 		["Attr-LvPoints"] = function(points: number)
 			playerData.LvPoints:set(points)
 		end,
-		["Attr-DmgPoints"] = function(points: number)
+		["Attr-DMGPoints"] = function(points: number)
 			playerData.DMG:set(points)
 		end,
 		["Attr-MagicPoints"] = function(points: number)

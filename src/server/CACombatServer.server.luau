@@ -18,9 +18,7 @@ local fromRGB = Color3.fromRGB
 local wait = task.wait
 local cfNew = CFrame.new
 
---[[
-	Combat starts! Good luck players
-]]
+
 local function combatStartSetup(plr: Player, monster: Model)
 	--- if monster was occupied by another player, we will return it
 	if monster:GetAttribute("InCombat") then return end
@@ -97,9 +95,6 @@ end
 Events.CombatStart:Connect(combatStartSetup)
 
 
---[[
-	Player hit the orb and deal dmg to mobs
-]]
 local function mobTakeDMG(plr: Player, orb: Model)
 	local char = plr.Character :: Model
 
@@ -158,9 +153,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 end
 Events.MobTakeDMG:Connect(mobTakeDMG)
 
---[[
-	Character is taking damage rn
-]]
+
 local function charTakeDMG(plr: Player, dmgPart: Model)
 	if not dmgPart then return end
 	if not dmgPart.Parent then return end

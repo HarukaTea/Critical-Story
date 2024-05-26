@@ -25,6 +25,7 @@ local PlayerEffectsList = require(RepS.Modules.UI.Views.PlayerEffectsList)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
+local AlchemistAbilityIndicator = require(RepS.Modules.UI.Components.AlchemistAbilityIndicator)
 local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
@@ -149,6 +150,8 @@ return function(plr: Player)
 					ClassAbilityIndicator(self, "Wizard"),
 					ClassAbilityIndicator(self, "Knight"),
 					ClassAbilityIndicator(self, "Rogue"),
+
+					AlchemistAbilityIndicator(self, "Alchemist")
 				}
 			})
 		},

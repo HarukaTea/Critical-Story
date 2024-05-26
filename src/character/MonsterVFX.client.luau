@@ -16,7 +16,7 @@ local sinh, random = math.sinh, math.random
 local v3New = Vector3.new
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
 
---// Monster attacks
+--// Foxes
 local function spikeShot(blast: Model)
 	wait(0.5)
 	blast.Spike:Play()

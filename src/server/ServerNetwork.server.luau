@@ -24,9 +24,7 @@ local wait = task.wait
 local instanceNew = Instance.new
 local sFind, sub = string.find, string.sub
 
---[[
-	Handle the prompts that triggered
-]]
+
 local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 	if prompt.Name == "Class" then
 		local class = prompt.Parent.Parent.Name
@@ -101,10 +99,8 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 end
 PPS.PromptTriggered:Connect(promptsHandler)
 
---[[
-	Player finally reach the requirement and level up!
-]]
-local LEVEL_CAP = 2000
+
+local LEVEL_CAP = 1100
 local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
 	return if exp >= floor(level ^ 1.65) + 59 and level < LEVEL_CAP then true else false
@@ -137,9 +133,7 @@ local function levelUp(plr: Player)
 end
 Signals.LevelUp:Connect(levelUp)
 
---[[
-	Handle the request from player to add points
-]]
+
 local function addPoint(plr: Player, option: string, times: number)
 	if option == "Reset" then
 		local level = plr:GetAttribute("Levels")
@@ -151,7 +145,7 @@ local function addPoint(plr: Player, option: string, times: number)
 		end
 
 		HarukaLib:AddAttr(plr, "Gold", -cost)
-		plr:SetAttribute("DmgPoints", 0)
+		plr:SetAttribute("DMGPoints", 0)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
 		plr:SetAttribute("ShieldPoints", 0)
@@ -170,9 +164,7 @@ local function addPoint(plr: Player, option: string, times: number)
 end
 Events.AddPoints:Connect(addPoint)
 
---[[
-	Handle the request from player to equip an item
-]]
+
 local function _equipCheck(plr: Player, itemType: string, requestItem: string) : boolean
 	local count = 0
 	local check = true
@@ -235,9 +227,7 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 end
 Events.EquipItems:Connect(equipItem)
 
---[[
-	Handle the request from player to use items
-]]
+
 local function _essentialCheck(plr: Player, item: string) : string
 	return if plr.Inventory:FindFirstChild(item) and plr.Inventory[item].Value > 0 then true else false
 end
@@ -253,9 +243,7 @@ local function useItem(plr: Player, item: string)
 end
 Events.UseItem:Connect(useItem)
 
---[[
-	Handle the request from player to pin an item
-]]
+
 local function pinItem(plr: Player, item: string)
 	if not plr.Inventory:FindFirstChild(item) then return end
 
@@ -264,9 +252,7 @@ local function pinItem(plr: Player, item: string)
 end
 Events.UpdatePinnedItems:Connect(pinItem)
 
---[[
-	Finished chatting with NPCs, and award quest rewards if have
-]]
+
 local function npcChatEnded(plr: Player, npc: Model, series: string)
 	-- checks
 	if not npc then return end
@@ -323,9 +309,7 @@ local function npcChatEnded(plr: Player, npc: Model, series: string)
 end
 Events.NPCChatEnded:Connect(npcChatEnded)
 
---[[
-	Manually give the quest reward
-]]
+
 local function _newQuest(series: string, questId: number, plr: Player)
 	local newQuest = instanceNew("IntConstrainedValue")
 	newQuest.Name = series
@@ -346,9 +330,7 @@ local function questCompleted(series: string, questId: number, plr: Player, need
 end
 Signals.QuestComplete:Connect(questCompleted)
 
---[[
-	Manually give the quest
-]]
+
 local function newQuest(plr: Player, npc: Model, series: string, questId: number)
 	if StoryBook[series][questId].NPC ~= npc.Name then return end
 
@@ -361,18 +343,14 @@ local function newQuest(plr: Player, npc: Model, series: string, questId: number
 end
 Events.NewQuest:Connect(newQuest)
 
---[[
-	Change player's last seen location
-]]
+
 local function changeLastSeen(plr: Player, location: string)
 	plr:SetAttribute("LastSeenLocation", location)
 	plr:SetAttribute("RespawnLocation", workspace.Maps[location].SpawnPoint.Position)
 end
 Events.ChangePlayerLocation:Connect(changeLastSeen)
 
---[[
-	Handle the request to change settings for player
-]]
+
 local function toggleSettings(plr: Player, id: string)
 	if sFind(id, "Combat") then
 		local mode = sub(id, 1, sFind(id, "Combat") - 1)
@@ -390,9 +368,7 @@ local function toggleSettings(plr: Player, id: string)
 end
 Events.ChangePlayerSetting:Connect(toggleSettings)
 
---[[
-	Switch mob target by ctrl or click
-]]
+
 local function switchMobTarget(plr: Player, monster: Model)
 	if monster:HasTag("Monster") and monster:GetAttribute("Health") > 0 and monster.PrimaryPart then
 		plr.Character.CharStats.TargetMonster.Value = monster
@@ -400,17 +376,13 @@ local function switchMobTarget(plr: Player, monster: Model)
 end
 Events.ChangeMobTarget:Connect(switchMobTarget)
 
---[[
-	Sometimes player wanna rejoin by typing `!rejoin` in chat
-]]
+
 local function rejoinRequest(plr: Player)
 	TeleS:Teleport(game.PlaceId, plr)
 end
 Events.RejoinRequest:Connect(rejoinRequest)
 
---[[
-	Fix the reset button issue
-]]
+
 local function forceReset(plr: Player)
 	plr.Character.Humanoid.Health = 0
 end
