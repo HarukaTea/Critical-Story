@@ -1,11 +1,11 @@
 --!nocheck
+
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RunService = game:GetService("RunService")
 local Shared = script:WaitForChild("Shared")
 local Util = require(Shared:WaitForChild("Util"))
-
-local CreateGui = require(script.CreateGui)
 
 if RunService:IsClient() == false then
 	error(
@@ -44,7 +44,8 @@ do
 	Cmdr.Dispatcher = require(Shared.Dispatcher)(Cmdr)
 end
 
-CreateGui().Parent = Players.LocalPlayer.PlayerGui
+-- create gui
+ReplicatedStorage.Package.Unloads.Cmdr:Clone().Parent = Players.LocalPlayer.PlayerGui
 
 local Interface = require(script.CmdrInterface)(Cmdr)
 

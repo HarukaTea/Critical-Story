@@ -322,12 +322,11 @@ function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: numbe
 
                 child:Destroy()
 
-                ServerUtil:ShowNumber(monster, baseDamage, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
-                HarukaLib:AddAttr(monster, "Health", -baseDamage)
+                local explosionDMG = floor(baseDamage / 3)
+                ServerUtil:ShowNumber(monster, explosionDMG, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
+                HarukaLib:AddAttr(monster, "Health", -explosionDMG)
             end
         end
-
-        BuffEffectsUtil:MagicBuff(char, 2, 6)
     end
 
     CAAttackUtil:DealDMG(plr, monster, baseDamage)

@@ -38,11 +38,15 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
             locationInfo.Name:set(AssetBook.LocationInfo[location].Name)
-			locationInfo.Desc:set(AssetBook.LocationInfo[location].Desc)
 
 			wait(0.3)
 			locationInfo.OverallStrokeTrans:set(0.3)
 			locationInfo.OverallTrans:set(0)
+            if AssetBook.LocationInfo[location].RecommendLevel > self.plr:GetAttribute("Levels") + 10 then
+                locationInfo.RLevelTrans:set(0)
+                locationInfo.RLevelStrokeTrans:set(0.3)
+                locationInfo.RLevelText:set("Recommend Level: "..AssetBook.LocationInfo[location].RecommendLevel)
+            end
 
 			wait(0.1)
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.three)
@@ -51,6 +55,8 @@ local function LocationTitleFrame(self: table) : Frame
 			wait(3)
 			locationInfo.OverallStrokeTrans:set(1)
 			locationInfo.OverallTrans:set(1)
+            locationInfo.RLevelTrans:set(1)
+            locationInfo.RLevelStrokeTrans:set(1)
 
 			wait(1)
 			locationInfo.Shown:set(false)
@@ -65,6 +71,7 @@ local function LocationTitleFrame(self: table) : Frame
 
     return Components.Frame(scope, {
         Name = "LocationTitle",
+
         Visible = Computed(scope, function(use)
             return use(self.locationInfo.Shown)
         end),
@@ -113,19 +120,28 @@ local function LocationTitleFrame(self: table) : Frame
                 [Children] = { Components.RoundUICorner(scope) }
             }),
             Components.TextLabel(scope, {
-                Name = "LocationDesc",
-                Text = Computed(scope, function(use)
-                    return use(self.locationInfo.Desc)
-                end),
+                Name = "RecommendLevel",
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 1.7),
                 Size = fromScale(1, 0.45),
+                TextColor3 = fromRGB(255, 85, 127),
 
+                Text = Computed(scope, function(use)
+                    return use(self.locationInfo.RLevelText)
+                end),
                 TextTransparency = Tween(scope, Computed(scope, function(use)
-                    return use(self.locationInfo.OverallTrans)
+                    return use(self.locationInfo.RLevelTrans)
                 end), AssetBook.TweenInfos.half),
 
-                [Children] = { TextStroke(self) }
+                [Children] = {
+                    Components.TextUIStroke(self.scope, {
+                        Thickness = 2,
+
+                        Transparency = Tween(self.scope, Computed(self.scope, function(use)
+                            return use(self.locationInfo.RLevelStrokeTrans)
+                        end), AssetBook.TweenInfos.half)
+                    })
+                }
             }),
         }
     })

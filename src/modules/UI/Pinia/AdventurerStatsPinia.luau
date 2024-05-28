@@ -76,12 +76,14 @@ local function AdventurerStatsPinia(self: table)
     self.locationInfo = {
 		Thread = nil,
 		Name = Value(""),
-		Desc = Value(""),
 		Shown = Value(false),
 		OverallTrans = Value(1),
 		OverallStrokeTrans = Value(1),
 		HorizonLineSize = Value(fromScale(0.25, 0.07)),
-        HorizonLineTweenInfo = Value(AssetBook.TweenInfos.two)
+        HorizonLineTweenInfo = Value(AssetBook.TweenInfos.two),
+		RLevelTrans = Value(1),
+		RLevelStrokeTrans = Value(1),
+		RLevelText = Value("")
 	}
 
     self.promptsList = Value({})

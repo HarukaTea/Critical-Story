@@ -65,7 +65,6 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Right", self, {
 						FilterButton("Equip", self),
 						FilterButton("Pin", self),
-						FilterButton("Use", self),
 					}),
 
 					Components.Frame(scope, {

@@ -22,7 +22,8 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 		PublicCombat = "Public Combat Mode",
 		PotatoMode = "Low Detail Mode",
 		PlayerList = "Player List",
-		MapDetails = "Map Details"
+		MapDetails = "Map Details",
+		Particles = "Particles"
 	}
     local isSelecting = Fusion.Value(scope, false)
 

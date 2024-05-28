@@ -39,26 +39,13 @@ local function BackpackPinia(self: table)
     self.itemSlotClicked = Signal.new()
 
     self.filterInfo = {
-        Equip = {
-            Visible = Value(false),
-            Text = Value("EQUIP")
-        },
-        Pin = {
-            Visible = Value(false),
-            Text = Value("PIN"),
-            Size = Value(fromScale(0.116, 1))
-        },
-        Use = {
-            Visible = Value(false),
-            Text = Value("USE")
-        }
+        Equip = Value("EQUIP"),
+        Pin = Value("PIN"),
     }
 
     self.absStatSize = Value(0)
-	self.itemName, self.itemType, self.itemTier, self.itemStats, self.itemDesc =
-		Value(""), Value(""), Value(""), Value(""), Value("")
-	self.horizonLineVisible = Value(false)
-	self.itemTypeColor, self.itemTierColor = Value(fromRGB()), Value(fromRGB())
+	self.itemName, self.itemStats, self.itemDesc = Value(""),  Value(""), Value("")
+	self.itemTierColor = Value(fromRGB()), Value(fromRGB())
 
 
      --[[
@@ -69,16 +56,9 @@ local function BackpackPinia(self: table)
             element:SetAttribute("Selected", nil)
         end
 
-        self.horizonLineVisible:set(false)
         self.itemName:set("")
-        self.itemType:set("")
-        self.itemTier:set("")
         self.itemStats:set("")
         self.itemDesc:set("")
-
-        self.filterInfo.Equip.Visible:set(false)
-        self.filterInfo.Pin.Visible:set(false)
-        self.filterInfo.Use.Visible:set(false)
     end
 end
 

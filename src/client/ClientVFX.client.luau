@@ -1,6 +1,7 @@
 --!nocheck
 
 local CS = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
@@ -8,6 +9,8 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Signals = require(RepS.Modules.Data.Signals)
 local WindLines = require(RepS.Modules.Packages.Atmosphere.WindLines)
 local WindShake = require(RepS.Modules.Packages.Atmosphere.WindShake)
+
+local plr = Players.LocalPlayer
 
 local instanceNew = Instance.new
 local v3New = Vector3.new
@@ -21,6 +24,13 @@ local function fadeEffect(effect: ParticleEmitter)
     if effect then effect.Enabled = false end
 end
 CS:GetInstanceAddedSignal("GlobalEffects"):Connect(fadeEffect)
+
+--- global settings
+local function disableEffect(effect: ParticleEmitter)
+    wait()
+    if effect then effect.Enabled = plr:GetAttribute("Particles") end
+end
+CS:GetInstanceAddedSignal("ParticleEffects"):Connect(disableEffect)
 
 --- text fade
 local function fadeText(text: BasePart)

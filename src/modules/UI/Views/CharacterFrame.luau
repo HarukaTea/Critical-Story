@@ -161,28 +161,55 @@ local function CharacterFrame(self: table): Frame
 					CharPointsBtn("Magic", "Left", self),
 				},
 			}),
-			Components.TextLabel(scope, {
-				Name = "PointsLeft",
-				Position = fromScale(0.775, 1.013),
-				Size = fromScale(0.209, 0.08),
-				TextXAlignment = Enum.TextXAlignment.Right,
-				RichText = true,
 
-				Text = Computed(scope, function(use)
-					return [[SKILL POINTS LEFT:  <font color="#f6e58d">]]..use(playerData.LvPoints).."</font>"
-				end)
+			Components.Frame(scope, {
+				Name = "BottomRight",
+				Size = fromScale(0.418, 0.08),
+				Position = fromScale(0.566, 1.013),
+				AnchorPoint = Vector2.new(),
+
+				[Children] = {
+					New(scope, "UIListLayout")({
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Right
+					}),
+					Components.TextBox(scope, {
+						Name = "PointsPerAdd",
+						Size = fromScale(0.2, 1),
+
+						Text = Computed(scope, function(use)
+							return use(self.pointsPerAdd)
+						end),
+						[Fusion.Out("Text")] = self.pointsPerAdd,
+
+						[Children] = { Components.RoundUICorner(scope) }
+					}),
+					Components.TextLabel(scope, {
+						Name = "PointsLeft",
+						Size = fromScale(0.5, 1),
+						TextXAlignment = Enum.TextXAlignment.Right,
+						RichText = true,
+
+						Text = Computed(scope, function(use)
+							return [[SKILL POINTS LEFT:  <font color="#f6e58d">]]..use(playerData.LvPoints).."</font>"
+						end)
+					}),
+				}
 			}),
+
 			Components.TextButton(scope, {
 				Name = "Reset",
 				Position = fromScale(0.647, -0.094),
 				Size = fromScale(0.09, 0.078),
 				Text = "RESET",
-				TextColor3 = Tween(scope, Computed(scope, function(use)
+
+				TextColor3 = Computed(scope, function(use)
 					return use(contentColor)
-				end), AssetBook.TweenInfos.twiceHalf),
-				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
+				end),
+				BackgroundColor3 = Computed(scope, function(use)
 					return use(bgColor)
-				end), AssetBook.TweenInfos.twiceHalf),
+				end),
 
 				[OnEvent("MouseEnter")] = function()
 					bgColor:set(fromRGB(255, 255, 255))
@@ -197,6 +224,7 @@ local function CharacterFrame(self: table): Frame
 
 					if peek(playerData.Gold) >= cost and cost ~= 0 then
 						Events.AddPoints:Fire("Reset")
+
 					elseif cost > 0 then
 						Signals.CreateHint:Fire("You don't have enough gold to reset!")
 					end

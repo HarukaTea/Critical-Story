@@ -1,5 +1,6 @@
 --!nocheck
 
+local CollectionService = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
@@ -59,6 +60,13 @@ local function SettingsFrame(self: table): Frame
 			playerSettings.MapDetails:set(state)
 
 			Signals.EnableMapDetails:Fire(if state then "Enable" else "Disable")
+		end,
+		["Attr-Particles"] = function(state: boolean)
+			playerSettings.Particles:set(state)
+
+			for _, effect: ParticleEmitter in CollectionService:GetTagged("ParticleEffects") do
+				if effect then effect.Enabled = false end
+			end
 		end
 	}))
 
@@ -84,7 +92,8 @@ local function SettingsFrame(self: table): Frame
 			SettingToggleBtn("PublicCombat", self),
 			SettingToggleBtn("PotatoMode", self),
 			SettingToggleBtn("PlayerList", self),
-			SettingToggleBtn("MapDetails", self)
+			SettingToggleBtn("MapDetails", self),
+			SettingToggleBtn("Particles", self)
 		},
 	})
 end

@@ -27,7 +27,7 @@ local COLORS = {
 	Use = fromRGB(103, 154, 154),
 	Pin = fromRGB(93, 47, 140),
 }
-local BLACKLIST = { "Equip", "Pin", "Use" }
+local BLACKLIST = { "Equip", "Pin" }
 
 local function _checkSlot(self: table, type: string) : string
 	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
@@ -71,18 +71,9 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 		BackgroundColor3 = COLORS[id],
 
 		Text = Computed(scope, function(use)
-			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Text) else upper(id)
+			return if tFind(BLACKLIST, id) then use(self.filterInfo[id]) else upper(id)
 		end),
-		Visible = Computed(scope, function(use)
-			return if tFind(BLACKLIST, id) then use(self.filterInfo[id].Visible) else true
-		end),
-		Size = Computed(scope, function(use)
-			if tFind(BLACKLIST, id) then
-				return if id == "Pin" then use(self.filterInfo.Pin.Size) else fromScale(0.116, 1)
-			else
-				return fromScale(0.12, 1)
-			end
-		end),
+		Size = fromScale(0.116, 1),
 
 		[Fusion.Children] = {
 			Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
@@ -118,21 +109,6 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 				elseif checkSame == "Exist" then
 					Events.EquipItems:Fire("Clear" .. itemType, sameSlot, item)
-				end
-
-			elseif id == "Use" then
-				local item = _findItem(peek(self.itemFrame))
-
-				if item == "None" then return end
-
-				local itemInfo = ItemBook:FindItem(item)
-				local itemType = itemInfo.Type :: string
-				if not itemType then return end
-
-				--- actives
-				if itemType == "Active" and not itemInfo.IsSkill then
-					Events.UseItem:Fire(item)
-					return
 				end
 
 			elseif id == "Pin" then

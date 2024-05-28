@@ -32,7 +32,8 @@ return {
 			PotatoMode = false,
 			PlayerList = true,
 			MapDetails = true,
-			CombatMode = "Solo"
+			CombatMode = "Solo",
+			Particles = true
 		},
 
 		BanStats = {
@@ -73,7 +74,8 @@ return {
 			PotatoMode = false,
 			PlayerList = true,
 			MapDetails = true,
-			CombatMode = "Solo"
+			CombatMode = "Solo",
+			Particles = true
 		},
 
 		BanStats = {
@@ -114,7 +116,8 @@ return {
 			PotatoMode = false,
 			PlayerList = true,
 			MapDetails = true,
-			CombatMode = "Solo"
+			CombatMode = "Solo",
+			Particles = true
 		},
 
 		BanStats = {

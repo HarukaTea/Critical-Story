@@ -17,7 +17,13 @@ local function AdventurerMenuPinia(self: table) : table
 	self.Add, self.Empty = HarukaLib.Bin()
 
     self.chosenFilter = Value("Character")
-	self.frames = { Character = Value(true), Settings = Value(false) }
+	self.frames = { Character = Value(true), Settings = Value(false), Log = Value(false) }
+
+	self.pointsPerAdd = Value("1")
+
+	self.errorList = Value({})
+	self.chosenErrorFilter = Value("Server")
+	self.errorAbsContentSize, self.errorAbsSize = Value(0), Value(0)
 
     self.playerData = {
 		Levels = Value(plr:GetAttribute("Levels")),
@@ -45,7 +51,8 @@ local function AdventurerMenuPinia(self: table) : table
 		PublicCombat = Value(plr:GetAttribute("CombatMode") == "Public"),
 		PotatoMode = Value(plr:GetAttribute("PotatoMode")),
 		PlayerList = Value(plr:GetAttribute("PlayerList")),
-		MapDetails = Value(plr:GetAttribute("MapDetails"))
+		MapDetails = Value(plr:GetAttribute("MapDetails")),
+		Particles = Value(plr:GetAttribute("Particles"))
 	}
 end
 

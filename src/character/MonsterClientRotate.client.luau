@@ -21,14 +21,12 @@ local cfAngles = CFrame.Angles
 ---// Setup
 local function setup()
 	for _, monster: Model in workspace:WaitForChild("Monsters", 999):GetDescendants() do
-		if monster:HasTag("Monster") and monster.PrimaryPart and not monster:GetAttribute("SubMonster") then
+		if monster:HasTag("Monster") and monster.PrimaryPart then
 			monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
 		end
 	end
 	local function _addMonster(monster: Model)
 		wait()
-		if monster:GetAttribute("SubMonster") then return end
-
 		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
 
 		monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)

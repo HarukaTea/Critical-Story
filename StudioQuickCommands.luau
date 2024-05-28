@@ -86,4 +86,4 @@ for _, child in workspace.Maps:GetChildren() do
 end
 
 local ServerUtil = require(game:GetService("ServerScriptService").Modules.Utils.ServerUtil)
-ServerUtil:EquipArmor(workspace.Fallen_SakuraLY, "Chrono")
+ServerUtil:EquipArmor(workspace.Fallen_SakuraLY, "Archer")

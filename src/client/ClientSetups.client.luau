@@ -2,6 +2,7 @@
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
+local ScriptContext = game:GetService("ScriptContext")
 
 local Events = require(RepS.Modules.Data.Events)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -54,3 +55,16 @@ local function disableDefaultFreecam()
     plr.PlayerGui.BubbleChat:Destroy()
 end
 Spawn(disableDefaultFreecam)
+
+
+local function errorReports()
+    local function _errored(msg: string, _, _)
+        local newError = Instance.new("StringValue")
+        newError.Name = "Client"
+        newError.Value = msg
+        newError:SetAttribute("Owner", plr.Name)
+        newError.Parent = workspace.MapComponents.ScriptErrors
+    end
+    ScriptContext.Error:Connect(_errored)
+end
+Spawn(errorReports)

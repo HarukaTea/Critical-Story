@@ -76,9 +76,30 @@ local function ClassFrame(self: table) : Frame
                 Size = fromScale(0.15, 1.5),
 
                 [Children] = {
+                    Fusion.New(scope, "UIListLayout")({
+                        Padding = UDim.new(0.08, 0),
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        FillDirection = Enum.FillDirection.Horizontal
+                    }),
+
                     ActiveSlot(1, self),
                     ActiveSlot(2, self),
                     ActiveSlot(3, self),
+                }
+            }),
+            Components.Frame(scope, {
+                Name = "CFrame",
+                AnchorPoint = v2New(),
+                Position = fromScale(0.837, -2.7),
+                Size = fromScale(0.15, 1.5),
+
+                [Children] = {
+                    Fusion.New(scope, "UIListLayout")({
+                        Padding = UDim.new(0.08, 0),
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        FillDirection = Enum.FillDirection.Horizontal,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Right
+                    }),
 
                     ExCategoryOpenBtn("Menu", self),
                     ExCategoryOpenBtn("Backpack", self)
@@ -91,6 +112,12 @@ local function ClassFrame(self: table) : Frame
                 Size = fromScale(0.15, 1.5),
 
                 [Children] = {
+                    Fusion.New(scope, "UIListLayout")({
+                        Padding = UDim.new(0.08, 0),
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        FillDirection = Enum.FillDirection.Horizontal
+                    }),
+
                     PassiveSlot(1, self),
                     PassiveSlot(2, self),
                     PassiveSlot(3, self)

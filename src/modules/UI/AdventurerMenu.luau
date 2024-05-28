@@ -11,6 +11,7 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
 
 local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
+local LogFrame = require(RepS.Modules.UI.Views.LogFrame)
 local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
 
 local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
@@ -50,6 +51,7 @@ return function(plr: Player)
 				[Fusion.Children] = {
 					CharacterFrame(self),
 					SettingsFrame(self),
+					LogFrame(self),
 
 					ExCategoryTitle("Menu", self),
 					ExCategoryBottomBtns("Left", self, {

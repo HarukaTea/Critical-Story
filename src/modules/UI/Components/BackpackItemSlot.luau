@@ -14,7 +14,6 @@ local Children, OnEvent, Value, Computed, New, peek =
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local tFind = table.find
 local udNew = UDim.new
 
 local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: table): ImageButton
@@ -31,12 +30,12 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: t
 		["Attr-Equipped"] = function(state: boolean)
 			equipped:set(state)
 
-			self.filterInfo.Equip.Text:set(if state then "UNEQUIP" else "EQUIP")
+			self.filterInfo.Equip:set(if state then "UNEQUIP" else "EQUIP")
 		end,
 		["Attr-Pinned"] = function(state: boolean)
 			pinned:set(state)
 
-			self.filterInfo.Pin.Text:set(if state then "UNPIN" else "PIN")
+			self.filterInfo.Pin:set(if state then "UNPIN" else "PIN")
 		end
 	})
 	self.itemSlotClicked:Connect(function()
@@ -137,28 +136,15 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: t
 			itemFrame[item]:SetAttribute("Selected", true)
 			isSelecting:set(true)
 
-			local itemType = itemInfo.Type
-			self.horizonLineVisible:set(true)
 			self.itemName:set(itemInfo.Name)
-			self.itemType:set(itemType)
-			self.itemTypeColor:set(AssetBook.TypeColor[itemType])
-			self.itemTier:set(itemInfo.Tier)
-			self.itemTierColor:set(AssetBook.TierColor[peek(self.itemTier)])
+			self.itemTierColor:set(AssetBook.TierColor[peek(itemInfo.Tier)])
 			self.itemStats:set(HarukaLib:RichTextify(itemInfo.Stat))
 			self.itemDesc:set(itemInfo.Desc)
 
 			local filterInfo = self.filterInfo :: table
-			local blacklist = { "Material" }
 
-			filterInfo.Equip.Visible:set(if not tFind(blacklist, itemType) then true else false)
-			filterInfo.Equip.Text:set(if peek(equipped) then "UNEQUIP" else "EQUIP")
-
-			filterInfo.Use.Visible:set(false)
-			if itemType == "Active" and not itemInfo.IsSkill then filterInfo.Use.Visible:set(true) end
-
-			filterInfo.Pin.Visible:set(true)
-			filterInfo.Pin.Text:set(if peek(pinned) then "UNPIN" else "PIN")
-			filterInfo.Pin.Size:set(if peek(filterInfo.Equip.Visible) then fromScale(0.116, 1) else fromScale(0.237, 1))
+			filterInfo.Equip:set(if peek(equipped) then "UNEQUIP" else "EQUIP")
+			filterInfo.Pin:set(if peek(pinned) then "UNPIN" else "PIN")
 		end,
 	})
 end

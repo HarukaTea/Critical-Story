@@ -2,14 +2,14 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local Children, New, Computed, Tween, OnEvent, Value, peek =
-	Fusion.Children, Fusion.New, Fusion.Computed, Fusion.Tween, Fusion.OnEvent, Fusion.Value, Fusion.peek
+local Children, New, Computed, OnEvent, Value, peek =
+	Fusion.Children, Fusion.New, Fusion.Computed, Fusion.OnEvent, Fusion.Value, Fusion.peek
 
 local udNew = UDim.new
 local fromScale = UDim2.fromScale
@@ -40,8 +40,8 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 		Shield = "ShieldPoints",
 		Magic = "MagicPoints"
 	}
-	local bgColors = { Value(scope, fromRGB(30, 30, 30)), Value(scope, fromRGB(30, 30, 30)) }
-	local contentColors = { Value(scope, fromRGB(255, 255, 255)), Value(scope, fromRGB(255, 255, 255)) }
+	local bgColors = Value(scope, fromRGB(30, 30, 30))
+	local contentColors = Value(scope, fromRGB(255, 255, 255))
 
 	return New(scope, "Frame")({
         Name = id,
@@ -70,30 +70,47 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 				Size = fromScale(0.15, 1),
 				Position = if direction == "Left" then fromScale(-0.195, 0) else fromScale(1.05, 0),
 				Text = "+",
-				Visible = Computed(scope, function(use)
-					return if use(self.playerData.LvPoints) > 0 then true else false
+
+				BackgroundColor3 = Computed(scope, function(use)
+					return use(bgColors)
+				end),
+				TextColor3 = Computed(scope, function(use)
+					return use(contentColors)
 				end),
 
-				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
-					return use(bgColors[1])
-				end), AssetBook.TweenInfos.twiceHalf),
-				TextColor3 = Tween(scope, Computed(scope, function(use)
-					return use(contentColors[1])
-				end), AssetBook.TweenInfos.twiceHalf),
-
 				[OnEvent("MouseEnter")] = function()
-					bgColors[1]:set(fromRGB(255, 255, 255))
-					contentColors[1]:set(fromRGB())
+					bgColors:set(fromRGB(255, 255, 255))
+					contentColors:set(fromRGB())
 				end,
 				[OnEvent("MouseLeave")] = function()
-					bgColors[1]:set(fromRGB(30, 30, 30))
-					contentColors[1]:set(fromRGB(255, 255, 255))
+					bgColors:set(fromRGB(30, 30, 30))
+					contentColors:set(fromRGB(255, 255, 255))
 				end,
 				[OnEvent("MouseButton1Click")] = function()
 					if peek(self.playerData.LvPoints) > 0 then
+						local pointPerAdd = tonumber(peek(self.pointsPerAdd))
+
+						if pointPerAdd then
+							local check = HarukaLib:TypeCheck("MinMax", pointPerAdd, 0, 99999)
+							local check2 = HarukaLib:TypeCheck("Integer", pointPerAdd)
+
+							if not check or not check2 then
+								Signals.CreateHint:Fire("Wrong input number!")
+								return
+							end
+						else
+							Signals.CreateHint:Fire("Wrong input number!")
+							return
+						end
+
+						if peek(self.playerData.LvPoints) < pointPerAdd then
+							Signals.CreateHint:Fire("You don't have enough skill points!")
+							return
+						end
+
 						workspace.Sounds.SFXs.Ding:Play()
 
-						Events.AddPoints:Fire(POINTS[id], 1)
+						Events.AddPoints:Fire(POINTS[id], pointPerAdd)
 					else
 						Signals.CreateHint:Fire("You don't have enough skill points!")
 					end
@@ -106,56 +123,9 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 						Thickness = 2.5,
 						Enabled = true,
 
-						Color = Tween(scope, Computed(scope, function(use)
-							return if use(bgColors[1]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
-						end), AssetBook.TweenInfos.twiceHalf)
-					})
-				}
-			}),
-			Components.TextButton(scope, {
-				Name = "Add10",
-				Size = fromScale(0.28, 1),
-				Position = if direction == "Left" then fromScale(-0.565, 0) else fromScale(1.29, 0),
-				Text = "+10",
-				Visible = Computed(scope, function(use)
-					return if use(self.playerData.LvPoints) >= 10 then true else false
-				end),
-
-				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
-					return use(bgColors[2])
-				end), AssetBook.TweenInfos.twiceHalf),
-				TextColor3 = Tween(scope, Computed(scope, function(use)
-					return use(contentColors[2])
-				end), AssetBook.TweenInfos.twiceHalf),
-
-				[OnEvent("MouseEnter")] = function()
-					bgColors[2]:set(fromRGB(255, 255, 255))
-					contentColors[2]:set(fromRGB())
-				end,
-				[OnEvent("MouseLeave")] = function()
-					bgColors[2]:set(fromRGB(30, 30, 30))
-					contentColors[2]:set(fromRGB(255, 255, 255))
-				end,
-				[OnEvent("MouseButton1Click")] = function()
-					if peek(self.playerData.LvPoints) >= 10 then
-						workspace.Sounds.SFXs.Ding:Play()
-
-						Events.AddPoints:Fire(POINTS[id], 10)
-					else
-						Signals.CreateHint:Fire("You don't have enough skill points!")
-					end
-				end,
-
-				[Children] = {
-					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
-					Components.UIStroke(scope, {
-						Transparency = 0.2,
-						Thickness = 2.5,
-						Enabled = true,
-
-						Color = Tween(scope, Computed(scope, function(use)
-							return if use(bgColors[2]) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
-						end))
+						Color = Computed(scope, function(use)
+							return if use(bgColors) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
+						end)
 					})
 				}
 			})

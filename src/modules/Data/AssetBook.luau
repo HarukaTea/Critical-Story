@@ -45,6 +45,92 @@ AssetBook.QuestColor = {
     Town = fromRGB(255, 107, 129)
 }
 
+AssetBook.RankRoleInfo = {
+    [2] = {
+        Role = "CS Tester",
+        ChatRole = "Tester",
+        Color = "#70a1ff"
+    },
+    [3] = {
+        Role = "CS Grand Tester",
+        ChatRole = "Tester+",
+        Color = "#1e90ff"
+    },
+    [4] = {
+        Role = "CS Trello Contributor",
+        ChatRole = "Trello",
+        Color = "#5352ed"
+    },
+    [125] = {
+        Role = "CS Contributor",
+        ChatRole = "Contributor",
+        Color = "#ff6b81"
+    },
+    [126] = {
+        Role = "CS Moderator",
+        ChatRole = "Mod",
+        Color = "#ff4757"
+    },
+    [255] = {
+        Role = "CS Founder",
+        ChatRole = "Founder",
+        Color = "#ffa502"
+    },
+}
+AssetBook.CustomRoleInfo = {
+    ["68027875"] = {
+        Role = "CW Founder",
+        ChatRole = "CW Founder",
+        Color = "#ffa502"
+    },
+    ["2040399306"] = {
+        Role = "CSV Founder",
+        ChatRole = "CSV Founder",
+        Color = "#ffa502"
+    },
+    ["1097119343"] = {
+        Role = "CV Founder",
+        ChatRole = "CV Founder",
+        Color = "#ffa502"
+    },
+    ["3563941913"] = {
+        Role = "CO Founder",
+        ChatRole = "CO Founder",
+        Color = "#ffa502"
+    },
+    ["91364976"] = {
+        Role = "CR Founder",
+        ChatRole = "CR Founder",
+        Color = "#ffa502"
+    },
+
+    ["517042349"] = {
+        Role = "Abyss The Executor",
+        ChatRole = "Abyss",
+        Color = "#3742fa"
+    },
+    ["850971587"] = {
+        Role = "Alchemist User",
+        ChatRole = "Alchemist",
+        Color = "#7bed9f"
+    },
+    ["596899926"] = {
+        Role = "Mayor of Carrotopia",
+        ChatRole = "Carrot",
+        Color = "#ff7f50"
+    },
+    ["748297118"] = {
+        Role = "Known Illegal Merchant",
+        ChatRole = "Merchant",
+        Color = "#fd79a8"
+    },
+    ["332773444"] = {
+        Role = "Sigma Male",
+        ChatRole = "Sigma",
+        Color = "#74b9ff"
+    },
+}
+
 AssetBook.PromptIcons = {
     Chat = "rbxassetid://13124035950",
     Exit = "rbxassetid://16458254833",
@@ -197,7 +283,6 @@ local default = {
 AssetBook.LocationInfo = {
     MonolithVillage = {
         Name = "Monolith Village",
-        Desc = "The start of your story",
         Music = "StoryBegins",
         MusicVolume = 0.7,
         RecommendLevel = 1,
@@ -206,7 +291,6 @@ AssetBook.LocationInfo = {
     },
     MonolithGrove = {
         Name = "Monolith Grove",
-        Desc = "Where can I find the way out?",
         Music = "HiddenForest",
         MusicVolume = 0.7,
         RecommendLevel = 1,
@@ -219,7 +303,6 @@ AssetBook.LocationInfo = {
     },
     InitusBay = {
         Name = "Initus Bay",
-        Desc = "The start of your adventure",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 1,
@@ -228,7 +311,6 @@ AssetBook.LocationInfo = {
     },
     PrimisField = {
         Name = "Primis Field",
-        Desc = "Great place for slimes",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 5,
@@ -237,7 +319,6 @@ AssetBook.LocationInfo = {
     },
     ThyrsusForest = {
         Name = "Thyrsus Woods",
-        Desc = "All you can hear is the howling of wolves",
         Music = "Conquest",
         MusicVolume = 0.6,
         RecommendLevel = 40,
@@ -250,7 +331,6 @@ AssetBook.LocationInfo = {
     },
     EnsisLake = {
         Name = "Ensis Lake",
-        Desc = "Is there a way to get to the center?",
         Music = "FarewayLand",
         MusicVolume = 1.5,
         RecommendLevel = 20,
@@ -259,7 +339,6 @@ AssetBook.LocationInfo = {
     },
     SonusCave = {
         Name = "Sonus Cave",
-        Desc = "Bats make you crazy!",
         Music = "RoadTaken",
         MusicVolume = 0.5,
         RecommendLevel = 5,
@@ -273,7 +352,6 @@ AssetBook.LocationInfo = {
     },
     Highlands = {
         Name = "Highlands",
-        Desc = "I'd rather not fight these annoying slimes",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 30,
@@ -282,7 +360,6 @@ AssetBook.LocationInfo = {
     },
     VenatorVillage = {
         Name = "Venator Village",
-        Desc = "The inevitable path to snowy world",
         Music = "StepLegends",
         MusicVolume = 0.5,
         RecommendLevel = 1,
@@ -291,7 +368,6 @@ AssetBook.LocationInfo = {
     },
     EnsisRiver = {
         Name = "Ensis River",
-        Desc = "Where does the river truly originate?",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 1,
