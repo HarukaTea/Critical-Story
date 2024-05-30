@@ -41,7 +41,7 @@ return function(plr: Player)
 
 		[Fusion.Children] = {
 			Components.Frame(scope, {
-				Name = "BG",
+				Name = "BottomBG",
 				AnchorPoint = v2New(0.5, 0.9),
 				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),

@@ -62,7 +62,7 @@ return function(plr: Player)
 
 		[Children] = {
 			Components.Frame(scope, {
-				Name = "BG",
+				Name = "BottomBG",
 				AnchorPoint = v2New(0.5, 0.9),
 				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
@@ -190,7 +190,8 @@ return function(plr: Player)
 			end
 		end
 	end
-	local function moveUpJumpBtn()
+	Spawn(_autoEquipItems)
+	local function _moveUpJumpBtn()
 		local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 		if isMobile then
@@ -200,8 +201,7 @@ return function(plr: Player)
 			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).Position = fromScale(0.82, 0.8)
 		end
 	end
-	Spawn(_autoEquipItems)
-	Spawn(moveUpJumpBtn)
+	Spawn(_moveUpJumpBtn)
 
 	---// Listening events
 	local playerData = self.playerData

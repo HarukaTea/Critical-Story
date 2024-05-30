@@ -36,14 +36,15 @@ return function(plr: Player)
 
 	Pinia(self) --// Create a storage
 
-	local UI = Components.ScreenGui(self.scope, {
+	local scope = self.scope :: table
+	local UI = Components.ScreenGui(scope, {
 		Name = "AdventurerMenu",
 		Parent = plr.PlayerGui,
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 
 		[Fusion.Children] = {
-			Components.Frame(self.scope, {
+			Components.Frame(scope, {
 				Name = "BG",
 				Visible = false,
 				ZIndex = 2,
@@ -61,12 +62,8 @@ return function(plr: Player)
 					})
 				}
 			}),
-			Components.Frame(self.scope, {
-				Name = "Shadow",
-				BackgroundTransparency = 0.15,
-				ZIndex = 0,
-				Visible = false,
-			}),
+
+			Components.BGShadow(scope)
 		},
 	})
 

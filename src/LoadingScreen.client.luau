@@ -106,7 +106,8 @@ local classes = {
     "rbxassetid://12190535870",
     "rbxassetid://12236618949",
     "rbxassetid://15875390788",
-    "rbxassetid://16654290906"
+    "rbxassetid://16654290906",
+    "rbxassetid://17667241921"
 }
 local classImages = {}
 for index, class in classes do

@@ -92,21 +92,24 @@ end
 function ClientUtil:GetKeyStoryLocations() : table
     local pos = {}
 
-    for _, child: Model in workspace:WaitForChild("MapComponents").NPCs:GetChildren() do
-        pos[child.Name] = child.PrimaryPart.Position
-    end
-    for _, child: Model in workspace.MapComponents.Statues:GetChildren() do
-        pos[child.Name] = child.PrimaryPart.Position
-    end
-    for _, child: Instance in workspace:WaitForChild("Maps"):GetDescendants() do
-        if sFind(child.Name, "StoryLocator") then
-            local map, locator = child.Parent.Name, child.Name
-
-            if not pos[map] then pos[map] = {} end
-
-            pos[map][locator] = child.Position
+    local ok, err = pcall(function()
+        for _, child: Model in workspace:WaitForChild("MapComponents").NPCs:GetChildren() do
+            pos[child.Name] = child.PrimaryPart.Position
         end
-    end
+        for _, child: Model in workspace.MapComponents.Statues:GetChildren() do
+            pos[child.Name] = child.PrimaryPart.Position
+        end
+        for _, child: Instance in workspace:WaitForChild("Maps"):GetDescendants() do
+            if sFind(child.Name, "StoryLocator") then
+                local map, locator = child.Parent.Name, child.Name
+
+                if not pos[map] then pos[map] = {} end
+
+                pos[map][locator] = child.Position
+            end
+        end
+    end)
+    if not ok then warn(err) end
 
     return pos
 end

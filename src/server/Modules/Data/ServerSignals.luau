@@ -14,6 +14,8 @@ local Signals = {
 	FirstStepTutorial = Signal(),
 	CompletedInitusBay = Signal(),
 
+	JoinFaction = Signal(),
+
 	FChenPTown2 = Signal()
 }
 

@@ -16,6 +16,7 @@ local function AlchemistAbilityIndicator(self: table) : Frame
         task.wait()
         self.charClassInfo.Alchemist:set(creations:GetChildren())
     end
+    _handleCreations()
     self.Add(creations.ChildAdded:Connect(_handleCreations))
     self.Add(creations.ChildRemoved:Connect(_handleCreations))
 

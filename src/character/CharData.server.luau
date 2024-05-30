@@ -70,6 +70,8 @@ local function setup()
 
     char:SetAttribute("CharDataLoaded", true)
 
+    if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then ServerUtil:EquipArmor(char, plr:GetAttribute("Cosmetic")) end
+
     --// Spawn to the nearest respawn point
     if not RS:IsStudio() then
         if plr:GetAttribute("RespawnLocation") ~= v3New() then char:PivotTo(cfNew(plr:GetAttribute("RespawnLocation"))) end
@@ -129,7 +131,7 @@ local function charAttributesSetup()
         char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
     end
     local function updateMaxDMG()
-        char:SetAttribute("MaxDMG", 15 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
+        char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
     end
     local function updateMagic()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))

@@ -60,6 +60,8 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local class = forceClass or plr:GetAttribute("Class") :: string
 	local styleFolder = RepS.Package.StyleWeapons[class] :: Folder
 
+	if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then return end
+
 	for _, child: Instance in char:GetChildren() do
 		if child:HasTag("Weapon") then child:Destroy() end
 	end
@@ -87,17 +89,16 @@ end
 --[[
 	Equip cosmetics, just like equip weapons, you can pass a cosmetic to force equip
 ]]
-function ServerUtil:EquipArmor(char: Model, forceArmor: string?)
-	local plr = Players:GetPlayerFromCharacter(char)
-	local class = forceArmor or plr:GetAttribute("Class") :: string
-
+function ServerUtil:EquipArmor(char: Model, armorId: string)
     if char.Humanoid.Health > 0 then
         if char:FindFirstChild("Armor") then char.Armor:Destroy() end
 		for _, child: Instance in char:GetChildren() do
 			if child:HasTag("Weapon") then child:Destroy() end
 		end
 
-		local armor = RepS.Package.Armors[class]:Clone() :: Model
+		if not armorId then return end
+
+		local armor = RepS.Package.Cosmetics[armorId]:Clone() :: Model
         local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg" }
 
         --- wait character fully loads
@@ -401,18 +402,6 @@ function ServerUtil:ShowText(char: Model, info: string, color: Color3)
 	eff.Parent = workspace
 
 	Debris:AddItem(eff, 2)
-end
-
---[[
-	Give drops after monsters are defeated by players
-]]
-function ServerUtil:GiveDrop(plr: Player, monster: Model)
-	local drop = HarukaLib:RollLoot({
-		[monster:GetAttribute("CommonDrop")] = 85,
-		[monster:GetAttribute("RareDrop")] = 15
-	})
-
-	ServerUtil:GiveItem(plr, drop, 1)
 end
 
 --[[

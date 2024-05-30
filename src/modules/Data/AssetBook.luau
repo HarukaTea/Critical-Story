@@ -24,19 +24,11 @@ AssetBook.TweenInfos = {
 }
 
 AssetBook.TierColor = {
-	Common = fromRGB(0, 255, 0),
-	Rare = fromRGB(49, 226, 236),
-	Epic = fromRGB(214, 96, 253),
-	Ultra = fromRGB(250, 250, 65),
-	Mythic = fromRGB(255, 22, 57),
-}
-
-AssetBook.TypeColor = {
-	Active = fromRGB(255, 170, 127),
-	Passive = fromRGB(99, 244, 9),
-	Material = fromRGB(0, 222, 238),
-	Cosmetic = fromRGB(170, 85, 255),
-	Quest = fromRGB(46, 213, 115),
+	fromRGB(0, 255, 0),
+	fromRGB(49, 226, 236),
+	fromRGB(214, 96, 253),
+	fromRGB(250, 250, 65),
+	fromRGB(255, 22, 57),
 }
 
 AssetBook.QuestColor = {
@@ -129,6 +121,41 @@ AssetBook.CustomRoleInfo = {
         ChatRole = "Sigma",
         Color = "#74b9ff"
     },
+    ["1196067403"] = {
+        Role = "Tree Monster Fanatic",
+        ChatRole = "Tree",
+        Color = "#2ed573"
+    },
+    ["1210467492"] = {
+        Role = "Thingamybob",
+        ChatRole = "Snow",
+        Color = "#fff"
+    },
+    ["1680347725"] = {
+        Role = "Strategist",
+        ChatRole = "Strategist",
+        Color = "#fff"
+    },
+    ["1457659888"] = {
+        Role = "Striker",
+        ChatRole = "Striker",
+        Color = "#f79f1f"
+    },
+    ["1312728712"] = {
+        Role = "Raid Shadow Legend",
+        ChatRole = "Raid Shadow",
+        Color = "#fd79a8"
+    },
+    ["1094363213"] = {
+        Role = "Ebalo",
+        ChatRole = "Ebalo",
+        Color = "#e056fd"
+    },
+    ["232313396"] = {
+        Role = "Mia",
+        ChatRole = "Mia",
+        Color = "#fd79a8"
+    }
 }
 
 AssetBook.PromptIcons = {
@@ -185,60 +212,110 @@ AssetBook.ClassInfo = {
 		Image = "rbxassetid://15875390788",
 		Color = fromRGB(0, 255, 252),
         Type = "Magic"
-	}
+	},
+    Juggernaut = {
+        Image = "rbxassetid://16654290906",
+        Color = fromRGB(253, 148, 44),
+        Type = "DMG"
+    },
+    Reaper = {
+        Image = "rbxassetid://17667241921",
+        Color = fromRGB(163, 39, 39),
+        Type = "DMG"
+    }
 }
 
 AssetBook.MonsterInfo = {
     SpikeFox = {
         Name = "Spike Fox",
-        Icon = "rbxassetid://13886503379"
+        Icon = "rbxassetid://13886503379",
+        Drops = {
+            SpikyFur = 80,
+            SpikyQuills = 20
+        }
     },
     SpikeWolf = {
         Name = "Spike Wolf",
-        Icon = "rbxassetid://16483664838"
+        Icon = "rbxassetid://16483664838",
+        Drops = {
+            SpikyFur = 70,
+            SpikyQuills = 30
+        }
     },
     ThornWolf = {
         Name = "Thorn Wolf",
-        Icon = "rbxassetid://15688333545"
+        Icon = "rbxassetid://15688333545",
+        Drops = {
+            SpikyFur = 60,
+            SpikyQuills = 40
+        }
     },
     HardmodeWolf = {
         Name = "Hardmode Wolf",
-        Icon = "rbxassetid://15688333545"
-    },
-    ElderWolf = {
-        Name = "Elder Wolf",
-        Icon = ""
+        Icon = "rbxassetid://15688333545",
+        Drops = {
+            BlackFur = 90,
+            BlackWolfNecklace = 10
+        }
     },
 
     Kitsune = {
         Name = "Kitsune",
-        Icon = "rbxassetid://17543155124"
+        Icon = "rbxassetid://17543155124",
+        Drops = {
+            KitsuneFur = 60,
+            KitsuneFlame = 40
+        }
     },
     Stalker = {
         Name = "Stalker",
-        Icon = "rbxassetid://17543156640"
+        Icon = "rbxassetid://17543156640",
+        Drops = {
+            StalkerLeaf = 60,
+            StalkerLog = 40,
+        }
     },
 
     GreenSlime = {
         Name = "Green Slime",
-        Icon = "rbxassetid://15951815518"
+        Icon = "rbxassetid://15951815518",
+        Drops = {
+            SlimeGel = 80,
+            SlimeCore = 20
+        }
+    },
+    BlueSlime = {
+        Name = "Blue Slime",
+        Icon = "rbxassetid://16483649460",
+        Drops = {
+            SlimeGel = 70,
+            SlimeCore = 30
+        }
     },
     LapisSlime = {
         Name = "Lapis Slime",
-        Icon = "rbxassetid://16483649287"
+        Icon = "rbxassetid://16483649287",
+        Drops = {
+            SlimeGel = 60,
+            SlimeCore = 40
+        }
     },
     PurpleSlime = {
         Name = "Purple Slime",
-        Icon = "rbxassetid://16483649160"
+        Icon = "rbxassetid://16483649160",
+        Drops = {
+            SlimeGel = 50,
+            SlimeCore = 50
+        }
     },
     CrimsonSlime = {
         Name = "Crimson Slime",
-        Icon = "rbxassetid://17543155439"
+        Icon = "rbxassetid://17543155439",
+        Drops = {
+            CrimsonSlimeCore = 90,
+            CrimsonSlimeFang = 10
+        }
     },
-    IceSlime = {
-        Name = "Ice Slime",
-        Icon = ""
-    }
 }
 
 AssetBook.BuffInfo = {
@@ -317,44 +394,11 @@ AssetBook.LocationInfo = {
 
         Lighting = default
     },
-    ThyrsusForest = {
-        Name = "Thyrsus Woods",
-        Music = "Conquest",
-        MusicVolume = 0.6,
-        RecommendLevel = 40,
-
-        Lighting = {
-            Ambient = fromRGB(),
-            FogColor = fromRGB(170, 255, 255),
-            FogEnd = 1000
-        }
-    },
     EnsisLake = {
         Name = "Ensis Lake",
         Music = "FarewayLand",
         MusicVolume = 1.5,
         RecommendLevel = 20,
-
-        Lighting = default
-    },
-    SonusCave = {
-        Name = "Sonus Cave",
-        Music = "RoadTaken",
-        MusicVolume = 0.5,
-        RecommendLevel = 5,
-
-        Lighting = {
-            Ambient = fromRGB(),
-            OutdoorAmbient = fromRGB(),
-            FogColor = fromRGB(21, 152, 205),
-            FogEnd = 2000
-        }
-    },
-    Highlands = {
-        Name = "Highlands",
-        Music = "Conquest",
-        MusicVolume = 0.5,
-        RecommendLevel = 30,
 
         Lighting = default
     },
@@ -371,6 +415,14 @@ AssetBook.LocationInfo = {
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 1,
+
+        Lighting = default
+    },
+    EasterIsland = {
+        Name = "Easter Island",
+        Music = "EarlJuly",
+        MusicVolume = 0.3,
+        RecommendLevel = 150,
 
         Lighting = default
     }

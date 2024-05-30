@@ -12,10 +12,10 @@ local wait = task.wait
 local cfNew, cfFromEulerAnglesXYZ = CFrame.new, CFrame.fromEulerAnglesXYZ
 
 while wait(1) do
-	if not char.PrimaryPart then break end
+	if not char.PrimaryPart then return end
 
 	local uri = RepS.Package.MagicAssets.UriClone:Clone() :: Model
-	uri.PrimaryPart.CFrame = char.PrimaryPart.CFrame
+	uri:PivotTo(char.PrimaryPart.CFrame)
 	uri.Parent = workspace
 	Debris:AddItem(uri, 1)
 

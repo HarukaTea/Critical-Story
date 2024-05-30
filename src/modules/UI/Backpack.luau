@@ -107,12 +107,8 @@ return function(plr: Player)
 					}),
 				},
 			}),
-			Components.Frame(scope, {
-				Name = "Shadow",
-				BackgroundTransparency = 0.15,
-				ZIndex = 0,
-				Visible = false,
-			}),
+
+			Components.BGShadow(scope)
 		},
 	})
 

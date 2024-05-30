@@ -21,8 +21,9 @@ return {
 			HealthPoints = 0
 		},
 
-		QuestsV2 = {
+		QuestsV3 = {
 			Main = 1,
+			Side = {},
 			Town = {}
 		},
 
@@ -63,8 +64,9 @@ return {
 			HealthPoints = 0
 		},
 
-		QuestsV2 = {
+		QuestsV3 = {
 			Main = 1,
+			Side = {},
 			Town = {}
 		},
 
@@ -105,8 +107,9 @@ return {
 			HealthPoints = 0
 		},
 
-		QuestsV2 = {
+		QuestsV3 = {
 			Main = 1,
+			Side = {},
 			Town = {}
 		},
 

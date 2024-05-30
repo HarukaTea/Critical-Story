@@ -112,6 +112,10 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 						end
 					end
 
+					if player:GetAttribute("Cosmetic") and player:GetAttribute("Cosmetic") ~= "" then
+						self.playerItemIconList[7]:set(player:GetAttribute("Cosmetic"), true)
+					end
+
 					self.playerDescVisible:set(true)
 				end
 			})

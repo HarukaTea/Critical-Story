@@ -65,6 +65,8 @@ local function LogFrame(self: table) : Frame
 		end),
 
         [Children] = {
+            Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+
             Fusion.New(scope, "Frame")({
                 Name = "Top",
                 Size = UDim2.fromScale(1, 0.1),
@@ -79,6 +81,13 @@ local function LogFrame(self: table) : Frame
                         Name = "Title",
                         Text = "FILTER:",
                         Size = UDim2.fromScale(0.1, 1),
+
+                        [Children] = {
+                            Fusion.New(scope, "UIPadding")({
+                                PaddingTop = UDim.new(0.1, 0),
+                                PaddingBottom = UDim.new(0.1, 0)
+                            })
+                        }
                     }),
                     Fusion.New(scope, "Frame")({
                         Name = "ToggleBtn",

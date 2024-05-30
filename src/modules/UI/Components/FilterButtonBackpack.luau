@@ -30,7 +30,7 @@ local COLORS = {
 local BLACKLIST = { "Equip", "Pin" }
 
 local function _checkSlot(self: table, type: string) : string
-	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
+	local classFrame = self.plrGui.AdventurerStats.BottomBG.ClassFrame
 
 	for _, element: Frame in classFrame:GetDescendants() do
 		if sFind(element.Name, type) and not element:GetAttribute("Equipped") then
@@ -41,7 +41,7 @@ local function _checkSlot(self: table, type: string) : string
 	return "Full"
 end
 local function _checkSameItem(self: table, item: string, type: string) : (string, string?)
-	local classFrame = self.plrGui.AdventurerStats.BG.ClassFrame
+	local classFrame = self.plrGui.AdventurerStats.BottomBG.ClassFrame
 
 	local check, sameSlot = false, nil
 	for _, element: Frame in classFrame:GetDescendants() do

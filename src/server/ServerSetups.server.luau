@@ -188,7 +188,7 @@ local function mainSetup()
 		MS:SubscribeAsync("JoinFriendRequest", function(message: table)
 			for _, plr: Player in Players:GetPlayers() do
 				if plr.UserId == message.Data then
-					MS:PublishAsync("JoinFriendReturn", { plr.UserId, game.JobId })
+					MS:PublishAsync("JoinFriendReturn", { plr.UserId, game.JobId, game.PlaceId })
 					break
 				end
 			end
@@ -236,7 +236,9 @@ local function mainSetup()
 			accessCode = upper(accessCode)
 
 			MS:SubscribeAsync("ReturnAllPrivateServers", function(message: table)
-				if message.Data == accessCode then MS:PublishAsync("JoinPrivateCheck", { accessCode, code }) end
+				if message.Data == accessCode then
+					MS:PublishAsync("JoinPrivateCheck", { accessCode, code, game.PlaceId })
+				end
 			end)
 
 			RepS.Package.PrivateServerId.Value = accessCode

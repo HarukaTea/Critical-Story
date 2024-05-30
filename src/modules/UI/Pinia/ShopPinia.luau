@@ -11,8 +11,6 @@ local peek = Fusion.peek
 local fromRGB = Color3.fromRGB
 
 local function BackpackPinia(self: table)
-    local plr = self.plr :: Player
-
     self.scope = Fusion.scoped({})
 	local function Value(val: any)
 		return Fusion.Value(self.scope, val)
@@ -20,13 +18,7 @@ local function BackpackPinia(self: table)
 
     self.Add, self.Empty = HarukaLib.Bin()
 
-    self.inventory = plr:WaitForChild("Inventory", 999)
-
-	self.itemFrame = Value()
-
-	self.items = Value(self.inventory:GetChildren())
-	self.noItemsShow = Value(true)
-	self.chosenFilter = Value("Passive")
+    self.visible = Value(false)
 
     local camVPSize = workspace.CurrentCamera.ViewportSize
 
@@ -37,14 +29,14 @@ local function BackpackPinia(self: table)
 
     self.itemSlotClicked = Signal.new()
 
-    self.filterInfo = {
-        Equip = Value("EQUIP"),
-        Pin = Value("PIN"),
-    }
-
     self.absStatSize = Value(0)
 	self.itemName, self.itemStats, self.itemDesc = Value(""),  Value(""), Value("")
 	self.itemTierColor = Value(fromRGB())
+    self.itemCost = Value(0)
+    self.itemCostColor = Value(fromRGB(255, 255, 0))
+
+    self.items = Value({})
+    self.itemFrame = Value()
 
     function self:DeselectAll()
         for _, element: ImageButton in peek(self.itemFrame):GetChildren() do
@@ -54,6 +46,8 @@ local function BackpackPinia(self: table)
         self.itemName:set("")
         self.itemStats:set("")
         self.itemDesc:set("")
+        self.itemCost:set(0)
+        self.itemCostColor:set(fromRGB(255, 255, 0))
     end
 end
 

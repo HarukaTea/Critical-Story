@@ -57,7 +57,7 @@ local function PlayerDescFrame(self: table) : Frame
 
         [Children] = {
             Components.Frame(scope, {
-                Name = "BG",
+                Name = "DescBG",
                 AnchorPoint = v2New(),
                 Position = fromScale(0, 0),
                 BackgroundTransparency = 0.1,

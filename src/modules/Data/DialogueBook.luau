@@ -1,8 +1,8 @@
 --!nocheck
 
-local dialogues = {}
+local DialogueBook = {}
 
-dialogues.Pioxit1 = {
+DialogueBook.Pioxit1 = {
     Main1 = {
         "Hi, I'm <blue>Pioxit</font>, the <yellow>savior</font> of this dimension.",
         "The dimension is composed of countless worlds that share an underlying essence yet appear distinct.",
@@ -15,7 +15,13 @@ dialogues.Pioxit1 = {
         "And now, as the seal begins to weaken, the remnants of The Abyss are planning a comeback.",
         "The Toucan branch, led by <purple>Calex</font>, has already stirred up turmoil in some worlds.",
         "My remaining power is not enough to reinforce the seal. Therefore, I need your help.",
-        "I believe you can do it, right?"
+        "CHOICE 1",
+
+        Choice1 = {
+            "I will try my best.",
+
+            Option1 = { "Great, I believe you can do it!" }
+        }
     },
 
     Else = {
@@ -27,7 +33,7 @@ dialogues.Pioxit1 = {
     }
 }
 
-dialogues.Pioxit = {
+DialogueBook.Pioxit = {
     Main2 = {
         "You have finally awakened. Still not accustomed to this world, are you?",
         "Here is the first stop on your journey: <blue>Monolith Village</font>.",
@@ -62,7 +68,7 @@ dialogues.Pioxit = {
     Extra = {}
 }
 
-dialogues.Milk = {
+DialogueBook.Milk = {
     Main3 = {
         "Hello, Adventurer! Wait...Is that the Critical Manipulator you're carrying?",
         [[It's inevitable that we meet here, is it <yellow>Pioxit</font> who brings you here?]],
@@ -104,13 +110,95 @@ dialogues.Milk = {
     }
 }
 
+--// Town
+DialogueBook.FChenP = {
+    ---// Monolith Grove
+    Town1 = {
+        "I guess you haven't completed it, right?"
+    },
+    Town2 = {
+        "Great work! Thanks for the help!"
+    },
 
---// Villagers
-dialogues.Xiaotie = {
     Else = {
-        "How did you do that?",
-        "I was just relaxing under this tree, and then you suddenly appeared..."
+        "Hi, explorer, could you do me a favor?",
+        "CHOICE 1",
+
+        Choice1 = {
+            "Sure, what is that?",
+            "EXIT Sorry, I'm not ready right now.",
+
+            Option1 = {
+                "The quest is simple, can you bring 6 Spiky Fur?",
+                "CHOICE 2"
+            },
+            Option2 = {
+                "Sure, you can come back whenever you want."
+            }
+        },
+        Choice2 = {
+            "QUEST Sure, I'll do it.",
+            "EXIT I have something else to do.",
+
+            Option1 = {
+                "Alright, I'll wait for you, good luck then!",
+                "QUEST TOWN 1"
+            },
+            Option2 = {
+                "Sure, you can come back whenever you want."
+            }
+        }
+    },
+
+    Extra = {
+        Town2 = "FChenPTown2"
     }
 }
 
-return dialogues
+
+--// Villagers
+DialogueBook.Xiaotie = {
+    Else = {
+        "I was relaxing under this tree, and then you just suddenly appeared..."
+    }
+}
+DialogueBook.hnxtwyz = {
+    Else = {
+        "This is the <blue>Jump pad</font>, which will help your exploration in this world.",
+        "CHOICE 1",
+
+        Choice1 = {
+            "Are there other mechanics?",
+
+            Option1 = { "<blue>Pivot Orbs</font>?" },
+        }
+    }
+}
+DialogueBook.Edward = {
+    Else = {
+        "Potions are pretty useful for battles.",
+        "You will undoubtedly drink them in your future exploration.",
+    }
+}
+DialogueBook.Ethan = {
+    Else = {
+        "Thank goodness! Finally, an adventurer passing by! I nearly got lost in the forest.",
+        "You seems familiar to me, maybe we will meet again in the future?",
+        "CHOICE 1",
+
+        Choice1 = {
+            "Why are you here?",
+
+            Option1 = {
+                "<red>to exec...</font>to complete the exploration tasks given by Faction.",
+                "Well, good luck then!"
+             }
+        }
+    },
+
+    Extra = {
+        Else = "JoinFaction"
+    }
+}
+
+return DialogueBook

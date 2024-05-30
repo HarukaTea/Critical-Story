@@ -15,6 +15,7 @@ local requireList = {
 	UIModules.Backpack,
 	UIModules.ShiftLock,
 	UIModules.PlayerList,
+	UIModules.Shop,
 	UIModules.NPCChat,
 	UIModules.Hints
 }

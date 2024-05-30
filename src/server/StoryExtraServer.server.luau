@@ -9,7 +9,6 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
-local instanceNew = Instance.new
 
 --// Main
 local function startTheAdventure(plr: Player)
@@ -43,3 +42,29 @@ local function firstCombat(plr: Player)
 end
 Signals.FirstStepTutorial:Connect(firstCombat)
 
+--// Side
+local function newFactionJourney(plr: Player)
+    local check = false
+    for _, quest: IntValue in plr.Quests:GetChildren() do
+        if quest.Name == "Side" and quest.Value == 1 then check = true break end
+    end
+
+    if not check then
+        local intValue = Instance.new("IntConstrainedValue")
+        intValue.Name = "Side"
+        intValue.MinValue = 1
+        intValue.MaxValue = #StoryBook.Side
+        intValue.Value = 1
+        intValue.Parent = plr.Quests
+    end
+end
+Signals.JoinFaction:Connect(newFactionJourney)
+
+--// Town
+local function gaveFurs(plr: Player)
+    local inventory = plr:WaitForChild("Inventory", 999) :: Folder
+
+    inventory.SpikyFur.Value -= 6
+    if inventory.SpikyFur.Value <= 0 then inventory.SpikyFur:Destroy() end
+end
+Signals.FChenPTown2:Connect(gaveFurs)

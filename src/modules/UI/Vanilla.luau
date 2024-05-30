@@ -152,4 +152,15 @@ function Components.RoundUICorner(scope: table) : UICorner
 	return Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.5, 0) })
 end
 
+
+--// Custom
+function Components.BGShadow(scope: table) : Frame
+	return Components.Frame(scope, {
+        Name = "Shadow",
+        BackgroundTransparency = 0.15,
+        ZIndex = 0,
+        Visible = false
+    })
+end
+
 return Components

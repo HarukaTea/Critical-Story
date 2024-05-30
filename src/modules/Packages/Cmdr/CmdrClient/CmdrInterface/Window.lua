@@ -76,34 +76,11 @@ function Window:SetVisible(visible)
 	Gui.Visible = visible
 
 	if visible then
-		self.PreviousChatWindowConfigurationEnabled = TextChatService.ChatWindowConfiguration.Enabled
-		self.PreviousChatInputBarConfigurationEnabled = TextChatService.ChatInputBarConfiguration.Enabled
-		TextChatService.ChatWindowConfiguration.Enabled = false
-		TextChatService.ChatInputBarConfiguration.Enabled = false
-
 		Entry.TextBox:CaptureFocus()
 		self:SetEntryText("")
-
-		if self.Cmdr.ActivationUnlocksMouse then
-			self.PreviousMouseBehavior = UserInputService.MouseBehavior
-			UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-		end
 	else
-		TextChatService.ChatWindowConfiguration.Enabled = if self.PreviousChatWindowConfigurationEnabled ~= nil
-			then self.PreviousChatWindowConfigurationEnabled
-			else true
-		TextChatService.ChatInputBarConfiguration.Enabled = if self.PreviousChatInputBarConfigurationEnabled
-				~= nil
-			then self.PreviousChatInputBarConfigurationEnabled
-			else true
-
 		Entry.TextBox:ReleaseFocus()
 		self.AutoComplete:Hide()
-
-		if self.PreviousMouseBehavior then
-			UserInputService.MouseBehavior = self.PreviousMouseBehavior
-			self.PreviousMouseBehavior = nil
-		end
 	end
 end
 

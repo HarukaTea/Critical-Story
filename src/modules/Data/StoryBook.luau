@@ -96,11 +96,11 @@ StoryBook.Main = {
 
 StoryBook.Side = {
     {
-        Name = "New Critical Power",
-        Target = "Get Archer class from its statue",
+        Name = "Faction",
+        Target = "Coming soon",
         Desc = "",
         NPC = "None",
-        Hint = if pos.Archer then pos.Archer else v3New(),
+        Hint = v3New(),
 
         Script = true,
 

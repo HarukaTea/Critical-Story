@@ -12,7 +12,7 @@ local Key = require(Util.Key)
 local Serdes = require(Util.Serdes)
 local Buffer = require(Util.Buffer)
 
-function Client.new(isReliable: boolean, Identifier: string, conf: table)
+function Client.new(Identifier: string, conf: table)
 	local self = setmetatable({}, Client)
 
 	self._buffer = Buffer.new()
@@ -21,7 +21,6 @@ function Client.new(isReliable: boolean, Identifier: string, conf: table)
 	self.fn = {}
 	self._conf = table.freeze(conf or {})
 	self.IsConnected = false
-	self.isReliable = isReliable
 
 	ClientProcess.add(self.id, Identifier, conf or { yieldWait = 10, logging = { store = false, opt = false } })
 	self._buffer:remove()
@@ -30,7 +29,7 @@ function Client.new(isReliable: boolean, Identifier: string, conf: table)
 end
 
 function Client:Fire(...: any)
-	ClientProcess.insertQueue(self.id, self.isReliable, ...)
+	ClientProcess.insertQueue(self.id, ...)
 end
 
 function Client:Connect(callback: (args: any) -> ()): string

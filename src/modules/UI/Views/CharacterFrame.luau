@@ -188,7 +188,6 @@ local function CharacterFrame(self: table): Frame
 					Components.TextLabel(scope, {
 						Name = "PointsLeft",
 						Size = fromScale(0.5, 1),
-						TextXAlignment = Enum.TextXAlignment.Right,
 						RichText = true,
 
 						Text = Computed(scope, function(use)

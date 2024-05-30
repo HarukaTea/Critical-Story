@@ -19,6 +19,7 @@ local function PlayerEffectsList(self: table) : Frame
 		wait()
 		self.charStatsDict.EffectsList:set(self.charData.EffectsList:GetChildren())
 	end
+    _setEffectsChildren()
     self.Add(self.charData.EffectsList.ChildAdded:Connect(_setEffectsChildren))
     self.Add(self.charData.EffectsList.ChildRemoved:Connect(_setEffectsChildren))
 

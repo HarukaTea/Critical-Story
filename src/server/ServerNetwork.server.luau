@@ -45,6 +45,16 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 		Events.NPCChat:Fire(plr, npc, prompt)
 
+	elseif prompt.Name == "Shop" then
+		local shop = prompt.Parent.Parent :: Model
+		local items = {}
+
+		for _, item: Instance in shop.SellingItems:GetChildren() do
+			items[#items + 1] = item.Name
+		end
+
+		Events.EnterShopping:Fire(plr, "Shop", items)
+
 	elseif prompt.Name == "Travel" then
 		local destination = prompt.ActionText
 		local locator = prompt:GetAttribute("Locator") :: string
@@ -212,6 +222,14 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 
 		Events.EquipItems:Fire(plr, itemSlot, item)
 
+	elseif itemType == "Cosmetic" then
+		if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then return end
+
+		plr:SetAttribute("Cosmetic", item)
+		_equipNewItem(plr, item, itemSlot)
+
+		ServerUtil:EquipArmor(plr.Character, item)
+
 	elseif itemType == "ClearPassive" and item ~= "" then
 		PassiveUtil:UnequipPassive(char, item)
 
@@ -223,6 +241,13 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 		_unequipCheck(plr, item)
 
 		Events.EquipItems:Fire(plr, itemSlot, "Null")
+
+	elseif itemType == "ClearCosmetic" then
+		_unequipCheck(plr, item)
+
+		plr:SetAttribute("Cosmetic", nil)
+
+		ServerUtil:EquipArmor(char, nil)
 	end
 end
 Events.EquipItems:Connect(equipItem)

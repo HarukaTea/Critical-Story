@@ -25,7 +25,7 @@ end
 
 local function _saveData(plr: Player)
 	local inventory = {}
-	local quests, townQuests = {}, {}
+	local quests, townQuests, sideQuests = {}, {}, {}
 
 	for _, item: IntValue in plr.Inventory:GetChildren() do
 		if item.Value <= 0 then continue end
@@ -33,6 +33,7 @@ local function _saveData(plr: Player)
 		local info = {
 			Amount = item.Value,
 			Equipped = item:GetAttribute("Equipped") or false,
+			Pinned = item:GetAttribute("Pinned") or false,
 			Slot = item:GetAttribute("Slot") or "None"
 		}
 		inventory[item.Name] = info
@@ -40,16 +41,20 @@ local function _saveData(plr: Player)
 	for _, quest: IntConstrainedValue in plr.Quests:GetChildren() do
 		if quest.Name == "Town" then
 			townQuests[#townQuests + 1] = quest.Value
+
+		elseif quest.Name == "Side" then
+			sideQuests[#sideQuests + 1] = quest.Value
 		else
 			quests[quest.Name] = quest.Value
 		end
 	end
+	quests.Side = sideQuests
 	quests.Town = townQuests
 
 	local slot = _getSlot(plr)
 
 	profiles[plr].Data[slot].Inventory = inventory
-	profiles[plr].Data[slot].QuestsV2 = quests
+	profiles[plr].Data[slot].QuestsV3 = quests
 end
 
 
@@ -105,9 +110,9 @@ local function setup(plr: Player)
 				intValue.Value = val
 				intValue.Parent = questsData
 			end
-			for questType: string, questId: number in data.QuestsV2 do
-				if questType == "Town" then
-					for _, townQuest: number in questId do _createQuestVal("Town", townQuest) end
+			for questType: string, questId: number in data.QuestsV3 do
+				if questType == "Town" or questType == "Side" then
+					for _, separateQuest: number in questId do _createQuestVal(questType, separateQuest) end
 					continue
 				end
 
@@ -118,14 +123,21 @@ local function setup(plr: Player)
 			for index: string, info: table in data.Inventory do
 				if not ItemBook:IsItemExist(index) then continue end
 
+				local itemType = ItemBook:FindItem(index).Type
+				local maxAmount = 1
+
+				if itemType == "Active" then if not ItemBook:FindItem(index).IsSkill then maxAmount = 999 end end
+				if itemType == "Material" then maxAmount = 999 end
+
 				local intValue = Instance.new("IntConstrainedValue")
 				intValue.Name = index
-				intValue.MaxValue = if ItemBook:FindItem(index).IsSkill then 1 else 999
+				intValue.MaxValue = maxAmount
 				intValue.Value = info.Amount
 				if info.Equipped then
 					intValue:SetAttribute("Equipped", true)
 					intValue:SetAttribute("Slot", info.Slot)
 				end
+				if info.Pinned then intValue:SetAttribute("Pinned", true) end
 				intValue.Parent = backpackData
 			end
 
@@ -178,6 +190,7 @@ local function clear(plr: Player)
 		end
 	end)
 
+	pcall(_saveData, plr)
 	if scopes[plr] then scopes[plr]() end
 	if profiles[plr] then profiles[plr]:Release() end
 

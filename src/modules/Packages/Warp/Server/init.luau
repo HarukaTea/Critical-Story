@@ -13,7 +13,7 @@ local Key = require(Util.Key)
 local Serdes = require(Util.Serdes)
 local Buffer = require(Util.Buffer)
 
-function Server.new(isReliable: boolean, Identifier: string, conf: table?)
+function Server.new(Identifier: string, conf: table?)
 	local self = setmetatable({}, Server)
 
 	self._buffer = Buffer.new()
@@ -22,7 +22,6 @@ function Server.new(isReliable: boolean, Identifier: string, conf: table?)
 	self.fn = {}
 	self._conf = table.freeze(conf or {})
 	self.IsConnected = false
-	self.isReliable = isReliable
 
 	ServerProcess.add(self.id, Identifier, conf or { rateLimit = { maxEntrance = 200, interval = 2 } })
 	self._buffer:remove()
@@ -31,12 +30,12 @@ function Server.new(isReliable: boolean, Identifier: string, conf: table?)
 end
 
 function Server:Fire(player: Player, ...: any)
-	ServerProcess.insertQueue(self.id, self.isReliable, player, ...)
+	ServerProcess.insertQueue(self.id, player, ...)
 end
 
 function Server:FireAll(...: any)
 	for _, player: Player in ipairs(Players:GetPlayers()) do
-		ServerProcess.insertQueue(self.id, self.isReliable, player, ...)
+		if player then ServerProcess.insertQueue(self.id, player, ...) end
 	end
 end
 
@@ -44,7 +43,7 @@ function Server:FireAllExpect(plrs: { Player }, ...: any)
 	for _, player: Player in ipairs(Players:GetPlayers()) do
 		if table.find(plrs, player) then continue end
 
-		ServerProcess.insertQueue(self.id, self.isReliable, player, ...)
+		if player then ServerProcess.insertQueue(self.id, player, ...) end
 	end
 end
 
@@ -52,7 +51,7 @@ function Server:FireAllInRange(range: number, from: Vector3, data: { any }, exce
 	for _, player: Player in ipairs(Players:GetPlayers()) do
 		if (except and table.find(except, player)) or not player.Character or not player.Character.PrimaryPart or (player.Character.PrimaryPart.Position - from).Magnitude < range then continue end
 
-		ServerProcess.insertQueue(self.id, self.isReliable, player, table.unpack(data))
+		if player then ServerProcess.insertQueue(self.id, player, table.unpack(data)) end
 	end
 end
 

@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
@@ -44,7 +45,7 @@ local function combatEnds()
             attack:RemoveTag("MonsterDMG")
         end
         for _, player: Player in combatPlrs do
-            Events.ClientTween:Fire(player, attacks, { Transparency = 1 }, "one")
+            if player then Events.ClientTween:Fire(player, attacks, { Transparency = 1 }, "one") end
         end
 
         for _, player: Player in combatPlrs do
@@ -62,7 +63,8 @@ local function combatEnds()
                 for _, defeated: Model in beatList do
                     totalEXP += defeated:GetAttribute("EXP")
 
-                    ServerUtil:GiveDrop(player, RepS.Package.MonsterModels[defeated.Name])
+                    local drop = HarukaLib:RollLoot(AssetBook.MonsterInfo[monster.Name].Drops)
+	                ServerUtil:GiveItem(player, drop, 1)
                 end
 
                 HarukaLib:AddAttr(player, "EXP", totalEXP)
