@@ -23,9 +23,6 @@ local function BackpackPinia(self: table)
     local camVPSize = workspace.CurrentCamera.ViewportSize
 
     self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })
-	self.absCellPadding = Value({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
-	self.absCellSize = Value(peek(self.absSize)[1] / 15.58)
-	self.absScrollSize, self.absContentSize = Value(90), Value(30)
 
     self.itemSlotClicked = Signal.new()
 

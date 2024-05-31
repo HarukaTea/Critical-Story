@@ -100,6 +100,19 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 				if not itemType then return end
 
 				--- equip
+				local whiteList = { "Active", "Passive", "Cosmetic" }
+				if not tFind(whiteList, itemType) then return end
+
+				if itemType == "Cosmetic" then
+					local currentCos = self.plr:GetAttribute("Cosmetic") :: string
+					if not currentCos or currentCos == "" then
+						Events.EquipItems:Fire("Cosmetic", "Cosmetic1", item)
+					else
+						Events.EquipItems:Fire("ClearCosmetic", "Cosmetic1", item)
+					end
+					return
+				end
+
 				local slot = _checkSlot(self, itemType)
 				local checkSame, sameSlot = _checkSameItem(self, item, itemType)
 

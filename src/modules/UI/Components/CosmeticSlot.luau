@@ -25,11 +25,18 @@ local function CosmeticSlot(self: table): Frame
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
+	HarukaLib:Hydrate(self.plr, {
+		["Attr-Cosmetic"] = function(newCos: string)
+			if not newCos or newCos == "" then return end
+
+			self.cosmeticEquipped:set(newCos)
+		end
+	})
+
 	return Fusion.New(scope, "Frame")({
-		Name = "Cosmetic1",
+		Name = "CosmeticSlot",
 		BackgroundColor3 = color3New(),
 		Size = fromScale(0.281, 0.658),
-		[Fusion.Ref] = self.cosmeticSlot,
 
 		[Fusion.Children] = {
 			Components.RoundUICorner(scope),

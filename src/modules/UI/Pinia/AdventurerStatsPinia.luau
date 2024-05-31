@@ -99,7 +99,6 @@ local function AdventurerStatsPinia(self: table)
 
 	self.activeSlotList = { Value(), Value(), Value() }
 	self.passiveSlotList = { Value(), Value(), Value() }
-	self.cosmeticSlot = Value()
 
 	self.targetingMobs = Value({})
 	self.monsterTargetingPos = Value(fromScale(-0.2, 0.5))

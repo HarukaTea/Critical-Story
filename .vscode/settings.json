@@ -15,7 +15,8 @@
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
 
-        "src/character/Health.server.luau": true,
-        "src/character/Animate.client.luau": true
+        //"src/character/Animate.client.luau": true,
+
+        "src/modules/Packages": true
     }
 }

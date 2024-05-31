@@ -6,6 +6,7 @@ local Warp = require(RepS.Modules.Packages.Warp)
 
 return {
 	AddPoints = Warp("AddSkillPoints"),
+	BuyItems = Warp("BuyItems"),
 	CombatStart = Warp("CombatStart"),
 	CreateHint = Warp("CreateHint"),
 	ClientTween = Warp("ClientTween"),

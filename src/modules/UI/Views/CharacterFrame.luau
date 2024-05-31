@@ -103,8 +103,7 @@ local function CharacterFrame(self: table): Frame
 		end
 	}))
 
-	local bgColor = Fusion.Value(scope, fromRGB(30, 30, 30))
-	local contentColor = Fusion.Value(scope, fromRGB(255, 255, 255))
+	local isSelecting = Fusion.Value(scope, false)
 
 	return Components.Frame(scope, {
 		Name = "Character",
@@ -204,19 +203,17 @@ local function CharacterFrame(self: table): Frame
 				Text = "RESET",
 
 				TextColor3 = Computed(scope, function(use)
-					return use(contentColor)
+					return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
 				end),
 				BackgroundColor3 = Computed(scope, function(use)
-					return use(bgColor)
+					return if not use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
 				end),
 
 				[OnEvent("MouseEnter")] = function()
-					bgColor:set(fromRGB(255, 255, 255))
-					contentColor:set(fromRGB())
+					isSelecting:set(true)
 				end,
 				[OnEvent("MouseLeave")] = function()
-					bgColor:set(fromRGB(30, 30, 30))
-					contentColor:set(fromRGB(255, 255, 255))
+					isSelecting:set(false)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
 					local cost = ((peek(playerData.Levels) - 1) * 2 - peek(playerData.LvPoints)) * 20
@@ -237,7 +234,7 @@ local function CharacterFrame(self: table): Frame
 						Enabled = true,
 
 						Color = Tween(scope, Computed(scope, function(use)
-							return if use(bgColor) == fromRGB(30, 30, 30) then fromRGB(255, 85, 0) else fromRGB()
+							return if not use(isSelecting) then fromRGB(255, 85, 0) else fromRGB()
 						end), AssetBook.TweenInfos.twiceHalf),
 					}),
 					New(scope, "UIPadding")({ PaddingBottom = udNew(0, 1) })

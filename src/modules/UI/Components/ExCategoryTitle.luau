@@ -31,6 +31,8 @@ local function ExCategoryTitle(id: string, self: table): Frame
 		}))
 	end
 
+	local isSelecting = Fusion.Value(scope, false)
+
 	return New(scope, "Frame")({
 		Name = "Top",
 		BackgroundTransparency = 1,
@@ -73,7 +75,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 			Components.TextLabel(scope, {
 				Name = "Title",
 				Position = fromScale(0.063, 0.195),
-				Size = fromScale(0.85, 0.6),
+				Size = fromScale(0.87, 0.6),
 				Text = id,
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}),
@@ -83,22 +85,41 @@ local function ExCategoryTitle(id: string, self: table): Frame
 				Size = fromScale(0.04, 1),
 				Text = "X",
 
-				[Children] = {
-					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
-					Components.UIStroke(scope, {
-						Thickness = 3,
-						Enabled = true
-					}),
-				},
+				BackgroundColor3 = Computed(scope, function(use)
+					return if use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
+				end),
+				TextColor3 = Computed(scope, function(use)
+					return if not use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
+				end),
 
+				[OnEvent("MouseEnter")] = function()
+					isSelecting:set(true)
+				end,
+				[OnEvent("MouseLeave")] = function()
+					isSelecting:set(false)
+				end,
 				[OnEvent("MouseButton1Click")] = function()
 					if id == "Shop" or id == "Crafting" then
 						self.visible:set(false)
+						self.items:set({})
+						self.currentShop:set("")
 						return
 					end
 
 					ClientUtil:OpenUI(plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
 				end,
+
+				[Children] = {
+					New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
+					Components.UIStroke(scope, {
+						Thickness = 3,
+						Enabled = true,
+
+						Color = Computed(scope, function(use)
+							return if not use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
+						end),
+					}),
+				},
 			}),
 		},
 	})

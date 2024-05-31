@@ -68,8 +68,6 @@ local function setup()
         if char:GetAttribute("HitCD") >= 0 then HarukaLib:AddAttr(char, "HitCD", -1) end
     end))
 
-    char:SetAttribute("CharDataLoaded", true)
-
     if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then ServerUtil:EquipArmor(char, plr:GetAttribute("Cosmetic")) end
 
     --// Spawn to the nearest respawn point
@@ -229,6 +227,8 @@ local function charAttributesSetup()
             clearClassAttrs()
         end
     }))
+
+    char:SetAttribute("CharDataLoaded", true)
 end
 Spawn(charAttributesSetup)
 

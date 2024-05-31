@@ -12,6 +12,7 @@ local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local RecipeBook = require(RepS.Modules.Data.RecipeBook)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -53,7 +54,12 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 			items[#items + 1] = item.Name
 		end
 
-		Events.EnterShopping:Fire(plr, "Shop", items)
+		Events.EnterShopping:Fire(plr, "Shop", items, shop.Name)
+
+	elseif prompt.Name == "Crafting" then
+		local craftingTable = prompt.Parent.Parent :: Model
+
+		Events.EnterShopping:Fire(plr, "Crafting", nil, craftingTable.Name)
 
 	elseif prompt.Name == "Travel" then
 		local destination = prompt.ActionText
@@ -251,6 +257,21 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 	end
 end
 Events.EquipItems:Connect(equipItem)
+
+
+local function buyItems(plr: Player, item: string, amount: number)
+	local cost = ItemBook:FindItem(item).Price * amount
+
+	if plr:GetAttribute("Gold") < cost then
+		Events.CreateHint:Fire(plr, "You don't have enough Gold to buy this item!")
+		return
+	end
+
+	HarukaLib:AddAttr(plr, "Gold", -cost)
+
+	ServerUtil:GiveItem(plr, item, amount)
+end
+Events.BuyItems:Connect(buyItems)
 
 
 local function _essentialCheck(plr: Player, item: string) : string

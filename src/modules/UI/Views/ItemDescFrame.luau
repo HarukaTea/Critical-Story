@@ -55,14 +55,14 @@ local function ItemDescFrame(self: table): Frame
 				AutomaticSize = Enum.AutomaticSize.Y,
 
 				TextSize = Computed(scope, function(use)
-					return use(self.absStatSize) - 2
+					return use(self.absStatSize) - 4
 				end),
 				Text = Computed(scope, function(use)
 					return use(self.itemStats)
 				end),
 
 				[Children] = {
-					New(scope, "UITextSizeConstraint")({ MaxTextSize = 35 }),
+					New(scope, "UITextSizeConstraint")({ MaxTextSize = 30 }),
 				},
 			}),
 			Components.TextLabel(scope, {
@@ -86,7 +86,7 @@ local function ItemDescFrame(self: table): Frame
 				end),
 
 				[Children] = {
-					New(scope, "UITextSizeConstraint")({ MaxTextSize = 32 }),
+					New(scope, "UITextSizeConstraint")({ MaxTextSize = 29 }),
 				},
 			}),
 		},

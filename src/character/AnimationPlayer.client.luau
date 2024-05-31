@@ -10,6 +10,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local char = script.Parent :: Model
 local humanoid = char:WaitForChild("Humanoid") :: Humanoid
 local animator = humanoid:WaitForChild("Animator") :: Animator
+local plr = Players.LocalPlayer
 
 local animations = RepS.Package.Animations :: Folder
 
@@ -45,10 +46,7 @@ local anims = {
 local function playAnim(anim: string)
 	if not anims[anim] then warn("Can't found animation: "..anim.."!") return end
 
-	if anim == "MagicCastedAnim1" then
-		local class = Players.LocalPlayer:GetAttribute("Class") :: string
-		if AssetBook.ClassInfo[class].Type == "Magic" then anim = "MagicCastedAnim2" end
-	end
+	if anim == "MagicCastedAnim1" then if AssetBook.ClassInfo[plr:GetAttribute("Class")].Type == "Magic" then anim = "MagicCastedAnim2" end end
 
 	anims[anim]:Play()
 end

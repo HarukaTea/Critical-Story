@@ -27,10 +27,11 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         end
     }))
 
-    local function _handleItems(passedId: string, items: table)
+    local function _handleItems(passedId: string, items: table, shopName: string)
         if passedId == id then
             self.items:set(items)
             self.visible:set(true)
+            self.currentShop:set(shopName)
         end
     end
     Events.EnterShopping:Connect(_handleItems)
@@ -47,7 +48,6 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         ScrollingEnabled = Computed(scope, function(use)
             return if use(self.absContentSize) > use(self.absScrollSize) then true else false
         end),
-
         [Fusion.Ref] = self.itemFrame,
 
         [Fusion.OnChange("AbsoluteSize")] = function(newSize)

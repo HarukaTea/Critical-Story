@@ -5,11 +5,14 @@ local RepS = game:GetService("ReplicatedStorage")
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local Pinia = require(RepS.Modules.UI.Pinia.ShopPinia)
 
 local ShopItemList = require(RepS.Modules.UI.Views.ShopItemList)
 local ItemDescFrame = require(RepS.Modules.UI.Views.ItemDescFrame)
+local ItemCostFrame = require(RepS.Modules.UI.Views.ItemCostFrame)
 
 local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
 local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
@@ -54,7 +57,6 @@ return function(plr: Player)
 
 				[Children] = {
 					ExCategoryTitle("Shop", self),
-
 					ExCategoryBottomBtns("Right", self, {
 						Components.TextButton(scope, {
                             Name = "Buy",
@@ -63,7 +65,46 @@ return function(plr: Player)
                             Size = fromScale(0.24, 1),
 
                             [Fusion.OnEvent("MouseButton1Click")] = function()
+								for _, shop: Model in workspace.MapComponents.WorldShops:GetDescendants() do
+									if shop.Name ~= Fusion.peek(self.currentShop) then continue end
 
+									--- distance check
+									local distance = self.plr:DistanceFromCharacter(shop.Prompt.Position)
+									if distance >= 25 and distance > 0 then
+										Signals.CreateHint:Fire("You are far away from the shop!")
+										return
+									end
+
+									--- amount check
+									local amount = tonumber(Fusion.peek(self.buyAmount)) :: string
+									if amount then
+										local check = HarukaLib:TypeCheck("MinMax", amount, 0, 99999)
+										local check2 = HarukaLib:TypeCheck("Integer", amount)
+
+										if not check or not check2 then
+											Signals.CreateHint:Fire("Wrong input number!")
+											return
+										end
+
+										if amount > 1000 then
+											Signals.CreateHint:Fire("You can't buy 1k+ items at once!")
+											return
+										end
+									else
+										Signals.CreateHint:Fire("Wrong input number!")
+										return
+									end
+
+									--- item check
+									local item = "None"
+									for _, child: ImageButton in Fusion.peek(self.itemFrame):GetChildren() do
+										if child:IsA("ImageButton") and child:GetAttribute("Selected") then item = child.Name end
+									end
+									if item == "None" then return end
+
+									Events.BuyItems:Fire(item, amount)
+									break
+								end
                             end,
 
                             [Children] = {
@@ -81,35 +122,7 @@ return function(plr: Player)
 					}),
 
 					ItemDescFrame(self),
-
-					Components.Frame(scope, {
-						Name = "Stats",
-						Position = fromScale(0.853, 0.572),
-						Size = fromScale(0.25, 0.651),
-
-						[Children] = {
-							Fusion.New(scope, "UIListLayout")({
-								SortOrder = Enum.SortOrder.LayoutOrder,
-								Padding = UDim.new(0.05, 0),
-								HorizontalAlignment = Enum.HorizontalAlignment.Center,
-								VerticalAlignment = Enum.VerticalAlignment.Bottom
-							}),
-
-							Components.TextLabel(scope, {
-								Name = "ItemCost",
-								Position = fromScale(0.5, 0.052),
-								Size = fromScale(0.9, 0.075),
-								AnchorPoint = Vector2.new(0.5, 0.5),
-
-								Text = Fusion.Computed(scope, function(use)
-									return "COST "..use(self.itemCost).." GOLD"
-								end),
-								TextColor3 = Fusion.Computed(scope, function(use)
-									return use(self.itemCostColor)
-								end)
-							})
-						}
-					})
+					ItemCostFrame(self)
 				},
 			}),
 

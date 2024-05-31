@@ -16,12 +16,13 @@ local cfAngles = CFrame.Angles
 local rad = math.rad
 
 local function playSound(sound: Sound | string, pos: number?)
-	if sound == "StopAll" then
+	if sound == nil then
 		for _, music: Sound in workspace.Sounds:GetChildren() do
 			if music:IsA("Sound") then music:Stop() end
 		end
 		return
 	end
+
 	if sound.Playing then
 		local newSound = sound:Clone() :: Sound
 		newSound.PlayOnRemove = true

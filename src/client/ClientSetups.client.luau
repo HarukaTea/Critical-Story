@@ -85,7 +85,7 @@ local function chatRegister()
             --// System message
             properties.PrefixText = string.format(
                 "<font color='#%s'><b>%s</b></font>",
-                Color3.new(255, 255, 0):ToHex(),
+                Color3.fromRGB(255, 255, 0):ToHex(),
                 "[WORLD]"
             )
 
