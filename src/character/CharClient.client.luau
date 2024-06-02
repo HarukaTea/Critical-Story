@@ -20,7 +20,6 @@ local wait = task.wait
 local function changeLocation(location: string)
     if not location or location == "" then return end
 
-    wait()
     Events.ChangePlayerLocation:Fire(location)
 
     --- sounds

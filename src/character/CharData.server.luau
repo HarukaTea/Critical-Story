@@ -68,7 +68,8 @@ local function setup()
         if char:GetAttribute("HitCD") >= 0 then HarukaLib:AddAttr(char, "HitCD", -1) end
     end))
 
-    if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then ServerUtil:EquipArmor(char, plr:GetAttribute("Cosmetic")) end
+    local cosmetic = plr:GetAttribute("Cosmetic") :: string?
+    if cosmetic and cosmetic ~= "" then ServerUtil:EquipArmor(char, cosmetic) end
 
     --// Spawn to the nearest respawn point
     if not RS:IsStudio() then

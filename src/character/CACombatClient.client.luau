@@ -37,52 +37,6 @@ local cfNew = CFrame.new
 repeat wait() until Players.LocalPlayer:GetAttribute("PlayerDataLoaded")
 repeat wait() until char:GetAttribute("CharDataLoaded")
 
---// Pre-functions
-local function setup()
-	for _, folder: Folder in mapComponents.CombatHolders:GetChildren() do folder:Destroy() end
-	for _, folder: Folder in mapComponents.OrbHolders:GetChildren() do folder:Destroy() end
-
-	--- add all mobs
-	for _, monster: Model in monsterLocations:GetDescendants() do
-		if monster:HasTag("Monster") and monster.PrimaryPart and not monster:GetAttribute("SubMonster") then
-			monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
-		end
-	end
-	local function _addMonster(monster: Model)
-		wait()
-		if monster:GetAttribute("SubMonster") then return end
-
-		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
-
-		monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
-	end
-	local function _removeMonster(monster: Model)
-		for index: number, node: any in monsterNodes do
-			if node:GetObject() == monster then
-				node:Destroy()
-
-				table.remove(monsterNodes, index)
-			end
-		end
-	end
-	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
-	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_removeMonster))
-
-	--- detect mobs when player is near them
-    Add(HarukaLib.Clock(0.15, function()
-		if isInCombat then return end
-		if not char.PrimaryPart then return end
-
-		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 20)
-		for _, monster: Model in nearbyMonsters do
-			if not monster then continue end
-			if not monster.PrimaryPart then continue end
-
-			Events.CombatStart:Fire(monster)
-			break
-		end
-	end))
-end
 
 --// Connections
 local function startCombat(monster: Model)
@@ -232,6 +186,51 @@ Add(CS:GetInstanceAddedSignal("CombatHolder"):Connect(combatHolderHandler))
 Add(CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler))
 
 --// Setup
+local function setup()
+	for _, folder: Folder in mapComponents.CombatHolders:GetChildren() do folder:Destroy() end
+	for _, folder: Folder in mapComponents.OrbHolders:GetChildren() do folder:Destroy() end
+
+	--- add all mobs
+	for _, monster: Model in monsterLocations:GetDescendants() do
+		if monster:HasTag("Monster") and monster.PrimaryPart and not monster:GetAttribute("SubMonster") then
+			monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+		end
+	end
+	local function _addMonster(monster: Model)
+		wait()
+		if monster:GetAttribute("SubMonster") then return end
+
+		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
+
+		monsterNodes[#monsterNodes + 1] = monsterTree:CreateNode(monster.PrimaryPart.Position, monster)
+	end
+	local function _removeMonster(monster: Model)
+		for index: number, node: any in monsterNodes do
+			if node:GetObject() == monster then
+				node:Destroy()
+
+				table.remove(monsterNodes, index)
+			end
+		end
+	end
+	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
+	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_removeMonster))
+
+	--- detect mobs when player is near them
+    Add(HarukaLib.Clock(0.15, function()
+		if isInCombat then return end
+		if not char.PrimaryPart then return end
+
+		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 20)
+		for _, monster: Model in nearbyMonsters do
+			if not monster then continue end
+			if not monster.PrimaryPart then continue end
+
+			Events.CombatStart:Fire(monster)
+			break
+		end
+	end))
+end
 setup()
 
 --// Clear
