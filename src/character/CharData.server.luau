@@ -69,11 +69,14 @@ local function setup()
     end))
 
     local cosmetic = plr:GetAttribute("Cosmetic") :: string?
-    if cosmetic and cosmetic ~= "" then ServerUtil:EquipArmor(char, cosmetic) end
+    if cosmetic and cosmetic ~= "None" then ServerUtil:EquipArmor(char, cosmetic) end
 
     --// Spawn to the nearest respawn point
     if not RS:IsStudio() then
-        if plr:GetAttribute("RespawnLocation") ~= v3New() then char:PivotTo(cfNew(plr:GetAttribute("RespawnLocation"))) end
+        local area = plr:GetAttribute("LastSeenLocation") :: string
+        if not workspace.Maps:FindFirstChild(area) then return end
+
+        char:PivotTo(cfNew(workspace.Maps[area].SpawnPoint.Position))
     end
 end
 Spawn(setup)
@@ -89,14 +92,15 @@ local function classAttributesSetup()
         end
     end))
 
-    --- knight
-    Add(HarukaLib.Clock(1, function()
-        if char:GetAttribute("Guard") <= 0 then return end
-
-        HarukaLib:AddAttr(char, "Guard", -1)
+    --- wizard / knight / juggernaut / reaper
+    Add(HarukaLib.Clock(2, function()
+        if char:GetAttribute("Focus") > 0 then HarukaLib:AddAttr(char, "Focus", -1) end
+        if char:GetAttribute("Guard") > 0 then HarukaLib:AddAttr(char, "Guard", -1) end
+        if char:GetAttribute("Rage") > 0 then HarukaLib:AddAttr(char, "Rage", -1) end
+        if char:GetAttribute("LifeStolen") > 0 then HarukaLib:AddAttr(char, "LifeStolen", -1) end
     end))
 
-    --- Rogue
+    --- rogue
     Add(HarukaLib.Clock(0.6, function()
         if char:GetAttribute("RogueCri") <= 0 then return end
 
@@ -174,6 +178,8 @@ local function charAttributesSetup()
         char:SetAttribute("Focus", 0)
         char:SetAttribute("Guard", 0)
         char:SetAttribute("RogueCri", 0)
+        char:SetAttribute("Rage", 0)
+        char:SetAttribute("LifeStolen", 0)
         char.AlchemistCreations:ClearAllChildren()
     end
 

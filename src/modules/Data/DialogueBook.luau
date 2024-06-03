@@ -194,10 +194,6 @@ DialogueBook.Ethan = {
                 "Well, good luck then!"
              }
         }
-    },
-
-    Extra = {
-        Else = "JoinFaction"
     }
 }
 

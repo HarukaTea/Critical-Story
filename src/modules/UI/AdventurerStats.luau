@@ -151,7 +151,10 @@ return function(plr: Player)
 					ClassAbilityIndicator(self, "Knight"),
 					ClassAbilityIndicator(self, "Rogue"),
 
-					AlchemistAbilityIndicator(self, "Alchemist")
+					AlchemistAbilityIndicator(self),
+
+					ClassAbilityIndicator(self, "Juggernaut"),
+					ClassAbilityIndicator(self, "Reaper")
 				}
 			})
 		},
@@ -255,6 +258,12 @@ return function(plr: Player)
 		end,
 		["Attr-RogueCri"] = function(rogueCri: number)
 			charClassInfo.Rogue:set(rogueCri)
+		end,
+		["Attr-Rage"] = function(rage: number)
+			charClassInfo.Juggernaut:set(rage)
+		end,
+		["Attr-LifeStolen"] = function(lifeStolen: number)
+			charClassInfo.Reaper:set(lifeStolen)
 		end,
 
 		["Attr-InCombat"] = function(newState: boolean)

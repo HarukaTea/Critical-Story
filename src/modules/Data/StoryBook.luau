@@ -82,9 +82,9 @@ StoryBook.Main = {
     },
     {
         Name = "Initus Bay",
-        Target = "Start your adventure!",
+        Target = "Coming Soon",
         Desc = "",
-        NPC = "Hehe",
+        NPC = "None",
         Hint = v3New(),
 
         Rewards = {
@@ -101,8 +101,6 @@ StoryBook.Side = {
         Desc = "",
         NPC = "None",
         Hint = v3New(),
-
-        Script = true,
 
         Rewards = {
             EXP = 20,

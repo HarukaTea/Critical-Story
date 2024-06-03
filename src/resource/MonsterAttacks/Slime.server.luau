@@ -11,9 +11,8 @@ local wait = task.wait
 local cfNew = CFrame.new
 local random = math.random
 local v3New = Vector3.new
-local fromRGB = Color3.fromRGB
 
-local SLIME_COLOR = fromRGB(128, 187, 219)
+local SLIME_COLOR = monster:GetAttribute("SlimeColor")
 
 local function lookAt(target: Model)
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
@@ -28,6 +27,9 @@ local function slimeShot(target: Model)
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
+	if monster:GetAttribute("SPProjectile") then
+		blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
+	end
 
 	blast.Parent = monster.AttackHolder.Value
 end
@@ -41,42 +43,11 @@ local function slimeWave(target: Model)
 	blast:PivotTo(cfNew(post, post + monster.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
+	if monster:GetAttribute("SPProjectile") then
+		blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
+	end
 
 	blast.Parent = monster.AttackHolder.Value
-end
-
-local function slimeDiveDown()
-	local post = ServerUtil:FindPartOnRay(monster.PrimaryPart.Position)
-
-	local blast = RepS.Package.MonsterAttacks.Slime.Slime3:Clone() :: Model
-	blast.Owner.Value = monster
-	blast:PivotTo(cfNew(post, post + monster.PrimaryPart.CFrame.LookVector))
-
-	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-
-	blast.Parent = monster.AttackHolder.Value
-
-	local divedown = blast.Base.CFrame * cfNew(0,-8,0)
-	wait(0.5)
-	monster.PrimaryPart.CFrame = divedown
-end
-
-local function slimeDiveUp(target: Model)
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
-
-	local blast = RepS.Package.MonsterAttacks.Slime.Slime3:Clone() :: Model
-	blast.Owner.Value = monster
-	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
-
-	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-
-	blast.Parent = monster.AttackHolder.Value
-	monster.PrimaryPart.CFrame = blast.Base.CFrame * cfNew(0,-8,0)
-
-	local diveup = blast.Base.CFrame * cfNew(0, monster.PrimaryPart.Size.Y/2, 0)
-
-	wait(0.5)
-	monster.PrimaryPart.CFrame = diveup
 end
 
 local function slimeBarrage(target: Model)
@@ -87,6 +58,9 @@ local function slimeBarrage(target: Model)
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
+	if monster:GetAttribute("SPProjectile") then
+		blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
+	end
 
 	blast.Parent = monster.AttackHolder.Value
 
@@ -98,11 +72,14 @@ local function slimeBarrage(target: Model)
 		blastR:PivotTo(cfNew(postR, postR + target.PrimaryPart.CFrame.LookVector))
 
 		blastR:SetAttribute("SlimeColor", SLIME_COLOR)
+		if monster:GetAttribute("SPProjectile") then
+			blastR.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
+		end
 
 		blastR.Parent = monster.AttackHolder.Value
 	end
 
-	wait(0.5)
+	wait(0.35)
 	lookAt(target)
 
 	local blastS = RepS.Package.MonsterAttacks.Slime.SlimeSpin:Clone() :: Model
@@ -123,18 +100,18 @@ local function attacking()
 
 			if comboRandom == 1 then
 				slimeWave(target)
-				wait(0.35)
+				wait(0.5)
 
 			elseif comboRandom == 2 then
 				slimeBarrage(target)
-				wait(0.35)
+				wait(0.5)
 			end
 		end,
 
 		function (target: Model) : boolean
 			if random(1, 2) == 1 then
 				slimeWave(target)
-				wait(0.35)
+				wait(0.5)
 			end
 
 			return false
@@ -146,33 +123,23 @@ local function attacking()
 
 				for _ = 1, 5 do
 					slimeShot(target)
-					wait(0.02)
+					wait(0.05)
 				end
-				wait(0.35)
+				wait(0.5)
 			end
 		end,
 
 		function (target: Model) : boolean
 			for _ = 1, 3 do
 				slimeWave(target)
-				wait(0.5)
+				wait(0.8)
 			end
-		end,
-
-		function (target: Model) : boolean
-			slimeDiveDown()
-
-            monster:SetAttribute("CantAttack", true)
-
-            wait(0.5)
-            slimeDiveUp(target)
-            monster:SetAttribute("CantAttack", nil)
 		end,
 
 		function (target: Model) : boolean
 			for _ = 1, random(2,4) do
                 slimeBarrage(target)
-                wait(0.35)
+                wait(0.5)
             end
 		end,
 	})

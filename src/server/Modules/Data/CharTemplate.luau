@@ -42,5 +42,7 @@ return {
     Stack = 0,
     Focus = 0,
     Guard = 0,
-    RogueCri = 0
+    RogueCri = 0,
+    Rage = 0,
+    LifeStolen = 0
 }

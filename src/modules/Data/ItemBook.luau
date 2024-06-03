@@ -205,7 +205,7 @@ ItemBook.Items = {
         ["Icon"] = 17355782628,
         ["IsSkill"] = true,
         ["Mana"] = 200,
-        ["Price"] = 2000
+        ["Price"] = 15000
     },
     {
         ["ItemId"] = "TravellerBoots",
@@ -985,7 +985,7 @@ ItemBook.Items = {
         ["Icon"] = 14429563981,
         ["IsSkill"] = false,
         ["Mana"] = 0,
-        ["Price"] = 5000
+        ["Price"] = 50000
     }
 }
 

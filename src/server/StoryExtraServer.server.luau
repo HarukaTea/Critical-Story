@@ -44,12 +44,14 @@ Signals.FirstStepTutorial:Connect(firstCombat)
 
 --// Side
 local function newFactionJourney(plr: Player)
+    print("1")
     local check = false
     for _, quest: IntValue in plr.Quests:GetChildren() do
         if quest.Name == "Side" and quest.Value == 1 then check = true break end
     end
 
     if not check then
+        print("2")
         local intValue = Instance.new("IntConstrainedValue")
         intValue.Name = "Side"
         intValue.MinValue = 1

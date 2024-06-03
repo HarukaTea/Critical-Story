@@ -225,6 +225,13 @@ AssetBook.ClassInfo = {
     }
 }
 
+AssetBook.WorldInfo = {
+	Mainworld = 12343565896, PrivateTest = 12003361010, NiximCavern = 12294239008,
+	CE = 17302653565, TimeDomain = 11904003271, Everfrost = 12373196969,
+	Stronghold = 12373229403, Arkus = 13970315225, LoneTown = 16555333700,
+	SummerIsland = 17444533020
+}
+
 AssetBook.MonsterInfo = {
     SpikeFox = {
         Name = "Spike Fox",
@@ -244,7 +251,7 @@ AssetBook.MonsterInfo = {
     },
     ThornWolf = {
         Name = "Thorn Wolf",
-        Icon = "rbxassetid://15688333545",
+        Icon = "rbxassetid://16483664838",
         Drops = {
             SpikyFur = 60,
             SpikyQuills = 40
@@ -425,6 +432,15 @@ AssetBook.LocationInfo = {
         RecommendLevel = 150,
 
         Lighting = default
+    },
+
+    NorthernStronghold = {
+        Name = "Northern Stronghold",
+        Music = "Stronghold",
+        MusicVolume = 0.7,
+        RecommendLevel = 150,
+
+        Lighting = {}
     }
 }
 

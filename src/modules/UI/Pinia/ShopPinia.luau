@@ -35,7 +35,6 @@ local function BackpackPinia(self: table)
     self.itemCost = Value(0)
     self.itemCostColor = Value(fromRGB(255, 255, 0))
     self.buyAmount = Value("1")
-    self.currentShop = Value("None")
 
     self.items = Value({})
     self.itemFrame = Value()

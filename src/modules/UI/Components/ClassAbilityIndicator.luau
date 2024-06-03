@@ -95,7 +95,10 @@ local function ClassAbilityIndicator(self: table, class: string) : Frame
                         return use(self.charClassInfo.Rogue).."% CHANCE"
 
                     elseif class == "Juggernaut" then
-                        return "RAGE 33%"
+                        return "RAGE "..use(self.charClassInfo.Juggernaut).."%"
+
+                    elseif class == "Reaper" then
+                        return use(self.charClassInfo.Reaper).."% LIFE STOLEN"
                     end
                 end),
                 TextColor3 = AssetBook.ClassInfo[class].Color,

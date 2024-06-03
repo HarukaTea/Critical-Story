@@ -65,7 +65,8 @@ local function AdventurerStatsPinia(self: table)
 		Knight = Value(0),
 		Rogue = Value(0),
 		Alchemist = Value({}),
-		Juggernaut = Value(0)
+		Juggernaut = Value(0),
+		Reaper = Value(0)
 	}
 
     self.newAddedItems = Value({})

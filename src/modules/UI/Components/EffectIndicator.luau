@@ -80,7 +80,11 @@ local function EffectIndicator(effect: Script, scope: table) : ImageLabel
 				Position = fromScale(0.5, 0.6),
 				Size = fromScale(1.2, 0.5),
 				ZIndex = 3,
-				Text = effect:GetAttribute("Power").."x",
+
+				Text = Fusion.Computed(scope, function()
+					if effect:GetAttribute("Power") then return effect:GetAttribute("Power").."x" end
+					if effect:GetAttribute("Percentage") then return effect:GetAttribute("Percentage").."%" end
+				end),
 
 				[Children] = {
 					Components.TextUIStroke(scope, { Thickness = 2.5 })

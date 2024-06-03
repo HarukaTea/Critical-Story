@@ -33,6 +33,10 @@ local anims = {
 	AlchemistAnim2 = animator:LoadAnimation(animations.AlchemistAttack),
 	IllusionistAnim1 = animator:LoadAnimation(animations.WizardAttack),
 	IllusionistAnim2 = animator:LoadAnimation(animations.WizardAttack2),
+	JuggernautAnim1 = animator:LoadAnimation(animations.KnightAttack),
+	JuggernautAnim2 = animator:LoadAnimation(animations.KnightAttack2),
+	ReaperAnim1 = animator:LoadAnimation(animations.WarriorAttack),
+	ReaperAnim2 = animator:LoadAnimation(animations.WarriorAttack2),
 
 	FireStaffAnim1 = animator:LoadAnimation(animations.WizardAttack),
 	FireStaffAnim2 = animator:LoadAnimation(animations.WizardAttack2),

@@ -105,7 +105,7 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 				if itemType == "Cosmetic" then
 					local currentCos = self.plr:GetAttribute("Cosmetic") :: string
-					if not currentCos or currentCos == "" then
+					if not currentCos or currentCos == "None" then
 						Events.EquipItems:Fire("Cosmetic", "Cosmetic1", item)
 					else
 						Events.EquipItems:Fire("ClearCosmetic", "Cosmetic1", item)

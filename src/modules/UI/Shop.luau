@@ -46,14 +46,14 @@ return function(plr: Player)
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 
-		Enabled = Fusion.Computed(scope, function(use)
-			return use(self.visible)
-		end),
-
 		[Children] = {
 			Components.Frame(scope, {
 				Name = "BG",
 				ZIndex = 2,
+
+				Visible = Fusion.Computed(scope, function(use)
+					return use(self.visible)
+				end),
 
 				[Children] = {
 					ExCategoryTitle("Shop", self),
@@ -66,11 +66,12 @@ return function(plr: Player)
 
                             [Fusion.OnEvent("MouseButton1Click")] = function()
 								for _, shop: Model in workspace.MapComponents.WorldShops:GetDescendants() do
-									if shop.Name ~= Fusion.peek(self.currentShop) then continue end
+									if not plr:GetAttribute("CurrentShop") then break end
+									if shop.Name ~= plr:GetAttribute("CurrentShop") then continue end
 
 									--- distance check
 									local distance = self.plr:DistanceFromCharacter(shop.Prompt.Position)
-									if distance >= 25 and distance > 0 then
+									if distance >= 32 or distance <= 0 then
 										Signals.CreateHint:Fire("You are far away from the shop!")
 										return
 									end
@@ -129,7 +130,11 @@ return function(plr: Player)
 			Components.Frame(scope, {
 				Name = "Shadow",
 				BackgroundTransparency = 0.15,
-				ZIndex = 0
+				ZIndex = 0,
+
+				Visible = Fusion.Computed(scope, function(use)
+					return use(self.visible)
+				end),
 			})
 		},
 	})

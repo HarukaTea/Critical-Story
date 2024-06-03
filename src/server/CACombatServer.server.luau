@@ -207,6 +207,8 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
         local oriDmg = dmg
 		dmg = floor(oriDmg - (oriDmg * char:GetAttribute("Guard")) / 100)
 
+		ServerUtil:ShowText(char, "GUARDED!", AssetBook.ClassInfo.Knight.Color)
+
 		char:SetAttribute("Guard", 0)
 	end
 

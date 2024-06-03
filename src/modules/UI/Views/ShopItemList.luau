@@ -27,11 +27,12 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         end
     }))
 
-    local function _handleItems(passedId: string, items: table, shopName: string)
+    local function _handleItems(passedId: string, items: table)
         if passedId == id then
             self.items:set(items)
             self.visible:set(true)
-            self.currentShop:set(shopName)
+
+            self:DeselectAll()
         end
     end
     Events.EnterShopping:Connect(_handleItems)

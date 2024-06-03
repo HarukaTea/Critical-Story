@@ -60,7 +60,8 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local class = forceClass or plr:GetAttribute("Class") :: string
 	local styleFolder = RepS.Package.StyleWeapons[class] :: Folder
 
-	if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then return end
+	if char.Humanoid.Health <= 0 then return end
+	if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "None" then return end
 
 	for _, child: Instance in char:GetChildren() do
 		if child:HasTag("Weapon") then child:Destroy() end
@@ -90,64 +91,68 @@ end
 	Equip cosmetics, just like equip weapons, you can pass a cosmetic to force equip
 ]]
 function ServerUtil:EquipArmor(char: Model, armorId: string)
-    if char.Humanoid.Health > 0 then
-        if char:FindFirstChild("Armor") then char.Armor:Destroy() end
-		for _, child: Instance in char:GetChildren() do
-			if child:HasTag("Weapon") then child:Destroy() end
+	if char.Humanoid.Health <= 0 then return end
+
+	if char:FindFirstChild("Armor") then char.Armor:Destroy() end
+
+	for _, child: Instance in char:GetChildren() do
+		if child:HasTag("Weapon") then child:Destroy() end
+	end
+
+	if not armorId or armorId == "" or armorId == "None" then
+		ServerUtil:EquipWeapon(char)
+		return
+	end
+
+	local armor = RepS.Package.Cosmetics[armorId]:Clone() :: Model
+	local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg" }
+
+	--- wait character fully loads
+	for _, part: string in equipList do char:WaitForChild(part, 999) end
+
+	--- equip armor
+	local function _equipArmorPart(part: string)
+		for _, child: BasePart in armor[part]:GetChildren() do
+			if child.Name ~= "Middle" then
+				local weldC = instanceNew("WeldConstraint")
+				weldC.Part0 = child.Parent.Middle
+				weldC.Part1 = child
+				weldC.Parent = armor
+			end
 		end
 
-		if not armorId then return end
+		local weld = instanceNew("Weld")
+		weld.Part0 = char:FindFirstChild(if part == "Extra" then "Torso" else part)
+		weld.Part1 = armor[part].Middle
+		weld.Parent = armor
+	end
+	for _, part: string in equipList do
+		if not armor:FindFirstChild(part) then continue end
 
-		local armor = RepS.Package.Cosmetics[armorId]:Clone() :: Model
-        local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg" }
+		_equipArmorPart(part)
+	end
 
-        --- wait character fully loads
-        for _, part: string in equipList do char:WaitForChild(part, 999) end
+	--- equip weapon
+	local function _weldWeapon(weapon: string, part: string)
+		if not armor:FindFirstChild(weapon) then return end
 
-		--- equip armor
-		local function _equipArmorPart(part: string)
-			for _, child: BasePart in armor[part]:GetChildren() do
-                if child.Name ~= "Middle" then
-                    local weldC = instanceNew("WeldConstraint")
-                    weldC.Part0 = child.Parent.Middle
-                    weldC.Part1 = child
-                    weldC.Parent = armor
-                end
-            end
+		local realWeapon = armor[weapon]:Clone() :: Model
+		ServerUtil:WeldPart(char[part.." Arm"], realWeapon)
 
-            local weld = instanceNew("Weld")
-            weld.Part0 = char:FindFirstChild(if part == "Extra" then "Torso" else part)
-            weld.Part1 = armor[part].Middle
-            weld.Parent = armor
-		end
-        for _, part: string in equipList do
-			if not armor:FindFirstChild(part) then continue end
+		realWeapon:AddTag("Weapon")
+		realWeapon.Parent = char
+	end
+	_weldWeapon("HandleLeft", "Left")
+	_weldWeapon("HandleRight", "Right")
 
-            _equipArmorPart(part)
-        end
+	-- equip extra
+	if armor:FindFirstChild("Extra") then _equipArmorPart("Extra") end
 
-		--- equip weapon
-		local function _weldWeapon(weapon: string, part: string)
-			if not armor:FindFirstChild(weapon) then return end
+	--- ray cancels
+	ServerUtil:SetCollisionGroup(armor, "Player")
 
-			local realWeapon = armor[weapon]:Clone() :: Model
-			ServerUtil:WeldPart(char[part.." Arm"], realWeapon)
-
-			realWeapon:AddTag("Weapon")
-			realWeapon.Parent = char
-		end
-		_weldWeapon("HandleLeft", "Left")
-		_weldWeapon("HandleRight", "Right")
-
-		-- equip extra
-		if armor:FindFirstChild("Extra") then _equipArmorPart("Extra") end
-
-		--- ray cancels
-		ServerUtil:SetCollisionGroup(armor, "Player")
-
-		armor.Name = "Armor"
-        armor.Parent = char
-    end
+	armor.Name = "Armor"
+	armor.Parent = char
 end
 
 --[[

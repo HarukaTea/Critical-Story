@@ -27,7 +27,7 @@ local function CosmeticSlot(self: table): Frame
 
 	HarukaLib:Hydrate(self.plr, {
 		["Attr-Cosmetic"] = function(newCos: string)
-			if not newCos or newCos == "" then return end
+			if not newCos or newCos == "None" then return end
 
 			self.cosmeticEquipped:set(newCos)
 		end

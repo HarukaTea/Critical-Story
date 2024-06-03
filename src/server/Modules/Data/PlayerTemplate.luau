@@ -11,7 +11,8 @@ return {
 
 			Class = "Warrior",
 			LastSeenLocation = "MonolithVillage",
-			RespawnLocation = { "Vector3", 0, 0, 0 },
+			LastSeenWorld = "Mainworld",
+			Cosmetic = "None",
 
 			LvPoints = 0,
 			DMGPoints = 0,
@@ -54,7 +55,8 @@ return {
 
 			Class = "Warrior",
 			LastSeenLocation = "MonolithVillage",
-			RespawnLocation = { "Vector3", 0, 0, 0 },
+			LastSeenWorld = "Mainworld",
+			Cosmetic = "None",
 
 			LvPoints = 0,
 			DMGPoints = 0,
@@ -97,7 +99,8 @@ return {
 
 			Class = "Warrior",
 			LastSeenLocation = "MonolithVillage",
-			RespawnLocation = { "Vector3", 0, 0, 0 },
+			LastSeenWorld = "Mainworld",
+			Cosmetic = "None",
 
 			LvPoints = 0,
 			DMGPoints = 0,

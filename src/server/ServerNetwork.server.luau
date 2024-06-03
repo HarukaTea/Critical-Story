@@ -8,6 +8,7 @@ local SS = game:GetService("ServerStorage")
 local TeleS = game:GetService("TeleportService")
 local TestS = game:GetService("TestService")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -54,25 +55,26 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 			items[#items + 1] = item.Name
 		end
 
-		Events.EnterShopping:Fire(plr, "Shop", items, shop.Name)
+		plr:SetAttribute("CurrentShop", shop.Name)
 
-	elseif prompt.Name == "Crafting" then
-		local craftingTable = prompt.Parent.Parent :: Model
-
-		Events.EnterShopping:Fire(plr, "Crafting", nil, craftingTable.Name)
+		Events.EnterShopping:Fire(plr, "Shop", items)
 
 	elseif prompt.Name == "Travel" then
-		local destination = prompt.ActionText
-		local locator = prompt:GetAttribute("Locator") :: string
+		local world = prompt:GetAttribute("Destination") :: string
+		local worldId = AssetBook.WorldInfo[world]
 
-		Events.SwitchScene:Fire(plr, 1)
+		if prompt:GetAttribute("Require") then
+			if not plr.Inventory:FindFirstChild(prompt:GetAttribute("Require")) then
+				Events.CreateHint:Fire(plr, "You don't have a ticket!")
+				return
+			end
+		end
+		local joinData = plr:GetJoinData().TeleportData :: table?
+		local slotChosen = if joinData then joinData[1] else "Slot1"
 
-		wait(0.6)
-		local success = pcall(function() --// remind me that I didn't add the locators
-			plr.Character:PivotTo(workspace.Maps[destination][locator].CFrame)
-		end)
-
-		if not success then warn("Failed to teleport to "..locator.." in "..destination.."!") end
+		local teleportOptions = instanceNew("TeleportOptions")
+		teleportOptions:SetTeleportData({ slotChosen })
+		TeleS:TeleportAsync(worldId, { plr }, teleportOptions)
 
 	elseif prompt.Name == "Material" then
 		local hasTool = false
@@ -229,9 +231,8 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 		Events.EquipItems:Fire(plr, itemSlot, item)
 
 	elseif itemType == "Cosmetic" then
-		if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "" then return end
-
 		plr:SetAttribute("Cosmetic", item)
+
 		_equipNewItem(plr, item, itemSlot)
 
 		ServerUtil:EquipArmor(plr.Character, item)
@@ -251,7 +252,7 @@ local function equipItem(plr: Player, itemType: string, itemSlot: string, item: 
 	elseif itemType == "ClearCosmetic" then
 		_unequipCheck(plr, item)
 
-		plr:SetAttribute("Cosmetic", nil)
+		plr:SetAttribute("Cosmetic", "None")
 
 		ServerUtil:EquipArmor(char, nil)
 	end
@@ -261,7 +262,20 @@ Events.EquipItems:Connect(equipItem)
 
 local function buyItems(plr: Player, item: string, amount: number)
 	local cost = ItemBook:FindItem(item).Price * amount
+	local currentShop = plr:GetAttribute("CurrentShop") :: string
 
+	if not currentShop then
+		Events.CreateHint:Fire(plr, "You aren't in the shop!")
+		return
+	else
+		local shopModel = workspace.MapComponents.WorldShops:FindFirstChild(currentShop, true)
+		local distance = plr:DistanceFromCharacter(shopModel.Prompt.Position)
+
+		if distance >= 25 or distance <= 0 then
+			Events.CreateHint:Fire(plr, "You're far away from the shop!")
+			return
+		end
+	end
 	if plr:GetAttribute("Gold") < cost then
 		Events.CreateHint:Fire(plr, "You don't have enough Gold to buy this item!")
 		return

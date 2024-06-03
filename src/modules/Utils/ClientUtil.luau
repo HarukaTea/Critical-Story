@@ -19,9 +19,7 @@ local sFind = string.find
 
 local ClientUtil = {}
 
---[[
-    The class hit visual effects
-]]
+
 function ClientUtil:ClassHitVFX(monster: Model, char: Model)
     pcall(function()
         local plr = Players:GetPlayerFromCharacter(char)
@@ -44,9 +42,7 @@ function ClientUtil:ClassHitVFX(monster: Model, char: Model)
     end)
 end
 
---[[
-    Hit by monsters
-]]
+
 function ClientUtil:CharOnHit(char: Model)
     pcall(function()
         local hitEff = RepS.Package.Effects.HitEffect:Clone() :: BasePart
@@ -86,9 +82,7 @@ function ClientUtil:SetCharTrans(trans: number, char: Model)
     end)
 end
 
---[[
-    Get all key locations in story
-]]
+
 function ClientUtil:GetKeyStoryLocations() : table
     local pos = {}
 
@@ -114,9 +108,7 @@ function ClientUtil:GetKeyStoryLocations() : table
     return pos
 end
 
---[[
-    Freeze player's controls, usually used for chat and combat
-]]
+
 function ClientUtil:FreezePlayerControls(action: string)
     if action == "Freeze" then
         UIS.ModalEnabled = true
@@ -131,9 +123,7 @@ function ClientUtil:FreezePlayerControls(action: string)
     end
 end
 
---[[
-    Common functions for menu and backpack UI
-]]
+
 function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
     if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
     if not plr.Character then return end

@@ -112,8 +112,9 @@ local function PlayerSlot(self: table, player: Player, scope: table): Frame
 						end
 					end
 
-					if player:GetAttribute("Cosmetic") and player:GetAttribute("Cosmetic") ~= "" then
-						self.playerItemIconList[7]:set(player:GetAttribute("Cosmetic"), true)
+					local cosmetic = player:GetAttribute("Cosmetic") :: string
+					if cosmetic and cosmetic ~= "None" then
+						self.playerItemIconList[7]:set(cosmetic, true)
 					end
 
 					self.playerDescVisible:set(true)

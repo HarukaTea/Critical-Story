@@ -20,9 +20,7 @@ local cfNew, v3New = CFrame.new, Vector3.new
 local cfAngles = CFrame.Angles
 local rad, floor = math.rad, math.floor
 
---[[
-    RNG this attack to be a critical attack, and return the result
-]]
+
 function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, forceRarity: number?) : string
     local char = plr.Character
     local criChanceRarity = forceRarity or char:GetAttribute("CriChance")
@@ -49,15 +47,17 @@ function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, f
     return result
 end
 
---[[
-    Deal damage to monsters
-]]
-function CAAttackUtil:DealDMG(plr: Player, monster: Model, dmg: number)
+
+function CAAttackUtil:DealDMG(plr: Player, monster: Model, dmg: number, noCri: boolean?) : string
     ServerUtil:ShowNumber(monster, dmg, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
 
     HarukaLib:AddAttr(monster, "Health", -dmg)
 
-    CAAttackUtil:CriticalHit(plr, monster, dmg)
+    if noCri then return "None" end
+
+    local criResult = CAAttackUtil:CriticalHit(plr, monster, dmg)
+
+    return criResult
 end
 
 
@@ -72,6 +72,8 @@ function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 		local comboEff = RepS.Package.Effects.ComboEffect:Clone() :: ParticleEmitter
 		comboEff.Parent = monster.PrimaryPart
 		Debris:AddItem(comboEff, 1)
+
+        ServerUtil:ShowText(char, "COMBO!", AssetBook.ClassInfo.Warrior.Color)
 
         CAAttackUtil:DealDMG(plr, monster, finalDamage)
 	else
@@ -95,15 +97,12 @@ function CAAttackUtil.Archer(plr: Player, monster: Model, baseDamage: number)
         --- bow dmg
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
-        --- arrow dmg
+        -- arrow dmg
         for _ = char:GetAttribute("Stack"), 1, -1 do
-            if monster:GetAttribute("Health") <= 0 then break end
-
-            HarukaLib:AddAttr(char, "Stack", -1)
-
             CAAttackUtil:DealDMG(plr, monster, baseDamage)
         end
-        if char:GetAttribute("Stack") <= 0 then char:SetAttribute("Stack", 0) end
+
+        char:SetAttribute("Stack", 0)
     else
         CAAttackUtil:DealDMG(plr, monster, baseDamage)
     end
@@ -129,7 +128,10 @@ function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
         char:SetAttribute("Focus", 0)
 
         BuffEffectsUtil:MagicVFX(monster)
-        CAAttackUtil:DealDMG(plr, monster, floor(baseDamage * 3))
+
+        ServerUtil:ShowText(char, "BURST!", AssetBook.ClassInfo.Wizard.Color)
+
+        CAAttackUtil:DealDMG(plr, monster, floor(baseDamage * 3), true)
     end
 
     BuffEffectsUtil:RestoreManaByOrb(plr.Character)
@@ -150,16 +152,15 @@ function CAAttackUtil.Rogue(plr: Player, monster: Model, baseDamage: number)
     local char = plr.Character
 
     HarukaLib:AddAttr(char, "RogueCri", 10)
-    CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     if char:GetAttribute("RogueCri") > 100 then char:SetAttribute("RogueCri", 100) end
-
-    --- extra critical hit roll cuz it's rogue class
-    local result = CAAttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCri"))
-
-    if result == "CriticalHit" then char:SetAttribute("RogueCri", 0) end
-
     BuffEffectsUtil:RestoreManaByOrb(plr.Character)
+
+    local result = CAAttackUtil:DealDMG(plr, monster, baseDamage)
+    if result == "CriticalHit" then return end --- double crit disabled
+
+    local exResult = CAAttackUtil:CriticalHit(plr, monster, baseDamage, char:GetAttribute("RogueCri"))
+    if exResult == "CriticalHit" then char:SetAttribute("RogueCri", 0) end
 end
 
 function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, orb: Model)
@@ -242,6 +243,8 @@ local function _createAlchemy(char: Model, color: string)
             if created.Name == "Green" then g += 1 end
         end
 
+        ServerUtil:ShowText(char, "ALCHEMY!", AssetBook.ClassInfo.Alchemist.Color)
+
         char.AlchemistCreations:ClearAllChildren()
 
         if r >= 3 then
@@ -322,9 +325,19 @@ function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: numbe
 
                 child:Destroy()
 
-                local explosionDMG = floor(baseDamage / 3)
-                ServerUtil:ShowNumber(monster, explosionDMG, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
-                HarukaLib:AddAttr(monster, "Health", -explosionDMG)
+                pcall(function()
+                    local monsters = char.CharStats.TargetMonsters:GetChildren() :: table
+                    for _, targetMonster: ObjectValue in monsters do
+                        if not targetMonster.Value then continue end
+                        if not targetMonster.Value.PrimaryPart then continue end
+
+                        local explosionDMG = floor(baseDamage / 2)
+
+                        ServerUtil:ShowNumber(targetMonster.Value, explosionDMG, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
+
+                        HarukaLib:AddAttr(targetMonster.Value, "Health", -explosionDMG)
+                    end
+                end)
             end
         end
     end
@@ -332,6 +345,71 @@ function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: numbe
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
 
     BuffEffectsUtil:RestoreManaByOrb(char)
+end
+
+function CAAttackUtil.Juggernaut(plr: Player, monster: Model, baseDamage: number)
+    local char = plr.Character
+
+    HarukaLib:AddAttr(char, "Rage", 15)
+
+    if char:GetAttribute("Rage") >= 100 then
+        char:SetAttribute("Rage", 100)
+
+        ServerUtil:ShowText(char, "RAGING!", AssetBook.ClassInfo.Juggernaut.Color)
+
+        Spawn(function()
+            while wait(0.015) do
+                if char:GetAttribute("Rage") < 0 then return end
+
+                HarukaLib:AddAttr(char, "Rage", -1)
+            end
+        end)
+
+        local pos, pos2 = ServerUtil:GenerateOrbPos(monster), ServerUtil:GenerateOrbPos(monster)
+
+        local juggHealOrb = RepS.Package.PlayerAttacks.JuggernautHealOrb:Clone() :: Model
+        juggHealOrb.Owner.Value = plr.Character
+        juggHealOrb:PivotTo(pos)
+        juggHealOrb:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
+        juggHealOrb.Parent = workspace.MapComponents.OrbHolders[plr.Name]
+        Debris:AddItem(juggHealOrb, char:GetAttribute("OrbLifeTime"))
+
+        local juggPierceOrb = RepS.Package.PlayerAttacks.JuggernautPierceOrb:Clone() :: Model
+        juggPierceOrb.Owner.Value = plr.Character
+        juggPierceOrb:PivotTo(pos2)
+        juggPierceOrb:SetAttribute("OrbLifeTime", char:GetAttribute("OrbLifeTime"))
+        juggPierceOrb.Parent = workspace.MapComponents.OrbHolders[plr.Name]
+        Debris:AddItem(juggPierceOrb, char:GetAttribute("OrbLifeTime"))
+    end
+
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
+
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
+end
+
+function CAAttackUtil.JuggernautHeal(plr: Player)
+    BuffEffectsUtil:Heal(plr.Character, plr.Character:GetAttribute("MaxHealth"))
+end
+function CAAttackUtil.JuggernautPierce(plr: Player, monster: Model)
+    BuffEffectsUtil:Burn(plr.Character, monster, 6)
+end
+
+function CAAttackUtil.Reaper(plr: Player, monster: Model, baseDamage: number)
+    local char = plr.Character
+
+    HarukaLib:AddAttr(char, "LifeStolen", 15)
+    if char:GetAttribute("LifeStolen") >= 100 then
+        char:SetAttribute("LifeStolen", 0)
+
+        ServerUtil:ShowText(char, "LIFE STOLE!", AssetBook.ClassInfo.Reaper.Color)
+
+        BuffEffectsUtil:Heal(char, char.Humanoid.MaxHealth)
+        CAAttackUtil:DealDMG(plr, monster, char.Humanoid.Health)
+    end
+
+    CAAttackUtil:DealDMG(plr, monster, baseDamage)
+
+    BuffEffectsUtil:RestoreManaByOrb(plr.Character)
 end
 
 function CAAttackUtil.FireStaff(plr: Player, monster: Model)

@@ -1,7 +1,6 @@
 --!nocheck
 
 local BS = game:GetService("BadgeService")
-local GS = game:GetService("GroupService")
 local HttpService = game:GetService("HttpService")
 local MS = game:GetService("MessagingService")
 local Players = game:GetService("Players")
@@ -70,6 +69,17 @@ local function mainSetup()
  		end
 	end)
 
+	--- clear touches
+	Spawn(function()
+		for _, child: Instance in workspace:GetDescendants() do
+			if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
+				if child:HasTag("Bounce") then continue end
+
+				child.CanTouch = false
+			end
+		end
+	end)
+
 	--- npc setups
 	Spawn(function()
 		for _, npc: Model in workspace.MapComponents.NPCs:GetChildren() do
@@ -105,6 +115,7 @@ local function mainSetup()
 				zone.Transparency = 1
 				zone.CanCollide = false
 				zone.CanQuery = false
+				zone.CanTouch = true
 			end
 		end
 	end)
@@ -141,11 +152,10 @@ local function mainSetup()
 			SS.Resources.Unloads.MonsterData:Clone().Parent = child
 		end
 		for _, child: Model in RepS.Package.MonsterAttacks:GetDescendants() do
-			if SS.Resources.MonsterBlastAttacks:FindFirstChild(child.Name) then
-				SS.Resources.MonsterBlastAttacks[child.Name]:Clone().Parent = child
-			end
-			if child:GetAttribute("LinkedScript") then
-				SS.Resources.MonsterBlastAttacks[child:GetAttribute("LinkedScript")]:Clone().Parent = child
+			local ref = child:GetAttribute("LinkedScript") or child.Name
+
+			if SS.Resources.MonsterBlastAttacks:FindFirstChild(ref) then
+				SS.Resources.MonsterBlastAttacks[ref]:Clone().Parent = child
 			end
 		end
 
@@ -168,11 +178,7 @@ local function mainSetup()
 		local function _playerAdded(plr: Player)
 			BS:AwardBadge(plr.UserId, 2129794618)
 
-			local groups = GS:GetGroupsAsync(plr.UserId)
-			local rank = 0
-			for _, group in groups do
-				if group.Id == 16912246 then rank = group.Rank end --// Milkshake shop
-			end
+			local rank = plr:GetRankInGroup(16912246)
 			plr:SetAttribute("Rank", rank)
 
 			if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end

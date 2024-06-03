@@ -102,7 +102,6 @@ local function ExCategoryTitle(id: string, self: table): Frame
 					if id == "Shop" or id == "Crafting" then
 						self.visible:set(false)
 						self.items:set({})
-						self.currentShop:set("")
 						return
 					end
 

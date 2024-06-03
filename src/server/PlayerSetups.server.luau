@@ -89,7 +89,10 @@ local function setup(plr: Player)
 			questsData.Parent = plr
 
 			---// Load stats
+			local blackList = { "V9Transfered", "RespawnLocation" }
 			for attr: string, val: any in data.Stats do
+				if table.find(blackList, attr) then continue end
+
 				plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
 				Add(HarukaLib:Hydrate(plr, {
