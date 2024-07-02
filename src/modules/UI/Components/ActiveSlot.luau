@@ -4,6 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -106,7 +107,7 @@ local function ActiveSlot(index: number, self: table): Frame
 				Image = Computed(scope, function(use)
 					local item = use(self.activeEquipList[index]) :: string
 
-					return if ItemBook:IsItemExist(item) then "rbxassetid://"..ItemBook:FindItem(item).Icon else ItemBook.ItemImagesEx.Null
+					return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
 				end)
 			}),
 			Components.TextLabel(scope, {

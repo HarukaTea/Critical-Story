@@ -1,5 +1,6 @@
 --!nocheck
 
+local BadgeService = game:GetService("BadgeService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -11,6 +12,7 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local Promise = require(RepS.Modules.Packages.Promise)
 
 local Add, Empty = HarukaLib.Bin()
 
@@ -161,6 +163,17 @@ local function charAttributesSetup()
     end
     local function levelReqCheck()
         local level = plr:GetAttribute("Levels") :: number
+
+        Spawn(function()
+            Promise.new(function()
+                local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2132605760)
+
+                if not hasBadge then BadgeService:AwardBadge(plr.UserId, 2132605760) end
+
+            end):Catch(function(err)
+                warn(err)
+            end)
+        end)
 
         if plr:GetAttribute("EXP") >= floor(level ^ 1.65) + 49 then
             if lvUpCD then return end

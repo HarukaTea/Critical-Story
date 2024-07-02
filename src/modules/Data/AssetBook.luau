@@ -262,7 +262,7 @@ AssetBook.MonsterInfo = {
         Icon = "rbxassetid://15688333545",
         Drops = {
             BlackFur = 90,
-            BlackWolfNecklace = 10
+            BlackwolfNecklace = 10
         }
     },
 

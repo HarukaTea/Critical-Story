@@ -68,6 +68,12 @@ local function chatRegister()
                 local role = sender:GetAttribute("Role") :: string
                 local roleInfo: table?
 
+                if role == "Alpha Tester" then
+                    roleInfo = {
+                        ChatRole = "Alpha",
+                        Color = "#70a1ff"
+                    }
+                end
                 for _, roleinfo: table in AssetBook.RankRoleInfo do
                     if roleinfo.Role == role then roleInfo = roleinfo break end
                 end

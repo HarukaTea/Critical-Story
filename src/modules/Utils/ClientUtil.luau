@@ -65,9 +65,7 @@ function ClientUtil:CharOnHit(char: Model)
     end
 end
 
---[[
-    Character was hit by mobs
-]]
+
 function ClientUtil:SetCharTrans(trans: number, char: Model)
     pcall(function()
         for _, child: Instance in char:GetChildren() do
@@ -124,7 +122,7 @@ function ClientUtil:FreezePlayerControls(action: string)
 end
 
 
-function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
+function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
     if not plr:GetAttribute("CurrentMenu") then plr:SetAttribute("CurrentMenu", "None") end
     if not plr.Character then return end
     if not plr.Character.PrimaryPart then return end
@@ -169,8 +167,21 @@ function ClientUtil:OpenUI(plr: Player, targetUI: string, isForce: boolean?)
         plr:SetAttribute("CurrentMenu", targetUI)
 
         _setExVisibleState(plrGui[targetUI], true)
-        _setExVisibleState(if targetUI == "Backpack" then plrGui.AdventurerMenu else plrGui.Backpack, false)
+
+        local closeList = { "AdventurerMenu", "Backpack", "Shop" }
+        for _, closeUI: string in closeList do
+            if closeUI == targetUI then continue end
+
+            _setExVisibleState(plrGui[closeUI], false)
+        end
     end
+end
+
+
+function ClientUtil:CombineRbxId(id: string?)
+    if not id then return "rbxassetid://0" end
+
+    return "rbxassetid://".. id
 end
 
 return ClientUtil

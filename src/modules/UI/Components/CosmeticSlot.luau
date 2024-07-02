@@ -4,6 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -54,7 +55,7 @@ local function CosmeticSlot(self: table): Frame
 				Image = Fusion.Computed(scope, function(use)
 					local item = use(self.cosmeticEquipped) :: string
 
-					return if item == "Null" then ItemBook.ItemImagesEx.Null else "rbxassetid://"..ItemBook:FindItem(item).Icon
+					return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
 				end),
 			}),
 			Components.HoverImageButton(scope, {

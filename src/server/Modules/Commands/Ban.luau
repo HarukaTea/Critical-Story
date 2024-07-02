@@ -13,7 +13,7 @@ return {
         {
             Type = "number",
             Name = "duration",
-            Description = "The duration of ban, in hours"
+            Description = "The duration of ban, in SECONDS, -1 is permanent ban"
         },
         function(context: table)
             return {

@@ -63,7 +63,7 @@ local function combatEnds()
                 for _, defeated: Model in beatList do
                     totalEXP += defeated:GetAttribute("EXP")
 
-                    local drop = HarukaLib:RollLoot(AssetBook.MonsterInfo[monster.Name].Drops)
+                    local drop = HarukaLib:RollLoot(AssetBook.MonsterInfo[defeated.Name].Drops)
 	                ServerUtil:GiveItem(player, drop, 1)
                 end
 
@@ -72,7 +72,7 @@ local function combatEnds()
                 HarukaLib:AddAttr(player, "RP", floor(totalEXP / 6))
 
                 ServerUtil:ShowText(char, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
-                ServerUtil:ShowText(char, "+" .. floor(totalEXP / 1.5) .. " Gold", fromRGB(255, 255, 127))
+                ServerUtil:ShowText(char, "+" .. floor(totalEXP / 2) .. " Gold", fromRGB(255, 255, 127))
                 ServerUtil:ShowText(char, "+" .. floor(totalEXP / 6) .. " RP", fromRGB(0, 255, 255))
 
                 --// Clear

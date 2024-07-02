@@ -18,8 +18,6 @@ local function BackpackPinia(self: table)
 
     self.Add, self.Empty = HarukaLib.Bin()
 
-    self.visible = Value(false)
-
     local camVPSize = workspace.CurrentCamera.ViewportSize
 
     self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })

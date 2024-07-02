@@ -4,6 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -43,11 +44,27 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: t
 	end)
 
 	item = item.Name
+
 	local itemInfo = ItemBook:FindItem(item)
+	if itemInfo.ItemId == nil then
+		itemInfo = {
+			["ItemId"] = "???",
+			["Name"] = "???",
+			["Type"] = "Material",
+			["Tier"] = 1,
+			["Desc"] = "???",
+			["Stat"] = "???",
+			["Icon"] = 2985521957,
+			["IsSkill"] = false,
+			["Mana"] = 0,
+			["Price"] = 0
+		}
+	end
+
 	return Components.HoverImageButton(scope, {
 		Name = item,
 		BackgroundTransparency = 0,
-		Image = "rbxassetid://"..itemInfo.Icon,
+		Image = ClientUtil:CombineRbxId(itemInfo.Icon),
 
 		[Children] = {
 			Components.RoundUICorner(scope),

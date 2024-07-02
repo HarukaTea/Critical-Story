@@ -1,6 +1,7 @@
 --!nocheck
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
 
@@ -31,26 +32,23 @@ local function startAnim(anim: AnimationTrack, transitionTime: number)
 	end
 end
 local localStateFunctions = {
-	[Enum.HumanoidStateType.Jumping] = function()
-		startAnim(ANIMS.Jumping, 0.1)
-	end,
-	[Enum.HumanoidStateType.Freefall] = function()
-		startAnim(ANIMS.Freefall, 0.1)
-	end,
-	[Enum.HumanoidStateType.Seated] = function()
-		startAnim(ANIMS.Seated, 0.5)
-	end,
+	[Enum.HumanoidStateType.Jumping] = false,
+	[Enum.HumanoidStateType.Freefall] = false,
+	[Enum.HumanoidStateType.Seated] = false
 }
 local stateFunctions = {
-	[Enum.HumanoidStateType.Jumping] = function() end,
-	[Enum.HumanoidStateType.Freefall] = function() end,
-	[Enum.HumanoidStateType.Swimming] = function() end,
-	[Enum.HumanoidStateType.GettingUp] = function() end,
-	[Enum.HumanoidStateType.Landed] = function() end,
-	[Enum.HumanoidStateType.Dead] = function() end,
-	[Enum.HumanoidStateType.Climbing] = function() end,
-	[Enum.HumanoidStateType.Running] = function() end,
+	[Enum.HumanoidStateType.Jumping] = true,
+	[Enum.HumanoidStateType.Freefall] = true,
+	[Enum.HumanoidStateType.Swimming] = true,
+	[Enum.HumanoidStateType.GettingUp] = true,
+	[Enum.HumanoidStateType.Landed] = true,
+	[Enum.HumanoidStateType.Dead] = true,
+	[Enum.HumanoidStateType.Climbing] = true,
+	[Enum.HumanoidStateType.Running] = true
 }
+
+local jumpAnimTime = 0
+local isFreefalling = false
 
 --// Setup
 local function setup()
@@ -60,11 +58,8 @@ local function setup()
 	Add(humanoid.StateChanged:Connect(function(_, state)
 		activeState = state
 
-		local localFunc = localStateFunctions[activeState]
-		if localFunc then localFunc() return end
-
 		local func = stateFunctions[activeState]
-		if func then func() else startAnim() end
+		if not func then startAnim() end
 	end))
 	Add(humanoid.Running:Connect(function()
 		if humanoid.MoveDirection.Magnitude > 0 then
@@ -72,6 +67,8 @@ local function setup()
 		else
 			startAnim(ANIMS.Idle, 0.1)
 		end
+
+		isFreefalling = false
 	end))
 	Add(humanoid.Climbing:Connect(function(vel)
 		if vel ~= 0 then
@@ -80,10 +77,38 @@ local function setup()
 		else
 			ANIMS.Climbing:AdjustSpeed(0)
 		end
+
+		isFreefalling = false
+	end))
+	Add(humanoid.Jumping:Connect(function()
+		jumpAnimTime = 0.3
+
+		startAnim(ANIMS.Jumping, 0.1)
+		isFreefalling = false
+	end))
+	Add(humanoid.FreeFalling:Connect(function()
+		if jumpAnimTime <= 0 then
+			startAnim(ANIMS.Freefall, 0.1)
+		end
+
+		isFreefalling = true
+	end))
+	Add(humanoid.Seated:Connect(function()
+		startAnim(ANIMS.Seated, 0.1)
+
+		isFreefalling = false
+	end))
+
+	Add(RunService.RenderStepped:Connect(function(dt)
+		if jumpAnimTime > 0 then jumpAnimTime -= dt end
+		if isFreefalling and jumpAnimTime <= 0 then startAnim(ANIMS.Freefall, 0.1) end
 	end))
 
 	local func = localStateFunctions[activeState]
-	if func then func() else startAnim(ANIMS.Idle, 0.1) end
+	if not func then
+		startAnim(ANIMS.Idle, 0.1)
+		isFreefalling = false
+	end
 end
 setup()
 

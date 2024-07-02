@@ -24,9 +24,7 @@ local yAxis = Vector3.yAxis
 
 local ServerUtil = {}
 
---[[
-	SuperWeld actually, a simple function to create weld between two parts
-]]
+
 function ServerUtil:WeldPart(part: Part, welded: Model)
 	local C = welded:GetChildren()
 	for i = 1, #C do
@@ -52,9 +50,7 @@ function ServerUtil:WeldPart(part: Part, welded: Model)
 	end
 end
 
---[[
-	Equip player's weapon, you can only pass an class string to force equip
-]]
+
 function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local plr = Players:GetPlayerFromCharacter(char)
 	local class = forceClass or plr:GetAttribute("Class") :: string
@@ -87,9 +83,7 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	end
 end
 
---[[
-	Equip cosmetics, just like equip weapons, you can pass a cosmetic to force equip
-]]
+
 function ServerUtil:EquipArmor(char: Model, armorId: string)
 	if char.Humanoid.Health <= 0 then return end
 
@@ -155,10 +149,7 @@ function ServerUtil:EquipArmor(char: Model, armorId: string)
 	armor.Parent = char
 end
 
---[[
-	Spawn a monster, with the given locator part, you can pass level in to force
-	Spawn strong monsters
-]]
+
 function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	if not RepS.Package.MonsterModels:FindFirstChild(locator.Name) then return end
 
@@ -210,9 +201,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	return monster
 end
 
---[[
-	Make monster enter combat state from "relax" one
-]]
+
 function ServerUtil:MonsterActivateCombat(monster: Model)
 	monster:SetAttribute("InCombat", true)
 
@@ -233,11 +222,7 @@ function ServerUtil:MonsterActivateCombat(monster: Model)
 	monster.Attack.Disabled = false
 end
 
---[[
-	Monster defeated visual effects, and ready to Spawn another one
 
-	You can make it not respawn after defeated, like story monsters
-]]
 function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespawn: boolean?)
 	local respawnLocatorTip: BasePart = if monster:GetAttribute("SubMonster") then monster.Parent.Parent else monster.Parent
 	local locator = monster.Parent :: BasePart
@@ -276,9 +261,7 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	for _, waitingLocator: BasePart in waitingLocators do ServerUtil:SetupMonster(waitingLocator) end
 end
 
---[[
-	Get all players that fighting a same monster
-]]
+
 function ServerUtil:GetPlayersByMonster(monster: Model) : table
 	local combatPlrs = {}
 
@@ -293,9 +276,7 @@ function ServerUtil:GetPlayersByMonster(monster: Model) : table
 	return if success then combatPlrs else {}
 end
 
---[[
-	Return a randomly generate a position in the combat area
-]]
+
 function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	local orbLocation: CFrame
 
@@ -309,19 +290,16 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 	end):Then(function(position: Vector3, pos: Vector3)
 		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
 
-	end):Catch(function(error)
+	end):Catch(function(err)
 		orbLocation = cfNew(0, 0, 0)
 
-		warn("Can not give a proper position for orbs!")
-		warn("ORB: "..error)
+		warn("[Orb System]: "..err)
 	end)
 
 	return orbLocation
 end
 
---[[
-	Add target for monsters, so that they can attack you
-]]
+
 function ServerUtil:AddSingleTarget(plr: Player, monster: Model)
 	local playerSymbol = instanceNew("ObjectValue")
 	playerSymbol.Value = plr.Character
@@ -334,9 +312,7 @@ function ServerUtil:AddSingleTarget(plr: Player, monster: Model)
 	monsterSymbol.Parent = plr.Character.CharStats.TargetMonsters
 end
 
---[[
-	A list of setups after added targets for monsters
-]]
+
 function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 	if not monster then return end
 	if not monster.PrimaryPart then return end
@@ -369,9 +345,7 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 	end
 end
 
---[[
-	Pop up the damage you or monster you did in workspace
-]]
+
 function ServerUtil:ShowNumber(target: Model, number: number, color: Color3?, size: number?)
 	--- checks
 	if not target then return end
@@ -393,9 +367,7 @@ function ServerUtil:ShowNumber(target: Model, number: number, color: Color3?, si
 	Debris:AddItem(eff, 2)
 end
 
---[[
-	Pop up the text which you give, around the part in workspace
-]]
+
 function ServerUtil:ShowText(char: Model, info: string, color: Color3)
 	if not char then return end
 	if not char.PrimaryPart then return end
@@ -409,9 +381,7 @@ function ServerUtil:ShowText(char: Model, info: string, color: Color3)
 	Debris:AddItem(eff, 2)
 end
 
---[[
-	Give items to player, used by materials or tester commands
-]]
+
 function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	local inventoryFolder = plr.Inventory :: Folder
 
@@ -435,9 +405,7 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	Events.GiveDrop:Fire(plr, item)
 end
 
---[[
-	A list of checks before using a skill, then we cast it
-]]
+
 function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, script: Script) : boolean
 	local char = plr.Character
 	local monster = char.CharStats.TargetMonster.Value :: Model
@@ -486,10 +454,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	return true
 end
 
---[[
-	The core function, fires a ray, if there's a part, return the ray position
-	where it ends
-]]
+
 function ServerUtil:FindPartOnRay(givenPos: Vector3) : Vector3
 	local ray = rayNew(givenPos, -(yAxis).Unit * 500)
 	local ignoreList = {}
@@ -511,18 +476,14 @@ function ServerUtil:FindPartOnRay(givenPos: Vector3) : Vector3
 	end
 end
 
---[[
-	A simple function to set a part's collision group
-]]
+
 function ServerUtil:SetCollisionGroup(object: Instance, group: string)
 	if object:IsA("BasePart") or object:IsA("UnionOperation") or object:IsA("CornerWedgePart") then object.CollisionGroup = group end
 
 	for _, child: Instance in object:GetChildren() do ServerUtil:SetCollisionGroup(child, group) end
 end
 
---[[
-	Reward the quest awards
-]]
+
 function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Player)
 	for reward: string, val: number in StoryBook[series][questId].Rewards do
 		HarukaLib:AddAttr(plr, reward, val)
@@ -531,9 +492,7 @@ function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Playe
 	end
 end
 
---[[
-	A pretty simple behavior tree for monsters
-]]
+
 function ServerUtil.MobBehaviorTree(monster: Model, funcs: table)
 	wait(0.5)
 	local success, errorMsg = pcall(function()

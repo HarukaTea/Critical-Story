@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
@@ -27,13 +28,12 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         end
     }))
 
-    local function _handleItems(passedId: string, items: table)
-        if passedId == id then
-            self.items:set(items)
-            self.visible:set(true)
+    local function _handleItems(items: table)
+        self.items:set(items)
 
-            self:DeselectAll()
-        end
+        self:DeselectAll()
+
+        ClientUtil:OpenUIEx(self.plr, "Shop")
     end
     Events.EnterShopping:Connect(_handleItems)
 

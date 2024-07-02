@@ -15,9 +15,11 @@ local plr = Players:GetPlayerFromCharacter(char)
 local wait = task.wait
 local sFind = string.find
 
+local quests = plr:WaitForChild("Quests", 999) :: Folder
+
 --// Setups
 local function questDataSetup()
-    local quests = plr:WaitForChild("Quests", 999) :: Folder
+    repeat wait() until char:WaitForChild("CharStats", 999)
 
     for _, quest: IntConstrainedValue in quests:GetChildren() do
         if StoryBook[quest.Name][quest.Value]["Script"] then

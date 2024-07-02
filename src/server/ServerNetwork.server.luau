@@ -57,7 +57,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 
 		plr:SetAttribute("CurrentShop", shop.Name)
 
-		Events.EnterShopping:Fire(plr, "Shop", items)
+		Events.EnterShopping:Fire(plr, items)
 
 	elseif prompt.Name == "Travel" then
 		local world = prompt:GetAttribute("Destination") :: string

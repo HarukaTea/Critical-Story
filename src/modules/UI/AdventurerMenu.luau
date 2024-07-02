@@ -71,13 +71,13 @@ return function(plr: Player)
 	local function _openMenu(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
 
-		ClientUtil:OpenUI(plr, "AdventurerMenu")
+		ClientUtil:OpenUIEx(plr, "AdventurerMenu")
 	end
 	CAS:BindAction("OpenMenu", _openMenu, false, Enum.KeyCode.C)
 
 	--// Connections
 	local function checkIfOpened()
-		if UI.BG.Visible then ClientUtil:OpenUI(plr, "AdventurerMenu", true) end
+		if UI.BG.Visible then ClientUtil:OpenUIEx(plr, "AdventurerMenu", true) end
 	end
 	self.Add(HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)

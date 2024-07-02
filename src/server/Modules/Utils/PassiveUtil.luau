@@ -9,9 +9,7 @@ local PassiveUtil = {}
 
 local find, sub = string.find, string.sub
 
---[[
-    Equip a new passive, and apply its buffs
-]]
+
 function PassiveUtil:EquipPassive(item: string, char: Model)
     if item == "TravellerBoots" then
         HarukaLib:AddAttr(char, "SpeedBuff", 8)
@@ -152,18 +150,14 @@ function PassiveUtil:EquipPassive(item: string, char: Model)
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", true)
 end
 
---[[
-    Unequip a passive, and remove its buffs
-]]
+
 function PassiveUtil:UnequipPassive(char: Model, item: string)
     char.CharStats.Items:SetAttribute(item.."_PASSIVE", false)
 
     PassiveUtil:ClearAllPassives(char)
 end
 
---[[
-    Unequip a passive by clear all passive, and re-equip the rest
-]]
+
 function PassiveUtil:ClearAllPassives(char: Model)
     for attribute: string, _ in char:GetAttributes() do
         if find(attribute, "Buff") then

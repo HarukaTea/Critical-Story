@@ -4,6 +4,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
@@ -17,12 +18,23 @@ local fromRGB = Color3.fromRGB
 
 local function ItemBar(item: string, scope: table): Frame
 	local itemInfo = ItemBook:FindItem(item)
-	local info = {
-		Icon = "rbxassetid://"..itemInfo.Icon,
-		Name = itemInfo.Name,
-		TierColor = AssetBook.TierColor[itemInfo.Tier],
-		Position = Fusion.Value(scope, fromScale(1.2, 0))
-	}
+	local info: table?
+
+	if itemInfo.ItemId then
+		info = {
+			Icon = ClientUtil:CombineRbxId(itemInfo.Icon),
+			Name = itemInfo.Name,
+			TierColor = AssetBook.TierColor[itemInfo.Tier],
+			Position = Fusion.Value(scope, fromScale(1.2, 0))
+		}
+	else
+		info = {
+			Icon = ItemBook.ItemImagesEx.Unknown,
+			Name = "???",
+			TierColor = AssetBook.TierColor[1],
+			Position = Fusion.Value(scope, fromScale(1.2, 0))
+		}
+	end
 	local isSelecting = Fusion.Value(scope, false)
 
 	Spawn(function()

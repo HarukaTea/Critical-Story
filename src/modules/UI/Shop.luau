@@ -50,10 +50,7 @@ return function(plr: Player)
 			Components.Frame(scope, {
 				Name = "BG",
 				ZIndex = 2,
-
-				Visible = Fusion.Computed(scope, function(use)
-					return use(self.visible)
-				end),
+				Visible = false,
 
 				[Children] = {
 					ExCategoryTitle("Shop", self),
@@ -127,15 +124,7 @@ return function(plr: Player)
 				},
 			}),
 
-			Components.Frame(scope, {
-				Name = "Shadow",
-				BackgroundTransparency = 0.15,
-				ZIndex = 0,
-
-				Visible = Fusion.Computed(scope, function(use)
-					return use(self.visible)
-				end),
-			})
+			Components.BGShadow(scope)
 		},
 	})
 

@@ -19,17 +19,22 @@ local task = nil -- Disable usage of Roblox's task scheduler
 local Package = script.Parent.Parent
 local Types = require(Package.Types)
 local External = require(Package.External)
-local isState = require(Package.State.isState)
+-- Logging
 local parseError = require(Package.Logging.parseError)
-local Observer = require(Package.State.Observer)
+-- Memory
+local checkLifetime = require(Package.Memory.checkLifetime)
+-- Graph
+local Observer = require(Package.Graph.Observer)
+-- State
+local castToState = require(Package.State.castToState)
 local peek = require(Package.State.peek)
+-- Utility
 local xtypeof = require(Package.Utility.xtypeof)
-local whichLivesLonger = require(Package.Memory.whichLivesLonger)
 
 local function setProperty_unsafe(
 	instance: Instance,
 	property: string,
-	value: any
+	value: unknown
 )
 	(instance :: any)[property] = value
 end
@@ -44,7 +49,7 @@ end
 local function setProperty(
 	instance: Instance,
 	property: string,
-	value: any
+	value: unknown
 )
 	local success, err = xpcall(setProperty_unsafe :: any, parseError, instance, property, value)
 
@@ -67,18 +72,18 @@ local function setProperty(
 end
 
 local function bindProperty(
-	scope: Types.Scope<any>,
+	scope: Types.Scope<unknown>,
 	instance: Instance,
 	property: string,
-	value: Types.UsedAs<any>
+	value: Types.UsedAs<unknown>
 )
-	if isState(value) then
-		local value = value :: Types.StateObject<any>
-		if value.scope == nil then
-			External.logError("useAfterDestroy", nil, `The {value.kind} object, bound to {property},`, `the {instance.ClassName} instance`)
-		elseif whichLivesLonger(scope, instance, value.scope, value.oldestTask) == "definitely-a" then
-			External.logWarn("possiblyOutlives", `The {value.kind} object, bound to {property},`, `the {instance.ClassName} instance`)
-		end
+	if castToState(value) then
+		local value = value :: Types.StateObject<unknown>
+		checkLifetime.bOutlivesA(
+			scope, instance,
+			value.scope, value.oldestTask,
+			checkLifetime.formatters.boundProperty, property
+		)
 		-- value is a state object - bind to changes
 		Observer(scope, value :: any):onBind(function()
 			setProperty(instance, property, peek(value))
@@ -90,15 +95,15 @@ local function bindProperty(
 end
 
 local function applyInstanceProps(
-	scope: Types.Scope<any>,
+	scope: Types.Scope<unknown>,
 	props: Types.PropertyTable,
 	applyTo: Instance
 )
 	local specialKeys = {
-		self = {} :: {[Types.SpecialKey]: any},
-		descendants = {} :: {[Types.SpecialKey]: any},
-		ancestor = {} :: {[Types.SpecialKey]: any},
-		observer = {} :: {[Types.SpecialKey]: any}
+		self = {} :: {[Types.SpecialKey]: unknown},
+		descendants = {} :: {[Types.SpecialKey]: unknown},
+		ancestor = {} :: {[Types.SpecialKey]: unknown},
+		observer = {} :: {[Types.SpecialKey]: unknown}
 	}
 
 	for key, value in pairs(props) do

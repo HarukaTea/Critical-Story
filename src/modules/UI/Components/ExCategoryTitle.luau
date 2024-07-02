@@ -99,13 +99,9 @@ local function ExCategoryTitle(id: string, self: table): Frame
 					isSelecting:set(false)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					if id == "Shop" or id == "Crafting" then
-						self.visible:set(false)
-						self.items:set({})
-						return
-					end
+					if id == "Shop" or id == "Crafting" then self.items:set({}) end
 
-					ClientUtil:OpenUI(plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
+					ClientUtil:OpenUIEx(plr, if id == "Menu" then "AdventurerMenu" else id)
 				end,
 
 				[Children] = {

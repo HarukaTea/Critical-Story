@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
+local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 
@@ -31,8 +32,9 @@ local function PlayerItemSlot(id: number, self: table): ImageLabel
 		Size = fromScale(0.19, 0.165),
 
 		Image = Computed(scope, function(use)
-            return if use(self.playerItemIconList[id]) == "Null" then
-                ItemBook.ItemImagesEx.Null else "rbxassetid://"..ItemBook:FindItem(use(self.playerItemIconList[id])).Icon
+            local item = use(self.playerItemIconList[id])
+
+            return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
         end),
 
 		[Children] = {

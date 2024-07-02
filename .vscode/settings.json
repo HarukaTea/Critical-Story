@@ -6,6 +6,10 @@
         "src/modules/Packages/Cmdr/Shared/Util.lua",
         "src/modules/Packages/Warp/Util/Buffer.luau"
     ],
+    "robloxLsp.diagnostics.disable": [
+        "undefined-type"
+    ],
+    "roblox-ui.sourcemap.rojoProjectFile": "world.project.json",
 
     "files.exclude": {
         "**/.git": true,
@@ -16,7 +20,5 @@
         "**/Thumbs.db": true,
 
         "src/character/Health.server.luau": true,
-        "src/modules/Packages": true,
-        "src/server/Modules/Packages": true
     }
 }

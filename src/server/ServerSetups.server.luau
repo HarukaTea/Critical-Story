@@ -16,6 +16,7 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local Promise = require(RepS.Modules.Packages.Promise)
 
 local instanceNew = Instance.new
 local wait = task.wait
@@ -173,10 +174,28 @@ local function mainSetup()
 	end)
 
 	--- player extra info setup
-	local joinData
+	local joinData: table?
 	Spawn(function()
 		local function _playerAdded(plr: Player)
-			BS:AwardBadge(plr.UserId, 2129794618)
+			--- welcome, adventurer!
+			Promise.new(function()
+				local hasBadge = BS:UserHasBadgeAsync(plr.UserId, 2129794618)
+
+				if not hasBadge then BS:AwardBadge(plr.UserId, 2129794618) end
+
+			end):Catch(function(err)
+				warn(err)
+			end)
+
+			--- alpha tester
+			Promise.new(function()
+				local hasBadge = BS:UserHasBadgeAsync(plr.UserId, 2129794607)
+
+				if hasBadge then plr:SetAttribute("Role", "Alpha Tester") end
+
+			end):Catch(function(err)
+				warn(err)
+			end)
 
 			local rank = plr:GetRankInGroup(16912246)
 			plr:SetAttribute("Rank", rank)
@@ -204,15 +223,6 @@ local function mainSetup()
 			for _, plr: Player in Players:GetPlayers() do
 				if plr.UserId == message.Data then
 					MS:PublishAsync("JoinUserReturn", { plr.UserId, game.JobId, game.PlaceId })
-					break
-				end
-			end
-		end)
-
-		MS:SubscribeAsync("BanRequest", function(message: table)
-			for _, plr: Player in Players:GetPlayers() do
-				if plr.UserId == message.Data[1] then
-					plr:Kick("You got banned! Reason: "..message.Data[3]..", unban in "..message.Data[2].." hours!")
 					break
 				end
 			end

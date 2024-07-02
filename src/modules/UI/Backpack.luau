@@ -116,7 +116,7 @@ return function(plr: Player)
 	local function _openBackpack(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
 
-		ClientUtil:OpenUI(plr, "Backpack")
+		ClientUtil:OpenUIEx(plr, "Backpack")
 	end
 	CAS:BindAction("OpenBackpack", _openBackpack, false, Enum.KeyCode.B)
 
@@ -141,7 +141,7 @@ return function(plr: Player)
 
 	--// Connections
 	local function checkIfOpened()
-		if UI.BG.Visible then ClientUtil:OpenUI(plr, "Backpack", true) end
+		if UI.BG.Visible then ClientUtil:OpenUIEx(plr, "Backpack", true) end
 	end
 	self.Add(HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)

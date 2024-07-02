@@ -22,8 +22,6 @@ local function bounce(hit: BasePart)
 
     local humanoid = char.Humanoid :: Humanoid
 
-    humanoid.Sit = true
-
     local bp = instanceNew("BodyPosition")
     bp.Name = "Bouncer"
     bp.D = 800
@@ -32,13 +30,9 @@ local function bounce(hit: BasePart)
     bp.Parent = char.Humanoid.RootPart
     Debris:AddItem(bp, 1)
 
-    Signals.PlayAnimation:Fire("Bounce")
     workspace.Sounds.SFXs.Bounce:Play()
 
     repeat wait() until plr:DistanceFromCharacter(bp.Position) <= 5
-
-    humanoid.PlatformStand = false
-    humanoid.Sit = false
 
     if bp then bp:Destroy() end
 end

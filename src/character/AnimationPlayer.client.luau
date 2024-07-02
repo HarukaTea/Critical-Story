@@ -42,8 +42,6 @@ local anims = {
 	FireStaffAnim2 = animator:LoadAnimation(animations.WizardAttack2),
 	MagicCastedAnim1 = animator:LoadAnimation(animations.MagicCasted1),
 	MagicCastedAnim2 = animator:LoadAnimation(animations.MagicCasted2),
-
-	Bounce = animator:LoadAnimation(animations.Bounce)
 }
 
 --// Connections

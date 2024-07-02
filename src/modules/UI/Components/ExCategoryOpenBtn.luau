@@ -86,7 +86,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 					isSelecting:set(false)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					ClientUtil:OpenUI(self.plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
+					ClientUtil:OpenUIEx(self.plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
 				end,
 			}),
 			Components.TextLabel(scope, {
