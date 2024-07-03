@@ -54,7 +54,7 @@ local function PassiveSlot(index: number, self: table): Frame
 				Image = Fusion.Computed(scope, function(use)
 					local item = use(self.passiveEquipList[index]) :: string
 
-					return if ItemBook:FindItem(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
+					return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
 				end),
 			}),
 			Components.HoverImageButton(scope, {

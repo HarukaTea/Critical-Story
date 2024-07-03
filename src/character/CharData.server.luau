@@ -141,12 +141,14 @@ local function charAttributesSetup()
     local function updateMagic()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
     end
-    local function updateShield()
+    local function updateShield(isForce: boolean?)
         char:SetAttribute("MaxShield", 20 * plr:GetAttribute("ShieldPoints") + 20 + char:GetAttribute("ShieldBuff"))
+
         char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
     end
-    local function updateMana()
+    local function updateMana(isForce: boolean?)
         char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 20) + 100 + char:GetAttribute("ManaBuff"))
+
         char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
     end
     local function updateHP()
@@ -200,9 +202,9 @@ local function charAttributesSetup()
     Spawn(updateMinDMG)
     Spawn(updateMaxDMG)
     Spawn(updateMagic)
-    Spawn(updateShield)
+    Spawn(updateShield, true)
     Spawn(updateHP)
-    Spawn(updateMana)
+    Spawn(updateMana, true)
     Spawn(updateSpeed)
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)

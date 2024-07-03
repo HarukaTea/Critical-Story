@@ -466,7 +466,7 @@ ItemBook.Items = {
         ["Tier"] = 3,
         ["Desc"] = "Used by hikers and adventurers",
         ["Stat"] = "Allows you to immense the cold in some areas of <blue>Tundra</font>",
-        ["Icon"] = 16517557366,
+        ["Icon"] = 2985521957,
         ["IsSkill"] = false,
         ["Mana"] = 0,
         ["Price"] = 10000
@@ -993,7 +993,7 @@ ItemBook.ItemImagesEx = {
     Null = "rbxassetid://1637592633",
     Unknown = "rbxassetid://2985521957",
 
-    Gold = "rbxassetid://16654275243",
+    Gold = "rbxassetid://12048586431",
     RP = "rbxassetid://16002068286",
     Backpack = "rbxassetid://2970814599"
 }

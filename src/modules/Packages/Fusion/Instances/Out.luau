@@ -11,10 +11,8 @@ local task = nil -- Disable usage of Roblox's task scheduler
 local Package = script.Parent.Parent
 local Types = require(Package.Types)
 local External = require(Package.External)
--- Memory
-local checkLifetime = require(Package.Memory.checkLifetime)
--- State
-local castToState = require(Package.State.castToState)
+local isState = require(Package.State.isState)
+local whichLivesLonger = require(Package.Memory.whichLivesLonger)
 
 local keyCache: {[string]: Types.SpecialKey} = {}
 
@@ -38,7 +36,7 @@ local function Out(
 					External.logError("invalidOutProperty", nil, applyTo.ClassName, propertyName)
 				end
 	
-				if not castToState(value) then
+				if not isState(value) then
 					External.logError("invalidOutType")
 				end
 				local value = value :: Types.StateObject<unknown>
@@ -46,12 +44,12 @@ local function Out(
 					External.logError("invalidOutType")
 				end
 				local value = value :: Types.Value<unknown>
-				checkLifetime.bOutlivesA(
-					scope, applyTo, 
-					value.scope, value.oldestTask,
-					checkLifetime.formatters.propertyOutputsTo, propertyName
-				)
-
+	
+				if value.scope == nil then
+					External.logError("useAfterDestroy", nil, `The Value, which [Out "{propertyName}"] outputs to,`, `the {applyTo.ClassName} instance`)
+				elseif whichLivesLonger(scope, applyTo, value.scope, value.oldestTask) == "definitely-a" then
+					External.logWarn("possiblyOutlives", `The Value, which [Out "{propertyName}"] outputs to,`, `the {applyTo.ClassName} instance`)
+				end
 				value:set((applyTo :: any)[propertyName])
 				table.insert(
 					scope,

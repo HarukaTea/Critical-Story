@@ -147,7 +147,7 @@ local function mobTakeDMG(plr: Player, orb: Model)
 				["None"] = 100 - charCurrentChance
 			})
 
-			if result == extraAttacks[i] then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 6) end
+			if result == extraAttacks[i].."Chance" then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 6) end
 		end
 	end)
 end

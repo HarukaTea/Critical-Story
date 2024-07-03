@@ -7,7 +7,8 @@
         "src/modules/Packages/Warp/Util/Buffer.luau"
     ],
     "robloxLsp.diagnostics.disable": [
-        "undefined-type"
+        "undefined-type",
+        "redefined-type"
     ],
     "roblox-ui.sourcemap.rojoProjectFile": "world.project.json",
 

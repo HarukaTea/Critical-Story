@@ -349,7 +349,7 @@ AssetBook.BuffInfo = {
     SpeedBuff = {
         Color = fromRGB(0, 255, 255),
         Icon = "rbxassetid://2970816149",
-        Type = "Debuff"
+        Type = "Buff"
     },
     DefenseBuff = {
         Color = fromRGB(128, 128, 128),

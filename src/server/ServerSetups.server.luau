@@ -188,20 +188,23 @@ local function mainSetup()
 			end)
 
 			--- alpha tester
-			Promise.new(function()
+			Promise.new(function(resolve)
 				local hasBadge = BS:UserHasBadgeAsync(plr.UserId, 2129794607)
 
 				if hasBadge then plr:SetAttribute("Role", "Alpha Tester") end
 
+				resolve()
+
+			end):Then(function()
+				local rank = plr:GetRankInGroup(16912246)
+				plr:SetAttribute("Rank", rank)
+
+				if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
+				if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
+
 			end):Catch(function(err)
 				warn(err)
 			end)
-
-			local rank = plr:GetRankInGroup(16912246)
-			plr:SetAttribute("Rank", rank)
-
-			if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
-			if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
 
 			joinData = plr:GetJoinData().TeleportData
 		end

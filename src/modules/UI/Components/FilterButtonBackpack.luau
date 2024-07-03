@@ -24,7 +24,6 @@ local COLORS = {
 	Other = fromRGB(0, 130, 139),
 
 	Equip = fromRGB(131, 131, 65),
-	Use = fromRGB(103, 154, 154),
 	Pin = fromRGB(93, 47, 140),
 }
 local BLACKLIST = { "Equip", "Pin" }

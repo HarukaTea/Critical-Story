@@ -11,10 +11,11 @@ local task = nil -- Disable usage of Roblox's task scheduler
 local Package = script.Parent.Parent
 local Types = require(Package.Types)
 local External = require(Package.External)
-local Observer = require(Package.Graph.Observer)
+local Observer = require(Package.State.Observer)
 local peek = require(Package.State.peek)
-local castToState = require(Package.State.castToState)
+local isState = require(Package.State.isState)
 local doCleanup = require(Package.Memory.doCleanup)
+local scopePool = require(Package.Memory.scopePool)
 
 type Set<T> = {[T]: unknown}
 
@@ -44,6 +45,8 @@ return {
 		local function updateChildren()
 			oldParented, newParented = newParented, oldParented
 			oldScopes, newScopes = newScopes, oldScopes
+			table.clear(newParented)
+			table.clear(newScopes)
 	
 			local function processChild(
 				child: unknown,
@@ -71,7 +74,7 @@ return {
 						child.Name = autoName
 					end
 	
-				elseif castToState(child) then
+				elseif isState(child) then
 					-- case 2; state object
 					local child = child :: Types.StateObject<unknown>
 	
@@ -128,13 +131,12 @@ return {
 			for oldInstance in pairs(oldParented) do
 				oldInstance.Parent = nil
 			end
-			table.clear(oldParented)
 	
 			-- disconnect observers which weren't reused
 			for oldState, childScope in pairs(oldScopes) do
 				doCleanup(childScope)
+				scopePool.clearAndGive(childScope)
 			end
-			table.clear(oldScopes)
 		end
 	
 		table.insert(scope, function()
