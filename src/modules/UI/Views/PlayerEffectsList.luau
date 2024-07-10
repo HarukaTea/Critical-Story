@@ -13,15 +13,15 @@ local fromScale = UDim2.fromScale
 local wait = task.wait
 
 local function PlayerEffectsList(self: table) : Frame
-    local scope = self.scope :: table
+    local scope = self.scope :: Fusion.Scope
 
     local function _setEffectsChildren()
 		wait()
 		self.charStatsDict.EffectsList:set(self.charData.EffectsList:GetChildren())
 	end
     _setEffectsChildren()
-    self.Add(self.charData.EffectsList.ChildAdded:Connect(_setEffectsChildren))
-    self.Add(self.charData.EffectsList.ChildRemoved:Connect(_setEffectsChildren))
+    table.insert(scope, self.charData.EffectsList.ChildAdded:Connect(_setEffectsChildren))
+    table.insert(scope, self.charData.EffectsList.ChildRemoved:Connect(_setEffectsChildren))
 
     return Components.Frame(scope, {
         Name = "EffectsFrame",
@@ -36,7 +36,7 @@ local function PlayerEffectsList(self: table) : Frame
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
                 FillDirection = Enum.FillDirection.Horizontal
             }),
-            Fusion.ForValues(scope, self.charStatsDict.EffectsList, function(_, localScope: table, effect: Script)
+            Fusion.ForValues(scope, self.charStatsDict.EffectsList, function(_, localScope: Fusion.Scope, effect: Script)
                 return EffectIndicator(effect, localScope)
             end)
         }

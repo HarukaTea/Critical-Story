@@ -12,7 +12,7 @@ local humanoid = char:WaitForChild("Humanoid") :: Humanoid
 local animator = humanoid:WaitForChild("Animator") :: Animator
 local plr = Players.LocalPlayer
 
-local animations = RepS.Package.Animations :: Folder
+local animations = RepS.Package.Animations.ClassAnims :: Folder
 
 local anims = {
 	WarriorAnim1 = animator:LoadAnimation(animations.WarriorAttack),
@@ -46,9 +46,11 @@ local anims = {
 
 --// Connections
 local function playAnim(anim: string)
-	if not anims[anim] then warn("Can't found animation: "..anim.."!") return end
+	if not anims[anim] then warn(`Can't found animation: {anim} !`) return end
 
-	if anim == "MagicCastedAnim1" then if AssetBook.ClassInfo[plr:GetAttribute("Class")].Type == "Magic" then anim = "MagicCastedAnim2" end end
+	if anim == "MagicCastedAnim1" then
+		if AssetBook.ClassInfo[plr:GetAttribute("Class")].Type == "Magic" then anim = "MagicCastedAnim2" end
+	end
 
 	anims[anim]:Play()
 end

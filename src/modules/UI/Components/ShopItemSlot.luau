@@ -12,7 +12,7 @@ local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Children, OnEvent, Value, Computed, peek =
 	Fusion.Children, Fusion.OnEvent, Fusion.Value, Fusion.Computed, Fusion.peek
 
-local function ShopItemSlot(item: IntConstrainedValue, self: table, scope: table): ImageButton
+local function ShopItemSlot(item: IntConstrainedValue, self: table, scope: Fusion.Scope): ImageButton
 	local isSelecting = Value(scope, false)
 
 	--// Connections

@@ -15,7 +15,7 @@ local v2New = Vector2.new
 local sub = string.sub
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local function ChatOption(option: string, icon: string, self: table, index: number, scope: table) : Frame
+local function ChatOption(option: string, icon: string, self: table, index: number, scope: Fusion.Scope) : Frame
     local isSelecting = Fusion.Value(scope, false)
 
     if icon ~= "Chat" then option = sub(option, #icon + 2) end

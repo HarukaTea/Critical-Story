@@ -32,7 +32,7 @@ local function bounce(hit: BasePart)
 
     workspace.Sounds.SFXs.Bounce:Play()
 
-    repeat wait() until plr:DistanceFromCharacter(bp.Position) <= 5
+    repeat wait() until plr:DistanceFromCharacter(hit.Parent.Destination.Position) <= 5
 
     if bp then bp:Destroy() end
 end

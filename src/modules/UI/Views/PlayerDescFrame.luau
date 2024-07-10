@@ -14,7 +14,7 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
 local function PlayerItemSlot(id: number, self: table): ImageLabel
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
     local POSITIONS = {
         fromScale(0.164, 0.391),
         fromScale(0.401, 0.391),
@@ -45,7 +45,7 @@ local function PlayerItemSlot(id: number, self: table): ImageLabel
 end
 
 local function PlayerDescFrame(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     return Components.Frame(scope, {
         Name = "Desc",

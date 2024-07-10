@@ -5,9 +5,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local Signal = require(RepS.Modules.Packages.Signal).new
 
 local Signals = {
-	BanRequest = Signal(),
 	LevelUp = Signal(),
 	QuestComplete = Signal(),
+	RejoinPlace = Signal(),
 
 	--- story
 	StoryMain1 = Signal(),

@@ -20,6 +20,32 @@ local sFind = string.find
 local ClientUtil = {}
 
 
+function ClientUtil:WeldPart(part: Part, welded: Model)
+	local C = welded:GetChildren()
+	for i = 1, #C do
+		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") or C[i]:IsA("CornerWedgePart") then
+			local W = Instance.new("Weld")
+			W.Part0 = welded.Middle
+			W.Part1 = C[i]
+			local CJ = cfNew(welded.Middle.Position)
+			W.C0 = welded.Middle.CFrame:Inverse() * CJ
+			W.C1 = C[i].CFrame:Inverse() * CJ
+			W.Parent = welded.Middle
+		end
+		local Y = Instance.new("Weld")
+		Y.Part0 = part
+		Y.Part1 = welded.Middle
+		Y.C0 = cfNew(Vector3.zero)
+		Y.Parent = Y.Part0
+	end
+
+	local h = welded:GetChildren()
+	for _, child in h do
+		if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then child.Anchored = false end
+	end
+end
+
+
 function ClientUtil:ClassHitVFX(monster: Model, char: Model)
     pcall(function()
         local plr = Players:GetPlayerFromCharacter(char)
@@ -137,7 +163,7 @@ function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
         return
     end
 
-    local plrGui = plr.PlayerGui
+    local plrGui = plr:FindFirstChildOfClass("PlayerGui")
     local function _setExVisibleState(ui: ScreenGui, state: boolean)
 		ui.BG.Visible = state
 		ui.Shadow.Visible = state
@@ -178,8 +204,77 @@ function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
 end
 
 
+function ClientUtil:SetupMonster(locator: Part) : Model
+	if not RepS.Package.MonsterModels:FindFirstChild(locator.Name) then return end
+
+	local level = locator:GetAttribute("Levels") :: number
+	local monster = RepS.Package.MonsterModels[locator.Name]:Clone() :: Model
+	monster:PivotTo(cfNew(locator.Position))
+	if not monster:GetAttribute("CantRotate") then
+        monster:PivotTo(cfNew(locator.Position) * CFrame.Angles(0, math.rad(random(0, 360)), 0))
+    end
+    monster:SetAttribute("ExclusivePlayer", locator:GetAttribute("ExclusivePlayer"))
+
+	if monster:GetAttribute("Floatable") then
+		local vel = Instance.new("BodyVelocity")
+		vel.MaxForce = Vector3.one * math.huge
+		vel.Velocity = Vector3.zero
+		vel.Parent = monster
+	end
+
+	if not locator:GetAttribute("SubMonster") then
+		local tierDisplay = RepS.Package.Effects.TierDisplay:Clone() :: BillboardGui
+		tierDisplay.Monster.Text = AssetBook.MonsterInfo[monster.Name].Name
+		tierDisplay.Levels.Text = "Level "..level
+		tierDisplay.Parent = monster.Head
+
+		tierDisplay.Enabled = if monster:GetAttribute("HideTag") then false else true
+	else
+		monster:SetAttribute("SubMonster", true)
+	end
+
+	monster:SetAttribute("InCombat", false)
+
+	for _, child: Instance in monster:GetChildren() do
+		if child:IsA("Part") and monster:FindFirstChild(child.Name .. "Model") then
+			ClientUtil:WeldPart(child, monster[child.Name .. "Model"])
+		end
+	end
+	monster.Parent = locator
+
+	ClientUtil:SetCollisionGroup(monster, "NPC")
+	for _, part: Instance in monster:GetDescendants() do
+        if part:IsA("UnionOperation") or part:IsA("BasePart") or part:IsA("CornerWedgePart") then
+            part.CanTouch = false
+            part.CanQuery = false
+        end
+    end
+
+    --- animator? harder to use lol
+    local ok, err = pcall(function()
+        local animator = monster.AnimationController.Animator :: Animator
+        local ref = AssetBook.MonsterInfo[monster.Name].IdleAnim
+
+        animator:LoadAnimation(RepS.Package.Animations.MonsterAnims[ref]):Play()
+    end)
+    if not ok then warn(err) end
+
+	return monster
+end
+
+
+function ClientUtil:SetCollisionGroup(object: Instance, group: string)
+	if object:IsA("BasePart") or object:IsA("UnionOperation") or object:IsA("CornerWedgePart") then object.CollisionGroup = group end
+
+	for _, child: Instance in object:GetChildren() do ClientUtil:SetCollisionGroup(child, group) end
+end
+
+
 function ClientUtil:CombineRbxId(id: string?)
-    if not id then return "rbxassetid://0" end
+    if not id then
+        warn("[ClientUtil]: Invalid Id")
+        return "rbxassetid://0"
+    end
 
     return "rbxassetid://".. id
 end

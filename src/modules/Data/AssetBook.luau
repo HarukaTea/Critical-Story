@@ -222,6 +222,11 @@ AssetBook.ClassInfo = {
         Image = "rbxassetid://17667241921",
         Color = fromRGB(163, 39, 39),
         Type = "DMG"
+    },
+    WindDancer = {
+        Image = "rbxassetid://18423401512",
+        Color = Color3.fromHex('#70a1ff'),
+        Type = "DMG"
     }
 }
 
@@ -236,6 +241,8 @@ AssetBook.MonsterInfo = {
     SpikeFox = {
         Name = "Spike Fox",
         Icon = "rbxassetid://13886503379",
+        IdleAnim = "SpikeWolfIdle",
+
         Drops = {
             SpikyFur = 80,
             SpikyQuills = 20
@@ -244,6 +251,8 @@ AssetBook.MonsterInfo = {
     SpikeWolf = {
         Name = "Spike Wolf",
         Icon = "rbxassetid://16483664838",
+        IdleAnim = "SpikeWolfIdle",
+
         Drops = {
             SpikyFur = 70,
             SpikyQuills = 30
@@ -252,6 +261,8 @@ AssetBook.MonsterInfo = {
     ThornWolf = {
         Name = "Thorn Wolf",
         Icon = "rbxassetid://16483664838",
+        IdleAnim = "SpikeWolfIdle",
+
         Drops = {
             SpikyFur = 60,
             SpikyQuills = 40
@@ -260,6 +271,8 @@ AssetBook.MonsterInfo = {
     HardmodeWolf = {
         Name = "Hardmode Wolf",
         Icon = "rbxassetid://15688333545",
+        IdleAnim = "SpikeWolfIdle",
+
         Drops = {
             BlackFur = 90,
             BlackwolfNecklace = 10
@@ -269,6 +282,8 @@ AssetBook.MonsterInfo = {
     Kitsune = {
         Name = "Kitsune",
         Icon = "rbxassetid://17543155124",
+        IdleAnim = "SpikeWolfIdle",
+
         Drops = {
             KitsuneFur = 60,
             KitsuneFlame = 40
@@ -277,6 +292,8 @@ AssetBook.MonsterInfo = {
     Stalker = {
         Name = "Stalker",
         Icon = "rbxassetid://17543156640",
+        IdleAnim = "SlimeIdle",
+
         Drops = {
             StalkerLeaf = 60,
             StalkerLog = 40,
@@ -286,6 +303,8 @@ AssetBook.MonsterInfo = {
     GreenSlime = {
         Name = "Green Slime",
         Icon = "rbxassetid://15951815518",
+        IdleAnim = "SlimeIdle",
+
         Drops = {
             SlimeGel = 80,
             SlimeCore = 20
@@ -294,6 +313,8 @@ AssetBook.MonsterInfo = {
     BlueSlime = {
         Name = "Blue Slime",
         Icon = "rbxassetid://16483649460",
+        IdleAnim = "SlimeIdle",
+
         Drops = {
             SlimeGel = 70,
             SlimeCore = 30
@@ -302,6 +323,8 @@ AssetBook.MonsterInfo = {
     LapisSlime = {
         Name = "Lapis Slime",
         Icon = "rbxassetid://16483649287",
+        IdleAnim = "SlimeIdle",
+
         Drops = {
             SlimeGel = 60,
             SlimeCore = 40
@@ -310,6 +333,8 @@ AssetBook.MonsterInfo = {
     PurpleSlime = {
         Name = "Purple Slime",
         Icon = "rbxassetid://16483649160",
+        IdleAnim = "SlimeIdle",
+
         Drops = {
             SlimeGel = 50,
             SlimeCore = 50
@@ -318,6 +343,8 @@ AssetBook.MonsterInfo = {
     CrimsonSlime = {
         Name = "Crimson Slime",
         Icon = "rbxassetid://17543155439",
+        IdleAnim = "SlimeIdle",
+
         Drops = {
             CrimsonSlimeCore = 90,
             CrimsonSlimeFang = 10
@@ -368,7 +395,7 @@ AssetBook.LocationInfo = {
     MonolithVillage = {
         Name = "Monolith Village",
         Music = "StoryBegins",
-        MusicVolume = 0.7,
+        MusicVolume = 1,
         RecommendLevel = 1,
 
         Lighting = default
@@ -376,7 +403,7 @@ AssetBook.LocationInfo = {
     MonolithGrove = {
         Name = "Monolith Grove",
         Music = "HiddenForest",
-        MusicVolume = 0.7,
+        MusicVolume = 0.5,
         RecommendLevel = 1,
 
         Lighting = {
@@ -387,7 +414,7 @@ AssetBook.LocationInfo = {
     },
     InitusBay = {
         Name = "Initus Bay",
-        Music = "Conquest",
+        Music = "BraveAdventure",
         MusicVolume = 0.5,
         RecommendLevel = 1,
 

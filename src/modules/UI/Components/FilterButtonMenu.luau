@@ -12,7 +12,7 @@ local fromRGB = Color3.fromRGB
 local upper = string.upper
 
 local function FilterButtonMenu(id: string, self: table): TextButton
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local COLORS = {
 		Character = fromRGB(172, 113, 86),
 		Settings = fromRGB(53, 107, 79),

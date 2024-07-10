@@ -3,11 +3,11 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local EXPFormula = require(RepS.Modules.Data.EXPFormula)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
-local floor = math.floor
 local fromScale = UDim2.fromScale
 local wait = task.wait
 
@@ -20,8 +20,6 @@ local function AdventurerStatsPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
-	self.Add, self.Empty = HarukaLib.Bin()
-
     self.inventory = plr:WaitForChild("Inventory", 999)
 	self.charData = char:WaitForChild("CharStats", 999)
 	self.humanoid = char.Humanoid
@@ -31,7 +29,7 @@ local function AdventurerStatsPinia(self: table)
 	self.playerData = {
 		EXP = {
 			Value(plr:GetAttribute("EXP")),
-			Value(floor(plr:GetAttribute("Levels") ^ 1.85) + 60),
+			Value(EXPFormula(plr:GetAttribute("Levels"))),
 		},
 		Class = Value(plr:GetAttribute("Class")),
 		Levels = Value(plr:GetAttribute("Levels")),
@@ -91,15 +89,14 @@ local function AdventurerStatsPinia(self: table)
 
     self.quests = Value(self.plr:WaitForChild("Quests", 999):GetChildren())
 
+	self.passiveEquipList = { Value("Null"), Value("Null"), Value("Null") }
+	self.passiveSlotList = { Value(), Value(), Value() }
+
 	self.activeInnerCDList = { false, false, false }
 	self.activeEquipList = { Value("Null"), Value("Null"), Value("Null") }
 	self.activeCDList = { Value(0), Value(0), Value(0) }
 	self.activeCDRotationList = { Value(0), Value(0), Value(0) }
-	self.passiveEquipList = { Value("Null"), Value("Null"), Value("Null") }
-	self.cosmeticEquipped = Value("Null")
-
 	self.activeSlotList = { Value(), Value(), Value() }
-	self.passiveSlotList = { Value(), Value(), Value() }
 
 	self.targetingMobs = Value({})
 	self.monsterTargetingPos = Value(fromScale(-0.2, 0.5))

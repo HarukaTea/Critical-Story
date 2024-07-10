@@ -7,6 +7,7 @@ local TS = game:GetService("TweenService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
+local EXPFormula = require(RepS.Modules.Data.EXPFormula)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -26,8 +27,8 @@ local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
 
 local AlchemistAbilityIndicator = require(RepS.Modules.UI.Components.AlchemistAbilityIndicator)
-local BottomProgressBar = require(RepS.Modules.UI.Components.BottomProgressBar)
 local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
+local EXPProgressBar = require(RepS.Modules.UI.Components.EXPProgressBar)
 local StatBar = require(RepS.Modules.UI.Components.StatBar)
 
 local Children, New = Fusion.Children, Fusion.New
@@ -37,7 +38,6 @@ AdventurerStats.__index = AdventurerStats
 AdventurerStats.__type = "AdventuerStats"
 
 local wait = task.wait
-local floor = math.floor
 local v2New, udNew, ud2New = Vector2.new, UDim.new, UDim2.new
 local fromScale = UDim2.fromScale
 local match = string.match
@@ -46,7 +46,7 @@ return function(plr: Player)
 	local self = setmetatable({}, AdventurerStats)
 
 	self.plr = plr
-	self.plrGui = plr.PlayerGui
+	self.plrGui = plr:FindFirstChildOfClass("PlayerGui")
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -54,7 +54,7 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local UI = Components.ScreenGui(scope, {
 		Name = "AdventurerStats",
 		DisplayOrder = 2,
@@ -75,7 +75,7 @@ return function(plr: Player)
 				[Children] = {
 					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
-					BottomProgressBar("EXP", self),
+					EXPProgressBar(self),
 
 					Components.Frame(scope, {
 						Name = "StatsFrame",
@@ -88,7 +88,6 @@ return function(plr: Player)
 								Padding = udNew(0.01, 0),
 								HorizontalAlignment = Enum.HorizontalAlignment.Center,
 								FillDirection = Enum.FillDirection.Horizontal,
-								SortOrder = Enum.SortOrder.LayoutOrder,
 							}),
 
 							StatBar("DEF", self),
@@ -103,12 +102,26 @@ return function(plr: Player)
 						FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
 						TextTransparency = 0.5,
 						TextXAlignment = Enum.TextXAlignment.Left,
-						Text = RepS.Package.ServerLocation.Value.." "
-							..RepS.Package.PrivateServerId.Value.." v"
+						Text = RepS.Package.ServerLocation.Value.." / "
+							..(if RepS.Package.PrivateServerId.Value == "" then "?" else RepS.Package.PrivateServerId.Value).." / v"
 							..RepS.Package.Version.Value,
 
 						[Children] = {
 							New(scope, "UIPadding")({ PaddingLeft = udNew(0.01, 0) }),
+							New(scope, "UITextSizeConstraint")({ MaxTextSize = 14 })
+						}
+					}),
+					Components.TextLabel(scope, {
+						Name = "UID",
+						Position = fromScale(0, 0.4),
+						Size = fromScale(1, 0.3),
+						FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
+						TextTransparency = 0.5,
+						TextXAlignment = Enum.TextXAlignment.Right,
+						Text = "UID: "..plr.UserId,
+
+						[Children] = {
+							New(scope, "UIPadding")({ PaddingRight = udNew(0.01, 0) }),
 							New(scope, "UITextSizeConstraint")({ MaxTextSize = 14 })
 						}
 					}),
@@ -198,7 +211,7 @@ return function(plr: Player)
 		local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 		if isMobile then
-			local touchGui = plr.PlayerGui:WaitForChild("TouchGui", 999) :: ScreenGui
+			local touchGui = plr:FindFirstChildOfClass("PlayerGui"):WaitForChild("TouchGui", 999) :: ScreenGui
 
 			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).AnchorPoint = v2New(0.82, 0.8)
 			touchGui:WaitForChild("TouchControlFrame", 999):WaitForChild("JumpButton", 999).Position = fromScale(0.82, 0.8)
@@ -208,14 +221,14 @@ return function(plr: Player)
 
 	---// Listening events
 	local playerData = self.playerData
-	self.Add(HarukaLib:Hydrate(plr, {
+	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
-			playerData.EXP[2]:set(floor(Fusion.peek(plr:GetAttribute("Levels")) ^ 1.65) + 59)
+			playerData.EXP[2]:set(EXPFormula(plr:GetAttribute("Levels")))
 		end,
 		["Attr-Levels"] = function(level: number)
 			playerData.Levels:set(level)
-			playerData.EXP[2]:set(floor(level ^ 1.65) + 59)
+			playerData.EXP[2]:set(EXPFormula(level))
 		end,
 		["Attr-Class"] = function(class: string)
 			playerData.Class:set(class)
@@ -236,7 +249,7 @@ return function(plr: Player)
 	}))
 
 	local charClassInfo = self.charClassInfo
-	self.Add(HarukaLib:Hydrate(self.char, {
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-Combo"] = function(combo: number)
 			charClassInfo.Warrior:set(combo)
 
@@ -272,7 +285,7 @@ return function(plr: Player)
 	}))
 
 	local charStatsDict = self.charStatsDict
-	self.Add(HarukaLib:Hydrate(self.char, {
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-Mana"] = function(mana: number)
 			charStatsDict.MP[1]:set(mana)
 		end,
@@ -285,14 +298,14 @@ return function(plr: Player)
 		["Attr-MaxShield"] = function(maxShield: number)
 			charStatsDict.DEF[2]:set(maxShield)
 		end,
-		["Attr-Healing"] = function(state: boolean)
+		["Attr-HPRecovering"] = function(state: boolean)
 			charStatsDict.HPHealing:set(state)
 		end,
-		["Attr-Repairing"] = function(state: boolean)
+		["Attr-ShieldRepairing"] = function(state: boolean)
 			charStatsDict.DEFRepairing:set(state)
 		end
 	}))
-	self.Add(HarukaLib:Hydrate(self.humanoid, {
+	table.insert(scope, HarukaLib:Hydrate(self.humanoid, {
 		["Prop-Health"] = function(health: number)
 			charStatsDict.HP[1]:set(health)
 		end,
@@ -313,8 +326,6 @@ return function(plr: Player)
 		Events.LevelUp:DisconnectAll()
 
 		Signals.ExCategoryOpened:DisconnectAll()
-
-		self.Empty()
 
 		Fusion.doCleanup(scope)
 

@@ -24,7 +24,7 @@ local tFind, insert = table.find, table.insert
 local match, sFind, gsub = string.match, string.find, string.gsub
 
 local function ChatFrame(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     local originDialoguesChatting = nil
     local dialoguesChatting = nil
@@ -273,7 +273,7 @@ local function ChatFrame(self: table) : Frame
                         HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         VerticalAlignment = Enum.VerticalAlignment.Bottom
                     }),
-                    Fusion.ForValues(scope, self.chatChoices, function(_, localScope: table, option: string)
+                    Fusion.ForValues(scope, self.chatChoices, function(_, localScope: Fusion.Scope, option: string)
                         local way = "Chat"
                         if sFind(option, "EXIT") then way = "Exit" end
                         if sFind(option, "BUY") then way = "Buy" end

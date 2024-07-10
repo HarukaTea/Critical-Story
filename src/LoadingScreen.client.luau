@@ -25,7 +25,6 @@ local udNew = UDim.new
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Health, true)
-SG:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
 
 local loadFinished = false
 
@@ -35,7 +34,7 @@ ui.Name = "Loading"
 ui.ScreenInsets = Enum.ScreenInsets.None
 ui.ClipToDeviceSafeArea = false
 ui.DisplayOrder = 100
-ui.Parent = plr.PlayerGui
+ui.Parent = plr:FindFirstChildOfClass("PlayerGui")
 
 local bg = instanceNew("Frame")
 bg.Name = "BG"
@@ -165,7 +164,7 @@ local cutsceneUI = instanceNew("ScreenGui")
 cutsceneUI.Name = "TempCutscene"
 cutsceneUI.DisplayOrder = 100
 cutsceneUI.IgnoreGuiInset = true
-cutsceneUI.Parent = plr.PlayerGui
+cutsceneUI.Parent = plr:FindFirstChildOfClass("PlayerGui")
 
 local cutsceneBG = instanceNew("Frame")
 cutsceneBG.BackgroundColor3 = fromRGB(234, 234, 234)
@@ -179,15 +178,15 @@ TS:Create(cutsceneBG, tweenInfoNew(0.5), { BackgroundTransparency = 0 }):Play()
 wait(1)
 local camera = workspace.CurrentCamera
 camera.CameraType = Enum.CameraType.Scriptable
-camera.CFrame = cfNew(-9997, 54.6, 9991.6, -0.5, 0, 0.8, -0, 1, 0, -0.84, 0, -0.53)
+camera.CFrame = cfNew(-10015, 55.3, 9989.6, -0.722, 0.0125, 0.69, -0, 1, -0.018, -0.691, -0.013, -0.721)
 plr:SetAttribute("InCutscene", true)
 
 SoundS.Musics.Volume = 0
 workspace.Sounds.StoryMusics.Cairn:Play()
 
-plr.PlayerGui:WaitForChild("NPCChat", 999)
+plr:FindFirstChildOfClass("PlayerGui"):WaitForChild("NPCChat", 999)
 
-repeat wait() until plr.Character
+repeat wait() until plr.Character or plr.CharacterAdded:Wait()
 
 plr.Character:PivotTo(workspace:WaitForChild("Maps", 999).StartCutscene.CutsceneLocator.CFrame)
 plr.Character:SetAttribute("CurrentRegion", "")

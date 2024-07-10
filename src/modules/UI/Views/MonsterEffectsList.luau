@@ -12,7 +12,7 @@ local udNew = UDim.new
 local v2New = Vector2.new
 
 local function MonsterEffectList(info: table, self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     return Components.Frame(scope, {
         Name = "MonsterEffectsList",
@@ -28,7 +28,7 @@ local function MonsterEffectList(info: table, self: table) : Frame
                 FillDirection = Enum.FillDirection.Horizontal
             }),
 
-            Fusion.ForValues(scope, info.EffectsList, function(_, localScope: table, effect: Script)
+            Fusion.ForValues(scope, info.EffectsList, function(_, localScope: Fusion.Scope, effect: Script)
                 return EffectIndicator(effect, localScope)
             end)
         }

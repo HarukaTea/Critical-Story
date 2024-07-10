@@ -25,7 +25,7 @@ local function TextStroke(self: table)
 end
 
 local function LocationTitleFrame(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     local function _showCurrentLocation(location: string)
         if not location or location == "" then return end
@@ -65,7 +65,7 @@ local function LocationTitleFrame(self: table) : Frame
 		end)
 	end
     _showCurrentLocation(self.char:GetAttribute("CurrentRegion"))
-    self.Add(HarukaLib:Hydrate(self.char, {
+    table.insert(scope, HarukaLib:Hydrate(self.char, {
         ["Attr-CurrentRegion"] = _showCurrentLocation
     }))
 

@@ -14,10 +14,10 @@ local SettingToggleBtn = require(RepS.Modules.UI.Components.SettingToggleBtn)
 local fromScale = UDim2.fromScale
 
 local function SettingsFrame(self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local playerSettings = self.playerSettings :: table
 
-	self.Add(HarukaLib:Hydrate(self.plr, {
+	table.insert(scope, HarukaLib:Hydrate(self.plr, {
 		["Attr-CombatMode"] = function(newMode: string)
 			playerSettings.PublicCombat:set(newMode == "Public")
 		end,

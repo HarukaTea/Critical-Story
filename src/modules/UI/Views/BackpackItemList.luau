@@ -16,9 +16,9 @@ local wait = task.wait
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 
 local function BackpackItemList(self: table) : ScrollingFrame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
-    self.Add(HarukaLib:Hydrate(workspace.CurrentCamera, {
+    table.insert(scope, HarukaLib:Hydrate(workspace.CurrentCamera, {
         ["Prop-ViewportSize"] = function(newSize: Vector2)
             self.absSize:set({
 				newSize.X * 0.71,
@@ -29,7 +29,7 @@ local function BackpackItemList(self: table) : ScrollingFrame
         end
     }))
 
-    return Components.ScrollingFrame(scope, {
+    self.itemFrame = Fusion.Value(scope, Components.ScrollingFrame(scope, {
         Name = "Items",
         Size = fromScale(0.99, 0.93),
         ScrollingDirection = Enum.ScrollingDirection.Y,
@@ -41,8 +41,6 @@ local function BackpackItemList(self: table) : ScrollingFrame
         ScrollingEnabled = Computed(scope, function(use)
             return if use(self.absContentSize) > use(self.absScrollSize) then true else false
         end),
-
-        [Fusion.Ref] = self.itemFrame,
 
         [Fusion.OnEvent("ChildAdded")] = function()
             wait()
@@ -72,7 +70,7 @@ local function BackpackItemList(self: table) : ScrollingFrame
                     self.absContentSize:set(newSize.Y)
                 end,
             }),
-            Fusion.ForValues(scope, self.items, function(use, localScope: table, item: IntValue)
+            Fusion.ForValues(scope, self.items, function(use, localScope: Fusion.Scope, item: IntValue)
                 if use(self.chosenFilter) == "Other" then
                     local filter = { "Material", "Cosmetic", "Quest" }
                     if tFind(filter, ItemBook:FindItem(item.Name).Type) then return BackpackItemSlot(item, self, localScope) end
@@ -82,7 +80,9 @@ local function BackpackItemList(self: table) : ScrollingFrame
                 end
             end),
         },
-    })
+    }))
+
+    return self.itemFrame
 end
 
 return BackpackItemList

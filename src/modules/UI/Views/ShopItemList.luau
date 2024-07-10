@@ -15,9 +15,9 @@ local Computed, peek = Fusion.Computed, Fusion.peek
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 
 local function ShopItemList(id: string, self: table) : ScrollingFrame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
-    self.Add(HarukaLib:Hydrate(workspace.CurrentCamera, {
+    table.insert(scope, HarukaLib:Hydrate(workspace.CurrentCamera, {
         ["Prop-ViewportSize"] = function(newSize: Vector2)
             self.absSize:set({
 				newSize.X * 0.71,
@@ -37,7 +37,7 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
     end
     Events.EnterShopping:Connect(_handleItems)
 
-    return Components.ScrollingFrame(scope, {
+    self.itemFrame = Components.ScrollingFrame(scope, {
         Name = "Items",
         Size = fromScale(0.99, 0.93),
         ScrollingDirection = Enum.ScrollingDirection.Y,
@@ -49,7 +49,6 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         ScrollingEnabled = Computed(scope, function(use)
             return if use(self.absContentSize) > use(self.absScrollSize) then true else false
         end),
-        [Fusion.Ref] = self.itemFrame,
 
         [Fusion.OnChange("AbsoluteSize")] = function(newSize)
             self.absScrollSize:set(newSize.Y)
@@ -68,11 +67,13 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
                     self.absContentSize:set(newSize.Y)
                 end,
             }),
-            Fusion.ForValues(scope, self.items, function(_, localScope: table, item: string)
+            Fusion.ForValues(scope, self.items, function(_, localScope: Fusion.Scope, item: string)
                 return ShopItemSlot(item, self, localScope)
             end),
         },
     })
+
+    return self.itemFrame
 end
 
 return ShopItemList

@@ -8,7 +8,10 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local monster = script.Parent :: Model
-local locator = monster.Parent :: BasePart
+local animator = monster.AnimationController.Animator :: Animator
+
+local spikeRainAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SpikeRain)
+local spikeShotAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SpikeShot)
 
 local wait, random, rad = task.wait, math.random, math.rad
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
@@ -16,7 +19,7 @@ local v3New = Vector3.new
 
 
 local function moving(target: Model)
-	local post = ServerUtil:FindPartOnRay(locator.Position + v3New(random(-32,32), 0, random(-32,32)))
+	local post = ServerUtil:FindPartOnRay(monster.Parent.Position + v3New(random(-32,32), 0, random(-32,32)))
 
 	monster:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector) * cfNew(0, 1.5, 0))
 	monster:PivotTo(cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position))
@@ -24,6 +27,8 @@ local function moving(target: Model)
 end
 
 local function spikeShot(target: Model)
+	spikeShotAnim:Play()
+
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local pRandom = random(1, 2)
@@ -35,6 +40,8 @@ local function spikeShot(target: Model)
 end
 
 local function spikeRain(target: Model)
+	spikeRainAnim:Play()
+
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local rangePos = ServerUtil:FindPartOnRay(target.PrimaryPart.Position + v3New(random(-15, 15), 10, random(-15, 15)))

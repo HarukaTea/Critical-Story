@@ -11,7 +11,7 @@ local Children = Fusion.Children
 local fromScale = UDim2.fromScale
 
 local function ItemCostFrame(self: table) : Frame
-    local scope = self.scope :: table
+    local scope = self.scope :: Fusion.Scope
 
     return Components.Frame(scope, {
         Name = "Stats",

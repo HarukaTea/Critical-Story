@@ -9,11 +9,11 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local clamp = math.clamp
 
-local function BottomProgressBar(id: string, self: table) : Frame
-    local scope = self.scope
+local function EXPProgressBar(self: table) : Frame
+    local scope = self.scope :: Fusion.Scope
 
     return Fusion.New(scope, "Frame")({
-        Name = id.."Bar",
+        Name = "EXPBar",
         BackgroundColor3 = fromRGB(30, 30, 30),
         Position = fromScale(0, 0.8),
         Size = fromScale(1, 0.1),
@@ -23,20 +23,16 @@ local function BottomProgressBar(id: string, self: table) : Frame
             Fusion.New(scope, "Frame")({
                 Name = "Bar",
                 BackgroundTransparency = 0.2,
-                BackgroundColor3 = if id == "EXP" then fromRGB(217, 193, 144) else fromRGB(255, 255, 255),
+                BackgroundColor3 = fromRGB(217, 193, 144),
 
                 Size = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
-                    if id == "EXP" then
-                        local x = clamp(use(self.playerData.EXP[1]) / use(self.playerData.EXP[2]), 0, 1)
+                    local x = clamp(use(self.playerData.EXP[1]) / use(self.playerData.EXP[2]), 0, 1)
 
-                        return fromScale(x, 1)
-                    else
-                        return use(self.phaseBarProgress)
-                    end
-                end), if self.phaseBarTweenInfo then self.phaseBarTweenInfo else AssetBook.TweenInfos.halfBack)
+                    return fromScale(x, 1)
+                end), AssetBook.TweenInfos.halfBack)
             })
         }
     })
 end
 
-return BottomProgressBar
+return EXPProgressBar

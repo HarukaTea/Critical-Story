@@ -1,6 +1,11 @@
 --!nocheck
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
+
+local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
+
+local Add, Empty = HarukaLib.Bin()
 
 local MOMENTUM_FACTOR = 0.008
 local MIN_MOMENTUM = 0.05
@@ -18,7 +23,7 @@ local v3New = Vector3.new
 local clamp, abs = math.clamp, math.abs
 local cfAngles = CFrame.Angles
 
-local rsConnection = RS.Heartbeat:Connect(function(deltaTime)
+Add(RS.Heartbeat:Connect(function(deltaTime)
 	local direction = HRP.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
 	local momentum = HRP.CFrame:VectorToObjectSpace(HRP.AssemblyLinearVelocity) * MOMENTUM_FACTOR
 
@@ -29,10 +34,7 @@ local rsConnection = RS.Heartbeat:Connect(function(deltaTime)
 	local angles = {-z, -x, 0}
 
 	m6d.C0 = m6d.C0:Lerp(originalM6dC0 * cfAngles(unpack(angles)), deltaTime * SPEED)
-end)
+end))
 
 --// Clear
-local function onDead()
-	rsConnection:Disconnect()
-end
-humanoid.Died:Once(onDead)
+humanoid.Died:Once(Empty)

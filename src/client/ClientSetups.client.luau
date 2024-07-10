@@ -109,9 +109,9 @@ Spawn(chatRegister)
 
 
 local function disableDefaultFreecam()
-    repeat wait() until plr.PlayerGui:WaitForChild("Freecam", 999)
+    repeat wait() until plr:FindFirstChildOfClass("PlayerGui"):WaitForChild("Freecam", 999)
 
-    plr.PlayerGui.Freecam:Destroy()
+    plr:FindFirstChildOfClass("PlayerGui").Freecam:Destroy()
 end
 Spawn(disableDefaultFreecam)
 

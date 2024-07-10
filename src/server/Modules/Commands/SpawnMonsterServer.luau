@@ -1,17 +1,13 @@
 --!nocheck
 
 local RepS = game:GetService("ReplicatedStorage")
-local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local cfNew = CFrame.new
-local wait = task.wait
 
-return function (context: table, monster: string, level: number, amount: number)
+return function (context: table, monster: string, level: number, amount: number, respawnable: boolean)
     local check = HarukaLib:TypeCheck("MinMax", level, 0, 9999)
     local check2 = HarukaLib:TypeCheck("Integer", level)
     local check3 = HarukaLib:TypeCheck("MinMax", amount, 0, 9999)
@@ -29,35 +25,30 @@ return function (context: table, monster: string, level: number, amount: number)
     if amount > 5 then
         return "Nah "..amount.." monsters will explode the server!"
     end
+    if typeof(respawnable) ~= "boolean" then
+        return "Respawnable must be a boolean value!"
+    end
 
     local locator = RepS.Package.Unloads.MonsterLocator:Clone() :: BasePart
     locator.Name = monster
     locator:ClearAllChildren()
     locator:SetAttribute("Levels", level)
-    locator:SetAttribute("CantRespawn", true)
+    locator:SetAttribute("CantRespawn", if respawnable then nil else true)
     locator:SetAttribute("SubMonster", nil)
     locator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
+    locator.Transparency = 1
     locator.Parent = workspace.Monsters
-
-    local spawnedMonster = ServerUtil:SetupMonster(locator, level)
-
-    spawnedMonster:SetAttribute("InCombat", true)
-    Spawn(function()
-        wait(2)
-        spawnedMonster:SetAttribute("InCombat", false)
-    end)
 
     for _ = 1, amount - 1 do
         local subLocator = RepS.Package.Unloads.MonsterLocator:Clone() :: BasePart
         subLocator.Name = monster
         subLocator:ClearAllChildren()
         subLocator:SetAttribute("SubMonster", true)
-        subLocator:SetAttribute("CantRespawn", true)
+        subLocator:SetAttribute("CantRespawn", if respawnable then nil else true)
         subLocator:SetAttribute("Levels", level)
         subLocator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
+        subLocator.Transparency = 1
         subLocator.Parent = locator
-
-        ServerUtil:SetupMonster(subLocator, level)
     end
 
     return "Level "..level.." "..AssetBook.MonsterInfo[monster].Name.." x"..amount.." spawned"

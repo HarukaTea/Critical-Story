@@ -4,7 +4,6 @@ local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -14,8 +13,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local Pinia = require(RepS.Modules.UI.Pinia.PlayerListPinia)
 
 local PlayerDescFrame = require(RepS.Modules.UI.Views.PlayerDescFrame)
-
-local PlayerSlot = require(RepS.Modules.UI.Components.PlayerSlot)
+local PlayerListFrame = require(RepS.Modules.UI.Views.PlayerListFrame)
 
 local Children, Computed, peek = Fusion.Children, Fusion.Computed, Fusion.peek
 
@@ -24,7 +22,7 @@ PlayerList.__index = PlayerList
 PlayerList.__type = "PlayerList"
 
 local wait = task.wait
-local color3New, v2New, udNew, ud2New = Color3.new, Vector2.new, UDim.new, UDim2.new
+local color3New, v2New, ud2New = Color3.new, Vector2.new, UDim2.new
 local fromScale, fromOffset = UDim2.fromScale, UDim2.fromOffset
 local fromRGB = Color3.fromRGB
 local min = math.min
@@ -38,11 +36,11 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	Components.ScreenGui(scope, {
 		Name = "PlayerList",
 		DisplayOrder = 10,
-		Parent = plr.PlayerGui,
+		Parent = plr:FindFirstChildOfClass("PlayerGui"),
 
 		[Children] = {
 			Components.Frame(scope, {
@@ -54,42 +52,8 @@ return function(plr: Player)
 				[Children] = {
 					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.386 }),
 
-					Components.ScrollingFrame(scope, {
-						Name = "List",
-						AnchorPoint = v2New(),
-						Size = fromScale(0.118, 3),
-						ZIndex = 2,
-						ScrollingDirection = Enum.ScrollingDirection.Y,
+					PlayerListFrame(self),
 
-						Position = Fusion.Tween(scope, Computed(scope, function(use)
-							return if use(self.isOpen) then fromScale(0.875, 0) else fromScale(1.2, 0)
-						end), AssetBook.TweenInfos.half),
-						CanvasSize = Computed(scope, function(use)
-							return if use(self.absContentSize) > use(self.absSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
-						end),
-						ScrollingEnabled = Computed(scope, function(use)
-							return if use(self.absContentSize) > use(self.absSize) then true else false
-						end),
-
-						[Fusion.Ref] = self.list,
-						[Fusion.OnChange("AbsoluteSize")] = function(newSize: Vector2)
-							self.absSize:set(newSize.Y)
-						end,
-
-						[Children] = {
-							Fusion.New(scope, "UIListLayout")({
-								Padding = udNew(0, 2),
-								HorizontalAlignment = Enum.HorizontalAlignment.Center,
-
-								[Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
-									self.absContentSize:set(newSize.Y)
-								end,
-							}),
-							Fusion.ForValues(scope, self.players, function(_, localScope: table, player: Player)
-								return PlayerSlot(self, player, localScope)
-							end),
-						},
-					}),
 					Components.HoverImageButton(scope, {
 						AnchorPoint = v2New(),
 						Position = fromScale(0.875, 0),
@@ -134,15 +98,15 @@ return function(plr: Player)
 	self.players:set(Players:GetPlayers())
 
 	---// Listening events
-	self.Add(Players.PlayerAdded:Connect(function(player)
+	table.insert(scope, Players.PlayerAdded:Connect(function(player)
 		repeat wait() until player:GetAttribute("PlayerDataLoaded")
 
 		self.players:set(Players:GetPlayers())
 	end))
-	self.Add(Players.PlayerRemoving:Connect(function()
+	table.insert(scope, Players.PlayerRemoving:Connect(function()
 		self.players:set(Players:GetPlayers())
 	end))
-	self.Add(HarukaLib:Hydrate(plr, {
+	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-PlayerList"] = function(state: boolean)
 			self.isOpen:set(state)
 		end
@@ -162,8 +126,6 @@ return function(plr: Player)
 		CAS:UnbindAction("TogglePlayerList")
 
 		Signals.ExCategoryOpened:DisconnectAll()
-
-		self.Empty()
 
 		Fusion.doCleanup(scope)
 

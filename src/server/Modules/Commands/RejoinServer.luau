@@ -1,9 +1,11 @@
 --!nocheck
 
-local TeleS = game:GetService("TeleportService")
+local SSS = game:GetService("ServerScriptService")
+
+local Signals = require(SSS.Modules.Data.ServerSignals)
 
 return function (context)
-    TeleS:Teleport(game.PlaceId, context.Executor)
+    Signals.RejoinPlace:Fire(context.Executor)
 
     return "Attempt to rejoin..."
 end

@@ -6,7 +6,6 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Signals = require(RepS.Modules.Data.Signals)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Computed, Tween = Fusion.Computed, Fusion.Tween
 
@@ -16,7 +15,7 @@ local fromRGB = Color3.fromRGB
 local clamp = math.clamp
 
 local function StatBar(id: string, self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local names = { HP = "HEALTH", MP = "MANA", DEF = "SHIELD" }
 	local colors = {
 		HP = fromRGB(48, 121, 36),
@@ -29,7 +28,7 @@ local function StatBar(id: string, self: table): Frame
 	local isSelecting = Fusion.Value(scope, false)
 
 	local children: TextLabel
-	if id == "DEF" then
+	if id == "DEF" or id == "HP" then
 		children = Components.TextLabel(scope, {
 			Name = "Level",
 			AnchorPoint = v2New(0.5, 0),
@@ -40,6 +39,13 @@ local function StatBar(id: string, self: table): Frame
 
 			Text = Computed(scope, function(use)
 				return "Lv." .. use(self.playerData.Levels)
+			end),
+			Visible = Computed(scope, function(use)
+				if id == "DEF" then
+					return if use(self.charStatsDict.DEF[2]) <= 0 then false else true
+				elseif id == "HP" then
+					return if use(self.charStatsDict.DEF[2]) > 0 then false else true
+				end
 			end),
 		})
 	end
@@ -52,8 +58,24 @@ local function StatBar(id: string, self: table): Frame
 	return Fusion.New(scope, "Frame")({
 		Name = id,
 		AnchorPoint = v2New(0.5, 0),
-		Size = if id == "HP" then fromScale(0.215, 0.875) else fromScale(0.185, 0.875),
 		BackgroundColor3 = color3New(),
+
+		Size = Tween(scope, Fusion.Computed(scope, function(use)
+			if id == "MP" then
+				return if use(self.charStatsDict.DEF[2]) > 0 then fromScale(0.15, 0.875) else fromScale(0.2, 0.875)
+			elseif id == "DEF" then
+				return if use(self.charStatsDict.DEF[2]) <= 0 then fromScale(0, 0.875) else fromScale(0.15, 0.875)
+			else
+				return fromScale(0.2, 0.875)
+			end
+		end), AssetBook.TweenInfos.half),
+		Visible = Computed(scope, function(use)
+			if id == "DEF" then
+				return if use(self.charStatsDict.DEF[2]) > 0 then true else false
+			else
+				return true
+			end
+		end),
 
 		[Fusion.Children] = {
 			Components.RoundUICorner(scope),

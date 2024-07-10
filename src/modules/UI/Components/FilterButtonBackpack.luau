@@ -8,6 +8,7 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Computed, peek = Fusion.Computed, Fusion.peek
 
@@ -62,8 +63,24 @@ local function _findItem(itemFrame: Frame) : string
 	return item
 end
 
+--- note: from v0.7, server will just open a new thread for equipping
+--- because of this, checks may not work, so we need to do it in client first
+local function _checkEquippedItems(self: table, requestItem: string) : boolean
+	local itemInfo = ItemBook:FindItem(requestItem)
+	if not itemInfo.ItemId then return false end
+
+	local count = 0
+	local check = true
+	for _, item: IntConstrainedValue in self.Inventory:GetChildren() do
+		if item:GetAttribute("Equipped") and ItemBook:FindItem(item.Name).Type == itemInfo.Type then count += 1 end
+	end
+	if count >= 3 and not self.plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
+
+	return check
+end
+
 local function FilterButtonBackpack(id: string, self: table): TextButton
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 
 	return Components.TextButton(scope, {
 		Name = id,
@@ -88,6 +105,12 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 		[Fusion.OnEvent("MouseButton1Click")] = function()
 			if self.equipClickCD then return end
 			if peek(self.chosenFilter) == id then return end
+
+			self.equipClickCD = true
+			Spawn(function()
+				wait(0.3)
+				self.equipClickCD = false
+			end)
 
 			if id == "Equip" then
 				local item = _findItem(peek(self.itemFrame))
@@ -117,6 +140,14 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 				if slot == "Full" and checkSame == "None" then Signals.CreateHint:Fire("Not enough space to equip!") return end
 				if slot ~= "Full" and checkSame == "None" then
+					--- check first
+					local equipCheck = _checkEquippedItems(self, item)
+					if equipCheck then return end
+
+					-- local assign first, to fix equip bug when server lag while equiping
+					self.inventory[item]:SetAttribute("Equipped", true)
+					self.inventory[item]:SetAttribute("Slot", slot)
+
 					Events.EquipItems:Fire(itemType, slot, item)
 
 				elseif checkSame == "Exist" then
@@ -135,10 +166,6 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 				self:DeselectAll()
 			end
-
-			self.equipClickCD = true
-			wait(0.2)
-			self.equipClickCD = false
 		end,
 	})
 end

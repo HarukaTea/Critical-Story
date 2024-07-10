@@ -25,7 +25,7 @@ return function(plr: Player)
 	local self = setmetatable({}, NPCChat)
 
 	self.plr = plr
-	self.plrGui = plr.PlayerGui
+	self.plrGui = plr:FindFirstChildOfClass("PlayerGui")
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -33,7 +33,7 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	Components.ScreenGui(scope, {
 		Name = "NPCChat",
 		DisplayOrder = 2,
@@ -64,8 +64,6 @@ return function(plr: Player)
 
 		Signals.NPCChat:DisconnectAll()
 		Signals.StartNPCChat:DisconnectAll()
-
-		self.Empty()
 
 		Fusion.doCleanup(scope)
 

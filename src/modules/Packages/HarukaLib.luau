@@ -7,6 +7,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
 local Spawn = require(ReplicatedStorage.Modules.Packages.Spawn)
+local Signal = require(ReplicatedStorage.Modules.Packages.Signal)
 
 local HarukaLib = {}
 
@@ -417,6 +418,60 @@ function HarukaLib:RollLoot(loots: { [string]: number }) : string
 
 		aggregate += chance
 	end
+end
+
+--[[
+	Play a cutscene camera using bezier curve
+]]
+function HarukaLib:PlayCutscene(pointsFolder: Folder | Model, duration: number)
+	local camera = workspace.CurrentCamera
+	local signal = Signal.new()
+
+	--// Private
+	local function _getCF(points: table, t: number) : CFrame
+		local copy = { unpack(points) }
+
+		local n = #copy
+		for j = 1, n - 1 do
+			for k = 1, n - j do
+				copy[k] = copy[k]:Lerp(copy[k + 1], t)
+			end
+		end
+		return copy[1]
+	end
+
+	--- sort points
+	local points = {}
+	local instances = pointsFolder:GetChildren()
+
+	table.sort(instances, function(a, b)
+		return tonumber(a.Name) < tonumber(b.Name)
+	end)
+	for _, point: BasePart in ipairs(instances) do
+		points[#points + 1] = point.CFrame
+	end
+
+	--- play
+	camera.CameraType = Enum.CameraType.Scriptable
+
+	local priority = Enum.RenderPriority.Camera.Value + 1
+	local start = os.clock()
+	local passedTime = 0
+
+	RunService:BindToRenderStep("HarukaCutscene", priority, function()
+		passedTime = os.clock() - start
+
+		if passedTime <= duration then
+			camera.CFrame = _getCF(points, passedTime / duration)
+		else
+			RunService:UnbindFromRenderStep("HarukaCutscene")
+
+			signal:Fire("Completed")
+			signal:Destroy()
+		end
+	end)
+
+	return signal
 end
 
 return HarukaLib

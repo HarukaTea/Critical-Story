@@ -64,8 +64,9 @@ local function enableWinds()
         WindPower = 0.5
     })
     for _, child: Instance in workspace:GetDescendants() do
-        if child:IsA("Model") and child.Name == "Tree" then
-            for _, treePart: BasePart in child:GetChildren() do
+        if child:IsA("Model") and string.find(child.Name, "Tree") then
+            for _, treePart: BasePart in child:GetDescendants() do
+                if not treePart:IsA("BasePart") then continue end
                 if treePart.Material == Enum.Material.Grass then WindShake:AddObjectShake(treePart) end
             end
         end

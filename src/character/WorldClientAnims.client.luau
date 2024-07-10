@@ -47,9 +47,4 @@ local function worldAnims()
 end
 worldAnims()
 
-local function onDead()
-    Empty()
-
-    script:Destroy()
-end
-char.Humanoid.Died:Once(onDead)
+char.Humanoid.Died:Once(Empty)

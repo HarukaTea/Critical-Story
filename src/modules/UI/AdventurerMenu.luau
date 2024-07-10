@@ -28,7 +28,7 @@ return function(plr: Player)
 	local self = setmetatable({}, AdventurerMenu)
 
 	self.plr = plr
-	self.plrGui = plr.PlayerGui
+	self.plrGui = plr:FindFirstChildOfClass("PlayerGui")
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -36,10 +36,10 @@ return function(plr: Player)
 
 	Pinia(self) --// Create a storage
 
-	local scope = self.scope :: table
+	local scope = self.scope :: Fusion.Scope
 	local UI = Components.ScreenGui(scope, {
 		Name = "AdventurerMenu",
-		Parent = plr.PlayerGui,
+		Parent = plr:FindFirstChildOfClass("PlayerGui"),
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 
@@ -79,12 +79,12 @@ return function(plr: Player)
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUIEx(plr, "AdventurerMenu", true) end
 	end
-	self.Add(HarukaLib:Hydrate(self.char, {
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
 	}))
-	self.Add(HarukaLib:Hydrate(plr, {
+	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-InChatting"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
@@ -94,8 +94,6 @@ return function(plr: Player)
 	local function _clearGarbage()
 		CAS:UnbindAction("OpenMenu")
 		plr:SetAttribute("CurrentMenu", "None")
-
-		self.Empty()
 
 		Fusion.doCleanup(self.scope)
 

@@ -8,6 +8,7 @@ local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
+local EXPFormula = require(RepS.Modules.Data.EXPFormula)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
@@ -28,7 +29,6 @@ local ATTRIBUTES = require(SSS.Modules.Data.CharTemplate)
 local wait = task.wait
 local floor = math.floor
 local instanceNew = Instance.new
-local v3New = Vector3.new
 local cfNew = CFrame.new
 
 repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -64,15 +64,6 @@ local function setup()
 
     ServerUtil:SetCollisionGroup(char, "Player")
 
-    Add(HarukaLib.Clock(1, function()
-        HarukaLib:AddAttr(plr, "PlayTime", 1)
-
-        if char:GetAttribute("HitCD") >= 0 then HarukaLib:AddAttr(char, "HitCD", -1) end
-    end))
-
-    local cosmetic = plr:GetAttribute("Cosmetic") :: string?
-    if cosmetic and cosmetic ~= "None" then ServerUtil:EquipArmor(char, cosmetic) end
-
     --// Spawn to the nearest respawn point
     if not RS:IsStudio() then
         local area = plr:GetAttribute("LastSeenLocation") :: string
@@ -81,7 +72,12 @@ local function setup()
         char:PivotTo(cfNew(workspace.Maps[area].SpawnPoint.Position))
     end
 end
-Spawn(setup)
+
+local function cosmeticSetup()
+    local cosmetic = plr:GetAttribute("Cosmetic") :: string?
+
+    if cosmetic and cosmetic ~= "None" then ServerUtil:EquipArmor(char, cosmetic) end
+end
 
 local function classAttributesSetup()
     --- warrior
@@ -94,26 +90,29 @@ local function classAttributesSetup()
         end
     end))
 
-    --- wizard / knight / juggernaut / reaper
-    Add(HarukaLib.Clock(2, function()
-        if char:GetAttribute("Focus") > 0 then HarukaLib:AddAttr(char, "Focus", -1) end
+    -- knight
+    Add(HarukaLib.Clock(1, function()
         if char:GetAttribute("Guard") > 0 then HarukaLib:AddAttr(char, "Guard", -1) end
-        if char:GetAttribute("Rage") > 0 then HarukaLib:AddAttr(char, "Rage", -1) end
+    end))
+
+    -- reaper
+    Add(HarukaLib.Clock(1.5, function()
         if char:GetAttribute("LifeStolen") > 0 then HarukaLib:AddAttr(char, "LifeStolen", -1) end
     end))
 
     --- rogue
     Add(HarukaLib.Clock(0.6, function()
-        if char:GetAttribute("RogueCri") <= 0 then return end
-
-        HarukaLib:AddAttr(char, "RogueCri", -1)
+        if char:GetAttribute("RogueCri") > 0 then HarukaLib:AddAttr(char, "RogueCri", -1) end
     end))
 
     _createFolder("AlchemistCreations", char)
 end
-Spawn(classAttributesSetup)
 
 local function charAttributesSetup()
+    setup()
+    cosmeticSetup()
+    classAttributesSetup()
+
     local function manaCheck(mana: number)
         local maxMana = char:GetAttribute("MaxMana") :: number
 
@@ -142,7 +141,7 @@ local function charAttributesSetup()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
     end
     local function updateShield(isForce: boolean?)
-        char:SetAttribute("MaxShield", 20 * plr:GetAttribute("ShieldPoints") + 20 + char:GetAttribute("ShieldBuff"))
+        char:SetAttribute("MaxShield", 0 + char:GetAttribute("ShieldBuff"))
 
         char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
     end
@@ -166,18 +165,7 @@ local function charAttributesSetup()
     local function levelReqCheck()
         local level = plr:GetAttribute("Levels") :: number
 
-        Spawn(function()
-            Promise.new(function()
-                local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2132605760)
-
-                if not hasBadge then BadgeService:AwardBadge(plr.UserId, 2132605760) end
-
-            end):Catch(function(err)
-                warn(err)
-            end)
-        end)
-
-        if plr:GetAttribute("EXP") >= floor(level ^ 1.65) + 49 then
+        if plr:GetAttribute("EXP") > EXPFormula(level) then
             if lvUpCD then return end
 
             lvUpCD = true
@@ -187,6 +175,51 @@ local function charAttributesSetup()
             lvUpCD = false
         end
     end
+
+    local shieldAdd, shieldEmpty = HarukaLib.Bin()
+    local function shieldRepair()
+        shieldEmpty()
+
+        char:SetAttribute("ShieldRepairing", false)
+
+        shieldAdd(task.spawn(function()
+            wait(6)
+            while wait(0.15) do
+                if char:GetAttribute("Shield") >= char:GetAttribute("MaxShield") or humanoid.Health <= 0 then
+                    char:SetAttribute("ShieldRepairing", false)
+                    break
+                end
+
+                char:SetAttribute("ShieldRepairing", true)
+
+                HarukaLib:AddAttr(char, "Shield", math.ceil(char:GetAttribute("MaxShield") * 0.006))
+            end
+        end))
+    end
+    Add(shieldEmpty)
+
+    local healthAdd, healthEmpty = HarukaLib.Bin()
+    local function healthRecover()
+        healthEmpty()
+
+        char:SetAttribute("HPRecovering", false)
+
+        healthAdd(task.spawn(function()
+            wait(15)
+            while wait(0.5) do
+                if humanoid.Health <= 0 or humanoid.Health >= humanoid.MaxHealth then
+                    char:SetAttribute("HPRecovering", false)
+                    break
+                end
+
+                char:SetAttribute("HPRecovering", true)
+
+                humanoid.Health += math.ceil(humanoid.MaxHealth * 0.01)
+            end
+        end))
+    end
+    Add(healthEmpty)
+
     local function clearClassAttrs()
         char:SetAttribute("Combo", 0)
         char:SetAttribute("Stack", 0)
@@ -219,7 +252,6 @@ local function charAttributesSetup()
             updateMaxDMG()
         end,
         ["Attr-MagicPoints"] = updateMagic,
-        ["Attr-ShieldPoints"] = updateShield,
         ["Attr-HealthPoints"] = updateHP,
         ["Attr-ManaPoints"] = updateMana,
 
@@ -247,12 +279,19 @@ local function charAttributesSetup()
 
             updateSpeed()
             clearClassAttrs()
+        end,
+        ["Attr-CurrentState"] = function(state: string)
+            if state == "Hit" then
+                shieldRepair()
+                healthRecover()
+            end
         end
     }))
 
     char:SetAttribute("CharDataLoaded", true)
 end
 Spawn(charAttributesSetup)
+
 
 --// Connections
 local function onDead()

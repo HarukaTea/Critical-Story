@@ -14,7 +14,7 @@ return {
         {
             Type = "number",
             Name = "amount",
-            Description = "The amount of reputation you want to get"
+            Description = "The amount of reputation you want to get, negative amount supported"
         }
     }
 }

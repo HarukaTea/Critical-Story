@@ -9,7 +9,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local fromScale = UDim2.fromScale
 
 local function AlchemistAbilityIndicator(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
     local creations = self.char.AlchemistCreations :: Folder
 
     local function _handleCreations()
@@ -17,8 +17,8 @@ local function AlchemistAbilityIndicator(self: table) : Frame
         self.charClassInfo.Alchemist:set(creations:GetChildren())
     end
     _handleCreations()
-    self.Add(creations.ChildAdded:Connect(_handleCreations))
-    self.Add(creations.ChildRemoved:Connect(_handleCreations))
+    table.insert(scope, creations.ChildAdded:Connect(_handleCreations))
+    table.insert(scope, creations.ChildRemoved:Connect(_handleCreations))
 
     return Components.Frame(scope, {
         Name = "AlchemistStyle",

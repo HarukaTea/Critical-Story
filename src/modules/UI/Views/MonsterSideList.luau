@@ -14,11 +14,11 @@ local Children, peek = Fusion.Children, Fusion.peek
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local udNew = UDim.new
-local wait, cancel, spawn = task.wait, task.cancel, task.spawn
+local wait, spawn = task.wait, task.spawn
 local insert, remove, tFind = table.insert, table.remove, table.find
 
 local function MonsterSideList(self: table) : Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 
 	local function _addMonster(monster: ObjectValue)
 		wait()
@@ -37,27 +37,27 @@ local function MonsterSideList(self: table) : Frame
 		remove(afterMonsters, tFind(afterMonsters, monster))
 		self.targetingMobs:set(afterMonsters)
 	end
-	self.Add(self.charData.TargetMonsters.ChildAdded:Connect(_addMonster))
-	self.Add(self.charData.TargetMonsters.ChildRemoved:Connect(_removeMonster))
+	table.insert(scope, self.charData.TargetMonsters.ChildAdded:Connect(_addMonster))
+	table.insert(scope, self.charData.TargetMonsters.ChildRemoved:Connect(_removeMonster))
 
-	local monsterHPThread: thread = nil
+	local monsterHPTracker = Fusion.scoped({})
 	local function _combatStartSetup(monster: Model)
-		if monsterHPThread then cancel(monsterHPThread) end
+		Fusion.doCleanup(monsterHPTracker)
 		if not monster then return end
 
-		monsterHPThread = spawn(function()
+		table.insert(monsterHPTracker, spawn(function()
 			while true do
 				self.monsterTargetingPos:set(fromScale(-0.225, 0.5))
 				wait(0.6)
 				self.monsterTargetingPos:set(fromScale(-0.2, 0.5))
 				wait(0.6)
 			end
-		end)
+		end))
 	end
 	local function _combatEndAction()
-		if monsterHPThread then cancel(monsterHPThread) end
+		Fusion.doCleanup(monsterHPTracker)
 	end
-	self.Add(HarukaLib:Hydrate(self.char, {
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
 			if state then
 				_combatStartSetup(self.charData.TargetMonster.Value)
@@ -85,7 +85,7 @@ local function MonsterSideList(self: table) : Frame
                 VerticalAlignment = Enum.VerticalAlignment.Bottom
             }),
 
-            Fusion.ForValues(scope, self.targetingMobs, function(_, localScope: table, obj: ObjectValue)
+            Fusion.ForValues(scope, self.targetingMobs, function(_, localScope: Fusion.Scope, obj: ObjectValue)
                 return MonsterBar(obj.Value, self, localScope)
             end)
         }

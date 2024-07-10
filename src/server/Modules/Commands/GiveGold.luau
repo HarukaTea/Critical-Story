@@ -14,7 +14,7 @@ return {
         {
             Type = "number",
             Name = "amount",
-            Description = "The amount of gold you wish to get"
+            Description = "The amount of gold you wish to get, negative amount supported"
         }
     }
 }

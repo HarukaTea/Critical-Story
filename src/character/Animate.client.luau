@@ -31,11 +31,6 @@ local function startAnim(anim: AnimationTrack, transitionTime: number)
 		oldAnim = anim
 	end
 end
-local localStateFunctions = {
-	[Enum.HumanoidStateType.Jumping] = true,
-	[Enum.HumanoidStateType.Freefall] = true,
-	[Enum.HumanoidStateType.Seated] = true
-}
 local stateFunctions = {
 	[Enum.HumanoidStateType.Jumping] = true,
 	[Enum.HumanoidStateType.Freefall] = true,
@@ -104,11 +99,7 @@ local function setup()
 		if isFreefalling and jumpAnimTime <= 0 then startAnim(ANIMS.Freefall, 0.1) end
 	end))
 
-	local func = localStateFunctions[activeState]
-	if func then
-		startAnim(ANIMS.Idle, 0.1)
-		isFreefalling = false
-	end
+	startAnim(ANIMS.Idle, 0.1)
 end
 setup()
 

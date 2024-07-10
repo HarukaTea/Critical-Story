@@ -993,7 +993,7 @@ ItemBook.ItemImagesEx = {
     Null = "rbxassetid://1637592633",
     Unknown = "rbxassetid://2985521957",
 
-    Gold = "rbxassetid://12048586431",
+    Gold = "rbxassetid://18421784947",
     RP = "rbxassetid://16002068286",
     Backpack = "rbxassetid://2970814599"
 }

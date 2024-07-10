@@ -62,11 +62,23 @@ return function(plr: Player)
 	self.shiftLockLabel = Fusion.Value(scope)
 	self.ON_ICON, self.OFF_ICON = "rbxasset://textures/ui/mouseLock_on.png", "rbxasset://textures/ui/mouseLock_off.png"
 
+	local shiftLockLabel = Fusion.Value(scope, Components.HoverImageButton(scope, {
+		Image = self.OFF_ICON,
+
+		[Fusion.OnEvent("MouseButton1Click")] = function()
+			if self.char:FindFirstChild("Humanoid") and self.char.PrimaryPart then
+				self:SetLockState(if self.enabled then "Off" else "On")
+				self:EnableShiftLock()
+			end
+		end,
+	}))
+	self.shiftLockLabel:set(shiftLockLabel)
+
 	Fusion.New(scope, "ScreenGui")({
 		Name = "MobileShiftLock",
 		ScreenInsets = Enum.ScreenInsets.None,
 		DisplayOrder = 10,
-		Parent = plr.PlayerGui,
+		Parent = plr:FindFirstChildOfClass("PlayerGui"),
 
 		[Fusion.Children] = {
 			Components.Frame(scope, {
@@ -77,17 +89,8 @@ return function(plr: Player)
 
 				[Fusion.Children] = {
 					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 1.007 }),
-					Components.HoverImageButton(scope, {
-						Image = self.OFF_ICON,
-						[Fusion.Ref] = self.shiftLockLabel,
 
-						[Fusion.OnEvent("MouseButton1Click")] = function()
-							if self.char:FindFirstChild("Humanoid") and self.char.PrimaryPart then
-								self:SetLockState(if self.enabled then "Off" else "On")
-								self:EnableShiftLock()
-							end
-						end,
-					}),
+					shiftLockLabel,
 				},
 			}),
 		},

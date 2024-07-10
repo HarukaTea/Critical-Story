@@ -17,7 +17,7 @@ local insert, tFind, remove = table.insert, table.find, table.remove
     TODO: multi-prompt actions
 ]]
 local function PromptsFrame(self: table) : Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 
     local function _addPrompt(prompt: ProximityPrompt)
 		local nowPrompts = Fusion.peek(self.promptsList)
@@ -39,9 +39,9 @@ local function PromptsFrame(self: table) : Frame
 		local blacklist = { "Chest", "PublicJoin", "PartyJoin", "Chat" }
 		if not tFind(blacklist, prompt.Name) then prompt.Enabled = true end
 	end
-	self.Add(PPS.PromptShown:Connect(_addPrompt))
-	self.Add(PPS.PromptHidden:Connect(_removePrompt))
-	self.Add(PPS.PromptTriggered:Connect(_triggerPrompt))
+	table.insert(scope, PPS.PromptShown:Connect(_addPrompt))
+	table.insert(scope, PPS.PromptHidden:Connect(_removePrompt))
+	table.insert(scope, PPS.PromptTriggered:Connect(_triggerPrompt))
 
     return Components.Frame(scope, {
         AnchorPoint = v2New(0.5, 0),
@@ -55,7 +55,7 @@ local function PromptsFrame(self: table) : Frame
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 HorizontalAlignment = Enum.HorizontalAlignment.Center
             }),
-            Fusion.ForValues(scope, self.promptsList, function(_, localScope: table, prompt: ProximityPrompt)
+            Fusion.ForValues(scope, self.promptsList, function(_, localScope: Fusion.Scope, prompt: ProximityPrompt)
                 return Prompt(prompt, 1, localScope)
             end)
         },

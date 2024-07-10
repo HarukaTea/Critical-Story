@@ -7,7 +7,6 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local ActiveSlot = require(RepS.Modules.UI.Components.ActiveSlot)
-local CosmeticSlot = require(RepS.Modules.UI.Components.CosmeticSlot)
 local ExCategoryOpenBtn = require(RepS.Modules.UI.Components.ExCategoryOpenBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
 
@@ -19,7 +18,7 @@ local match, sFind, format = string.match, string.find, string.format
 local wait = task.wait
 
 local function ClassFrame(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     local function _equipItem(slot: string, item: string)
         local index = tonumber(match(slot, "%d"))
@@ -73,7 +72,7 @@ local function ClassFrame(self: table) : Frame
             Components.Frame(scope, {
                 Name = "AFrame",
                 AnchorPoint = v2New(),
-                Position = fromScale(0.837, -1),
+                Position = fromScale(0.837, -1.2),
                 Size = fromScale(0.15, 1.5),
 
                 [Children] = {
@@ -91,7 +90,7 @@ local function ClassFrame(self: table) : Frame
             Components.Frame(scope, {
                 Name = "EFrame",
                 AnchorPoint = v2New(),
-                Position = fromScale(0.837, -2.7),
+                Position = fromScale(0.837, -2.9),
                 Size = fromScale(0.15, 1.5),
 
                 [Children] = {
@@ -123,23 +122,7 @@ local function ClassFrame(self: table) : Frame
                     PassiveSlot(2, self),
                     PassiveSlot(3, self)
                 }
-            }),
-            Components.Frame(scope, {
-                Name = "CFrame",
-                AnchorPoint = v2New(),
-                Position = fromScale(0.015, -2.2),
-                Size = fromScale(0.15, 1.5),
-
-                [Children] = {
-                    Fusion.New(scope, "UIListLayout")({
-                        Padding = UDim.new(0.08, 0),
-                        SortOrder = Enum.SortOrder.LayoutOrder,
-                        FillDirection = Enum.FillDirection.Horizontal,
-                    }),
-
-                    CosmeticSlot(self)
-                }
-            }),
+            })
         },
     })
 end

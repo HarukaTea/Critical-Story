@@ -16,7 +16,7 @@ local udNew = UDim.new
 local fromScale = UDim2.fromScale
 
 local function StatImage(id: string, self: table) : ImageLabel
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
     local isSelecting = Value(scope, false)
 
     local function exCategoryOpened()
@@ -65,11 +65,11 @@ local function StatImage(id: string, self: table) : ImageLabel
 end
 
 local function StatText(id: string, self: table) : TextLabel
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
     local char = self.char :: Model
     local charDMGStats = self.charDMGStats
 
-    self.Add(HarukaLib:Hydrate(char, {
+    table.insert(scope, HarukaLib:Hydrate(char, {
         ["Attr-MinDMG"] = function(newDMG: number)
             charDMGStats.MinDMG:set(newDMG)
         end,
@@ -110,7 +110,7 @@ local function StatText(id: string, self: table) : TextLabel
 end
 
 local function StatsTextsFrame(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     return Components.Frame(scope, {
         Name = "StatsTextsFrame",

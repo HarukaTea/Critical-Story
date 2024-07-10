@@ -6,6 +6,10 @@ local SSS = game:GetService("ServerScriptService")
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local monster = script.Parent :: Model
+local animator = monster.AnimationController.Animator :: Animator
+
+local blastAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SlimeIdle)
+local spinAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SlimeSpin)
 
 local wait = task.wait
 local cfNew = CFrame.new
@@ -82,6 +86,8 @@ local function slimeBarrage(target: Model)
 	wait(0.35)
 	lookAt(target)
 
+	spinAnim:Play()
+
 	local blastS = RepS.Package.MonsterAttacks.Slime.SlimeSpin:Clone() :: Model
 	blastS.Owner.Value = monster
 	blastS:PivotTo(monster.PrimaryPart.CFrame)
@@ -119,6 +125,7 @@ local function attacking()
 
 		function (target: Model) : boolean
 			for _ = 1, 3 do
+				blastAnim:Play()
 				lookAt(target)
 
 				for _ = 1, 5 do

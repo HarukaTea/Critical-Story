@@ -15,7 +15,7 @@ local fromRGB = Color3.fromRGB
 local wait = task.wait
 
 local function LevelUpVFXFrame(self: table) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     local function _showLvlUpVFX()
 		self.levelUpShown:set(true)

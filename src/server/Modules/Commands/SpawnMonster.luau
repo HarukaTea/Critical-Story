@@ -33,6 +33,12 @@ return {
             Name = "amount",
             Description = "The amount of monsters you wanna fight in a single combat, max is 5",
             Default = 1
+        },
+        {
+            Type = "boolean",
+            Name = "respawnable",
+            Description = "Whether or not the monster should respawn after it dies",
+            Default = false
         }
     }
 }

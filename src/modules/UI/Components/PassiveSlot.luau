@@ -18,7 +18,7 @@ local color3New = Color3.new
 local fromScale = UDim2.fromScale
 
 local function PassiveSlot(index: number, self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local positions = {
 		fromScale(0, 0),
 		fromScale(0.355, 0),
@@ -31,12 +31,11 @@ local function PassiveSlot(index: number, self: table): Frame
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
-	return Fusion.New(scope, "Frame")({
+	self.passiveSlotList[index] = Fusion.Value(scope, Fusion.New(scope, "Frame")({
 		Name = "Passive" .. index,
 		BackgroundColor3 = color3New(),
 		Position = positions[index],
 		Size = fromScale(0.281, 0.658),
-		[Fusion.Ref] = self.passiveSlotList[index],
 
 		[Fusion.Children] = {
 			Components.RoundUICorner(scope),
@@ -68,7 +67,9 @@ local function PassiveSlot(index: number, self: table): Frame
 				end,
 			}),
 		},
-	})
+	}))
+
+	return self.passiveSlotList[index]
 end
 
 return PassiveSlot

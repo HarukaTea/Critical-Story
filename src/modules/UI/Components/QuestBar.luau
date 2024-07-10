@@ -15,7 +15,7 @@ local udNew = UDim.new
 local v2New = Vector2.new
 local fontFromName = Font.fromName
 
-local function QuestBar(quest: IntValue, scope: table) : Frame
+local function QuestBar(quest: IntValue, scope: Fusion.Scope) : Frame
     local questType = quest.Name
 
     return Components.Frame(scope, {

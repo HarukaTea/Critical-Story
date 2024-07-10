@@ -69,12 +69,11 @@ local function ActiveSlot(index: number, self: table): Frame
 	end
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
-	return New(scope, "Frame")({
+	self.activeSlotList[index] = Fusion.Value(scope, New(scope, "Frame")({
 		Name = "Active"..index,
 		BackgroundColor3 = color3New(),
 		Position = fromScale(positions[index], 0),
 		Size = fromScale(0.281, 0.658),
-		[Fusion.Ref] = self.activeSlotList[index],
 
 		[Children] = {
 			Components.RoundUICorner(scope),
@@ -183,7 +182,9 @@ local function ActiveSlot(index: number, self: table): Frame
 			ProgressCircle("Left", self, index),
 			ProgressCircle("Right", self, index),
 		},
-	})
+	}))
+
+	return self.activeSlotList[index]
 end
 
 return ActiveSlot

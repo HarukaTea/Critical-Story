@@ -15,9 +15,9 @@ return {
     InCombat = false,
     OrbSpawnTime = 3,
     OrbLifeTime = 10,
-    HitCD = 0,
-    DEFRepairing = false,
-    HPHealing = false,
+    CurrentState = "None",
+    ShieldRepairing = false,
+    HPRecovering = false,
 
     --- Buffes
     HealthBuff = 0,

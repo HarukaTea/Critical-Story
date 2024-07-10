@@ -159,6 +159,13 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 	if not monster:GetAttribute("CantRotate") then monster:PivotTo(cfNew(locator.Position) * cfAngles(0, rad(random(0, 360)), 0)) end
 	monster:SetAttribute("Levels", level)
 
+	if monster:GetAttribute("Floatable") then
+		local vel = Instance.new("BodyVelocity")
+		vel.MaxForce = Vector3.one * math.huge
+		vel.Velocity = Vector3.zero
+		vel.Parent = monster
+	end
+
 	if not locator:GetAttribute("SubMonster") then
 		local tierDisplay = RepS.Package.Effects.TierDisplay:Clone() :: BillboardGui
 		tierDisplay.Monster.Text = AssetBook.MonsterInfo[monster.Name].Name
@@ -203,6 +210,7 @@ end
 
 
 function ServerUtil:MonsterActivateCombat(monster: Model)
+	monster.Parent:SetAttribute("InCombat", true)
 	monster:SetAttribute("InCombat", true)
 
 	if not monster:GetAttribute("SubMonster") then monster.Head.TierDisplay.Enabled = false end
@@ -257,8 +265,8 @@ function ServerUtil:MonsterDefeated(monster: Model, deadPos: Vector3, allowRespa
 	monster:Destroy()
 
 	wait(13)
-	ServerUtil:SetupMonster(locator)
-	for _, waitingLocator: BasePart in waitingLocators do ServerUtil:SetupMonster(waitingLocator) end
+	locator:SetAttribute("InCombat", false)
+	for _, waitingLocator: BasePart in waitingLocators do waitingLocator:SetAttribute("InCombat", false) end
 end
 
 

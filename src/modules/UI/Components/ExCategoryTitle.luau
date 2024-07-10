@@ -17,14 +17,14 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
 local function ExCategoryTitle(id: string, self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local plr = self.plr :: Player
 
 	local playerClass = nil
 	if id == "Menu" then
 		playerClass = Value(scope, plr:GetAttribute("Class"))
 
-		self.Add(HarukaLib:Hydrate(plr, {
+		table.insert(scope, HarukaLib:Hydrate(plr, {
 			["Attr-Class"] = function(newClass: string)
 				playerClass:set(newClass)
 			end

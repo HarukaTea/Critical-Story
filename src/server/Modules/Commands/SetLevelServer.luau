@@ -5,7 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 return function (_, players: table, level: number)
-    local check = HarukaLib:TypeCheck("MinMax", level, 0, 950 + 150)
+    local check = HarukaLib:TypeCheck("MinMax", level, 0, 125 + 1)
     local check2 = HarukaLib:TypeCheck("Integer", level)
 
     if not check or not check2 then
@@ -20,7 +20,6 @@ return function (_, players: table, level: number)
             plr:SetAttribute("DMGPoints", 0)
             plr:SetAttribute("MagicPoints", 0)
             plr:SetAttribute("HealthPoints", 0)
-            plr:SetAttribute("ShieldPoints", 0)
             plr:SetAttribute("ManaPoints", 0)
             plr:SetAttribute("Levels", level)
             plr:SetAttribute("LvPoints", (level - 1) * 2)

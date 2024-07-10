@@ -3,7 +3,6 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
-local SS = game:GetService("ServerStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
@@ -19,16 +18,22 @@ local wait = task.wait
 local cfNew = CFrame.new
 
 
-local function combatStartSetup(plr: Player, monster: Model)
+local function combatStartSetup(plr: Player, locator: BasePart)
 	--- if monster was occupied by another player, we will return it
-	if monster:GetAttribute("InCombat") then return end
-	if monster:GetAttribute("SubMonster") then return end
+	if locator:GetAttribute("InCombat") then return end
+	if locator:GetAttribute("SubMonster") then return end
 
-	local locator: BasePart = monster.Parent
 	local combatMode = plr:GetAttribute("CombatMode") :: string
+	local monster = ServerUtil:SetupMonster(locator)
+	for _, subLocator: BasePart in locator:GetDescendants() do
+		if subLocator:HasTag("MonsterLocation") and subLocator:IsA("BasePart") then
+			ServerUtil:SetupMonster(subLocator)
+		end
+	end
 
 	local check = true
 	if combatMode == "Public" then
+		locator:SetAttribute("InCombat", true)
 		monster:SetAttribute("InCombat", true)
 
 		local char = plr.Character
@@ -73,6 +78,7 @@ local function combatStartSetup(plr: Player, monster: Model)
 			char.PrimaryPart.Anchored = false
 
 		end):Catch(function()
+			locator:SetAttribute("InCombat", false)
 			monster:SetAttribute("InCombat", false)
 
 			check = false
@@ -183,17 +189,8 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 	end
 
 	--- some hit cd detections
-    HarukaLib:AddAttr(char, "HitCD", 6)
-    if char:GetAttribute("HitCD") > 6 then char:SetAttribute("HitCD", 6) end
-
-    if not char:FindFirstChild("RepairShield") then
-        SS.Resources.Unloads.RepairShield:Clone().Parent = char
-    end
-    if not char:FindFirstChild("HealHP") then
-        SS.Resources.Unloads.HealHP:Clone().Parent = char
-    end
-    char:SetAttribute("Repairing", false)
-    char:SetAttribute("Healing", false)
+	if char:GetAttribute("CurrentState") == "Hit" then char:SetAttribute("CurrentState", "None") end -- refresh hit cd
+    char:SetAttribute("CurrentState", "Hit")
 
     --- some extra damage
     if dmgPart:HasTag("Burn") then BuffEffectsUtil:Burn(char, monster, 6, true) end

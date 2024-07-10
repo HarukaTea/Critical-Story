@@ -28,16 +28,19 @@ local function firstCombat(plr: Player)
     locator.Name = "GreenSlime"
     locator:SetAttribute("Levels", 1)
     locator:SetAttribute("CantRespawn", true)
+    locator:SetAttribute("ExclusivePlayer", plr.Name)
+    locator.Transparency = 1
     locator.CFrame = workspace.Maps.MonolithVillage.TutorialLocator.CFrame
     locator.Parent = workspace.Monsters
 
     RepS.Package.Unloads.CombatEnds:Clone().Parent = locator
 
-    local monster = ServerUtil:SetupMonster(locator)
     plr.Character:PivotTo(locator.CFrame)
 
     locator.CombatEnds.Event:Connect(function()
-        if monster:GetAttribute("Health") <= 0 then Signals.QuestComplete:Fire("Main", 4, plr, true) end
+        if locator:FindFirstChildOfClass("Model"):GetAttribute("Health") <= 0 then
+            Signals.QuestComplete:Fire("Main", 4, plr, true)
+        end
     end)
 end
 Signals.FirstStepTutorial:Connect(firstCombat)

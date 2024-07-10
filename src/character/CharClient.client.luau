@@ -3,6 +3,7 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
@@ -64,7 +65,7 @@ local function dayNightCycle()
     local endTime = startTime + cycleTime
     local timeRatio, currentTime = minutesInADay / cycleTime, nil
 
-    Add(HarukaLib.Clock(0.05, function()
+    Add(RunService.Heartbeat:Connect(function()
         currentTime = tick()
 
         if currentTime > endTime then

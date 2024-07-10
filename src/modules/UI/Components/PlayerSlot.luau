@@ -16,7 +16,7 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local format, match = string.format, string.match
 
-local function PlayerSlot(self: table, player: Player, scope: table): Frame
+local function PlayerSlot(self: table, player: Player, scope: Fusion.Scope): Frame
 	local class = Fusion.Value(scope, player:GetAttribute("Class") or "Warrior") --// This often errors lol
 	local role = player:GetAttribute("Role")
 

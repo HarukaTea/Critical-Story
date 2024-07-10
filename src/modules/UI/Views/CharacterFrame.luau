@@ -23,14 +23,14 @@ local udNew =  UDim.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 
-local function BlockPart(scope: table, pos: UDim2, size: UDim2): Frame
+local function BlockPart(scope: Fusion.Scope, pos: UDim2, size: UDim2): Frame
 	return New(scope, "Frame")({
 		BackgroundTransparency = 0.9,
 		Position = pos,
 		Size = size,
 	})
 end
-local function LinePart(scope: table, pos: UDim2, direction: string, color: Color3, face: string): Frame
+local function LinePart(scope: Fusion.Scope, pos: UDim2, direction: string, color: Color3, face: string): Frame
 	local rotation: number
 	if face == "Up" then
 		rotation = -45
@@ -50,11 +50,11 @@ local function LinePart(scope: table, pos: UDim2, direction: string, color: Colo
 end
 
 local function CharacterFrame(self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local plr, char = self.plr :: Player, self.char :: Model
 	local playerData, charData = self.playerData, self.charData
 
-	self.Add(HarukaLib:Hydrate(plr, {
+	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-Levels"] = function(levels: number)
 			playerData.Levels:set(levels)
 		end,
@@ -70,9 +70,6 @@ local function CharacterFrame(self: table): Frame
 		["Attr-HealthPoints"] = function(points: number)
 			playerData.Health:set(points)
 		end,
-		["Attr-ShieldPoints"] = function(points: number)
-			playerData.Shield:set(points)
-		end,
 		["Attr-ManaPoints"] = function(points: number)
 			playerData.Mana:set(points)
 		end,
@@ -80,7 +77,7 @@ local function CharacterFrame(self: table): Frame
 			playerData.Gold:set(gold)
 		end
 	}))
-	self.Add(HarukaLib:Hydrate(char, {
+	table.insert(scope, HarukaLib:Hydrate(char, {
 		["Attr-MinDMG"] = function(dmg: number)
 			charData.MinDMG:set(dmg)
 		end,
@@ -97,7 +94,7 @@ local function CharacterFrame(self: table): Frame
 			charData.Mana:set(mana)
 		end
 	}))
-	self.Add(HarukaLib:Hydrate(char.Humanoid, {
+	table.insert(scope, HarukaLib:Hydrate(char.Humanoid, {
 		["Prop-MaxHealth"] = function(maxHP: number)
 			charData.Health:set(maxHP)
 		end
@@ -139,8 +136,6 @@ local function CharacterFrame(self: table): Frame
 					LinePart(scope, fromScale(0.631, 0.779), "X", fromRGB(255, 0, 0), "Line"),
 					LinePart(scope, fromScale(0.531, 0.447), "XY", fromRGB(85, 255, 0), "Up"),
 					LinePart(scope, fromScale(0.58, 0.367), "X", fromRGB(85, 255, 0), "Line"),
-					LinePart(scope, fromScale(0.417, 0.813), "XY", fromRGB(255, 255, 0), "Up"),
-					LinePart(scope, fromScale(0.352, 0.892), "X", fromRGB(255, 255, 0), "Line"),
 					LinePart(scope, fromScale(0.369, 0.524), "XY", fromRGB(170, 170, 255), "Up"),
 					LinePart(scope, fromScale(0.305, 0.603), "X", fromRGB(170, 170, 255), "Line"),
 					LinePart(scope, fromScale(0.42, 0.25), "XY", fromRGB(0, 255, 255), "Down"),
@@ -155,7 +150,6 @@ local function CharacterFrame(self: table): Frame
 				[Children] = {
 					CharPointsBtn("DMG", "Right", self),
 					CharPointsBtn("Health", "Right", self),
-					CharPointsBtn("Shield", "Left", self),
 					CharPointsBtn("Mana", "Left", self),
 					CharPointsBtn("Magic", "Left", self),
 				},

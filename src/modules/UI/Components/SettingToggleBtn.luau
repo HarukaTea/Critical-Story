@@ -15,7 +15,7 @@ local fromRGB = Color3.fromRGB
 local sFind, sub = string.find, string.sub
 
 local function SettingToggleBtn(id: string, self: table) : Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local TEXTS = {
 		Musics = "Musics",
 		SFXs = "Sound Effects",

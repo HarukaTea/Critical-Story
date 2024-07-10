@@ -23,7 +23,7 @@ local function startAdventure(plr: Player)
     cutsceneUI.Name = "TempCutscene"
     cutsceneUI.DisplayOrder = 100
     cutsceneUI.IgnoreGuiInset = true
-    cutsceneUI.Parent = plr.PlayerGui
+    cutsceneUI.Parent = plr:FindFirstChildOfClass("PlayerGui")
 
     local cutsceneBG = instanceNew("Frame")
     cutsceneBG.BackgroundColor3 = fromRGB(234, 234, 234)

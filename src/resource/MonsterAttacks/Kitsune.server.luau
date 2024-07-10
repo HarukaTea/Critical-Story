@@ -5,11 +5,16 @@ local SSS = game:GetService("ServerScriptService")
 
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
+local monster = script.Parent :: Model
+local animator = monster.AnimationController.Animator :: Animator
+
+local wolfBiteAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.WolfBite)
+local spikeShotAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SpikeShot)
+
 local wait, random = task.wait, math.random
 local cfNew = CFrame.new
 local v3New = Vector3.new
 
-local monster = script.Parent :: Model
 
 local function moving(target: Model)
 	local post = ServerUtil:FindPartOnRay(monster.Parent.Position + v3New(random(-32,32), 0, random(-32,32)))
@@ -20,6 +25,8 @@ local function moving(target: Model)
 end
 
 local function kitsuneBlastSpirit(target: Model)
+	spikeShotAnim:Play()
+
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local pRandom = random(1, 2)
@@ -31,6 +38,8 @@ local function kitsuneBlastSpirit(target: Model)
 end
 
 local function bite(target)
+	wolfBiteAnim:Play()
+
 	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
 
 	monster:PivotTo(cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position))

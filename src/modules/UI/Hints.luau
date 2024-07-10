@@ -29,7 +29,7 @@ return function(plr: Player)
 	Components.ScreenGui(scope, {
 		Name = "Hints",
 		DisplayOrder = 100,
-		Parent = plr.PlayerGui,
+		Parent = plr:FindFirstChildOfClass("PlayerGui"),
 
 		[Children] = {
 			Components.Frame(scope, {
@@ -45,7 +45,7 @@ return function(plr: Player)
 					}),
 					New(scope, "UIPadding")({ PaddingTop = udNew(0, 10) }),
 
-					Fusion.ForValues(scope, hintsList, function(_, localScope: table, text: string)
+					Fusion.ForValues(scope, hintsList, function(_, localScope: Fusion.Scope, text: string)
 						local overallTrans = Fusion.Value(localScope, 0)
 						Spawn(function()
 							wait(2.7)

@@ -31,7 +31,7 @@ local function setup()
 	local function _uiAdded(added: Instance)
 		if added:IsA("UIStroke") then CS:AddTag(added, "ScreenStroke") end
 	end
-	plr.PlayerGui.DescendantAdded:Connect(_uiAdded)
+	plr:FindFirstChildOfClass("PlayerGui").DescendantAdded:Connect(_uiAdded)
 
 	local function _updateSize()
 		for i: UIStroke, thickness: number in uiStrokes do
@@ -46,7 +46,7 @@ local function setup()
 	workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(_updateSize)
 
 	--// Setups
-	for _, element in plr.PlayerGui:GetDescendants() do
+	for _, element in plr:FindFirstChildOfClass("PlayerGui"):GetDescendants() do
 		if element:IsA("UIStroke") then CS:AddTag(element, "ScreenStroke") end
 	end
 end

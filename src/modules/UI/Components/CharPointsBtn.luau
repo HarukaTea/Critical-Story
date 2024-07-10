@@ -18,7 +18,7 @@ local upper = string.upper
 local fontFromName = Font.fromName
 
 local function CharPointsBtn(id: string, direction: string, self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local COLORS = {
 		DMG = fromRGB(255, 0, 0),
 		Health = fromRGB(85, 255, 0),
@@ -37,7 +37,6 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 		DMG = "DMGPoints",
 		Health = "HealthPoints",
 		Mana = "ManaPoints",
-		Shield = "ShieldPoints",
 		Magic = "MagicPoints"
 	}
 	local bgColors = Value(scope, fromRGB(30, 30, 30))

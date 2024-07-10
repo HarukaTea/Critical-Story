@@ -31,7 +31,7 @@ return function(plr: Player)
 	local self = setmetatable({}, Shop)
 
 	self.plr = plr
-	self.plrGui = plr.PlayerGui
+	self.plrGui = plr:FindFirstChildOfClass("PlayerGui")
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -39,7 +39,7 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	Components.ScreenGui(scope, {
 		Name = "Shop",
 		Parent = self.plrGui,
@@ -134,8 +134,6 @@ return function(plr: Player)
 		Events.EnterShopping:DisconnectAll()
 
 		self.itemSlotClicked:Destroy()
-
-		self.Empty()
 
 		Fusion.doCleanup(scope)
 

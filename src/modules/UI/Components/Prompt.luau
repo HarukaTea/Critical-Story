@@ -13,7 +13,7 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local function Prompt(prompt: ProximityPrompt, index: number, scope: table) : Frame
+local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scope) : Frame
     return Components.Frame(scope, {
         Name = "Prompt",
         AnchorPoint = v2New(0.5, 0),

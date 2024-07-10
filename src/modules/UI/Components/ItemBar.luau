@@ -16,7 +16,7 @@ local v2New = Vector2.new
 local wait = task.wait
 local fromRGB = Color3.fromRGB
 
-local function ItemBar(item: string, scope: table): Frame
+local function ItemBar(item: string, scope: Fusion.Scope): Frame
 	local itemInfo = ItemBook:FindItem(item)
 	local info: table?
 

@@ -22,7 +22,7 @@ local insert, tFind = table.insert, table.find
 local clamp = math.clamp
 local wait = task.wait
 
-local function MonsterBar(monster: Model, self: table, scope: table) : Frame
+local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Frame
     local info = {
         innerPos = Value(scope, fromScale(0.82, 0)),
         isSelecting = Value(scope, false),

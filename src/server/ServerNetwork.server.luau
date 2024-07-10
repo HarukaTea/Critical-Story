@@ -11,6 +11,7 @@ local TestS = game:GetService("TestService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local EXPFormula = require(RepS.Modules.Data.EXPFormula)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local RecipeBook = require(RepS.Modules.Data.RecipeBook)
@@ -101,8 +102,8 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		local finalMaterial = material.Name
 		if prompt:GetAttribute("Rare") then
 			finalMaterial = HarukaLib:RollLoot({
-				[prompt:GetAttribute("Rare")] = 85,
-				[material.Name] = 15
+				[prompt:GetAttribute("Rare")] = 15,
+				[material.Name] = 85
 			})
 		end
 
@@ -121,13 +122,13 @@ PPS.PromptTriggered:Connect(promptsHandler)
 local LEVEL_CAP = 1100
 local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
-	return if exp >= floor(level ^ 1.65) + 59 and level < LEVEL_CAP then true else false
+	return if exp > EXPFormula(level) and level < LEVEL_CAP then true else false
 end
 local function levelUp(plr: Player)
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
 
 	if check then
-		HarukaLib:AddAttr(plr, "EXP", -(floor(plr:GetAttribute("Levels") ^ 1.65) + 59))
+		HarukaLib:AddAttr(plr, "EXP", -EXPFormula(plr:GetAttribute("Levels")))
 		HarukaLib:AddAttr(plr, "Levels", 1)
 		HarukaLib:AddAttr(plr, "LvPoints", LEVEL_POINT)
 
@@ -166,7 +167,6 @@ local function addPoint(plr: Player, option: string, times: number)
 		plr:SetAttribute("DMGPoints", 0)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
-		plr:SetAttribute("ShieldPoints", 0)
 		plr:SetAttribute("ManaPoints", 0)
 		plr:SetAttribute("LvPoints", (level - 1) * LEVEL_POINT)
 		return
@@ -438,9 +438,17 @@ Events.ChangeMobTarget:Connect(switchMobTarget)
 
 
 local function rejoinRequest(plr: Player)
-	TeleS:Teleport(game.PlaceId, plr)
+	local joinData = plr:GetJoinData().TeleportData :: table?
+	local slotChosen = if joinData then joinData[1] else "Slot1"
+
+	local teleportOptions = Instance.new("TeleportOptions")
+
+	teleportOptions:SetTeleportData({ slotChosen })
+
+	TeleS:TeleportAsync(game.PlaceId, { plr }, teleportOptions)
 end
 Events.RejoinRequest:Connect(rejoinRequest)
+Signals.RejoinPlace:Connect(rejoinRequest)
 
 
 local function forceReset(plr: Player)

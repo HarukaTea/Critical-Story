@@ -8,6 +8,11 @@ local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local monster = script.Parent :: Model
+local animator = monster.AnimationController.Animator :: Animator
+
+local spikeRainAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SpikeRain)
+local spikeShotAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.SpikeShot)
+local wolfBiteAnim = animator:LoadAnimation(RepS.Package.Animations.MonsterAnims.WolfBite)
 
 local wait, random, rad = task.wait, math.random, math.rad
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
@@ -22,6 +27,8 @@ local function moving(target: Model)
 end
 
 local function spikeShot(target: Model)
+	spikeShotAnim:Play()
+
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local pRandom = random(1, 2)
@@ -36,6 +43,8 @@ local function spikeShot(target: Model)
 end
 
 local function spikeRain(target: Model)
+	spikeRainAnim:Play()
+
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
 
 	local rangePos = ServerUtil:FindPartOnRay(target.PrimaryPart.Position + v3New(random(-15, 15), 10, random(-15, 15)))
@@ -64,6 +73,8 @@ local function spikeRain(target: Model)
 end
 
 local function bite(target: Model)
+	wolfBiteAnim:Play()
+
 	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
 
 	monster:PivotTo(cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position))

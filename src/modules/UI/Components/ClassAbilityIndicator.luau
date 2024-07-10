@@ -13,7 +13,7 @@ local fromScale = UDim2.fromScale
 local clamp = math.clamp
 
 local function ClassAbilityIndicator(self: table, class: string) : Frame
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
     local charClassInfo = self.charClassInfo :: table
 
     return Components.Frame(scope, {

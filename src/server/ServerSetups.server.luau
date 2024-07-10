@@ -84,7 +84,9 @@ local function mainSetup()
 	--- npc setups
 	Spawn(function()
 		for _, npc: Model in workspace.MapComponents.NPCs:GetChildren() do
-			npc.Humanoid.Animator:LoadAnimation(RepS.Package.Animations.NPCIdle):Play()
+			local ref = npc:GetAttribute("Animation") or "DefaultIdle"
+
+			npc.Humanoid.Animator:LoadAnimation(RepS.Package.Animations.NPCAnims[ref]):Play()
 
 			ServerUtil:SetCollisionGroup(npc, "NPC")
 		end
@@ -150,6 +152,12 @@ local function mainSetup()
 			attackHolder.Name = "AttackHolder"
 			attackHolder.Parent = child
 
+			local animationPlayer = instanceNew("AnimationController")
+			animationPlayer.Parent = child
+
+			local animator = instanceNew("Animator")
+			animator.Parent = animationPlayer
+
 			SS.Resources.Unloads.MonsterData:Clone().Parent = child
 		end
 		for _, child: Model in RepS.Package.MonsterAttacks:GetDescendants() do
@@ -161,7 +169,7 @@ local function mainSetup()
 		end
 
 		for _, locator: Instance in workspace.Monsters:GetDescendants() do
-			if locator:HasTag("MonsterLocation") then ServerUtil:SetupMonster(locator) end
+			if locator:HasTag("MonsterLocation") then locator.Transparency = 1 end
 		end
 	end)
 
@@ -188,6 +196,13 @@ local function mainSetup()
 			end)
 
 			--- alpha tester
+			local function _setCustomRole()
+				local rank = plr:GetRankInGroup(16912246)
+				plr:SetAttribute("Rank", rank)
+
+				if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
+				if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
+			end
 			Promise.new(function(resolve)
 				local hasBadge = BS:UserHasBadgeAsync(plr.UserId, 2129794607)
 
@@ -195,15 +210,10 @@ local function mainSetup()
 
 				resolve()
 
-			end):Then(function()
-				local rank = plr:GetRankInGroup(16912246)
-				plr:SetAttribute("Rank", rank)
-
-				if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
-				if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
-
-			end):Catch(function(err)
+			end):Then(_setCustomRole):Catch(function(err)
 				warn(err)
+
+				_setCustomRole()
 			end)
 
 			joinData = plr:GetJoinData().TeleportData

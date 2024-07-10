@@ -18,34 +18,8 @@ local udNew = UDim.new
 local fontFromEnum = Font.fromEnum
 
 local function ExCategoryOpenBtn(id: string, self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local isSelecting = Fusion.Value(scope, false)
-
-	local children: ImageLabel?
-	if id == "Menu" then
-		children = Components.ImageLabel(scope, {
-			Name = "Hint",
-			BackgroundColor3 = fromRGB(195, 0, 0),
-			BackgroundTransparency = 0,
-			Position = fromScale(0.65, 0),
-			Size = fromScale(0.4, 0.4),
-			ZIndex = 3,
-
-			Visible = Computed(scope, function(use)
-				return if use(self.playerData.LvPoints) > 0 then true else false
-			end),
-
-			[Children] = {
-				Components.RoundUICorner(scope),
-				Components.TextLabel(scope, {
-					Name = "Attention",
-					Size = fromScale(1, 1),
-					FontFace = fontFromEnum(Enum.Font.GothamBlack),
-					Text = "!"
-				})
-			}
-		})
-	end
 
 	local function exCategoryOpened()
 		isSelecting:set(false)
@@ -102,7 +76,32 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 				[Children] = { Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.3, 0) })},
 			}),
 
-			children
+			Components.ImageLabel(scope, {
+				Name = "Hint",
+				BackgroundColor3 = fromRGB(195, 0, 0),
+				BackgroundTransparency = 0,
+				Position = fromScale(0.65, 0),
+				Size = fromScale(0.4, 0.4),
+				ZIndex = 3,
+
+				Visible = Computed(scope, function(use)
+					if id == "Menu" then
+						return if use(self.playerData.LvPoints) > 0 then true else false
+					else
+						return false --// TODO: Implement hint for backpack
+					end
+				end),
+
+				[Children] = {
+					Components.RoundUICorner(scope),
+					Components.TextLabel(scope, {
+						Name = "Attention",
+						Size = fromScale(1, 1),
+						FontFace = fontFromEnum(Enum.Font.GothamBlack),
+						Text = "!"
+					})
+				}
+			})
 		},
 	})
 end

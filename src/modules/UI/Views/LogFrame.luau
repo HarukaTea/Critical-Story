@@ -9,7 +9,7 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local Children = Fusion.Children
 
 local function FilterOption(option: string, self: table) : TextLabel
-    local scope = self.scope
+    local scope = self.scope :: Fusion.Scope
 
     return Components.TextLabel(scope, {
         Name = option,
@@ -30,7 +30,7 @@ local function FilterOption(option: string, self: table) : TextLabel
         }
     })
 end
-local function ErrorReport(scope: table, errorVal: StringValue) : TextLabel
+local function ErrorReport(scope: Fusion.Scope, errorVal: StringValue) : TextLabel
     return Components.TextLabel(scope, {
         Name = "Record",
         Size = UDim2.fromScale(1, 0.08),
@@ -44,7 +44,7 @@ local function ErrorReport(scope: table, errorVal: StringValue) : TextLabel
     })
 end
 local function LogFrame(self: table) : Frame
-    local scope = self.scope :: table
+    local scope = self.scope :: Fusion.Scope
 
     local scriptErrors = workspace:WaitForChild("MapComponents", 999).ScriptErrors :: Folder
     local function _handleErrors()
@@ -52,8 +52,8 @@ local function LogFrame(self: table) : Frame
         self.errorList:set(scriptErrors:GetChildren())
     end
     _handleErrors()
-    self.Add(scriptErrors.ChildAdded:Connect(_handleErrors))
-    self.Add(scriptErrors.ChildAdded:Connect(_handleErrors))
+    table.insert(scope, scriptErrors.ChildAdded:Connect(_handleErrors))
+    table.insert(scope, scriptErrors.ChildAdded:Connect(_handleErrors))
 
     return Components.Frame(scope, {
         Name = "Log",
@@ -151,7 +151,7 @@ local function LogFrame(self: table) : Frame
                             self.errorAbsContentSize:set(newSize.Y)
                         end
                     }),
-                    Fusion.ForValues(scope, self.errorList, function(use, localScope: table, errorVal: StringValue)
+                    Fusion.ForValues(scope, self.errorList, function(use, localScope: Fusion.Scope, errorVal: StringValue)
                         if use(self.chosenErrorFilter) == "Client" then
                             if errorVal:GetAttribute("Owner") ~= self.plr.Name then return nil end
                         end

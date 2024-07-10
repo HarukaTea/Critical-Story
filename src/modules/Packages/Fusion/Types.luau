@@ -99,7 +99,7 @@ export type Use = <T>(target: UsedAs<T>) -> T
 -- A state object whose value can be set at any time by the user.
 export type Value<T, S = T> = StateObject<T> & {
 	kind: "State",
- 	set: (Value<T, S>, newValue: S, force: boolean?) -> (),
+ 	set: (Value<T, S>, newValue: S, force: boolean?) -> S,
 	 ____phantom_setType: (never) -> S -- phantom data so this contains a T
 }
 export type ValueConstructor = <T>(
@@ -195,11 +195,6 @@ export type NewConstructor = (
 	className: string
 ) -> (propertyTable: PropertyTable) -> Instance
 
-export type HydrateConstructor = (
-	scope: Scope<unknown>,
-	target: Instance
-) -> (propertyTable: PropertyTable) -> Instance
-
 -- Is there a sane way to write out this type?
 -- ... I sure hope so.
 
@@ -254,9 +249,7 @@ export type Fusion = {
 	Spring: SpringConstructor,
 
 	New: NewConstructor,
-	Hydrate: HydrateConstructor,
 
-	Ref: SpecialKey,
 	Child: ({Child}) -> Child,
 	Children: SpecialKey,
 	Out: (propertyName: string) -> SpecialKey,

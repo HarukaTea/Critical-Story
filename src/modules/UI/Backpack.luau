@@ -34,7 +34,7 @@ return function(plr: Player)
 	local self = setmetatable({}, Backpack)
 
 	self.plr = plr
-	self.plrGui = plr.PlayerGui
+	self.plrGui = plr:FindFirstChildOfClass("PlayerGui")
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	repeat wait() until plr:GetAttribute("PlayerDataLoaded")
@@ -42,7 +42,7 @@ return function(plr: Player)
 
 	Pinia(self)
 
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 	local UI = Components.ScreenGui(scope, {
 		Name = "Backpack",
 		Parent = self.plrGui,
@@ -128,11 +128,11 @@ return function(plr: Player)
 	self.noItemsShow:set(not passiveCheck)
 
 	---// listening events
-	self.Add(self.inventory.ChildAdded:Connect(function()
+	table.insert(scope, self.inventory.ChildAdded:Connect(function()
 		wait()
 		self.items:set(self.inventory:GetChildren())
 	end))
-	self.Add(self.inventory.ChildRemoved:Connect(function()
+	table.insert(scope, self.inventory.ChildRemoved:Connect(function()
 		if not plr:IsDescendantOf(Players) then return end --- cuz plr left also triggers ChildRemoved
 
 		wait()
@@ -143,12 +143,12 @@ return function(plr: Player)
 	local function checkIfOpened()
 		if UI.BG.Visible then ClientUtil:OpenUIEx(plr, "Backpack", true) end
 	end
-	self.Add(HarukaLib:Hydrate(self.char, {
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-InCombat"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
 	}))
-	self.Add(HarukaLib:Hydrate(plr, {
+	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-InChatting"] = function(state: boolean)
 			if state then checkIfOpened() end
 		end
@@ -160,8 +160,6 @@ return function(plr: Player)
 		plr:SetAttribute("CurrentMenu", "None")
 
 		self.itemSlotClicked:Destroy()
-
-		self.Empty()
 
 		Fusion.doCleanup(scope)
 

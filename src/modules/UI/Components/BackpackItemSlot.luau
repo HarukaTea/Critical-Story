@@ -17,7 +17,7 @@ local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
 local udNew = UDim.new
 
-local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: table): ImageButton
+local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: Fusion.Scope): ImageButton
 	local amount = Value(scope, item.Value)
 	local equipped = Value(scope, item:GetAttribute("Equipped"))
 	local pinned = Value(scope, item:GetAttribute("Pinned"))

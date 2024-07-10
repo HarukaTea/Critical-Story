@@ -16,7 +16,7 @@ local insert, tFind, remove = table.insert, table.find, table.remove
 local wait = task.wait
 
 local function ItemAcquiredFrame(self: table): Frame
-	local scope = self.scope
+	local scope = self.scope :: Fusion.Scope
 
 	local function _giveDrop(item: string)
 		local nowAdded = Fusion.peek(self.newAddedItems)
@@ -43,7 +43,7 @@ local function ItemAcquiredFrame(self: table): Frame
 				Padding = udNew(0.15, 0),
 				VerticalAlignment = Enum.VerticalAlignment.Bottom,
 			}),
-			Fusion.ForValues(scope, self.newAddedItems, function(_, localScope: table, item: string)
+			Fusion.ForValues(scope, self.newAddedItems, function(_, localScope: Fusion.Scope, item: string)
 				return ItemBar(item, localScope)
 			end),
 		},
