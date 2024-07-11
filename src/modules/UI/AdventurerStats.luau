@@ -73,7 +73,7 @@ return function(plr: Player)
 				end),
 
 				[Children] = {
-					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
 
 					EXPProgressBar(self),
 
@@ -140,7 +140,7 @@ return function(plr: Player)
 				ZIndex = 2,
 
 				[Children] = {
-					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
 
 					LocationTitleFrame(self),
 					LevelUpVFXFrame(self),
@@ -152,7 +152,7 @@ return function(plr: Player)
 				ZIndex = 2,
 
 				[Children] = {
-					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
 
 					PromptsFrame(self),
 					ItemAcquiredFrame(self),

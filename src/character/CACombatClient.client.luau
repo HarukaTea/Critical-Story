@@ -52,7 +52,7 @@ local function startCombat(monster: Model)
 
 	--- border
 	if (char.PrimaryPart.Position - locator.Position).Magnitude >= 32 then
-		char:PivotTo(cfNew(locator.Position) * cfNew(0, 5.99, 0))
+		char:PivotTo(cfNew(locator.Position) * cfNew(math.random(-8, 8), 5.99, math.random(-8, 8)))
 	end
 	local border = RepS.Package.Unloads.CombatBorder:Clone() :: Model
 	border:PivotTo(cfNew(locator.Position))
@@ -91,9 +91,15 @@ local function onTouched(hit: BasePart)
 		local orb = hit.Parent :: Model
 
 		local check = true
-		Promise.new(function(_, reject)
+		Promise.new(function(resolve, reject)
 			if orb.Owner.Value ~= char then reject() end
-			if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
+
+			local distance1 = plr:DistanceFromCharacter(orb.PrimaryPart.Position)
+			local distance2 = plr:DistanceFromCharacter(orb.PrimaryPart.Position + v3New(0, 16, 0))
+			local distance3 = plr:DistanceFromCharacter(orb.PrimaryPart.Position - v3New(0, 16, 0))
+
+			if distance1 < 16 or distance2 < 16 or distance3 < 16 then resolve() end
+			if distance1 <= 0 or distance2 <= 0 or distance3 <= 0 then reject() end
 
 		end):Catch(function()
 			check = false
@@ -101,10 +107,11 @@ local function onTouched(hit: BasePart)
 		if not check then return end
 
 		orbTouchCD = true
-		humanoid.Jump = true
 		Spawn(function()
 			wait(0.1)
 			orbTouchCD = false
+
+			wait(0.1)
 			humanoid.AutoRotate = true
 		end)
 
@@ -113,13 +120,20 @@ local function onTouched(hit: BasePart)
 		SFX:Play()
 
 		if not orb:GetAttribute("DisallowFloat") then
+			humanoid.Jump = true
+			if char.Torso:FindFirstChild("OrbBV") then
+				char.Torso.OrbBV:Destroy()
+				char.Torso.AssemblyLinearVelocity = Vector3.zero
+			end
+
 			local weight = orb:GetAttribute("FloatWeight") :: number
-			local floatWeight: number = if weight then weight else 35
+			local floatWeight: number = if weight then weight else 30
 
 			local bv = newInstance("BodyVelocity")
+			bv.Name = "OrbBV"
 			bv.MaxForce = Vector3.one * 99999999
 			bv.Velocity = char.PrimaryPart.CFrame.LookVector + v3New(0, 1, 0) * floatWeight
-			bv.Parent = char.PrimaryPart
+			bv.Parent = char.Torso
 			Debris:AddItem(bv, 0.05)
 
 			humanoid.AutoRotate = false
@@ -219,7 +233,7 @@ local function setup()
 		if not char.PrimaryPart then return end
 		if encounterCD then return end
 
-		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 20)
+		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 18)
 		for _, monster: Model in nearbyMonsters do
 			if not monster then continue end
 			if not monster.PrimaryPart then continue end

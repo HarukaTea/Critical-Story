@@ -17,7 +17,7 @@ local function ExCategoryBottomBtns(direction: "Left" | "Right", self: table, bt
 		Position = fromScale(0.02, 0.922),
 
 		[Fusion.Children] = {
-			New(self.scope, "UIAspectRatioConstraint")({ AspectRatio = 48.504 }),
+			New(self.scope, "UIAspectRatioConstraint")({ AspectRatio = 47.089 }),
 			New(self.scope, "UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = udNew(0.012, 0),

@@ -48,7 +48,7 @@ return function(plr: Player)
 				ZIndex = 2,
 
 				[Fusion.Children] = {
-					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
+					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
 
 					ChatFrame(self),
 				},

@@ -112,7 +112,7 @@ local function CharacterFrame(self: table): Frame
 		end),
 
 		[Children] = {
-			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.751 }),
 			New(scope, "Frame")({
 				Name = "CharacterSelfView",
 				BackgroundTransparency = 1,

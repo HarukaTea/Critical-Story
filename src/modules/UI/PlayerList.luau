@@ -50,7 +50,7 @@ return function(plr: Player)
 				Size = fromScale(1, 0.1),
 
 				[Children] = {
-					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.386 }),
+					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
 
 					PlayerListFrame(self),
 

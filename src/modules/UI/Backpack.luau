@@ -92,7 +92,7 @@ return function(plr: Player)
 						end),
 
 						[Children] = {
-							Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 1.004 }),
+							Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 0.977 }),
 							Components.TextLabel(scope, {
 								Name = "What",
 								Position = fromScale(0.85, -0.2),

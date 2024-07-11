@@ -40,7 +40,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 		Position = ud2New(0.015, 0, 0.04, 40),
 
 		[Children] = {
-			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.255 }),
+			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.168 }),
 			New(scope, "UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = udNew(0.015, 0),

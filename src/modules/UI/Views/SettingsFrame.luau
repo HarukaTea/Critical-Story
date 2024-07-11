@@ -80,7 +80,7 @@ local function SettingsFrame(self: table): Frame
 		end),
 
 		[Fusion.Children] = {
-			Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
+			Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.751 }),
 			Fusion.New(scope, "UIGridLayout")({
 				CellPadding = fromScale(0.1, 0.1),
 				CellSize = fromScale(0.4, 0.09),
