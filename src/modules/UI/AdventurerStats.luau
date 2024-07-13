@@ -25,6 +25,7 @@ local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
 local PlayerEffectsList = require(RepS.Modules.UI.Views.PlayerEffectsList)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
+local PanelBtnsFrame = require(RepS.Modules.UI.Views.PanelBtnsFrame)
 
 local AlchemistAbilityIndicator = require(RepS.Modules.UI.Components.AlchemistAbilityIndicator)
 local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
@@ -58,11 +59,12 @@ return function(plr: Player)
 	local UI = Components.ScreenGui(scope, {
 		Name = "AdventurerStats",
 		DisplayOrder = 2,
+		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		Parent = self.plrGui,
 
 		[Children] = {
 			Components.Frame(scope, {
-				Name = "BottomBG",
+				Name = "Bottom",
 				AnchorPoint = v2New(0.5, 0.9),
 				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
@@ -73,7 +75,7 @@ return function(plr: Player)
 				end),
 
 				[Children] = {
-					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					EXPProgressBar(self),
 
@@ -102,9 +104,7 @@ return function(plr: Player)
 						FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
 						TextTransparency = 0.5,
 						TextXAlignment = Enum.TextXAlignment.Left,
-						Text = RepS.Package.ServerLocation.Value.." / "
-							..(if RepS.Package.PrivateServerId.Value == "" then "?" else RepS.Package.PrivateServerId.Value).." / v"
-							..RepS.Package.Version.Value,
+						Text = RepS.Package.ServerLocation.Value.." / " ..RepS.Package.Version.Value,
 
 						[Children] = {
 							New(scope, "UIPadding")({ PaddingLeft = udNew(0.01, 0) }),
@@ -112,13 +112,13 @@ return function(plr: Player)
 						}
 					}),
 					Components.TextLabel(scope, {
-						Name = "UID",
+						Name = "PrivateCode",
 						Position = fromScale(0, 0.4),
 						Size = fromScale(1, 0.3),
 						FontFace = Font.fromName("Ubuntu", Enum.FontWeight.Bold),
 						TextTransparency = 0.5,
 						TextXAlignment = Enum.TextXAlignment.Right,
-						Text = "UID: "..plr.UserId,
+						Text = if RepS.Package.PrivateServerId.Value == "" then "" else "PRIVATE CODE: "..RepS.Package.PrivateServerId.Value,
 
 						[Children] = {
 							New(scope, "UIPadding")({ PaddingRight = udNew(0.01, 0) }),
@@ -129,33 +129,34 @@ return function(plr: Player)
 					ClassFrame(self),
 					StatsTextsFrame(self),
 					MonsterSideList(self),
-					PlayerEffectsList(self)
+					PlayerEffectsList(self),
+					ItemAcquiredFrame(self),
 				},
 			}),
 			Components.Frame(scope, {
-				Name = "TopBG",
+				Name = "Top",
 				AnchorPoint = v2New(0.5, 0),
 				Position = ud2New(0.5, 0, 0, 58),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
 				[Children] = {
-					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					LocationTitleFrame(self),
 					LevelUpVFXFrame(self),
+					PanelBtnsFrame(self)
 				}
 			}),
 			Components.Frame(scope, {
-				Name = "CenterBG",
+				Name = "Center",
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
 				[Children] = {
-					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
+					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					PromptsFrame(self),
-					ItemAcquiredFrame(self),
 					QuestFrame(self),
 
 					ClassAbilityIndicator(self, "Warrior"),
@@ -173,7 +174,6 @@ return function(plr: Player)
 		},
 	})
 
-	self.nowMobIndex = 1
 	local function _changeMobTarget(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
 
@@ -255,7 +255,7 @@ return function(plr: Player)
 
             if combo <= 0 then return end
 
-			local bar = UI.CenterBG.WarriorStyle.BarBG.TweenBar :: Frame
+			local bar = UI.Center.WarriorStyle.BarBG.TweenBar :: Frame
 			TS:Create(bar, AssetBook.TweenInfos.twiceHalf, { Size = fromScale(1, 1) }):Play()
             wait(0.2)
             TS:Create(bar, AssetBook.TweenInfos.twiceHalfOne, { Size = fromScale(0, 1) }):Play()
@@ -278,10 +278,6 @@ return function(plr: Player)
 		["Attr-LifeStolen"] = function(lifeStolen: number)
 			charClassInfo.Reaper:set(lifeStolen)
 		end,
-
-		["Attr-InCombat"] = function(newState: boolean)
-			self.charStatsDict.IsInCombat:set(newState)
-		end
 	}))
 
 	local charStatsDict = self.charStatsDict
@@ -303,6 +299,9 @@ return function(plr: Player)
 		end,
 		["Attr-ShieldRepairing"] = function(state: boolean)
 			charStatsDict.DEFRepairing:set(state)
+		end,
+		["Attr-InCombat"] = function(newState: boolean)
+			self.charStatsDict.IsInCombat:set(newState)
 		end
 	}))
 	table.insert(scope, HarukaLib:Hydrate(self.humanoid, {

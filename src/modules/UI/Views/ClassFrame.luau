@@ -7,7 +7,6 @@ local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
 local ActiveSlot = require(RepS.Modules.UI.Components.ActiveSlot)
-local ExCategoryOpenBtn = require(RepS.Modules.UI.Components.ExCategoryOpenBtn)
 local PassiveSlot = require(RepS.Modules.UI.Components.PassiveSlot)
 
 local Children, peek = Fusion.Children, Fusion.peek
@@ -79,30 +78,13 @@ local function ClassFrame(self: table) : Frame
                     Fusion.New(scope, "UIListLayout")({
                         Padding = UDim.new(0.08, 0),
                         SortOrder = Enum.SortOrder.LayoutOrder,
-                        FillDirection = Enum.FillDirection.Horizontal
-                    }),
-
-                    ActiveSlot(1, self),
-                    ActiveSlot(2, self),
-                    ActiveSlot(3, self),
-                }
-            }),
-            Components.Frame(scope, {
-                Name = "EFrame",
-                AnchorPoint = v2New(),
-                Position = fromScale(0.837, -2.9),
-                Size = fromScale(0.15, 1.5),
-
-                [Children] = {
-                    Fusion.New(scope, "UIListLayout")({
-                        Padding = UDim.new(0.08, 0),
-                        SortOrder = Enum.SortOrder.LayoutOrder,
                         FillDirection = Enum.FillDirection.Horizontal,
                         HorizontalAlignment = Enum.HorizontalAlignment.Right
                     }),
 
-                    ExCategoryOpenBtn("Menu", self),
-                    ExCategoryOpenBtn("Backpack", self)
+                    ActiveSlot(1, self),
+                    ActiveSlot(2, self),
+                    ActiveSlot(3, self)
                 }
             }),
             Components.Frame(scope, {

@@ -21,7 +21,7 @@ local function StatBar(id: string, self: table): Frame
 		HP = fromRGB(48, 121, 36),
 		HPMid = fromRGB(148, 148, 0),
 		HPLow = fromRGB(203, 0, 0),
-		MP = fromRGB(73, 67, 167),
+		MP = fromRGB(19, 95, 176),
 		DEF = fromRGB(167, 115, 56),
 		DEFRepairing = fromRGB(72, 166, 176),
 	}

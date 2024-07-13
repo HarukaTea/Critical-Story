@@ -21,10 +21,10 @@ local fromScale = UDim2.fromScale
 function MobileShiftLock:SetLockState(state: string)
 	if state == "On" then
 		self.enabled = true
-		Fusion.peek(self.shiftLockLabel).Image = self.ON_ICON
+		self.icon:set(self.ON_ICON)
 	else
 		self.enabled = false
-		Fusion.peek(self.shiftLockLabel).Image = self.OFF_ICON
+		self.icon:set(self.OFF_ICON)
 	end
 end
 
@@ -38,7 +38,7 @@ function MobileShiftLock:EnableShiftLock()
 
 			if self.enabled then
 				if not self.char.Humanoid.Sit then
-					local x, y, z = camera.CFrame:ToOrientation()
+					local _, y, _ = camera.CFrame:ToOrientation()
 					self.char.PrimaryPart.CFrame = cfNew(self.char.PrimaryPart.Position) * cfAngle(0, y, 0)
 				end
 			end
@@ -59,24 +59,13 @@ return function(plr: Player)
 	self.char = plr.Character or plr.CharacterAdded:Wait()
 
 	self.rsConnection, self.enabled = nil, false
-	self.shiftLockLabel = Fusion.Value(scope)
 	self.ON_ICON, self.OFF_ICON = "rbxasset://textures/ui/mouseLock_on.png", "rbxasset://textures/ui/mouseLock_off.png"
 
-	local shiftLockLabel = Fusion.Value(scope, Components.HoverImageButton(scope, {
-		Image = self.OFF_ICON,
-
-		[Fusion.OnEvent("MouseButton1Click")] = function()
-			if self.char:FindFirstChild("Humanoid") and self.char.PrimaryPart then
-				self:SetLockState(if self.enabled then "Off" else "On")
-				self:EnableShiftLock()
-			end
-		end,
-	}))
-	self.shiftLockLabel:set(shiftLockLabel)
+	self.icon = Fusion.Value(scope, self.OFF_ICON)
 
 	Fusion.New(scope, "ScreenGui")({
 		Name = "MobileShiftLock",
-		ScreenInsets = Enum.ScreenInsets.None,
+		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 		Parent = plr:FindFirstChildOfClass("PlayerGui"),
 
@@ -90,7 +79,18 @@ return function(plr: Player)
 				[Fusion.Children] = {
 					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 1.007 }),
 
-					shiftLockLabel,
+					Components.HoverImageButton(scope, {
+						Image = Fusion.Computed(scope, function(use)
+							return use(self.icon)
+						end),
+
+						[Fusion.OnEvent("MouseButton1Click")] = function()
+							if self.char:FindFirstChild("Humanoid") and self.char.PrimaryPart then
+								self:SetLockState(if self.enabled then "Off" else "On")
+								self:EnableShiftLock()
+							end
+						end,
+					}),
 				},
 			}),
 		},

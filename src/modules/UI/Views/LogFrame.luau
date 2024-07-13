@@ -65,7 +65,7 @@ local function LogFrame(self: table) : Frame
 		end),
 
         [Children] = {
-            Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.751 }),
+            Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
 
             Fusion.New(scope, "Frame")({
                 Name = "Top",

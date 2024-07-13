@@ -4,6 +4,7 @@ local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -40,44 +41,55 @@ return function(plr: Player)
 	Components.ScreenGui(scope, {
 		Name = "PlayerList",
 		DisplayOrder = 10,
+		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		Parent = plr:FindFirstChildOfClass("PlayerGui"),
 
 		[Children] = {
 			Components.Frame(scope, {
 				Name = "Top",
 				AnchorPoint = v2New(),
-				Position = fromOffset(0, 36),
+				Position = fromOffset(0, 58),
 				Size = fromScale(1, 0.1),
 
 				[Children] = {
-					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.915 }),
+					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
-					PlayerListFrame(self),
+					Components.Frame(scope, {
+						Name = "PlayerListFrame",
 
-					Components.HoverImageButton(scope, {
-						AnchorPoint = v2New(),
-						Position = fromScale(0.875, 0),
+						Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+							return if use(self.isInCombat) then fromScale(0.5, 0.1) else fromScale(0.5, 1)
+						end), AssetBook.TweenInfos.half),
 
-						Size = Computed(scope, function(use)
-							return ud2New(0.118, 0, 0, min(use(self.absSize), use(self.absContentSize)))
-						end),
-						Visible = Computed(scope, function(use)
-							return use(self.isOpen)
-						end),
+						[Children] = {
+							PlayerListFrame(self),
 
-						[Fusion.OnEvent("MouseLeave")] = function()
-							for _, element: Frame in peek(self.list):GetChildren() do
-								if element:IsA("Frame") then
-									element.BackgroundColor3 = fromRGB(30, 30, 30)
-									element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
-								end
-							end
+							Components.HoverImageButton(scope, {
+								AnchorPoint = v2New(),
+								Position = fromScale(0.875, 0),
 
-							self.playerDescVisible:set(false)
-						end,
+								Size = Computed(scope, function(use)
+									return ud2New(0.118, 0, 0, min(use(self.absSize), use(self.absContentSize)))
+								end),
+								Visible = Computed(scope, function(use)
+									return use(self.isOpen)
+								end),
+
+								[Fusion.OnEvent("MouseLeave")] = function()
+									for _, element: Frame in peek(self.list):GetChildren() do
+										if element:IsA("Frame") then
+											element.BackgroundColor3 = fromRGB(30, 30, 30)
+											element.PlayerName.TextColor3 = if Players[element.Name]:GetAttribute("Role") then fromRGB(170, 255, 255) else color3New(1, 1, 1)
+										end
+									end
+
+									self.playerDescVisible:set(false)
+								end,
+							}),
+
+							PlayerDescFrame(self),
+						}
 					}),
-
-					PlayerDescFrame(self),
 				}
 			}),
 		},
@@ -121,7 +133,13 @@ return function(plr: Player)
 
 		self.playerDescVisible:set(false)
 	end)
+	table.insert(scope, HarukaLib:Hydrate(char, {
+		["Attr-InCombat"] = function(newState: boolean)
+			self.isInCombat:set(newState)
+		end
+	}))
 
+	--// Clear
 	local function _onDead()
 		CAS:UnbindAction("TogglePlayerList")
 

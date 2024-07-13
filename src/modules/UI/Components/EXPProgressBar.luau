@@ -22,7 +22,6 @@ local function EXPProgressBar(self: table) : Frame
         [Fusion.Children] = {
             Fusion.New(scope, "Frame")({
                 Name = "Bar",
-                BackgroundTransparency = 0.2,
                 BackgroundColor3 = fromRGB(217, 193, 144),
 
                 Size = Fusion.Tween(scope, Fusion.Computed(scope, function(use)

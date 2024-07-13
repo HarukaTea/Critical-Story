@@ -67,6 +67,8 @@ local function AdventurerStatsPinia(self: table)
 		Reaper = Value(0)
 	}
 
+	self.nowMobIndex = 1
+
     self.newAddedItems = Value({})
 
     self.levelUpShown, self.levelUpTitleShown, self.levelUpPos =

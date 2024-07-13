@@ -18,6 +18,8 @@ local function PlayerListPinia(self: table)
 	self.players = Value({})
 	self.isOpen = Value(true)
 
+    self.isInCombat = Value(false)
+
     self.playerDescVisible = Value(false)
     self.playerDescBGSize = Value(fromScale(1, 0.86))
 

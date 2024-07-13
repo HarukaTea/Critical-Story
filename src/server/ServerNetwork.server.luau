@@ -185,11 +185,13 @@ Events.AddPoints:Connect(addPoint)
 
 local function _equipCheck(plr: Player, itemType: string, requestItem: string) : boolean
 	local count = 0
+	local maxCount = 3
 	local check = true
+
 	for _, item: IntConstrainedValue in plr.Inventory:GetChildren() do
 		if item:GetAttribute("Equipped") and ItemBook:FindItem(item.Name).Type == itemType then count += 1 end
 	end
-	if count >= 3 and not plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
+	if count >= maxCount and not plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
 
 	return check
 end
@@ -406,7 +408,15 @@ Events.NewQuest:Connect(newQuest)
 
 local function changeLastSeen(plr: Player, location: string)
 	plr:SetAttribute("LastSeenLocation", location)
-	plr:SetAttribute("RespawnLocation", workspace.Maps[location].SpawnPoint.Position)
+
+	local spawns = workspace.Maps[location].SpawnPoint :: Model
+	if #spawns:GetChildren() > 0 then
+		local rSpawn = math.random(1, #spawns:GetChildren())
+
+		for index: number, spawnPoint: BasePart in ipairs(spawns:GetChildren()) do
+			if index == rSpawn then plr:SetAttribute("RespawnLocation", spawnPoint.Position) end
+		end
+	end
 end
 Events.ChangePlayerLocation:Connect(changeLastSeen)
 

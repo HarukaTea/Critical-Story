@@ -14,7 +14,6 @@ local OnEvent, Children, Computed = Fusion.OnEvent, Fusion.Children, Fusion.Comp
 local color3New = Color3.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local udNew = UDim.new
 local fontFromEnum = Font.fromEnum
 
 local function ExCategoryOpenBtn(id: string, self: table): Frame
@@ -30,7 +29,12 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 		Name = id,
 		BackgroundColor3 = color3New(),
 		Position = if id == "Menu" then fromScale(0.355, -1.1) else fromScale(0.71, -1.1),
-		Size = fromScale(0.281, 0.658),
+		Size = fromScale(1, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+
+		Visible = Computed(scope, function(use)
+			return if use(self.charStatsDict.IsInCombat) then false else true
+		end),
 
 		[Children] = {
 			Components.RoundUICorner(scope),
@@ -65,15 +69,16 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 			}),
 			Components.TextLabel(scope, {
 				Name = "Key",
+				AnchorPoint = Vector2.new(0.5, 0),
 				BackgroundColor3 = color3New(),
 				BackgroundTransparency = 0,
-				Position = fromScale(0.316, 1.109),
-				Size = fromScale(0.361, 0.362),
+				Position = fromScale(0.5, 1.11),
+				Size = fromScale(0.4, 0.4),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ZIndex = 4,
-				TextStrokeTransparency = 0,
 				Text = if id == "Menu" then "C" else "B",
 
-				[Children] = { Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.3, 0) })},
+				[Children] = { Components.RoundUICorner(scope) },
 			}),
 
 			Components.ImageLabel(scope, {
@@ -82,6 +87,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 				BackgroundTransparency = 0,
 				Position = fromScale(0.65, 0),
 				Size = fromScale(0.4, 0.4),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ZIndex = 3,
 
 				Visible = Computed(scope, function(use)

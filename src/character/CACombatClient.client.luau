@@ -15,6 +15,7 @@ local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
 local monsterTree = Octree.new()
+local locationTree = Octree.new()
 
 local char = script.Parent :: Model
 local humanoid = char:WaitForChild("Humanoid") :: Humanoid
@@ -29,7 +30,9 @@ local isInCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
 local monsterNodes = {}
+local locatorNodes = {}
 local encounterCD = false
+local currentMonster = nil
 
 local wait = task.wait
 local newInstance = Instance.new
@@ -69,6 +72,7 @@ local function endCombat()
 	if char:FindFirstChild("CombatBorder") then char.CombatBorder:Destroy() end
 
 	isInCombat = false
+	currentMonster = nil
 	humanoid.AutoRotate = true
 
 	--- sound actions
@@ -227,11 +231,33 @@ local function setup()
 	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
 	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_removeMonster))
 
+	--- add all locations
+	for _, locator: BasePart in monsterLocations:GetDescendants() do
+		if locator:HasTag("MonsterLocation") then locationTree:CreateNode(locator.Position, locator) end
+	end
+	local function _addLocation(locator: BasePart)
+		wait()
+		repeat wait() until locator
+
+		table.insert(locatorNodes, locationTree:CreateNode(locator.Position, locator))
+	end
+	local function _removeLocation(locator: BasePart)
+		for index: number, node: any in locatorNodes do
+			if node:GetObject() == locator then
+				node:Destroy()
+				table.remove(locatorNodes, index)
+			end
+		end
+	end
+	Add(CS:GetInstanceAddedSignal("MonsterLocation")):Connect(_addLocation)
+	Add(CS:GetInstanceRemovedSignal("MonsterLocation")):Connect(_removeLocation)
+
 	--- detect mobs when player is near them
     Add(HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
 		if not char.PrimaryPart then return end
 		if encounterCD then return end
+		if currentMonster then return end
 
 		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 18)
 		for _, monster: Model in nearbyMonsters do
@@ -241,8 +267,11 @@ local function setup()
 			if monster:GetAttribute("ExclusivePlayer") then
 				if monster:GetAttribute("ExclusivePlayer") ~= plr.Name then continue end
 			end
+			if monster:GetAttribute("InCombat") then continue end
 
 			encounterCD = true
+			currentMonster = monster
+
 			Events.CombatStart:Fire(monster.Parent)
 
 			wait(2)
@@ -255,44 +284,41 @@ local function setup()
 	Add(HarukaLib.Clock(0.5, function()
 		if not char.PrimaryPart then return end
 
-		for _, locator: BasePart in monsterLocations:GetDescendants() do
-			if locator:HasTag("MonsterLocation") and not locator:GetAttribute("InCombat") then
-				if locator:FindFirstChildOfClass("Model") then continue end
+		local nearbyLocators = locationTree:RadiusSearch(char.PrimaryPart.Position, 200)
+		for _, locator: BasePart in nearbyLocators do
+			if not locator then continue end
+			if locator:GetAttribute("InCombat") then continue end
+			if locator:FindFirstChildOfClass("Model") then continue end
 
-				local distance = plr:DistanceFromCharacter(locator.Position)
+			local monster = ClientUtil:SetupMonster(locator)
 
-				if distance < 200 and distance > 0 then
-					local monster = ClientUtil:SetupMonster(locator)
+			--// despawn
+			Spawn(function()
+				while monster and monster.PrimaryPart do
+					wait()
+					local mobDistance = plr:DistanceFromCharacter(monster.PrimaryPart.Position)
+					if mobDistance >= 200 or locator:GetAttribute("InCombat") then monster:Destroy() end
+				end
+			end)
 
-					--// despawn
-					Spawn(function()
-						while monster and monster.PrimaryPart do
-							wait()
-							local mobDistance = plr:DistanceFromCharacter(monster.PrimaryPart.Position)
-							if (mobDistance >= 200 and mobDistance > 0) or locator:GetAttribute("InCombat") then monster:Destroy() end
-						end
-					end)
+			--// rotate
+			Spawn(function()
+				while monster and monster.PrimaryPart do
+					wait(1 + math.random(1, 10) / 10)
+					if monster:GetAttribute("InCombat") then continue end
+					if monster:GetAttribute("CantRotate") then continue end
 
-					--// rotate
-					Spawn(function()
-						while monster and monster.PrimaryPart do
-							wait(1 + math.random(1, 10) / 10)
-							if monster:GetAttribute("InCombat") then continue end
-							if monster:GetAttribute("CantRotate") then continue end
+					local rotating = math.random(5, 20)
+					local direction = math.random(-2, 2)
 
-							local rotating = math.random(5, 20)
-							local direction = math.random(-2, 2)
-
-							pcall(function()
-								for _ = 1, rotating do
-									monster.PrimaryPart.CFrame *= CFrame.Angles(0, math.rad(direction * 5), 0)
-									wait(0.01)
-								end
-							end)
+					pcall(function()
+						for _ = 1, rotating do
+							monster.PrimaryPart.CFrame *= CFrame.Angles(0, math.rad(direction * 5), 0)
+							wait(0.01)
 						end
 					end)
 				end
-			end
+			end)
 		end
 	end))
 end
@@ -301,8 +327,12 @@ setup()
 --// Clear
 humanoid.Died:Once(function()
 	for _, node: any in monsterNodes do node:Destroy() end
+	for _, node: any in locatorNodes do node:Destroy() end
+
 	monsterTree = nil
 	monsterNodes = nil
+	locationTree = nil
+	locatorNodes = nil
 
 	Empty()
 end)

@@ -25,14 +25,14 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 			Icon = ClientUtil:CombineRbxId(itemInfo.Icon),
 			Name = itemInfo.Name,
 			TierColor = AssetBook.TierColor[itemInfo.Tier],
-			Position = Fusion.Value(scope, fromScale(1.2, 0))
+			Position = Fusion.Value(scope, fromScale(-0.5, 0))
 		}
 	else
 		info = {
 			Icon = ItemBook.ItemImagesEx.Unknown,
 			Name = "???",
 			TierColor = AssetBook.TierColor[1],
-			Position = Fusion.Value(scope, fromScale(1.2, 0))
+			Position = Fusion.Value(scope, fromScale(-0.5, 0))
 		}
 	end
 	local isSelecting = Fusion.Value(scope, false)
@@ -41,19 +41,20 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 		wait(0.75)
 		workspace.Sounds.SFXs.ItemAcquired:Play()
 
-		info.Position:set(fromScale(0.84, 0))
+		info.Position:set(fromScale(-0.02, 0))
 	end)
 	Spawn(function()
 		wait(3.2)
-		info.Position:set(fromScale(1.2, 0))
+		info.Position:set(fromScale(-0.5, 0))
 	end)
 
 	return Components.Frame(scope, {
-		Name = "Acquired",
+		Name = "AcquiredItem",
 		AnchorPoint = v2New(),
 
 		[Children] = {
 			Components.Frame(scope, {
+				Name = "Bar",
 				BackgroundTransparency = 0.2,
 				AnchorPoint = v2New(),
 				Size = fromScale(0.2, 1),
@@ -74,7 +75,9 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 					}),
 					Components.ImageLabel(scope, {
 						Name = "Icon",
-						Size = fromScale(0.196, 1),
+						Position = fromScale(0.81, 0),
+						Size = fromScale(1, 1),
+						SizeConstraint = Enum.SizeConstraint.RelativeYY,
 						Image = info.Icon,
 						BackgroundTransparency = 0,
 
@@ -82,19 +85,19 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 					}),
 					Components.TextLabel(scope, {
 						Name = "Title",
-						Position = fromScale(0.23, 0.03),
-						Size = fromScale(0.529, 0.4),
-						Text = "Acquired",
+						Position = fromScale(0.15, 0.03),
+						Size = fromScale(0.62, 0.4),
+						Text = "ITEM ACQUIRED",
 						TextColor3 = fromRGB(156, 156, 156),
-						TextXAlignment = Enum.TextXAlignment.Left,
+						TextXAlignment = Enum.TextXAlignment.Right,
 					}),
 					Components.TextLabel(scope, {
 						Name = "ItemName",
-						Position = fromScale(0.23, 0.44),
-						Size = fromScale(0.529, 0.45),
+						Position = fromScale(0.15, 0.44),
+						Size = fromScale(0.62, 0.45),
 						Text = info.Name,
 						TextColor3 = info.TierColor,
-						TextXAlignment = Enum.TextXAlignment.Left
+						TextXAlignment = Enum.TextXAlignment.Right
 					}),
 
 					Components.HoverImageButton(scope, {

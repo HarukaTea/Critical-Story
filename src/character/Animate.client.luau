@@ -1,5 +1,6 @@
 --!nocheck
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -8,11 +9,17 @@ local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
 local Add, Empty = HarukaLib.Bin()
 
 local char = script.Parent :: Model
+local plr = Players.LocalPlayer
 local animations = ReplicatedStorage.Package.Animations.CharAnims :: Folder
 local animator = char.Humanoid:WaitForChild("Animator") :: Animator
 
+repeat task.wait() until plr:GetAttribute("PlayerDataLoaded")
+repeat task.wait() until char:GetAttribute("CharDataLoaded")
+
+local class = plr:GetAttribute("Class") :: string
+
 local ANIMS = {
-	Idle = animator:LoadAnimation(animations.Idle),
+	Idle = animator:LoadAnimation(animations.ClassExclusive:FindFirstChild(class) or animations.Idle),
 	Freefall = animator:LoadAnimation(animations.Freefall),
 	Jumping = animator:LoadAnimation(animations.Jumping),
 	Running = animator:LoadAnimation(animations.Running),
@@ -31,16 +38,6 @@ local function startAnim(anim: AnimationTrack, transitionTime: number)
 		oldAnim = anim
 	end
 end
-local stateFunctions = {
-	[Enum.HumanoidStateType.Jumping] = true,
-	[Enum.HumanoidStateType.Freefall] = true,
-	[Enum.HumanoidStateType.Swimming] = true,
-	[Enum.HumanoidStateType.GettingUp] = true,
-	[Enum.HumanoidStateType.Landed] = true,
-	[Enum.HumanoidStateType.Dead] = true,
-	[Enum.HumanoidStateType.Climbing] = true,
-	[Enum.HumanoidStateType.Running] = true
-}
 
 local jumpAnimTime = 0
 local isFreefalling = false
@@ -48,14 +45,7 @@ local isFreefalling = false
 --// Setup
 local function setup()
 	local humanoid = char.Humanoid :: Humanoid
-	local _, activeState = pcall(function() return humanoid:GetState() end)
 
-	Add(humanoid.StateChanged:Connect(function(_, state)
-		activeState = state
-
-		local func = stateFunctions[activeState]
-		if not func then startAnim() end
-	end))
 	Add(humanoid.Running:Connect(function()
 		if humanoid.MoveDirection.Magnitude > 0 then
 			startAnim(ANIMS.Running, 0.1)

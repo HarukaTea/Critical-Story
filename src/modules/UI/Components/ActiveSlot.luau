@@ -73,7 +73,9 @@ local function ActiveSlot(index: number, self: table): Frame
 		Name = "Active"..index,
 		BackgroundColor3 = color3New(),
 		Position = fromScale(positions[index], 0),
-		Size = fromScale(0.281, 0.658),
+		Size = fromScale(0.65, 0.65),
+		SizeConstraint = Enum.SizeConstraint.RelativeYY,
+		LayoutOrder = index,
 
 		[Children] = {
 			Components.RoundUICorner(scope),
@@ -117,7 +119,7 @@ local function ActiveSlot(index: number, self: table): Frame
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
 
-				Text = Computed(scope, function(use, localScope)
+				Text = Computed(scope, function(use, localScope: Fusion.Scope)
 					local item = use(self.activeEquipList[index]) :: string
 
 					if item == "Null" then
@@ -125,11 +127,11 @@ local function ActiveSlot(index: number, self: table): Frame
 					else
 						local amount = Fusion.Value(localScope, self.inventory[item].Value)
 
-						localScope[#localScope + 1] = HarukaLib:Hydrate(self.inventory[item], {
+						table.insert(localScope, HarukaLib:Hydrate(self.inventory[item], {
 							["Prop-Value"] = function(newVal: number)
 								amount:set(newVal)
 							end
-						})
+						}))
 
 						return if use(amount) <= 1 then "" else "x"..use(amount)
 					end
@@ -168,15 +170,17 @@ local function ActiveSlot(index: number, self: table): Frame
 			}),
 			Components.TextLabel(scope, {
 				Name = "Key",
+				AnchorPoint = v2New(0.5, 0),
 				BackgroundColor3 = color3New(),
 				BackgroundTransparency = 0,
-				Position = fromScale(0.316, 1.109),
-				Size = fromScale(0.361, 0.362),
+				Position = fromScale(0.5, 1.11),
+				Size = fromScale(0.4, 0.4),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ZIndex = 4,
 				TextStrokeTransparency = 0,
 				Text = index,
 
-				[Children] = { New(scope, "UICorner")({ CornerRadius = udNew(0.3, 0) })},
+				[Children] = { Components.RoundUICorner(scope) },
 			}),
 
 			ProgressCircle("Left", self, index),

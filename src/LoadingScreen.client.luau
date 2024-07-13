@@ -25,6 +25,7 @@ local udNew = UDim.new
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 SG:SetCoreGuiEnabled(Enum.CoreGuiType.Health, true)
+SG:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
 
 local loadFinished = false
 

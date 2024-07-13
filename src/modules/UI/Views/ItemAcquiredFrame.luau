@@ -36,6 +36,7 @@ local function ItemAcquiredFrame(self: table): Frame
 
 	return Components.Frame(scope, {
 		Name = "ItemAcquiredFrame",
+		Position = UDim2.fromScale(0.5, -1.8),
 
 		[Children] = {
 			New(scope, "UIListLayout")({

@@ -30,7 +30,7 @@ local COLORS = {
 local BLACKLIST = { "Equip", "Pin" }
 
 local function _checkSlot(self: table, type: string) : string
-	local classFrame = self.plrGui.AdventurerStats.BottomBG.ClassFrame
+	local classFrame = self.plrGui.AdventurerStats.Bottom.ClassFrame
 
 	for _, element: Frame in classFrame:GetDescendants() do
 		if sFind(element.Name, type) and not element:GetAttribute("Equipped") then
@@ -41,7 +41,7 @@ local function _checkSlot(self: table, type: string) : string
 	return "Full"
 end
 local function _checkSameItem(self: table, item: string, type: string) : (string, string?)
-	local classFrame = self.plrGui.AdventurerStats.BottomBG.ClassFrame
+	local classFrame = self.plrGui.AdventurerStats.Bottom.ClassFrame
 
 	local check, sameSlot = false, nil
 	for _, element: Frame in classFrame:GetDescendants() do
@@ -70,11 +70,13 @@ local function _checkEquippedItems(self: table, requestItem: string) : boolean
 	if not itemInfo.ItemId then return false end
 
 	local count = 0
+	local maxCount = 3
 	local check = true
+
 	for _, item: IntConstrainedValue in self.Inventory:GetChildren() do
 		if item:GetAttribute("Equipped") and ItemBook:FindItem(item.Name).Type == itemInfo.Type then count += 1 end
 	end
-	if count >= 3 and not self.plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
+	if count >= maxCount and not self.plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
 
 	return check
 end
@@ -103,14 +105,18 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 			})
 		},
 		[Fusion.OnEvent("MouseButton1Click")] = function()
-			if self.equipClickCD then return end
 			if peek(self.chosenFilter) == id then return end
 
-			self.equipClickCD = true
-			Spawn(function()
-				wait(0.3)
-				self.equipClickCD = false
-			end)
+			if id == "Equip" or id == "Pin" then
+				if self.equipClickCD then return end
+
+				self.equipClickCD = true
+
+				Spawn(function()
+					wait(0.3)
+					self.equipClickCD = false
+				end)
+			end
 
 			if id == "Equip" then
 				local item = _findItem(peek(self.itemFrame))
@@ -142,7 +148,7 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 				if slot ~= "Full" and checkSame == "None" then
 					--- check first
 					local equipCheck = _checkEquippedItems(self, item)
-					if equipCheck then return end
+					if equipCheck then Signals.CreateHint:Fire("Not enough space to equip this item!") return end
 
 					-- local assign first, to fix equip bug when server lag while equiping
 					self.inventory[item]:SetAttribute("Equipped", true)

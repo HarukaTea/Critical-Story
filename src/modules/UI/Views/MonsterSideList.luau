@@ -74,7 +74,7 @@ local function MonsterSideList(self: table) : Frame
 		ZIndex = 2,
 
 		Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
-			return if use(self.charStatsDict.IsInCombat) then fromScale(0.015, -4.5) else fromScale(0.5, -4.5)
+			return if use(self.charStatsDict.IsInCombat) then fromScale(0.015, -2.8) else fromScale(0.5, -2.8)
 		end), AssetBook.TweenInfos.half),
 
         [Children] = {

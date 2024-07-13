@@ -40,7 +40,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 		Position = ud2New(0.015, 0, 0.04, 40),
 
 		[Children] = {
-			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 24.168 }),
+			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.255 }),
 			New(scope, "UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = udNew(0.015, 0),
@@ -81,6 +81,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 			}),
 			Components.TextButton(scope, {
 				Name = "Close",
+				AutoButtonColor = false,
 				Position = fromScale(0.948, 0.066),
 				Size = fromScale(0.04, 1),
 				Text = "X",
