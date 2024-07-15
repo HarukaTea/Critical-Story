@@ -26,7 +26,9 @@ function Components.ScreenGui(scope: Fusion.Scope, props: table) : ScreenGui
 	return _createNewCompoent(scope, props, "ScreenGui", {
 		ClipToDeviceSafeArea = false,
 		ScreenInsets = Enum.ScreenInsets.None,
-		IgnoreGuiInset = true
+		IgnoreGuiInset = true,
+
+		AutoLocalize = false,
 	})
 end
 
@@ -40,6 +42,8 @@ function Components.Frame(scope: Fusion.Scope, props: table) : Frame
 		Size = fromScale(1, 1),
 		BackgroundColor3 = fromRGB(30, 30, 30),
 		BackgroundTransparency = 1,
+
+		AutoLocalize = false,
 	})
 end
 
@@ -54,6 +58,8 @@ function Components.ScrollingFrame(scope: Fusion.Scope, props: table) : Scrollin
 		Position = fromScale(0.5, 0.5),
 		CanvasSize = fromScale(0, 0),
 		ScrollBarThickness = 0,
+
+		AutoLocalize = false,
 	})
 end
 
@@ -68,6 +74,8 @@ function Components.TextLabel(scope: Fusion.Scope, props: table) : TextLabel
 		TextScaled = true,
 		TextColor3 = color3New(1, 1, 1),
 		TextStrokeColor3 = color3New(),
+
+		AutoLocalize = false,
 	})
 end
 
@@ -82,6 +90,8 @@ function Components.TextBox(scope: Fusion.Scope, props: table) : TextBox
 		Text = "",
 		TextColor3 = color3New(1, 1, 1),
 		TextScaled = true,
+
+		AutoLocalize = false,
 	})
 end
 
@@ -93,6 +103,8 @@ function Components.ImageLabel(scope: Fusion.Scope, props: table) : ImageLabel
 		BackgroundColor3 = color3New(),
 		BackgroundTransparency = 1,
 		Image = "",
+
+		AutoLocalize = false,
 	})
 end
 
@@ -108,6 +120,8 @@ function Components.HoverImageButton(scope: Fusion.Scope, props: table) : ImageB
 		Position = fromScale(0.5, 0.5),
 		Size = ud2New(1, 0, 1, 0),
 		Image = "",
+
+		AutoLocalize = false,
 	})
 end
 
@@ -121,6 +135,8 @@ function Components.TextButton(scope: Fusion.Scope, props: table) : TextButton
 		FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Bold),
 		TextColor3 = color3New(1, 1, 1),
 		TextScaled = true,
+
+		AutoLocalize = false,
 	})
 end
 
@@ -159,7 +175,9 @@ function Components.BGShadow(scope: Fusion.Scope) : Frame
         Name = "Shadow",
         BackgroundTransparency = 0.15,
         ZIndex = 0,
-        Visible = false
+        Visible = false,
+
+		AutoLocalize = false,
     })
 end
 

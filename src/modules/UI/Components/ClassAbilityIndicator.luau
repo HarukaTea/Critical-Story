@@ -12,101 +12,106 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local clamp = math.clamp
 
-local function ClassAbilityIndicator(self: table, class: string) : Frame
+local function ClassAbilityIndicator(self: table) : Frame
     local scope = self.scope :: Fusion.Scope
+
     local charClassInfo = self.charClassInfo :: table
 
-    return Components.Frame(scope, {
-        Name = class.."Style",
-        Position = fromScale(0.5, 1.85),
-        Visible = Computed(scope, function(use)
-            --- in combat condition
-            if use(self.charStatsDict.IsInCombat)
-                and use(self.playerData.Class) == class
-                and use(self.charClassInfo[class]) > 0 then
+    return Fusion.Computed(scope, function(use: Fusion.Use, localScope: Fusion.Scope)
+        local class = use(self.playerData.Class) :: string
+        if class == nil then return nil end
 
-                return true
-            end
+        --- other classes that don't need indicators
+        local blackList = { "Repeater", "Striker", "Alchemist" }
+        if table.find(blackList, class) then return nil end
 
-            return false
-        end),
+        return Components.Frame(localScope, {
+            Name = class.."Style",
+            Position = fromScale(0.5, 1.85),
+            Visible = Computed(localScope, function(localUse: Fusion.Use)
+                --- in combat condition
+                if localUse(self.charStatsDict.IsInCombat)
+                    and localUse(self.playerData.Class) == class
+                    and localUse(self.charClassInfo[class]) > 0 then
 
-        [Children] = {
-            Components.Frame(scope, {
-                AnchorPoint = v2New(),
-                Name = "BarBG",
-                BackgroundTransparency = 0,
-                Position = fromScale(0.06, 0.383),
-                Size = fromScale(0.25, 0.2),
+                    return true
+                end
 
-                [Children] = {
-                    Components.RoundUICorner(scope),
-                    Components.Frame(scope, {
-                        Name = "TweenBar",
-                        BackgroundColor3 = AssetBook.ClassInfo[class].Color,
-                        BackgroundTransparency = 0,
+                return false
+            end),
 
-                        Visible = Computed(scope, function(use)
-                            local neededClass = use(self.playerData.Class) :: string
+            [Children] = {
+                Components.Frame(localScope, {
+                    AnchorPoint = v2New(),
+                    Name = "BarBG",
+                    BackgroundTransparency = 0,
+                    Position = fromScale(0.06, 0.383),
+                    Size = fromScale(0.25, 0.2),
 
-                            return if neededClass == class then true else false
-                        end),
-                        Size = Fusion.Tween(scope, Computed(scope, function(use)
-                            if class == "Warrior" then
-                                return fromScale(0, 1)
+                    [Children] = {
+                        Components.RoundUICorner(localScope),
+                        Components.Frame(localScope, {
+                            Name = "TweenBar",
+                            BackgroundColor3 = AssetBook.ClassInfo[class].Color,
+                            BackgroundTransparency = 0,
 
-                            elseif class == "Archer" then
-                                local x = clamp(use(charClassInfo.Archer) / 10, 0, 1)
+                            Size = Fusion.Tween(localScope, Computed(localScope, function(localUse: Fusion.Use)
+                                if class == "Warrior" then
+                                    return fromScale(0, 1)
 
-                                return fromScale(x, 1)
+                                elseif class == "Archer" then
+                                    local x = clamp(localUse(charClassInfo.Archer) / 10, 0, 1)
 
-                            else
-                                local x = clamp(use(charClassInfo[class]) / 100, 0, 1)
+                                    return fromScale(x, 1)
 
-                                return fromScale(x, 1)
-                            end
-                        end), AssetBook.TweenInfos.twiceHalf),
+                                else
+                                    local x = clamp(localUse(charClassInfo[class]) / 100, 0, 1)
 
-                        [Children] = { Components.RoundUICorner(scope) }
-                    })
-                }
-            }),
-            Components.TextLabel(scope, {
-                Name = "Amount",
-                Position = fromScale(0.06, -0.425),
-                Size = fromScale(0.25, 0.6),
+                                    return fromScale(x, 1)
+                                end
+                            end), AssetBook.TweenInfos.twiceHalf),
 
-                Text = Fusion.Computed(scope, function(use)
-                    if class == "Warrior" then
-                        return "COMBO x"..use(self.charClassInfo.Warrior)
+                            [Children] = { Components.RoundUICorner(localScope) }
+                        })
+                    }
+                }),
+                Components.TextLabel(localScope, {
+                    Name = "Amount",
+                    Position = fromScale(0.06, -0.425),
+                    Size = fromScale(0.25, 0.6),
 
-                    elseif class == "Archer" then
-                        local arrows = use(self.charClassInfo.Archer) :: string
+                    Text = Fusion.Computed(localScope, function(localUse: Fusion.Use)
+                        if class == "Warrior" then
+                            return "COMBO x"..localUse(self.charClassInfo.Warrior)
 
-                        return if arrows == 1 then "1 ARROW" else arrows.." ARROWS"
+                        elseif class == "Archer" then
+                            local arrows = localUse(self.charClassInfo.Archer) :: string
 
-                    elseif class == "Wizard" then
-                        return "FOCUS "..use(self.charClassInfo.Wizard).."%"
+                            return if arrows == 1 then "1 ARROW" else arrows.." ARROWS"
 
-                    elseif class == "Knight" then
-                        return "GUARD "..use(self.charClassInfo.Knight).."%"
+                        elseif class == "Wizard" then
+                            return "FOCUS "..localUse(self.charClassInfo.Wizard).."%"
 
-                    elseif class == "Rogue" then
-                        return use(self.charClassInfo.Rogue).."% CHANCE"
+                        elseif class == "Knight" then
+                            return "GUARD "..localUse(self.charClassInfo.Knight).."%"
 
-                    elseif class == "Juggernaut" then
-                        return "RAGE "..use(self.charClassInfo.Juggernaut).."%"
+                        elseif class == "Rogue" then
+                            return localUse(self.charClassInfo.Rogue).."% CHANCE"
 
-                    elseif class == "Reaper" then
-                        return use(self.charClassInfo.Reaper).."% LIFE STOLEN"
-                    end
-                end),
-                TextColor3 = AssetBook.ClassInfo[class].Color,
+                        elseif class == "Juggernaut" then
+                            return "RAGE "..localUse(self.charClassInfo.Juggernaut).."%"
 
-                [Children] = { Components.TextUIStroke(scope, { Thickness = 2 }) }
-            })
-        }
-    })
+                        elseif class == "Reaper" then
+                            return localUse(self.charClassInfo.Reaper).."% LIFE STOLEN"
+                        end
+                    end),
+                    TextColor3 = AssetBook.ClassInfo[class].Color,
+
+                    [Children] = { Components.TextUIStroke(localScope, { Thickness = 2 }) }
+                })
+            }
+        })
+    end)
 end
 
 return ClassAbilityIndicator

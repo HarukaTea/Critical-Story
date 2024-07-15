@@ -80,7 +80,7 @@ return function(plr: Player)
 					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 1.007 }),
 
 					Components.HoverImageButton(scope, {
-						Image = Fusion.Computed(scope, function(use)
+						Image = Fusion.Computed(scope, function(use: Fusion.Use)
 							return use(self.icon)
 						end),
 

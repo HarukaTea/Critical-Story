@@ -71,12 +71,8 @@ end
 local function attacking()
 	ServerUtil.MobBehaviorTree(monster, {
 		function (target: Model) : boolean
-			monster.PrimaryPart.Anchored = true
-
 			spikeRain(target)
 			wait(0.5)
-
-			monster.PrimaryPart.Anchored = false
 
 			return true
 		end,

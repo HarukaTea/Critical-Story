@@ -30,7 +30,7 @@ local function StatImage(id: string, self: table) : ImageLabel
         Size = fromScale(1, 1),
         SizeConstraint = Enum.SizeConstraint.RelativeYY,
 
-        Image = Computed(scope, function(use)
+        Image = Computed(scope, function(use: Fusion.Use)
             if id == "ClassATK" then
                 return AssetBook.ClassInfo[use(self.playerData.Class)].Image
 
@@ -48,7 +48,7 @@ local function StatImage(id: string, self: table) : ImageLabel
                 Enabled = true,
                 Thickness = 2.5,
 
-                Transparency = Fusion.Tween(scope, Computed(scope, function(use)
+                Transparency = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return if use(isSelecting) then 0.3 else 1
                 end), AssetBook.TweenInfos.twiceHalf)
             }),
@@ -85,7 +85,7 @@ local function StatText(id: string, self: table) : TextLabel
         Name = id.."Text",
         AutomaticSize = Enum.AutomaticSize.X,
         Size = fromScale(0, 1),
-        Text = Computed(scope, function(use)
+        Text = Computed(scope, function(use: Fusion.Use)
             if id == "ClassATK" then
                 if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
                     local minDMG, maxDMG = use(charDMGStats.MinDMG), use(charDMGStats.MaxDMG)

@@ -73,7 +73,7 @@ local function MonsterSideList(self: table) : Frame
         AnchorPoint = v2New(),
 		ZIndex = 2,
 
-		Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+		Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 			return if use(self.charStatsDict.IsInCombat) then fromScale(0.015, -2.8) else fromScale(0.5, -2.8)
 		end), AssetBook.TweenInfos.half),
 

@@ -25,7 +25,7 @@ local yAxis = Vector3.yAxis
 local ServerUtil = {}
 
 
-function ServerUtil:WeldPart(part: Part, welded: Model)
+function ServerUtil:WeldModel(part: Part, welded: Model)
 	local C = welded:GetChildren()
 	for i = 1, #C do
 		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") or C[i]:IsA("CornerWedgePart") then
@@ -66,7 +66,7 @@ function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local function _equipWeapon(weapon: Model, defaultPart: string)
 		local weldPos = if weapon:GetAttribute("Position") then weapon:GetAttribute("Position") else defaultPart
 
-		ServerUtil:WeldPart(char[weldPos], weapon)
+		ServerUtil:WeldModel(char[weldPos], weapon)
 		ServerUtil:SetCollisionGroup(weapon, "Player")
 
 		weapon.Parent = char
@@ -131,7 +131,7 @@ function ServerUtil:EquipArmor(char: Model, armorId: string)
 		if not armor:FindFirstChild(weapon) then return end
 
 		local realWeapon = armor[weapon]:Clone() :: Model
-		ServerUtil:WeldPart(char[part.." Arm"], realWeapon)
+		ServerUtil:WeldModel(char[part.." Arm"], realWeapon)
 
 		realWeapon:AddTag("Weapon")
 		realWeapon.Parent = char
@@ -190,7 +190,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 
 	for _, child: Instance in monster:GetChildren() do
 		if child:IsA("Part") and monster:FindFirstChild(child.Name .. "Model") then
-			ServerUtil:WeldPart(child, monster[child.Name .. "Model"])
+			ServerUtil:WeldModel(child, monster[child.Name .. "Model"])
 		end
 	end
 	monster.Parent = locator
@@ -296,7 +296,7 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 		resolve(position, pos)
 
 	end):Then(function(position: Vector3, pos: Vector3)
-		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7, 2)
+		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 9, 2)
 
 	end):Catch(function(err)
 		orbLocation = cfNew(0, 0, 0)
@@ -404,11 +404,10 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 		intValue.Parent = inventoryFolder
 	end
 
-	if not plr.Character.PrimaryPart:FindFirstChild("ItemAcquiredEffect") then
-		local itemAcquiredEffect = RepS.Package.Effects.ItemAcquiredEffect:Clone() :: ParticleEmitter
-		itemAcquiredEffect.Parent = plr.Character.PrimaryPart
-		Debris:AddItem(itemAcquiredEffect, 1)
-	end
+	local itemAcquiredEffect = RepS.Package.Effects.ItemAcquiredEffect:Clone() :: BasePart
+	itemAcquiredEffect.CFrame = plr.Character.PrimaryPart.CFrame
+	itemAcquiredEffect.Parent = workspace
+	Debris:AddItem(itemAcquiredEffect, 1)
 
 	Events.GiveDrop:Fire(plr, item)
 end
@@ -463,9 +462,9 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 end
 
 
-function ServerUtil:FindPartOnRay(givenPos: Vector3) : Vector3
+function ServerUtil:FindPartOnRay(givenPos: Vector3, ignoreList: table?) : Vector3
 	local ray = rayNew(givenPos, -(yAxis).Unit * 500)
-	local ignoreList = {}
+	ignoreList = ignoreList or {}
 
 	while wait() do
 		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
@@ -513,7 +512,7 @@ function ServerUtil.MobBehaviorTree(monster: Model, funcs: table)
 
 			local state = randomFunc(target)
 
-			if not state then wait(0.5) else wait() end
+			if state == nil then wait(0.5) else wait() end
 		end
 	end)
 

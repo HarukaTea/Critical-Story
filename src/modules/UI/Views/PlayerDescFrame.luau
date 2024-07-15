@@ -31,7 +31,7 @@ local function PlayerItemSlot(id: number, self: table): ImageLabel
 		Position = POSITIONS[id],
 		Size = fromScale(0.19, 0.165),
 
-		Image = Computed(scope, function(use)
+		Image = Computed(scope, function(use: Fusion.Use)
             local item = use(self.playerItemIconList[id])
 
             return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
@@ -53,7 +53,7 @@ local function PlayerDescFrame(self: table) : Frame
         Position = fromScale(0.715, 0),
         Size = fromScale(0.15, 4.5),
 
-        Visible = Fusion.Computed(scope, function(use)
+        Visible = Fusion.Computed(scope, function(use: Fusion.Use)
             return use(self.playerDescVisible)
         end),
 
@@ -65,7 +65,7 @@ local function PlayerDescFrame(self: table) : Frame
                 BackgroundTransparency = 0.1,
                 ZIndex = 0,
 
-                Size = Fusion.Computed(scope, function(use)
+                Size = Fusion.Computed(scope, function(use: Fusion.Use)
                     return use(self.playerDescBGSize)
                 end),
 
@@ -79,7 +79,7 @@ local function PlayerDescFrame(self: table) : Frame
                 Position = fromScale(0.05, 0.055),
                 Size = fromScale(0.205, 0.175),
 
-                Image = Computed(scope, function(use)
+                Image = Computed(scope, function(use: Fusion.Use)
                     return use(self.classImage)
                 end),
 
@@ -91,7 +91,7 @@ local function PlayerDescFrame(self: table) : Frame
                 Size = fromScale(0.63, 0.095),
                 TextXAlignment = Enum.TextXAlignment.Left,
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.displayName)
                 end)
             }),
@@ -102,7 +102,7 @@ local function PlayerDescFrame(self: table) : Frame
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextColor3 = fromRGB(193, 193, 193),
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.userName)
                 end)
             }),
@@ -112,7 +112,7 @@ local function PlayerDescFrame(self: table) : Frame
                 Size = fromScale(0.866, 0.077),
                 TextColor3 = fromRGB(255, 255, 0),
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.level)
                 end)
             }),
@@ -138,7 +138,7 @@ local function PlayerDescFrame(self: table) : Frame
                 Size = fromScale(0.865, 0.06),
                 TextTransparency = 0.2,
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.role)
                 end)
             }),

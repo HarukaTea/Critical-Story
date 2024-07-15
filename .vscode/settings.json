@@ -2,15 +2,11 @@
     "robloxLsp.workspace.ignoreDir": [
         ".vscode",
         "**/_Index/**",
-
-        "src/modules/Packages/Cmdr/Shared/Util.lua",
-        "src/modules/Packages/Warp/Util/Buffer.luau"
     ],
     "robloxLsp.diagnostics.disable": [
         "undefined-type",
         "redefined-type"
     ],
-    "roblox-ui.sourcemap.rojoProjectFile": "world.project.json",
 
     "files.exclude": {
         "**/.git": true,

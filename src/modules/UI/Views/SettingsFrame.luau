@@ -75,7 +75,7 @@ local function SettingsFrame(self: table): Frame
 		Position = fromScale(0.496, 0.567),
 		Size = fromScale(0.944, 0.627),
 
-		Visible = Fusion.Computed(scope, function(use)
+		Visible = Fusion.Computed(scope, function(use: Fusion.Use)
 			return use(self.frames.Settings)
 		end),
 

@@ -22,6 +22,8 @@ local sFind, upper = string.find, string.upper
 local COLORS = {
 	Passive = fromRGB(40, 98, 3),
 	Active = fromRGB(167, 111, 83),
+	Material = fromRGB(0, 130, 139),
+	Equipment = Color3.fromHex('#7b1fa2'),
 	Other = fromRGB(0, 130, 139),
 
 	Equip = fromRGB(131, 131, 65),
@@ -67,13 +69,13 @@ end
 --- because of this, checks may not work, so we need to do it in client first
 local function _checkEquippedItems(self: table, requestItem: string) : boolean
 	local itemInfo = ItemBook:FindItem(requestItem)
-	if not itemInfo.ItemId then return false end
+	if itemInfo.ItemId == nil then return false end
 
 	local count = 0
 	local maxCount = 3
 	local check = true
 
-	for _, item: IntConstrainedValue in self.Inventory:GetChildren() do
+	for _, item: IntConstrainedValue in self.plr.Inventory:GetChildren() do
 		if item:GetAttribute("Equipped") and ItemBook:FindItem(item.Name).Type == itemInfo.Type then count += 1 end
 	end
 	if count >= maxCount and not self.plr.Inventory[requestItem]:GetAttribute("Equipped") then check = false end
@@ -88,7 +90,7 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 		Name = id,
 		BackgroundColor3 = COLORS[id],
 
-		Text = Computed(scope, function(use)
+		Text = Computed(scope, function(use: Fusion.Use)
 			return if tFind(BLACKLIST, id) then use(self.filterInfo[id]) else upper(id)
 		end),
 		Size = fromScale(0.116, 1),
@@ -99,7 +101,7 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(self.chosenFilter) == id and not tFind(BLACKLIST, id) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			})
@@ -129,7 +131,10 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 
 				--- equip
 				local whiteList = { "Active", "Passive", "Cosmetic" }
-				if not tFind(whiteList, itemType) then return end
+				if not tFind(whiteList, itemType) then
+					Signals.CreateHint:Fire(`You can't equip {itemType}!`)
+					return
+				end
 
 				if itemType == "Cosmetic" then
 					local currentCos = self.plr:GetAttribute("Cosmetic") :: string
@@ -148,7 +153,7 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 				if slot ~= "Full" and checkSame == "None" then
 					--- check first
 					local equipCheck = _checkEquippedItems(self, item)
-					if equipCheck then Signals.CreateHint:Fire("Not enough space to equip this item!") return end
+					if not equipCheck then Signals.CreateHint:Fire("Not enough space to equip this item!") return end
 
 					-- local assign first, to fix equip bug when server lag while equiping
 					self.inventory[item]:SetAttribute("Equipped", true)

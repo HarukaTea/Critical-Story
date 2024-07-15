@@ -107,7 +107,7 @@ local function CharacterFrame(self: table): Frame
 		Position = fromScale(0.496, 0.567),
 		Size = fromScale(0.944, 0.627),
 
-		Visible = Computed(scope, function(use)
+		Visible = Computed(scope, function(use: Fusion.Use)
 			return use(self.frames.Character)
 		end),
 
@@ -171,7 +171,7 @@ local function CharacterFrame(self: table): Frame
 						Name = "PointsPerAdd",
 						Size = fromScale(0.2, 1),
 
-						Text = Computed(scope, function(use)
+						Text = Computed(scope, function(use: Fusion.Use)
 							return use(self.pointsPerAdd)
 						end),
 						[Fusion.Out("Text")] = self.pointsPerAdd,
@@ -183,7 +183,7 @@ local function CharacterFrame(self: table): Frame
 						Size = fromScale(0.5, 1),
 						RichText = true,
 
-						Text = Computed(scope, function(use)
+						Text = Computed(scope, function(use: Fusion.Use)
 							return [[SKILL POINTS LEFT:  <font color="#f6e58d">]]..use(playerData.LvPoints).."</font>"
 						end)
 					}),
@@ -196,10 +196,10 @@ local function CharacterFrame(self: table): Frame
 				Size = fromScale(0.09, 0.078),
 				Text = "RESET",
 
-				TextColor3 = Computed(scope, function(use)
+				TextColor3 = Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
 				end),
-				BackgroundColor3 = Computed(scope, function(use)
+				BackgroundColor3 = Computed(scope, function(use: Fusion.Use)
 					return if not use(isSelecting) then fromRGB() else fromRGB(255, 255, 255)
 				end),
 
@@ -227,7 +227,7 @@ local function CharacterFrame(self: table): Frame
 						Thickness = 2.5,
 						Enabled = true,
 
-						Color = Tween(scope, Computed(scope, function(use)
+						Color = Tween(scope, Computed(scope, function(use: Fusion.Use)
 							return if not use(isSelecting) then fromRGB(255, 85, 0) else fromRGB()
 						end), AssetBook.TweenInfos.twiceHalf),
 					}),
@@ -241,12 +241,12 @@ local function CharacterFrame(self: table): Frame
 				FontFace = Font.fromName("TitilliumWeb", Enum.FontWeight.Bold),
 				TextXAlignment = Enum.TextXAlignment.Left,
 
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 
 					return "COST: "..HarukaLib:NumberConvert(cost, "%.1f").." GOLD"
 				end),
-				TextColor3 = Tween(scope, Computed(scope, function(use)
+				TextColor3 = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					local cost = ((use(playerData.Levels) - 1) * 2 - use(playerData.LvPoints)) * 20
 					local have = use(playerData.Gold)
 

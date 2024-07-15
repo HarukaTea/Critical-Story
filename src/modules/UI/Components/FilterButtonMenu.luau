@@ -32,7 +32,7 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 					return if use(self.chosenFilter) == id then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			})

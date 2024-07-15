@@ -5,7 +5,10 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
+
+local Add, Empty = HarukaLib.Bin()
 
 local char = script.Parent :: Model
 local humanoid = char:WaitForChild("Humanoid") :: Humanoid
@@ -54,14 +57,11 @@ local function playAnim(anim: string)
 
 	anims[anim]:Play()
 end
-Events.PlayAnimation:Connect(playAnim)
-Signals.PlayAnimation:Connect(playAnim)
+Add(Events.PlayAnimation:Connect(playAnim))
+Add(Signals.PlayAnimation:Connect(playAnim))
 
 --// Clear
 local function onDead()
-	Events.PlayAnimation:DisconnectAll()
-	Signals.PlayAnimation:DisconnectAll()
-
 	--// 256 limit still happens, idk
 	for _, anim: AnimationTrack in anims do
 		anim:Stop(0)
@@ -72,5 +72,7 @@ local function onDead()
 		track:Stop(0)
 		track:Destroy()
 	end
+
+	Empty()
 end
 humanoid.Died:Once(onDead)

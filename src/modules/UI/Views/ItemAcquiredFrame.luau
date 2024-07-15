@@ -25,7 +25,7 @@ local function ItemAcquiredFrame(self: table): Frame
 		self.newAddedItems:set(nowAdded)
 
 		Spawn(function()
-			wait(4)
+			wait(6)
 			local afterAdded = Fusion.peek(self.newAddedItems)
 
 			remove(afterAdded, tFind(afterAdded, item))

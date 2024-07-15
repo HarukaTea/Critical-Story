@@ -12,13 +12,13 @@ local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
 local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local fromRGB = Color3.fromRGB
-local wait, cancel, spawn = task.wait, task.cancel, task.spawn
+local wait, spawn = task.wait, task.spawn
 
 local function TextStroke(self: table)
     return Components.TextUIStroke(self.scope, {
         Thickness = 2,
 
-        Transparency = Tween(self.scope, Computed(self.scope, function(use)
+        Transparency = Tween(self.scope, Computed(self.scope, function(use: Fusion.Use)
             return use(self.locationInfo.OverallStrokeTrans)
         end), AssetBook.TweenInfos.half)
     })
@@ -31,13 +31,15 @@ local function LocationTitleFrame(self: table) : Frame
         if not location or location == "" then return end
 		local locationInfo = self.locationInfo
 
-		if locationInfo.Thread then cancel(locationInfo.Thread) end
+        Fusion.doCleanup(self.locationScope)
 
-		locationInfo.Thread = spawn(function()
+		table.insert(self.locationScope, spawn(function()
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
+
             locationInfo.Name:set(AssetBook.LocationInfo[location].Name)
+            locationInfo.Desc:set(AssetBook.LocationInfo[location].Desc)
 
 			wait(0.3)
 			locationInfo.OverallStrokeTrans:set(0.3)
@@ -62,7 +64,7 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.Shown:set(false)
             locationInfo.HorizonLineTweenInfo:set(AssetBook.TweenInfos.half)
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
-		end)
+		end))
 	end
     _showCurrentLocation(self.char:GetAttribute("CurrentRegion"))
     table.insert(scope, HarukaLib:Hydrate(self.char, {
@@ -72,7 +74,7 @@ local function LocationTitleFrame(self: table) : Frame
     return Components.Frame(scope, {
         Name = "LocationTitle",
 
-        Visible = Computed(scope, function(use)
+        Visible = Computed(scope, function(use: Fusion.Use)
             return use(self.locationInfo.Shown)
         end),
 
@@ -83,7 +85,8 @@ local function LocationTitleFrame(self: table) : Frame
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0),
                 Size = fromScale(1, 0.45),
-                TextTransparency = Tween(scope, Computed(scope, function(use)
+
+                TextTransparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 
@@ -91,15 +94,15 @@ local function LocationTitleFrame(self: table) : Frame
             }),
             Components.TextLabel(scope, {
                 Name = "LocationName",
-                Text = Computed(scope, function(use)
-                    return use(self.locationInfo.Name)
-                end),
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 0.6),
                 Size = fromScale(1, 0.6),
                 TextColor3 = fromRGB(74, 222, 109),
 
-                TextTransparency = Tween(scope, Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
+                    return use(self.locationInfo.Name)
+                end),
+                TextTransparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 
@@ -110,14 +113,36 @@ local function LocationTitleFrame(self: table) : Frame
                 AnchorPoint = v2New(0.5, 0),
                 Position = fromScale(0.5, 1.4),
 
-                Size = Tween(scope, Computed(scope, function(use)
+                Size = Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return use(self.locationInfo.HorizonLineSize)
                 end), self.locationInfo.HorizonLineTweenInfo),
-                BackgroundTransparency = Tween(scope, Computed(scope, function(use)
+                BackgroundTransparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
+                    return use(self.locationInfo.OverallTrans)
+                end), AssetBook.TweenInfos.half),
+            }),
+
+            Components.TextLabel(scope, {
+                Name = "LocationDesc",
+                AnchorPoint = v2New(0.5, 0),
+                Position = fromScale(0.5, 1.7),
+                Size = fromScale(1, 0.45),
+
+                Text = Computed(scope, function(use: Fusion.Use)
+                    return use(self.locationInfo.Desc)
+                end),
+                TextTransparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return use(self.locationInfo.OverallTrans)
                 end), AssetBook.TweenInfos.half),
 
-                [Children] = { Components.RoundUICorner(scope) }
+                [Children] = {
+                    Components.TextUIStroke(self.scope, {
+                        Thickness = 2,
+
+                        Transparency = Tween(self.scope, Computed(self.scope, function(use: Fusion.Use)
+                            return use(self.locationInfo.OverallStrokeTrans)
+                        end), AssetBook.TweenInfos.half)
+                    })
+                }
             }),
             Components.TextLabel(scope, {
                 Name = "RecommendLevel",
@@ -126,10 +151,10 @@ local function LocationTitleFrame(self: table) : Frame
                 Size = fromScale(1, 0.45),
                 TextColor3 = fromRGB(255, 85, 127),
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.locationInfo.RLevelText)
                 end),
-                TextTransparency = Tween(scope, Computed(scope, function(use)
+                TextTransparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return use(self.locationInfo.RLevelTrans)
                 end), AssetBook.TweenInfos.half),
 
@@ -137,7 +162,7 @@ local function LocationTitleFrame(self: table) : Frame
                     Components.TextUIStroke(self.scope, {
                         Thickness = 2,
 
-                        Transparency = Tween(self.scope, Computed(self.scope, function(use)
+                        Transparency = Tween(self.scope, Computed(self.scope, function(use: Fusion.Use)
                             return use(self.locationInfo.RLevelStrokeTrans)
                         end), AssetBook.TweenInfos.half)
                     })

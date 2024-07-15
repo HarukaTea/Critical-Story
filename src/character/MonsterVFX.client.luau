@@ -9,10 +9,12 @@ local TS = game:GetService("TweenService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
+local Add, Empty = HarukaLib.Bin()
+
 local char = script.Parent :: Model
 
 local wait = task.wait
-local sinh, random = math.sinh, math.random
+local sinh = math.sinh
 local v3New = Vector3.new
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
 
@@ -52,63 +54,39 @@ end
 
 
 --// Slimes
-local function slimeShot(blast: Model, mob: Model)
-	wait(0.3)
+local function slimeShot(blast: Model, monster: Model)
+	wait(0.4)
 	TS:Create(blast.Base, AssetBook.TweenInfos.twiceHalf, { Size = Vector3.new(4, 1, 4) }):Play()
 
-	local length = (mob.PrimaryPart.Position - blast.Base.Position).Magnitude
-	local radius = (mob.PrimaryPart.Position - blast.Shot.Base.Position).Magnitude
+	local length = (monster.PrimaryPart.Position - blast.Base.Position).Magnitude
+	local height = 8
+	blast.Shot:PivotTo(cfNew(monster.PrimaryPart.Position, blast.Base.Position) * cfNew(0, 0, -length/2) * cfNew(0, -height, 0))
+
+	local radius = (monster.PrimaryPart.Position - blast.Shot.Base.Position).Magnitude
+	blast.Shot.Part.CFrame *= cfNew(0, radius, 0)
+
 	local angle = sinh((length / 2) / radius)
+	blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(angle, 0, 0))
 
-	blast.Shot:PivotTo(cfNew(mob.PrimaryPart.Position, blast.Base.Position) * cfNew(0,0,-length/2))
-	blast.Shot.Part.CFrame *= cfNew(0, radius / 2.5, 0)
-	blast.Shot:PivotTo(blast.Shot.Base.CFrame * cfAngles(angle,0,0))
-	Debris:AddItem(blast, 0.2)
+	local rotatingangle = angle * 2
+	HarukaLib:Tween(blast.Shot, AssetBook.TweenInfos.half, { Pivot = blast.Shot.Base.CFrame * cfAngles(-rotatingangle, 0, 0) }):Wait()
 
-	local rotatingangle = angle * 2 /10
-	HarukaLib:Tween(blast.Shot, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Shot.Base.CFrame * CFrame.Angles(-rotatingangle * 10, 0, 0) })
+	blast.Shot:Destroy()
 end
 
 local function slimeWave(blast: Model)
 	blast.SlimeAttack:Play()
 
-	for i = 1, 5 do TS:Create(blast["Position"..i], AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play() end
+	for i = 1, 5 do
+		TS:Create(blast["Position"..i], AssetBook.TweenInfos.twiceHalf, { Size = v3New(4, 1, 4) }):Play()
+	end
 end
 
 local function slimeBlast(blast: Model, noSound: boolean?)
-	local centerCFrame = blast.BlastCenter.CFrame :: CFrame
-	local cframe1, cframe2, cframe3, cframe4 =
-		blast.Blast1.CFrame :: CFrame,
-		blast.Blast2.CFrame :: CFrame,
-		blast.Blast3.CFrame :: CFrame,
-		blast.Blast4.CFrame :: CFrame
-	local cframeArray = { [1] = cframe1, [2] = cframe2, [3] = cframe3, [4] = cframe4 }
-
 	if not noSound then blast.SlimeAttack:Play() end
-	for _ = 1, 4 do
-		wait(0.01)
-		blast.BlastCenter.Size += v3New(0, 10, 0)
-		blast.BlastCenter.CFrame = centerCFrame
-		blast.BlastCenter.Transparency += 0.05
 
-		for j = 1, 4 do
-			blast["Blast" .. j].Size += v3New(0, random(5, 7), 0)
-			blast["Blast" .. j].CFrame = cframeArray[j]
-			blast["Blast" .. j].Transparency += 0.05
-		end
-	end
-	for _ = 1, 4 do
-		wait(0.01)
-		blast.BlastCenter.Size -= v3New(0, 10, 0)
-		blast.BlastCenter.CFrame = centerCFrame
-		blast.BlastCenter.Transparency += 0.25
-
-		for j = 1, 4 do
-			blast["Blast" .. j].Size -= v3New(0, random(5, 7), 0)
-			blast["Blast" .. j].CFrame = cframeArray[j]
-			blast["Blast" .. j].Transparency += 0.25
-		end
-	end
+	blast.Part.Size = v3New()
+	TS:Create(blast.Part, AssetBook.TweenInfos.half, { Size = v3New(1, 6, 6) }):Play()
 end
 
 local function slimeBlastFade(blast: Model)
@@ -191,9 +169,7 @@ local function vfxHandler(blast: Model | BasePart)
 
 	if not success and RS:IsStudio() then warn(errorMsg) end
 end
-local vfxConnection = CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler)
+Add(CS:GetInstanceAddedSignal("MonsterAttack"):Connect(vfxHandler))
 
-local function onDead()
-	vfxConnection:Disconnect()
-end
-char.Humanoid.Died:Once(onDead)
+--// Clear
+char.Humanoid.Died:Once(Empty)

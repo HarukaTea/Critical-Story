@@ -34,14 +34,14 @@ return function(plr: Player)
 		[Children] = {
 			Components.Frame(scope, {
 				Name = "BG",
-				Position = fromScale(0.5, 0.511),
-				Size = fromScale(1, 0.979),
+				Position = fromScale(0.5, 0.25),
 				ZIndex = 999,
 
 				[Children] = {
 					New(scope, "UIListLayout")({
 						Padding = udNew(0, 5),
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Bottom,
 					}),
 					New(scope, "UIPadding")({ PaddingTop = udNew(0, 10) }),
 
@@ -61,10 +61,10 @@ return function(plr: Player)
 							FontFace = fontFromName("Ubuntu", Enum.FontWeight.Bold),
 							TextScaled = false,
 
-							BackgroundTransparency = Fusion.Tween(localScope, Computed(localScope, function(use)
+							BackgroundTransparency = Fusion.Tween(localScope, Computed(localScope, function(use: Fusion.Use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
-							TextTransparency = Fusion.Tween(localScope, Computed(localScope, function(use)
+							TextTransparency = Fusion.Tween(localScope, Computed(localScope, function(use: Fusion.Use)
 								return use(overallTrans)
 							end), AssetBook.TweenInfos.twiceHalf),
 

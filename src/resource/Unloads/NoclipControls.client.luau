@@ -1,6 +1,7 @@
 --!nocheck
 
 local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
 local UIS = game:GetService("UserInputService")
 
 local tool = script.Parent :: HopperBin
@@ -12,6 +13,8 @@ local SPEED = 120
 local wait = task.wait
 local v3New, xAxis, yAxis, zAxis = Vector3.new, Vector3.xAxis, Vector3.yAxis, Vector3.zAxis
 local cfNew = CFrame.new
+
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, true)
 
 local function _getNextMovement(deltaTime)
 	local nextMove = v3New()

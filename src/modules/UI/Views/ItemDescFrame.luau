@@ -31,10 +31,10 @@ local function ItemDescFrame(self: table): Frame
 				AnchorPoint = v2New(0.5, 0.5),
 				TextXAlignment = Enum.TextXAlignment.Left,
 
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					return use(self.itemName)
 				end),
-				TextColor3 = Computed(scope, function(use)
+				TextColor3 = Computed(scope, function(use: Fusion.Use)
 					return use(self.itemTierColor)
 				end),
 
@@ -54,10 +54,10 @@ local function ItemDescFrame(self: table): Frame
 				TextXAlignment = Enum.TextXAlignment.Left,
 				AutomaticSize = Enum.AutomaticSize.Y,
 
-				TextSize = Computed(scope, function(use)
+				TextSize = Computed(scope, function(use: Fusion.Use)
 					return use(self.absStatSize) - 4
 				end),
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					return use(self.itemStats)
 				end),
 
@@ -78,10 +78,10 @@ local function ItemDescFrame(self: table): Frame
 				AutomaticSize = Enum.AutomaticSize.Y,
 				FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Bold, Enum.FontStyle.Italic),
 
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					return use(self.itemDesc)
 				end),
-				TextSize = Computed(scope, function(use)
+				TextSize = Computed(scope, function(use: Fusion.Use)
 					return use(self.absStatSize) - 5
 				end),
 

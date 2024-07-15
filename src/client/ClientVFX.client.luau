@@ -18,6 +18,13 @@ local wait = task.wait
 
 --// Effects init
 
+--- vfxs
+local function emitVFX(effect: ParticleEmitter)
+    wait()
+    effect:Emit(tonumber(effect:GetAttribute("EmitCount") or 5))
+end
+CS:GetInstanceAddedSignal("VFX"):Connect(emitVFX)
+
 --- effects fade
 local function fadeEffect(effect: ParticleEmitter)
     wait(0.4)

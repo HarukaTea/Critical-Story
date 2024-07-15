@@ -43,10 +43,10 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         ScrollingDirection = Enum.ScrollingDirection.Y,
         ClipsDescendants = false,
 
-        CanvasSize = Computed(scope, function(use)
+        CanvasSize = Computed(scope, function(use: Fusion.Use)
             return if use(self.absContentSize) > use(self.absScrollSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
         end),
-        ScrollingEnabled = Computed(scope, function(use)
+        ScrollingEnabled = Computed(scope, function(use: Fusion.Use)
             return if use(self.absContentSize) > use(self.absScrollSize) then true else false
         end),
 
@@ -56,10 +56,10 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
 
         [Fusion.Children] = {
             Fusion.New(scope, "UIGridLayout")({
-                CellPadding = Computed(scope, function(use)
+                CellPadding = Computed(scope, function(use: Fusion.Use)
                     return fromOffset(use(self.absCellPadding)[1], use(self.absCellPadding)[2])
                 end),
-                CellSize = Computed(scope, function(use)
+                CellSize = Computed(scope, function(use: Fusion.Use)
                     return fromOffset(use(self.absCellSize), use(self.absCellSize))
                 end),
 

@@ -7,6 +7,7 @@ local AssetBook = {}
 
 AssetBook.TweenInfos = {
 	fourHalf = newTweenInfo(0.05),
+    fourOneHalf = newTweenInfo(0.1),
 	threeHalf = newTweenInfo(0.15),
 	twiceHalf = newTweenInfo(0.2),
 	onceHalf = newTweenInfo(0.3),
@@ -394,6 +395,7 @@ local default = {
 AssetBook.LocationInfo = {
     MonolithVillage = {
         Name = "Monolith Village",
+        Desc = "Where story truly begins.",
         Music = "StoryBegins",
         MusicVolume = 1,
         RecommendLevel = 1,
@@ -402,6 +404,7 @@ AssetBook.LocationInfo = {
     },
     MonolithGrove = {
         Name = "Monolith Grove",
+        Desc = "",
         Music = "HiddenForest",
         MusicVolume = 0.5,
         RecommendLevel = 1,
@@ -414,6 +417,7 @@ AssetBook.LocationInfo = {
     },
     InitusBay = {
         Name = "Initus Bay",
+        Desc = "",
         Music = "BraveAdventure",
         MusicVolume = 0.5,
         RecommendLevel = 1,
@@ -422,6 +426,7 @@ AssetBook.LocationInfo = {
     },
     PrimisField = {
         Name = "Primis Field",
+        Desc = "",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 5,
@@ -430,6 +435,7 @@ AssetBook.LocationInfo = {
     },
     EnsisLake = {
         Name = "Ensis Lake",
+        Desc = "",
         Music = "FarewayLand",
         MusicVolume = 1.5,
         RecommendLevel = 20,
@@ -438,6 +444,7 @@ AssetBook.LocationInfo = {
     },
     VenatorVillage = {
         Name = "Venator Village",
+        Desc = "",
         Music = "StepLegends",
         MusicVolume = 0.5,
         RecommendLevel = 1,
@@ -446,23 +453,17 @@ AssetBook.LocationInfo = {
     },
     EnsisRiver = {
         Name = "Ensis River",
+        Desc = "",
         Music = "Conquest",
         MusicVolume = 0.5,
         RecommendLevel = 1,
 
         Lighting = default
     },
-    EasterIsland = {
-        Name = "Easter Island",
-        Music = "EarlJuly",
-        MusicVolume = 0.3,
-        RecommendLevel = 150,
-
-        Lighting = default
-    },
 
     NorthernStronghold = {
         Name = "Northern Stronghold",
+        Desc = "",
         Music = "Stronghold",
         MusicVolume = 0.7,
         RecommendLevel = 150,

@@ -2,7 +2,6 @@
 
 local CAS = game:GetService("ContextActionService")
 local Debris = game:GetService("Debris")
-local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
@@ -11,16 +10,13 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local cfNew = CFrame.new
-local csNew = ColorSequence.new
 local random = math.random
-local wait = task.wait
-local fromScale = UDim2.fromScale
 local sFind = string.find
 
 local ClientUtil = {}
 
 
-function ClientUtil:WeldPart(part: Part, welded: Model)
+function ClientUtil:WeldModel(part: Part, welded: Model)
 	local C = welded:GetChildren()
 	for i = 1, #C do
 		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") or C[i]:IsA("CornerWedgePart") then
@@ -46,63 +42,20 @@ function ClientUtil:WeldPart(part: Part, welded: Model)
 end
 
 
-function ClientUtil:ClassHitVFX(monster: Model, char: Model)
+function ClientUtil:HitVFX(char: Model)
     pcall(function()
-        local plr = Players:GetPlayerFromCharacter(char)
-        local class = plr:GetAttribute("Class") :: string
-        local color = AssetBook.ClassInfo[class].Color
+        local hitHighlight = RepS.Package.Effects.HitHighlight:Clone() :: Highlight
+        hitHighlight.Adornee = char
+        hitHighlight.Parent = char
 
-        char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
+        Debris:AddItem(hitHighlight, 1)
+        TS:Create(hitHighlight, AssetBook.TweenInfos.one, { FillTransparency = 1, OutlineTransparency = 1 }):Play()
 
-        local hitEff = RepS.Package.Effects.HitEffect:Clone() :: Part
-        hitEff.CFrame = monster.PrimaryPart.CFrame
-        hitEff.Effect.Image.ImageColor3 = color
-        hitEff.Particle.Color = csNew(color)
-        hitEff.Effect.Image.Rotation = random(1, 360)
-        if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
-        hitEff.Parent = workspace
-        Debris:AddItem(hitEff, 1)
-
-        TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
-        TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
-    end)
-end
-
-
-function ClientUtil:CharOnHit(char: Model)
-    pcall(function()
         local hitEff = RepS.Package.Effects.HitEffect:Clone() :: BasePart
-        hitEff.CFrame = char.Torso.CFrame
-        hitEff.Effect.Image.Rotation = random(1, 360)
-        if random(1, 2) == 1 then hitEff.Effect.Image.Image = "rbxassetid://2771196128" end
-        hitEff.Parent = char
-        Debris:AddItem(hitEff, 1)
+        hitEff.CFrame = char.Head.CFrame
+        hitEff.Parent = workspace
 
-        TS:Create(hitEff.Effect, AssetBook.TweenInfos.fourHalf, { Size = fromScale(30, 30) }):Play()
-        TS:Create(hitEff.Effect.Image, AssetBook.TweenInfos.fourHalf, { ImageTransparency = 1 }):Play()
-    end)
-
-    for _ = 1, 5 do
-        ClientUtil:SetCharTrans(0.5, char)
-        wait(0.05)
-
-        ClientUtil:SetCharTrans(0, char)
-        wait(0.05)
-    end
-end
-
-
-function ClientUtil:SetCharTrans(trans: number, char: Model)
-    pcall(function()
-        for _, child: Instance in char:GetChildren() do
-            if child:IsA("BasePart") and child ~= char.PrimaryPart then child.Transparency = trans end
-            if child:IsA("Model") then
-                for _, descendant in child:GetChildren() do
-                    if descendant.Name == "Part" then descendant.Transparency = trans end
-                end
-            end
-            if child:IsA("Accessory") then child.Handle.Transparency = trans end
-        end
+        Debris:AddItem(hitEff, 2)
     end)
 end
 
@@ -183,6 +136,8 @@ function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
 		Signals.ExCategoryOpened:Fire()
 	end
 
+    if targetUI == "Menu" then targetUI = "AdventurerMenu" end
+
     if plr:GetAttribute("CurrentMenu") == "None" then
         _setVisible(targetUI, plrGui[targetUI])
 
@@ -237,7 +192,7 @@ function ClientUtil:SetupMonster(locator: Part) : Model
 
 	for _, child: Instance in monster:GetChildren() do
 		if child:IsA("Part") and monster:FindFirstChild(child.Name .. "Model") then
-			ClientUtil:WeldPart(child, monster[child.Name .. "Model"])
+			ClientUtil:WeldModel(child, monster[child.Name .. "Model"])
 		end
 	end
 	monster.Parent = locator

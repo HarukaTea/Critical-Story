@@ -1,13 +1,10 @@
 --!nocheck
 
-local model = script.Parent
+local model = script.Parent :: Model
 
 local wait = task.wait
 
 pcall(function()
-    wait(8)
+    wait(9)
     model:RemoveTag("MonsterDMG")
-
-    wait(2)
-    model:Destroy()
 end)

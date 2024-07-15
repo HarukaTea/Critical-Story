@@ -37,10 +37,10 @@ local function StatBar(id: string, self: table): Frame
 			TextXAlignment = Enum.TextXAlignment.Right,
 			TextTransparency = 0.4,
 
-			Text = Computed(scope, function(use)
+			Text = Computed(scope, function(use: Fusion.Use)
 				return "Lv." .. use(self.playerData.Levels)
 			end),
-			Visible = Computed(scope, function(use)
+			Visible = Computed(scope, function(use: Fusion.Use)
 				if id == "DEF" then
 					return if use(self.charStatsDict.DEF[2]) <= 0 then false else true
 				elseif id == "HP" then
@@ -60,7 +60,7 @@ local function StatBar(id: string, self: table): Frame
 		AnchorPoint = v2New(0.5, 0),
 		BackgroundColor3 = color3New(),
 
-		Size = Tween(scope, Fusion.Computed(scope, function(use)
+		Size = Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 			if id == "MP" then
 				return if use(self.charStatsDict.DEF[2]) > 0 then fromScale(0.15, 0.875) else fromScale(0.2, 0.875)
 			elseif id == "DEF" then
@@ -69,7 +69,7 @@ local function StatBar(id: string, self: table): Frame
 				return fromScale(0.2, 0.875)
 			end
 		end), AssetBook.TweenInfos.half),
-		Visible = Computed(scope, function(use)
+		Visible = Computed(scope, function(use: Fusion.Use)
 			if id == "DEF" then
 				return if use(self.charStatsDict.DEF[2]) > 0 then true else false
 			else
@@ -83,7 +83,7 @@ local function StatBar(id: string, self: table): Frame
 				Thickness = 2.5,
 				Enabled = true,
 
-				Transparency = Tween(scope, Computed(scope, function(use)
+				Transparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
@@ -91,13 +91,13 @@ local function StatBar(id: string, self: table): Frame
 				Name = "Bar",
 				ZIndex = 0,
 
-				Size = Tween(scope, Computed(scope, function(use)
+				Size = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					local x = clamp(use(self.charStatsDict[id][1]) / use(self.charStatsDict[id][2]), 0, 1)
 
 					return fromScale(x, 1)
 				end), AssetBook.TweenInfos.halfBack),
 
-				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					if id == "HP" then
 						if use(self.charStatsDict.HPHealing) then
 							return colors.DEFRepairing
@@ -139,7 +139,7 @@ local function StatBar(id: string, self: table): Frame
 				TextXAlignment = Enum.TextXAlignment.Right,
 				TextStrokeTransparency = 0.7,
 
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					return use(self.charStatsDict[id][1]) .. "/" .. use(self.charStatsDict[id][2])
 				end),
 			}),

@@ -32,7 +32,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 		Size = fromScale(1, 1),
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
 
-		Visible = Computed(scope, function(use)
+		Visible = Computed(scope, function(use: Fusion.Use)
 			return if use(self.charStatsDict.IsInCombat) then false else true
 		end),
 
@@ -42,12 +42,12 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 				Thickness = 2.7,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.HoverImageButton(scope, {
-				Image = Computed(scope, function(use)
+				Image = Computed(scope, function(use: Fusion.Use)
 					if id == "Backpack" then
 						return ItemBook.ItemImagesEx.Backpack
 					else
@@ -64,7 +64,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 					isSelecting:set(false)
 				end,
 				[OnEvent("MouseButton1Click")] = function()
-					ClientUtil:OpenUIEx(self.plr, if id == "Menu" then "AdventurerMenu" else "Backpack")
+					ClientUtil:OpenUIEx(self.plr, id)
 				end,
 			}),
 			Components.TextLabel(scope, {
@@ -90,7 +90,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				ZIndex = 3,
 
-				Visible = Computed(scope, function(use)
+				Visible = Computed(scope, function(use: Fusion.Use)
 					if id == "Menu" then
 						return if use(self.playerData.LvPoints) > 0 then true else false
 					else

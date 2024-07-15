@@ -56,7 +56,7 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 				TextXAlignment = if direction == "Left" then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
 				TextColor3 = COLORS[id],
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
 					if id ~= "DMG" then
 						return upper(id)..": "..use(self.playerData[id]).." ("..use(self.charData[id])..")"
 					else
@@ -70,10 +70,10 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 				Position = if direction == "Left" then fromScale(-0.195, 0) else fromScale(1.05, 0),
 				Text = "+",
 
-				BackgroundColor3 = Computed(scope, function(use)
+				BackgroundColor3 = Computed(scope, function(use: Fusion.Use)
 					return use(bgColors)
 				end),
-				TextColor3 = Computed(scope, function(use)
+				TextColor3 = Computed(scope, function(use: Fusion.Use)
 					return use(contentColors)
 				end),
 
@@ -122,7 +122,7 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 						Thickness = 2.5,
 						Enabled = true,
 
-						Color = Computed(scope, function(use)
+						Color = Computed(scope, function(use: Fusion.Use)
 							return if use(bgColors) == fromRGB(30, 30, 30) then COLORS[id] else fromRGB()
 						end)
 					})

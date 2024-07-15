@@ -1,5 +1,6 @@
 --!nocheck
 
+local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
@@ -24,7 +25,10 @@ local function lookAt(target: Model)
 end
 
 local function slimeShot(target: Model)
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
+	blastAnim:Play()
+
+	--- shot
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = monster
@@ -36,11 +40,18 @@ local function slimeShot(target: Model)
 	end
 
 	blast.Parent = monster.AttackHolder.Value
+
+	--- jump
+	local bv = Instance.new("BodyVelocity")
+	bv.MaxForce = v3New(1, 1, 1) * math.huge
+	bv.Velocity = v3New(0, 1, 0) * 35
+	bv.Parent = monster.PrimaryPart
+	Debris:AddItem(bv, 0.01)
 end
 
 local function slimeWave(target: Model)
 	lookAt(target)
-	local post = ServerUtil:FindPartOnRay(monster.PrimaryPart.Position)
+	local post = ServerUtil:FindPartOnRay(monster.PrimaryPart.Position, { target })
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime2:Clone() :: Model
 	blast.Owner.Value = monster
@@ -55,7 +66,7 @@ local function slimeWave(target: Model)
 end
 
 local function slimeBarrage(target: Model)
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 	blast.Owner.Value = monster
@@ -69,7 +80,7 @@ local function slimeBarrage(target: Model)
 	blast.Parent = monster.AttackHolder.Value
 
 	for _ = 1, random(3, 5) do
-		local postR = ServerUtil:FindPartOnRay(monster.Parent.Position + v3New(random(-32,32), 20, random(-32,32)))
+		local postR = ServerUtil:FindPartOnRay(monster.Parent.Position + v3New(random(-32,32), 20, random(-32,32)), { target })
 
 		local blastR = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
 		blastR.Owner.Value = monster
@@ -106,44 +117,56 @@ local function attacking()
 
 			if comboRandom == 1 then
 				slimeWave(target)
-				wait(0.5)
+				wait(1) --- lag fix
 
 			elseif comboRandom == 2 then
+				if monster.Name == "GreenSlime" then return nil end
+
 				slimeBarrage(target)
-				wait(0.5)
+
+			else return nil
 			end
+
+			return true
 		end,
 
 		function (target: Model) : boolean
 			if random(1, 2) == 1 then
 				slimeWave(target)
-				wait(0.5)
+				wait(1)
+				return true
 			end
 
-			return false
+			return nil
 		end,
 
 		function (target: Model) : boolean
-			for _ = 1, 3 do
-				blastAnim:Play()
+			for _ = 1, random(2, 3) do
 				lookAt(target)
 
-				for _ = 1, 5 do
+				for _ = 1, 3 do
 					slimeShot(target)
-					wait(0.05)
+					wait(1)
 				end
+
 				wait(0.5)
 			end
+
+			return true
 		end,
 
 		function (target: Model) : boolean
-			for _ = 1, 3 do
+			for _ = 1, random(1, 3) do
 				slimeWave(target)
-				wait(0.8)
+				wait(2)
 			end
+
+			return true
 		end,
 
 		function (target: Model) : boolean
+			if monster.Name == "GreenSlime" then return nil end
+
 			for _ = 1, random(2,4) do
                 slimeBarrage(target)
                 wait(0.5)
@@ -151,4 +174,6 @@ local function attacking()
 		end,
 	})
 end
+
+wait(0.5)
 attacking()

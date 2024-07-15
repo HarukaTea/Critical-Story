@@ -2,6 +2,18 @@
     "name": "Critical-Story",
     "tree": {
         "$className": "DataModel",
+
+        "Workspace": {
+            "$properties": {
+                "StreamingEnabled": false,
+                "SignalBehavior": "Immediate"
+            }
+        },
+        "Players": {
+            "$properties": {
+                "RespawnTime": 3
+            }
+        },
         "ReplicatedFirst": {
             "LoadingScreen": {
                 "$path": "src/LoadingScreen.client.luau"
@@ -47,12 +59,6 @@
         "StarterGui": {
             "$properties": {
                 "ScreenOrientation": "LandscapeSensor"
-            }
-        },
-        "TextChatService": {
-            "$properties": {
-                "ChatTranslationEnabled": false,
-                "ChatVersion": "LegacyChatService"
             }
         }
     }

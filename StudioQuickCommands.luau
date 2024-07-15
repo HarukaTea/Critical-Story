@@ -8,6 +8,14 @@ for _, child in workspace:GetDescendants() do
     end
 end
 
+for _, orb: Model in workspace.PlayerAttacks:GetChildren() do
+    if orb:IsA("Model") then
+        orb.Sphere.SelectionSphere:Destroy()
+        orb.Sphere.Transparency = 0
+        orb.Sphere.Material = Enum.Material.ForceField
+    end
+end
+
 for _, child in workspace.MonsterModels:GetDescendants() do
     if child:IsA("BasePart") then
         if child.Name ~= "HumanoidRootPart" then child.CanCollide = false end

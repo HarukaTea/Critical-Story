@@ -18,7 +18,6 @@ local Pinia = require(RepS.Modules.UI.Pinia.AdventurerStatsPinia)
 
 local ClassFrame = require(RepS.Modules.UI.Views.ClassFrame)
 local ItemAcquiredFrame = require(RepS.Modules.UI.Views.ItemAcquiredFrame)
-local LevelUpVFXFrame = require(RepS.Modules.UI.Views.LevelUpVFXFrame)
 local LocationTitleFrame = require(RepS.Modules.UI.Views.LocationTitleFrame)
 local MonsterSideList = require(RepS.Modules.UI.Views.MonsterSideList)
 local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
@@ -70,7 +69,7 @@ return function(plr: Player)
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
 
-				Visible = Fusion.Computed(scope, function(use)
+				Visible = Fusion.Computed(scope, function(use: Fusion.Use)
 					return not use(self.isChatting)
 				end),
 
@@ -144,7 +143,6 @@ return function(plr: Player)
 					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
 					LocationTitleFrame(self),
-					LevelUpVFXFrame(self),
 					PanelBtnsFrame(self)
 				}
 			}),
@@ -159,16 +157,8 @@ return function(plr: Player)
 					PromptsFrame(self),
 					QuestFrame(self),
 
-					ClassAbilityIndicator(self, "Warrior"),
-					ClassAbilityIndicator(self, "Archer"),
-					ClassAbilityIndicator(self, "Wizard"),
-					ClassAbilityIndicator(self, "Knight"),
-					ClassAbilityIndicator(self, "Rogue"),
-
+					ClassAbilityIndicator(self),
 					AlchemistAbilityIndicator(self),
-
-					ClassAbilityIndicator(self, "Juggernaut"),
-					ClassAbilityIndicator(self, "Reaper")
 				}
 			})
 		},

@@ -14,12 +14,10 @@ local function AdventurerMenuPinia(self: table) : table
 	end
 
     self.chosenFilter = Value("Character")
-	self.frames = { Character = Value(true), Settings = Value(false), Log = Value(false) }
+	self.frames = { Character = Value(true), Settings = Value(false) }
 
 	self.pointsPerAdd = Value("1")
 
-	self.errorList = Value({})
-	self.chosenErrorFilter = Value("Server")
 	self.errorAbsContentSize, self.errorAbsSize = Value(0), Value(0)
 
     self.playerData = {

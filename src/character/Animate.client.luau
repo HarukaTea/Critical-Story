@@ -90,6 +90,8 @@ local function setup()
 	end))
 
 	startAnim(ANIMS.Idle, 0.1)
+
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
 end
 setup()
 

@@ -74,9 +74,10 @@ local function AdventurerStatsPinia(self: table)
     self.levelUpShown, self.levelUpTitleShown, self.levelUpPos =
         Value(false), Value(false), Value(fromScale(0.55, 0))
 
+	self.locationScope = Fusion.scoped({})
     self.locationInfo = {
-		Thread = nil,
 		Name = Value(""),
+		Desc = Value(""),
 		Shown = Value(false),
 		OverallTrans = Value(1),
 		OverallStrokeTrans = Value(1),

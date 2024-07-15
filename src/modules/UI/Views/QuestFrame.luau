@@ -30,7 +30,7 @@ local function QuestFrame(self: table) : Frame
             Fusion.New(scope, "UIListLayout")({
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Padding = udNew(0.5, 0),
-                VerticalAlignment = Enum.VerticalAlignment.Bottom
+                VerticalAlignment = Enum.VerticalAlignment.Center
             }),
             Fusion.ForValues(scope, self.quests, function(_, localScope: Fusion.Scope, quest: IntValue)
                 return QuestBar(quest, localScope)

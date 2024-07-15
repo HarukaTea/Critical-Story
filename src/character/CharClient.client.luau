@@ -19,6 +19,7 @@ local wait = task.wait
 
 local function changeLocation(location: string)
     if not location or location == "" then return end
+    if not AssetBook.LocationInfo[location] then return end
 
     Events.ChangePlayerLocation:Fire(location)
 

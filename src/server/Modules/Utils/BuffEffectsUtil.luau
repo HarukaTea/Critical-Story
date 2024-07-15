@@ -62,8 +62,9 @@ function BuffEffectsUtil:Heal(char: Model, healPower: number)
 
 	char.Humanoid.Health += floor(char.Humanoid.MaxHealth * healPower)
 
-	local healEff = RepS.Package.Effects.HealEffect:Clone() :: ParticleEmitter
-	healEff.Parent = char.PrimaryPart
+	local healEff = RepS.Package.Effects.HealEffect:Clone() :: BasePart
+	healEff.CFrame = char.PrimaryPart.CFrame
+	healEff.Parent = workspace
 	Debris:AddItem(healEff, 1)
 end
 

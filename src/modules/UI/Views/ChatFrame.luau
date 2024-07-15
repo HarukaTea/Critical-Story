@@ -194,7 +194,7 @@ local function ChatFrame(self: table) : Frame
         Position = fromScale(0.5, -0.1),
         Size = fromScale(0.585, 2.5),
 
-        Visible = Computed(scope, function(use)
+        Visible = Computed(scope, function(use: Fusion.Use)
             return use(self.isChatting)
         end),
 
@@ -221,7 +221,7 @@ local function ChatFrame(self: table) : Frame
                 ImageColor3 = fromRGB(218, 218, 218),
                 ImageTransparency = 0.1,
 
-                Visible = Computed(scope, function(use)
+                Visible = Computed(scope, function(use: Fusion.Use)
                     return use(self.triangleVisible)
                 end)
             }),
@@ -233,7 +233,7 @@ local function ChatFrame(self: table) : Frame
                 TextColor3 = fromRGB(255, 170, 127),
                 TextXAlignment = Enum.TextXAlignment.Left,
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return "<u>"..use(self.chatSpeaker).."</u>"
                 end)
             }),
@@ -252,10 +252,10 @@ local function ChatFrame(self: table) : Frame
                     self.chatDialogueAbsSize:set(size.Y)
                 end,
 
-                Text = Computed(scope, function(use)
+                Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.chatText)
                 end),
-                TextSize = Computed(scope, function(use)
+                TextSize = Computed(scope, function(use: Fusion.Use)
                     return use(self.chatDialogueAbsSize) / 2.5
                 end)
             }),

@@ -57,7 +57,7 @@ return function(plr: Player)
 					Components.Frame(scope, {
 						Name = "PlayerListFrame",
 
-						Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+						Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 							return if use(self.isInCombat) then fromScale(0.5, 0.1) else fromScale(0.5, 1)
 						end), AssetBook.TweenInfos.half),
 
@@ -68,10 +68,10 @@ return function(plr: Player)
 								AnchorPoint = v2New(),
 								Position = fromScale(0.875, 0),
 
-								Size = Computed(scope, function(use)
+								Size = Computed(scope, function(use: Fusion.Use)
 									return ud2New(0.118, 0, 0, min(use(self.absSize), use(self.absContentSize)))
 								end),
-								Visible = Computed(scope, function(use)
+								Visible = Computed(scope, function(use: Fusion.Use)
 									return use(self.isOpen)
 								end),
 

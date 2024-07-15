@@ -47,7 +47,7 @@ local function ShopItemSlot(item: IntConstrainedValue, self: table, scope: Fusio
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			})

@@ -72,7 +72,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: F
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
@@ -86,7 +86,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: F
 				ZIndex = 2,
 				Text = "E",
 
-				Visible = Computed(scope, function(use)
+				Visible = Computed(scope, function(use: Fusion.Use)
 					return use(equipped)
 				end),
 
@@ -108,7 +108,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: F
 				ZIndex = 3,
 				Text = "P",
 
-				Visible = Computed(scope, function(use)
+				Visible = Computed(scope, function(use: Fusion.Use)
 					if not use(equipped) then return use(pinned) end
 				end),
 
@@ -127,7 +127,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: F
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
 
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					local itemAmount = use(amount) :: number
 
 					return if itemAmount <= 1 then "" else "x"..itemAmount

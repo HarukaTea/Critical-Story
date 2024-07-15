@@ -80,7 +80,7 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 						Thickness = 3,
 						Enabled = true,
 
-						Transparency = Tween(scope, Computed(scope, function(use)
+						Transparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
 							return if use(isSelecting) then 0.3 else 1
 						end), AssetBook.TweenInfos.twiceHalf)
 					})
@@ -92,10 +92,10 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 				AnchorPoint = v2New(),
 				Size = fromScale(0.1, 1),
 
-				BackgroundColor3 = Tween(scope, Computed(scope, function(use)
+				BackgroundColor3 = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(self.playerSettings[id]) then fromRGB(80, 161, 118) else fromRGB(214, 71, 107)
 				end), AssetBook.TweenInfos.threeHalf),
-				Position = Tween(scope, Computed(scope, function(use)
+				Position = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(self.playerSettings[id]) then fromScale(0.8, 0) else fromScale(0.7, 0)
 				end), AssetBook.TweenInfos.twiceHalf),
 

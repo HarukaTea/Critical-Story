@@ -41,7 +41,7 @@ local function PlayerSlot(self: table, player: Player, scope: Fusion.Scope): Fra
 				Position = fromScale(0.055, 0.5),
 				Size = fromScale(0.13, 0.665),
 
-				Image = Fusion.Computed(scope, function(use)
+				Image = Fusion.Computed(scope, function(use: Fusion.Use)
 					return AssetBook.ClassInfo[use(class)].Image
 				end),
 

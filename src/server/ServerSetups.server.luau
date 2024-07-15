@@ -177,6 +177,21 @@ local function mainSetup()
 	Spawn(function()
 		for _, orb: Model in RepS.Package.PlayerAttacks:GetChildren() do
 			SS.Resources.Unloads.OrbAnim:Clone().Parent = orb
+
+			local ownerSymbol = instanceNew("ObjectValue")
+			ownerSymbol.Name = "Owner"
+			ownerSymbol.Parent = orb
+
+			for _, part: BasePart in orb:GetChildren() do
+				if not part:IsA("BasePart") then continue end
+
+				part.CanTouch = false
+				part.CanQuery = false
+				part.CanCollide = false
+				part.CastShadow = false
+			end
+
+			orb.Part.CanTouch = true
 		end
 		SS.Resources.Unloads.BorderColorTween:Clone().Parent = RepS.Package.Unloads.CombatBorder.Border
 	end)

@@ -24,7 +24,7 @@ local function EXPProgressBar(self: table) : Frame
                 Name = "Bar",
                 BackgroundColor3 = fromRGB(217, 193, 144),
 
-                Size = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+                Size = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
                     local x = clamp(use(self.playerData.EXP[1]) / use(self.playerData.EXP[2]), 0, 1)
 
                     return fromScale(x, 1)

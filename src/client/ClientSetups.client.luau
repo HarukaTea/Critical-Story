@@ -38,7 +38,7 @@ Spawn(openAcquiredChests)
 
 local function cmdrRegister()
     Cmdr:SetActivationKeys({ Enum.KeyCode.Quote })
-    Cmdr:SetPlaceName("CStory-0.8")
+    Cmdr:SetPlaceName("CStory-0.9")
 
     Signals.PlayerChatted:Connect(function(msg: string, sender: Player)
         if sender ~= plr then return end
@@ -87,19 +87,6 @@ local function chatRegister()
                     string.upper(roleInfo.ChatRole),
                     properties.PrefixText)
             end
-        else
-            --// System message
-            properties.PrefixText = string.format(
-                "<font color='#%s'><b>%s</b></font>",
-                Color3.fromRGB(255, 255, 0):ToHex(),
-                "[WORLD]"
-            )
-
-            properties.Text = string.format(
-                "<font color='#%s'>%s</font>",
-                Color3.new(1, 1, 1):ToHex(),
-                message.Text
-            )
         end
 
         return properties

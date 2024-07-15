@@ -60,7 +60,9 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Passive", self),
 						FilterButton("Active", self),
-						FilterButton("Other", self),
+						FilterButton("Material", self),
+						FilterButton("Equipment", self),
+						FilterButton("Other", self)
 					}),
 					ExCategoryBottomBtns("Right", self, {
 						FilterButton("Equip", self),
@@ -87,7 +89,7 @@ return function(plr: Player)
 						ImageColor3 = fromRGB(129, 129, 129),
 						ImageTransparency = 0.8,
 
-						Visible = Fusion.Computed(scope, function(use)
+						Visible = Fusion.Computed(scope, function(use: Fusion.Use)
 							return use(self.noItemsShow)
 						end),
 

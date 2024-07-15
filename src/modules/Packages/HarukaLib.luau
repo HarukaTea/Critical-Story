@@ -194,13 +194,8 @@ end
 function HarukaLib.Bin()
 	local bin = {}
 
-	return function (item: any)
-		bin[#bin + 1] = item
-
-		return item
-
-	end, function()
-		for _, item: any in bin do
+	local function doCleanup(tasks: any)
+		for _, item: any in tasks do
 			if typeof(item) == "Instance" then
 				item:Destroy()
 
@@ -212,8 +207,32 @@ function HarukaLib.Bin()
 
 			elseif typeof(item) == "thread" then
 				if item then task.cancel(item) end
+
+			elseif typeof(item) == "table" then
+				if typeof(item.destroy) == "function" then
+					item:destroy()
+
+				elseif typeof(task.Destroy) == "function" then
+					item:Destroy()
+
+				elseif item[1] ~= nil then
+					for index = #item, 1, -1 do
+						doCleanup(item[index])
+
+						item[index] = nil
+					end
+				end
 			end
 		end
+	end
+
+	return function (item: any)
+		table.insert(bin, item)
+
+		return item
+
+	end, function()
+		doCleanup(bin)
 
 		table.clear(bin)
 	end
@@ -250,6 +269,7 @@ end
 ]]
 function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 	local properties = {}
+	local signal = Signal.new()
 
 	local dataTypes = {
 		number = function(a, b, t)
@@ -354,7 +374,12 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 
 			task.wait()
 		end
+
+		signal:Fire("Completed")
+		signal:Destroy()
 	end)
+
+	return signal
 end
 
 --[[

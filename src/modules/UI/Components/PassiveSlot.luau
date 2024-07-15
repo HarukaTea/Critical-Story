@@ -11,8 +11,6 @@ local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
-local isMobile = HarukaLib:GetDevice() == "Mobile"
-
 local Value = Fusion.Value
 
 local color3New = Color3.new
@@ -28,8 +26,8 @@ local function PassiveSlot(index: number, self: table): Frame
 	Signals.ExCategoryOpened:Connect(exCategoryOpened)
 
 	local children: ImageButton?
-	if not isMobile then
-		Components.HoverImageButton(scope, {
+	if HarukaLib:GetDevice() ~= "Mobile" then
+		children = Components.HoverImageButton(scope, {
 			[Fusion.OnEvent("MouseEnter")] = function()
 				isSelecting:set(true)
 			end,
@@ -62,14 +60,14 @@ local function PassiveSlot(index: number, self: table): Frame
 				Thickness = 2.7,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
 			Components.ImageLabel(scope, {
 				Name = "Icon",
 				Size = fromScale(1, 1),
-				Image = Fusion.Computed(scope, function(use)
+				Image = Fusion.Computed(scope, function(use: Fusion.Use)
 					local item = use(self.passiveEquipList[index]) :: string
 
 					return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null

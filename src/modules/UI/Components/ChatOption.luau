@@ -29,7 +29,7 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
             Components.UIStroke(scope, {
                 Thickness = 2.8,
 
-                Enabled = Fusion.Computed(scope, function(use)
+                Enabled = Fusion.Computed(scope, function(use: Fusion.Use)
                     return use(isSelecting)
                 end),
 
@@ -75,8 +75,7 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
                     New(scope, "UIPadding")({
                         PaddingTop = udNew(0.05, 0),
                         PaddingBottom = udNew(0.05, 0)
-                    }),
-                    Components.TextUIStroke(scope, { Thickness = 1.5 })
+                    })
                 }
             })
         }

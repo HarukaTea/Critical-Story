@@ -32,7 +32,7 @@ local function ItemCostFrame(self: table) : Frame
 
                 [Fusion.Out("Text")] = self.buyAmount,
 
-                Text = Fusion.Computed(scope, function(use)
+                Text = Fusion.Computed(scope, function(use: Fusion.Use)
                     return use(self.buyAmount)
                 end),
 
@@ -43,7 +43,7 @@ local function ItemCostFrame(self: table) : Frame
                 Size = fromScale(0.9, 0.075),
                 TextScaled = false,
 
-                Text = Fusion.Computed(scope, function(use)
+                Text = Fusion.Computed(scope, function(use: Fusion.Use)
                     local totalCost = use(self.itemCost) :: number
 
                     --- amount check
@@ -63,10 +63,10 @@ local function ItemCostFrame(self: table) : Frame
 
                     return "COST "..HarukaLib:NumberConvert(totalCost, "%.2f").." GOLD"
                 end),
-                TextColor3 = Fusion.Computed(scope, function(use)
+                TextColor3 = Fusion.Computed(scope, function(use: Fusion.Use)
                     return use(self.itemCostColor)
                 end),
-                TextSize = Fusion.Computed(scope, function(use)
+                TextSize = Fusion.Computed(scope, function(use: Fusion.Use)
                     return use(self.absStatSize) - 3
                 end)
             })

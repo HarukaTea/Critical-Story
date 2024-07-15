@@ -37,48 +37,18 @@ local function ExCategoryTitle(id: string, self: table): Frame
 		Name = "Top",
 		BackgroundTransparency = 1,
 		Size = fromScale(0.97, 0.1),
-		Position = ud2New(0.015, 0, 0.04, 40),
+		Position = fromScale(0.015, 0.04),
 
 		[Children] = {
 			New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.255 }),
 			New(scope, "UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				Padding = udNew(0.015, 0),
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
 
-			Components.ImageLabel(scope, {
-				Name = "Icon",
-				ImageColor3 = id == "Backpack" and fromRGB(148, 148, 148) or color3New(1, 1, 1),
-				Position = fromScale(0.01, 0),
-				Size = fromScale(0.04, 1),
-				BackgroundTransparency = 0,
-
-				Image = Computed(scope, function(use)
-					if id == "Menu" then
-						return AssetBook.ClassInfo[use(playerClass)].Image
-
-					elseif id == "Backpack" then
-						return ItemBook.ItemImagesEx.Backpack
-
-					elseif id == "Shop" then
-						return AssetBook.ClassInfo.Illusionist.Image
-
-					elseif id == "Crafting" then
-						return ItemBook:FindItem("MiningPickaxe").Icon
-					end
-				end),
-
-				[Children] = { Components.RoundUICorner(scope) },
-			}),
-			Components.TextLabel(scope, {
-				Name = "Title",
-				Position = fromScale(0.063, 0.195),
-				Size = fromScale(0.87, 0.6),
-				Text = id,
-				TextXAlignment = Enum.TextXAlignment.Left,
-			}),
 			Components.TextButton(scope, {
 				Name = "Close",
 				AutoButtonColor = false,
@@ -86,10 +56,10 @@ local function ExCategoryTitle(id: string, self: table): Frame
 				Size = fromScale(0.04, 1),
 				Text = "X",
 
-				BackgroundColor3 = Computed(scope, function(use)
+				BackgroundColor3 = Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
 				end),
-				TextColor3 = Computed(scope, function(use)
+				TextColor3 = Computed(scope, function(use: Fusion.Use)
 					return if not use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
 				end),
 
@@ -102,7 +72,7 @@ local function ExCategoryTitle(id: string, self: table): Frame
 				[OnEvent("MouseButton1Click")] = function()
 					if id == "Shop" or id == "Crafting" then self.items:set({}) end
 
-					ClientUtil:OpenUIEx(plr, if id == "Menu" then "AdventurerMenu" else id)
+					ClientUtil:OpenUIEx(plr, id)
 				end,
 
 				[Children] = {
@@ -111,12 +81,16 @@ local function ExCategoryTitle(id: string, self: table): Frame
 						Thickness = 3,
 						Enabled = true,
 
-						Color = Computed(scope, function(use)
+						Color = Computed(scope, function(use: Fusion.Use)
 							return if not use(isSelecting) then fromRGB(255, 255, 255) else fromRGB()
 						end),
 					}),
 				},
 			}),
+
+			Components.Frame(scope, {
+				Size = UDim2.fromOffset(1, 1),
+			})
 		},
 	})
 end

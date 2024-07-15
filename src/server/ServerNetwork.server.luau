@@ -141,8 +141,9 @@ local function levelUp(plr: Player)
 
 		ServerUtil:ShowText(char, "LEVEL UP!", fromRGB(255, 255, 0))
 
-		local levelUpEffect = RepS.Package.Effects.LevelUpEffect:Clone() :: ParticleEmitter
-		levelUpEffect.Parent = char.PrimaryPart
+		local levelUpEffect = RepS.Package.Effects.LevelUpEffect:Clone() :: BasePart
+		levelUpEffect.CFrame = char.PrimaryPart.CFrame
+		levelUpEffect.Parent = workspace
 		Debris:AddItem(levelUpEffect, 1)
 
 		--- make character full state

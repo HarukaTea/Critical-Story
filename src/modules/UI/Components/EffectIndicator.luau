@@ -34,7 +34,7 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
 
 				[Children] = {
 					Fusion.New(info[2], "UIGradient")({
-						Rotation = Fusion.Computed(info[2], function(use)
+						Rotation = Fusion.Computed(info[2], function(use: Fusion.Use)
 							local angle = clamp(use(info[1]) * 360, 0, 360)
 
 							return if direction == "Left" then clamp(angle, 180, 360) else clamp(angle, 0, 180)

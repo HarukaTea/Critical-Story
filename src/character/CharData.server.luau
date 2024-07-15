@@ -298,7 +298,7 @@ local function onDead()
     if char.PrimaryPart then
         local defeatedEff = RepS.Package.Effects.DefeatedEffect:Clone()
         defeatedEff.CFrame = char.PrimaryPart.CFrame
-        defeatedEff.Parent = char
+        defeatedEff.Parent = workspace
         Debris:AddItem(defeatedEff, 1)
     end
     char:SetAttribute("InCombat", false)

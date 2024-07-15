@@ -40,11 +40,17 @@ end
 Events.PlaySound:Connect(playSound)
 
 
-local function clientTweenPlayer(objs: table, goal: table, style: string)
+local function clientTweenPlayer(objs: table, goal: table, style: string, useHarukaTween: boolean?)
 	style = AssetBook.TweenInfos[style]
 
 	for _, obj: Instance in objs do
-		pcall(function() TS:Create(obj, style, goal):Play() end)
+		pcall(function()
+			if not useHarukaTween then
+				TS:Create(obj, style, goal):Play()
+			else
+				HarukaLib:Tween(obj, style, goal)
+			end
+		end)
 	end
 end
 Events.ClientTween:Connect(clientTweenPlayer)

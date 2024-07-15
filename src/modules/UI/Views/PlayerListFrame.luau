@@ -22,13 +22,13 @@ local function PlayerListFrame(self: table)
         ZIndex = 2,
         ScrollingDirection = Enum.ScrollingDirection.Y,
 
-        Position = Fusion.Tween(scope, Computed(scope, function(use)
+        Position = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
             return if use(self.isOpen) then fromScale(0.875, 0) else fromScale(1.2, 0)
         end), AssetBook.TweenInfos.half),
-        CanvasSize = Computed(scope, function(use)
+        CanvasSize = Computed(scope, function(use: Fusion.Use)
             return if use(self.absContentSize) > use(self.absSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
         end),
-        ScrollingEnabled = Computed(scope, function(use)
+        ScrollingEnabled = Computed(scope, function(use: Fusion.Use)
             return if use(self.absContentSize) > use(self.absSize) then true else false
         end),
 

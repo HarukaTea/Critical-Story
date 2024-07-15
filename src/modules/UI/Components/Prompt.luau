@@ -18,25 +18,36 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scop
         Name = "Prompt",
         AnchorPoint = v2New(0.5, 0),
         BackgroundTransparency = 0,
-        Size = fromScale(0.158, 1),
+        Size = fromScale(0.18, 1),
 
         [Fusion.Children] = {
             Components.RoundUICorner(scope),
             Fusion.New(scope, "UIGradient")({
                 Transparency = nsNew({ nsKPNew(0, 0), nsKPNew(0.5, 0.2), nsKPNew(1, 1) }),
             }),
+            Components.UIStroke(scope, {
+                Thickness = 3,
+                Transparency = 0.3,
+
+                [Fusion.Children] = {
+                    Fusion.New(scope, "UIGradient")({
+                        Transparency = nsNew({ nsKPNew(0, 0), nsKPNew(0.5, 0.2), nsKPNew(0.9, 1), nsKPNew(1, 1) }),
+                    })
+                }
+            }),
 
             Components.ImageLabel(scope, {
                 Name = "Icon",
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(0.05, 0.5),
-                Size = fromScale(0.12, 0.7),
+                Size = fromScale(0.7, 0.7),
+                SizeConstraint = Enum.SizeConstraint.RelativeYY,
                 Image = if AssetBook.PromptIcons[prompt.Name] then AssetBook.PromptIcons[prompt.Name] else AssetBook.PromptIcons.Chat
             }),
             Components.TextLabel(scope, {
                 Name = "PromptText",
                 AnchorPoint = v2New(0, 0.5),
-                Position = fromScale(0.23, 0.5),
+                Position = fromScale(0.19, 0.5),
                 Size = fromScale(0.77, 0.7),
                 Text = prompt.ActionText,
 		        TextXAlignment = Enum.TextXAlignment.Left,
@@ -45,7 +56,8 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scop
                 Name = "Key",
                 AnchorPoint = v2New(0, 0.5),
                 Position = fromScale(-0.18, 0.5),
-                Size = fromScale(0.145, 0.8),
+                Size = fromScale(0.8, 0.8),
+                SizeConstraint = Enum.SizeConstraint.RelativeYY,
                 Text = "E",
                 Visible = if index == 1 and not isMobile then true else false,
 

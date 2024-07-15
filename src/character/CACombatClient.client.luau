@@ -141,10 +141,14 @@ local function onTouched(hit: BasePart)
 			Debris:AddItem(bv, 0.05)
 
 			humanoid.AutoRotate = false
-
 			Signals.PlayAnimation:Fire(`{orb:GetAttribute("Style")}Anim{animStep}`)
 
-			ClientUtil:ClassHitVFX(char.CharStats.TargetMonster.Value, char)
+			local monster = char.CharStats.TargetMonster.Value :: Model?
+			if monster then
+				ClientUtil:HitVFX(char.CharStats.TargetMonster.Value)
+
+				char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
+			end
 		end
 
 		Events.MobTakeDMG:Fire(hit.Parent)
@@ -165,7 +169,7 @@ local function onTouched(hit: BasePart)
 
 		Events.CharTakeDMG:Fire(hit.Parent)
 
-		ClientUtil:CharOnHit(char)
+		ClientUtil:HitVFX(char)
 	end
 end
 

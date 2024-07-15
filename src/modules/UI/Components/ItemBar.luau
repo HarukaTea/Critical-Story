@@ -44,7 +44,7 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 		info.Position:set(fromScale(-0.02, 0))
 	end)
 	Spawn(function()
-		wait(3.2)
+		wait(5.2)
 		info.Position:set(fromScale(-0.5, 0))
 	end)
 
@@ -59,7 +59,7 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 				AnchorPoint = v2New(),
 				Size = fromScale(0.2, 1),
 
-				Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+				Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 					return use(info.Position)
 				end), AssetBook.TweenInfos.twiceHalfOne),
 
@@ -69,7 +69,7 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 						Enabled = true,
 						Thickness = 3,
 
-						Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use)
+						Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 							return if use(isSelecting) then 0.3 else 1
 						end), AssetBook.TweenInfos.twiceHalfOne)
 					}),
@@ -87,7 +87,7 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 						Name = "Title",
 						Position = fromScale(0.15, 0.03),
 						Size = fromScale(0.62, 0.4),
-						Text = "ITEM ACQUIRED",
+						Text = "ACQUIRED",
 						TextColor3 = fromRGB(156, 156, 156),
 						TextXAlignment = Enum.TextXAlignment.Right,
 					}),

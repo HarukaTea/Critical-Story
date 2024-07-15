@@ -29,7 +29,7 @@ local function ProgressCircle(direction: string, self: table, index: number) : F
 		Size = fromScale(0.5, 1),
 		ZIndex = 2,
 
-		Visible = Computed(scope, function(use)
+		Visible = Computed(scope, function(use: Fusion.Use)
 			return if use(self.activeCDRotationList[index]) > 0 then true else false
 		end),
 
@@ -42,7 +42,7 @@ local function ProgressCircle(direction: string, self: table, index: number) : F
 
 				[Children] = {
 					New(scope, "UIGradient")({
-						Rotation = Computed(scope, function(use)
+						Rotation = Computed(scope, function(use: Fusion.Use)
 							local angle = clamp(use(self.activeCDRotationList[index]) * 360, 0, 360)
 
 							return if direction == "Left" then clamp(angle, 180, 360) else clamp(angle, 0, 180)
@@ -83,7 +83,7 @@ local function ActiveSlot(index: number, self: table): Frame
 				Thickness = 3,
 				Enabled = true,
 
-				Transparency = Fusion.Tween(scope, Computed(scope, function(use)
+				Transparency = Fusion.Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(isSelecting) then 0.3 else 1
 				end), AssetBook.TweenInfos.twiceHalf)
 			}),
@@ -105,7 +105,7 @@ local function ActiveSlot(index: number, self: table): Frame
 				Name = "Icon",
 				Size = fromScale(1, 1),
 
-				Image = Computed(scope, function(use)
+				Image = Computed(scope, function(use: Fusion.Use)
 					local item = use(self.activeEquipList[index]) :: string
 
 					return if ItemBook:IsItemExist(item) then ClientUtil:CombineRbxId(ItemBook:FindItem(item).Icon) else ItemBook.ItemImagesEx.Null
@@ -119,7 +119,7 @@ local function ActiveSlot(index: number, self: table): Frame
 				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Right,
 
-				Text = Computed(scope, function(use, localScope: Fusion.Scope)
+				Text = Computed(scope, function(use: Fusion.Use, localScope: Fusion.Scope)
 					local item = use(self.activeEquipList[index]) :: string
 
 					if item == "Null" then
@@ -150,10 +150,10 @@ local function ActiveSlot(index: number, self: table): Frame
 				ZIndex = 2,
 				TextStrokeTransparency = 0,
 
-				Text = Computed(scope, function(use)
+				Text = Computed(scope, function(use: Fusion.Use)
 					return use(self.activeCDList[index])
 				end),
-				Visible = Computed(scope, function(use)
+				Visible = Computed(scope, function(use: Fusion.Use)
 					return if tonumber(use(self.activeCDList[index])) > 0 then true else false
 				end),
 

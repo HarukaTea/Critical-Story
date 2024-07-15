@@ -68,7 +68,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                 BackgroundTransparency = 0,
                 Size = fromScale(0.18, 1.02),
 
-                Position = Tween(scope, Computed(scope, function(use)
+                Position = Tween(scope, Computed(scope, function(use: Fusion.Use)
                     return use(info.innerPos)
                 end), AssetBook.TweenInfos.twiceHalfOne),
 
@@ -78,7 +78,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                         Thickness = 2.7,
                         Enabled = true,
 
-                        Transparency = Tween(scope, Computed(scope, function(use)
+                        Transparency = Tween(scope, Computed(scope, function(use: Fusion.Use)
                             return if use(info.isSelecting) then 0.3 else 1
                         end), AssetBook.TweenInfos.twiceHalf)
                     }),
@@ -114,10 +114,10 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                         FontFace = fontFromName("Roboto", Enum.FontWeight.Bold),
                         Text = ">",
 
-                        Visible = Computed(scope, function(use)
+                        Visible = Computed(scope, function(use: Fusion.Use)
                             return use(info.Targeting)
                         end),
-                        Position = Tween(scope, Computed(scope, function(use)
+                        Position = Tween(scope, Computed(scope, function(use: Fusion.Use)
                             return use(self.monsterTargetingPos)
                         end), AssetBook.TweenInfos.half),
 
@@ -160,7 +160,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                             New(scope, "Frame")({
                                 Name = "Bar",
 
-                                BackgroundColor3 = Tween(scope, Computed(scope, function(use)
+                                BackgroundColor3 = Tween(scope, Computed(scope, function(use: Fusion.Use)
 									local HP, maxHP = use(info.HP) :: number, use(info.MaxHP) :: number
 
 									if HP / maxHP <= 0.66 and HP / maxHP > 0.33 then
@@ -171,7 +171,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
 										return fromRGB(0, 120, 104)
 									end
 								end), AssetBook.TweenInfos.onceHalf),
-								Size = Tween(scope, Computed(scope, function(use)
+								Size = Tween(scope, Computed(scope, function(use: Fusion.Use)
 									local x = clamp(use(info.HP) / use(info.MaxHP), 0, 1)
 
 									return fromScale(x, 1)
@@ -185,7 +185,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                                 ZIndex = 2,
                                 TextStrokeTransparency = 0.7,
                                 TextXAlignment = Enum.TextXAlignment.Right,
-                                Text = Computed(scope, function(use)
+                                Text = Computed(scope, function(use: Fusion.Use)
 									return use(info.HP) .. "/" .. use(info.MaxHP)
 								end),
 
