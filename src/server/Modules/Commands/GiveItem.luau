@@ -7,13 +7,13 @@ local ItemBook = require(RepS.Modules.Data.ItemBook)
 return {
     Name = "giveitem",
     Aliases = { "give" },
-    Description = "Give the item which exist in game to a player.",
-    Group = "Testers",
+    Description = "Give a item, which exist in game, for player(s).",
+    Group = "Developer",
     Args = {
         {
             Type = "players",
             Name = "players",
-            Description = "The player who recieve this item"
+            Description = "Player(s) who recieve this item"
         },
         function(context: table)
             local items = { "all" }
@@ -30,7 +30,7 @@ return {
         {
             Type = "number",
             Name = "amount",
-            Description = "The amount of this item",
+            Description = "The amount of this item, default is 1",
             Default = 1
         }
     }

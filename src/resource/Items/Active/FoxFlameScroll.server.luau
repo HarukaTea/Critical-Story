@@ -27,8 +27,8 @@ local ITEM_ATTRIBUTES = { CD = 8, COMBAT_REQ = true, MONSTER_REQ = true }
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic2 })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 
 local fireBall = RepS.Package.MagicAssets.FoxFlameScroll.FireBall:Clone() :: BasePart
 fireBall.CFrame = char.PrimaryPart.CFrame
@@ -52,21 +52,21 @@ local success, errorMsg = pcall(function()
 
 			BuffEffectsUtil:Burn(char, monster, 12)
 			BuffEffectsUtil:MagicVFX(monster)
-			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
+			Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic1 })
 
 			local eff = RepS.Package.MagicAssets.FoxFlameScroll.FoxBlast:Clone() :: BasePart
 			eff.CFrame = monster.PrimaryPart.CFrame
 			eff.Parent = workspace
 			Debris:AddItem(eff, 1)
 
-			Events.ClientTween:FireAll({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
+			Events.ClientTween.FireAll({ Objs = { eff }, Goal = { Size = v3New(24,24,24), Transparency = 1 }, TweenInfo = "one" })
 
 			fireBall.Spirit.Enabled = false
 			fireBall.CFrame = monster.PrimaryPart.CFrame
 			fireBall.Anchored = true
 			Debris:AddItem(fireBall, 1)
 
-			Events.ClientTween:FireAll({ fireBall }, { Size = v3New(9,9,9), Transparency = 1 }, "one")
+			Events.ClientTween.FireAll({ Objs = { fireBall }, Goal = { Size = v3New(9,9,9), Transparency = 1 }, TweenInfo = "one" })
 
 			local dmg = floor(char:GetAttribute("Magic") * 1.5) :: number
 			ServerUtil:ShowNumber(monster, dmg, fromRGB(255, 170, 0))

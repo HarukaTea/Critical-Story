@@ -40,7 +40,7 @@ local function PassiveSlot(index: number, self: table): Frame
 				if item == "Null" then return end
 				if item == "" then return end
 
-				Events.EquipItems:Fire("ClearPassive", "Passive"..index, item)
+				Events.EquipItem.Fire({ ItemType = "ClearPassive", ItemSlot = "Passive"..index, ItemId = item })
 
 				workspace.Sounds.SFXs.Equip:Play()
 			end

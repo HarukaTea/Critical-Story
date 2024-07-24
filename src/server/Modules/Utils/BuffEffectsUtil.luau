@@ -19,7 +19,7 @@ local BuffEffectsUtil = {}
 local function _playUpSound(char: Model)
 	local plr = Players:GetPlayerFromCharacter(char)
 
-	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Up)
+	Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Up })
 end
 
 
@@ -52,13 +52,13 @@ function BuffEffectsUtil:MagicVFX(monster: Model)
 	eff.Parent = workspace
 	Debris:AddItem(eff, 0.25)
 
-	Events.ClientTween:FireAll({ eff }, { Size = v3New(1, 1, 1) * 24, Transparency = 1 }, "twiceHalf")
+	Events.ClientTween.FireAll({ Objs = { eff }, Goal = { Size = v3New(1, 1, 1) * 24, Transparency = 1 }, TweenInfo = "twiceHalf" })
 end
 
 
 function BuffEffectsUtil:Heal(char: Model, healPower: number)
 	local plr = Players:GetPlayerFromCharacter(char)
-	Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Heal)
+	Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Heal })
 
 	char.Humanoid.Health += floor(char.Humanoid.MaxHealth * healPower)
 
@@ -156,7 +156,7 @@ function BuffEffectsUtil:MagicBuff(char: Model, power: number, duration: number)
 end
 
 
-function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: number)
+function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: number, noSound: boolean?)
 	local buff = SS.Resources.Unloads.SpeedBuff:Clone() :: Script
 
 	buff:SetAttribute("Duration", duration)
@@ -170,7 +170,7 @@ function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: numbe
 	speedEffect.Parent = char.PrimaryPart
 	Debris:AddItem(speedEffect, duration)
 
-	_playUpSound(char)
+	if not noSound then _playUpSound(char) end
 end
 
 

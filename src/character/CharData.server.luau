@@ -1,19 +1,18 @@
 --!nocheck
 
-local BadgeService = game:GetService("BadgeService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
 
+local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
-local EXPFormula = require(RepS.Modules.Data.EXPFormula)
+local Formula = require(RepS.Modules.Data.Formulas)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Signals = require(SSS.Modules.Data.ServerSignals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
-local Promise = require(RepS.Modules.Packages.Promise)
 
 local Add, Empty = HarukaLib.Bin()
 
@@ -127,7 +126,7 @@ local function charAttributesSetup()
         if shield <= 0 and not isBroken then
             isBroken = true
 
-            Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.ShieldBroken)
+            Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.ShieldBroken })
         end
     end
 
@@ -140,15 +139,11 @@ local function charAttributesSetup()
     local function updateMagic()
         char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
     end
-    local function updateShield(isForce: boolean?)
-        char:SetAttribute("MaxShield", 0 + char:GetAttribute("ShieldBuff"))
-
-        char:SetAttribute("Shield", char:GetAttribute("MaxShield"))
+    local function updateShield()
+        char:SetAttribute("MaxShield", char:GetAttribute("ShieldBuff"))
     end
-    local function updateMana(isForce: boolean?)
+    local function updateMana()
         char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 20) + 100 + char:GetAttribute("ManaBuff"))
-
-        char:SetAttribute("Mana", char:GetAttribute("MaxMana"))
     end
     local function updateHP()
         humanoid.MaxHealth = 50 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
@@ -165,7 +160,7 @@ local function charAttributesSetup()
     local function levelReqCheck()
         local level = plr:GetAttribute("Levels") :: number
 
-        if plr:GetAttribute("EXP") > EXPFormula(level) then
+        if plr:GetAttribute("EXP") > Formula.EXP(level) then
             if lvUpCD then return end
 
             lvUpCD = true
@@ -183,8 +178,8 @@ local function charAttributesSetup()
         char:SetAttribute("ShieldRepairing", false)
 
         shieldAdd(task.spawn(function()
-            wait(6)
-            while wait(0.15) do
+            wait(7)
+            while wait(0.1599) do
                 if char:GetAttribute("Shield") >= char:GetAttribute("MaxShield") or humanoid.Health <= 0 then
                     char:SetAttribute("ShieldRepairing", false)
                     break
@@ -229,6 +224,9 @@ local function charAttributesSetup()
         char:SetAttribute("Rage", 0)
         char:SetAttribute("LifeStolen", 0)
         char.AlchemistCreations:ClearAllChildren()
+    end
+    local function spawnProtect()
+        BuffEffectsUtil:SpeedBuff(char, 1.2, 5, true)
     end
 
     --// Setups
@@ -287,6 +285,8 @@ local function charAttributesSetup()
             end
         end
     }))
+
+    Spawn(spawnProtect)
 
     char:SetAttribute("CharDataLoaded", true)
 end

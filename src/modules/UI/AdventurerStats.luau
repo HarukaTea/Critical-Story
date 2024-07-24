@@ -7,7 +7,7 @@ local TS = game:GetService("TweenService")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
-local EXPFormula = require(RepS.Modules.Data.EXPFormula)
+local Formula = require(RepS.Modules.Data.Formulas)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -174,7 +174,7 @@ return function(plr: Player)
 			self.nowMobIndex += 1
 			if self.nowMobIndex > #monsters then self.nowMobIndex = 1 end
 
-			Events.ChangeMobTarget:Fire(monsters[self.nowMobIndex].Value)
+			Events.ChangeAttackTarget.Fire({ Target = monsters[self.nowMobIndex].Value })
 		end
 	end
 	local function _useItem(actionName: string, inputState: Enum.UserInputState)
@@ -192,7 +192,11 @@ return function(plr: Player)
 	local function _autoEquipItems()
 		for _, item in self.inventory:GetChildren() do
 			if item.Value > 0 and item:GetAttribute("Equipped") then
-				Events.EquipItems:Fire(ItemBook:FindItem(item.Name).Type, item:GetAttribute("Slot"), item.Name)
+				Events.EquipItem.Fire({
+					ItemType = ItemBook:FindItem(item.Name).Type,
+					ItemSlot = item:GetAttribute("Slot"),
+					ItemId = item.Name
+				})
 			end
 		end
 	end
@@ -214,11 +218,11 @@ return function(plr: Player)
 	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
-			playerData.EXP[2]:set(EXPFormula(plr:GetAttribute("Levels")))
+			playerData.EXP[2]:set(Formula.EXP(plr:GetAttribute("Levels")))
 		end,
 		["Attr-Levels"] = function(level: number)
 			playerData.Levels:set(level)
-			playerData.EXP[2]:set(EXPFormula(level))
+			playerData.EXP[2]:set(Formula.EXP(level))
 		end,
 		["Attr-Class"] = function(class: string)
 			playerData.Class:set(class)
@@ -271,6 +275,7 @@ return function(plr: Player)
 	}))
 
 	local charStatsDict = self.charStatsDict
+	local charDMGStats = self.charDMGStats
 	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-Mana"] = function(mana: number)
 			charStatsDict.MP[1]:set(mana)
@@ -302,6 +307,27 @@ return function(plr: Player)
 			charStatsDict.HP[2]:set(health)
 		end
 	}))
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
+        ["Attr-MinDMG"] = function(newDMG: number)
+            charDMGStats.MinDMG:set(newDMG)
+        end,
+        ["Attr-MaxDMG"] = function(newDMG: number)
+            charDMGStats.MaxDMG:set(newDMG)
+        end,
+        ["Attr-Magic"] = function(newMagic: number)
+            charDMGStats.Magic:set(newMagic)
+        end,
+
+		["Attr-MinDMGBuff"] = function(newDMG: number)
+            charDMGStats.MinDMGBuff:set(newDMG)
+        end,
+        ["Attr-MaxDMGBuff"] = function(newDMG: number)
+            charDMGStats.MaxDMGBuff:set(newDMG)
+        end,
+        ["Attr-MagicBuff"] = function(newMagic: number)
+            charDMGStats.MagicBuff:set(newMagic)
+        end,
+    }))
 
 	local function _clearGarbage()
 		CAS:UnbindAction("ChangeMobTargetLCtrl")
@@ -309,10 +335,6 @@ return function(plr: Player)
 		CAS:UnbindAction("UseItem1")
 		CAS:UnbindAction("UseItem2")
 		CAS:UnbindAction("UseItem3")
-
-		Events.EquipItems:DisconnectAll()
-		Events.GiveDrop:DisconnectAll()
-		Events.LevelUp:DisconnectAll()
 
 		Signals.ExCategoryOpened:DisconnectAll()
 

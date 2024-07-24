@@ -3,8 +3,8 @@
 return {
     Name = "givegold",
     Aliases = { "gold" },
-    Description = "Give the gold to which you given.",
-    Group = "Testers",
+    Description = "Give gold for player(s)",
+    Group = "Developer",
     Args = {
         {
             Type = "players",

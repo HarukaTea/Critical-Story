@@ -16,5 +16,6 @@ local ITEM_ATTRIBUTES = { RESTORE_BUFF = 0.3 }
 
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Heal)
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Heal })
+
 BuffEffectsUtil:RestoreMana(char, floor(char:GetAttribute("MaxMana") * ITEM_ATTRIBUTES.RESTORE_BUFF))

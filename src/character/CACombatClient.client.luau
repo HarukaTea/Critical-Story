@@ -14,7 +14,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
-local monsterTree = Octree.new()
+local monsterTree = {}
 local locationTree = Octree.new()
 
 local char = script.Parent :: Model
@@ -29,7 +29,6 @@ local monsterLocations = workspace:WaitForChild("Monsters", 999) :: Folder
 local isInCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
-local monsterNodes = {}
 local locatorNodes = {}
 local encounterCD = false
 local currentMonster = nil
@@ -151,7 +150,7 @@ local function onTouched(hit: BasePart)
 			end
 		end
 
-		Events.MobTakeDMG:Fire(hit.Parent)
+		Events.MonsterTakeDMG.Fire({ Orb = orb })
 
 		orb:Destroy()
 		animStep = if animStep == 1 then 2 else 1
@@ -167,7 +166,7 @@ local function onTouched(hit: BasePart)
 
 		if char:GetAttribute("Shield") > 0 then sfxs.ShieldAbsorb:Play() end
 
-		Events.CharTakeDMG:Fire(hit.Parent)
+		Events.PlayerTakeDMG.Fire({ Projectile = hit.Parent })
 
 		ClientUtil:HitVFX(char)
 	end
@@ -220,16 +219,13 @@ local function setup()
 		if monster:GetAttribute("SubMonster") then return end
 		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
 
-		table.insert(monsterNodes, monsterTree:CreateNode(monster.PrimaryPart.Position, monster))
+		table.insert(monsterTree, monster)
 	end
 	local function _removeMonster(monster: Model)
 		if monster:GetAttribute("SubMonster") then return end
 
-		for index: number, node: any in monsterNodes do
-			if node:GetObject() == monster then
-				node:Destroy()
-				table.remove(monsterNodes, index)
-			end
+		for index: number, node: any in monsterTree do
+			if node == monster then table.remove(monsterTree, index) end
 		end
 	end
 	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
@@ -255,16 +251,16 @@ local function setup()
 	end
 	Add(CS:GetInstanceAddedSignal("MonsterLocation")):Connect(_addLocation)
 	Add(CS:GetInstanceRemovedSignal("MonsterLocation")):Connect(_removeLocation)
+	Add(locatorNodes)
 
 	--- detect mobs when player is near them
-    Add(HarukaLib.Clock(0.15, function()
+	Add(HarukaLib.Clock(0.15, function()
 		if isInCombat then return end
 		if not char.PrimaryPart then return end
 		if encounterCD then return end
 		if currentMonster then return end
 
-		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 18)
-		for _, monster: Model in nearbyMonsters do
+		for _, monster: Model in monsterTree do
 			if not monster then continue end
 			if not monster.PrimaryPart then continue end
 			if monster:GetAttribute("SubMonster") then continue end
@@ -273,10 +269,13 @@ local function setup()
 			end
 			if monster:GetAttribute("InCombat") then continue end
 
+			local realDistance = plr:DistanceFromCharacter(monster.PrimaryPart.Position)
+			if realDistance > 18 or realDistance <= 0 then continue end
+
 			encounterCD = true
 			currentMonster = monster
 
-			Events.CombatStart:Fire(monster.Parent)
+			Events.CombatStart.Fire({ Locator = monster.Parent })
 
 			wait(2)
 			encounterCD = false
@@ -295,11 +294,14 @@ local function setup()
 			if locator:FindFirstChildOfClass("Model") then continue end
 
 			local monster = ClientUtil:SetupMonster(locator)
+			Add(monster)
 
 			--// despawn
 			Spawn(function()
 				while monster and monster.PrimaryPart do
 					wait()
+					if not monster or not monster.PrimaryPart then break end
+
 					local mobDistance = plr:DistanceFromCharacter(monster.PrimaryPart.Position)
 					if mobDistance >= 200 or locator:GetAttribute("InCombat") then monster:Destroy() end
 				end
@@ -309,18 +311,19 @@ local function setup()
 			Spawn(function()
 				while monster and monster.PrimaryPart do
 					wait(1 + math.random(1, 10) / 10)
+					if not monster or not monster.PrimaryPart then break end
 					if monster:GetAttribute("InCombat") then continue end
 					if monster:GetAttribute("CantRotate") then continue end
 
 					local rotating = math.random(5, 20)
 					local direction = math.random(-2, 2)
 
-					pcall(function()
-						for _ = 1, rotating do
-							monster.PrimaryPart.CFrame *= CFrame.Angles(0, math.rad(direction * 5), 0)
-							wait(0.01)
-						end
-					end)
+					for _ = 1, rotating do
+						if not monster or not monster.PrimaryPart then break end
+
+						monster.PrimaryPart.CFrame *= CFrame.Angles(0, math.rad(direction * 5), 0)
+						wait(0.01)
+					end
 				end
 			end)
 		end
@@ -329,14 +332,4 @@ end
 setup()
 
 --// Clear
-humanoid.Died:Once(function()
-	for _, node: any in monsterNodes do node:Destroy() end
-	for _, node: any in locatorNodes do node:Destroy() end
-
-	monsterTree = nil
-	monsterNodes = nil
-	locationTree = nil
-	locatorNodes = nil
-
-	Empty()
-end)
+humanoid.Died:Once(Empty)

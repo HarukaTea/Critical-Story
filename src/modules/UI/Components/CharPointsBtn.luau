@@ -109,7 +109,7 @@ local function CharPointsBtn(id: string, direction: string, self: table): Frame
 
 						workspace.Sounds.SFXs.Ding:Play()
 
-						Events.AddPoints:Fire(POINTS[id], pointPerAdd)
+						Events.AddPoints.Fire({ Target = POINTS[id], Points = pointPerAdd })
 					else
 						Signals.CreateHint:Fire("You don't have enough skill points!")
 					end

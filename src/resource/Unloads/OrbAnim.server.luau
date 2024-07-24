@@ -27,13 +27,30 @@ middle.Beam2.Transparency = nsNew(1, 1)
 model.Part.Transparency = 1
 model.Sphere.Transparency = 1
 
-Events.ClientTween:Fire(plr, { middle.Beam1, middle.Beam2 }, { Transparency = nsNew(-1, 1) }, "half", true)
-Events.ClientTween:Fire(plr, { model.Part, model.Sphere }, { Transparency = 0 }, "half")
+Events.ClientTween.Fire(plr, {
+    Objs = { middle.Beam1, middle.Beam2 },
+    Goal = { Transparency = nsNew(-1, 1) },
+    TweenInfo = "half",
+    UseHarukaTween = true
+})
+Events.ClientTween.Fire(plr, {
+    Objs = { model.Part, model.Sphere },
+    Goal = { Transparency = 0 },
+    TweenInfo = "half"
+})
 
 wait(orbLifeTime - 0.6)
 
 Debris:AddItem(model, 0.5)
 
-Events.ClientTween:Fire(plr, { middle.Beam1, middle.Beam2 }, { Transparency = nsNew(1, 1) }, "half", true)
-Events.ClientTween:Fire(plr, { model.Part, model.Sphere }, { Transparency = 1 }, "half")
-
+Events.ClientTween.Fire(plr, {
+    Objs = { middle.Beam1, middle.Beam2 },
+    Goal = { Transparency = nsNew(1, 1) },
+    TweenInfo = "half",
+    UseHarukaTween = true
+})
+Events.ClientTween.Fire(plr, {
+    Objs = { model.Part, model.Sphere },
+    Goal = { Transparency = 1 },
+    TweenInfo = "half"
+})

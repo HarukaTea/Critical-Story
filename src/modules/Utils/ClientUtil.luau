@@ -7,6 +7,7 @@ local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local cfNew = CFrame.new
@@ -18,16 +19,19 @@ local ClientUtil = {}
 
 function ClientUtil:WeldModel(part: Part, welded: Model)
 	local C = welded:GetChildren()
+
 	for i = 1, #C do
 		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") or C[i]:IsA("CornerWedgePart") then
 			local W = Instance.new("Weld")
 			W.Part0 = welded.Middle
 			W.Part1 = C[i]
+
 			local CJ = cfNew(welded.Middle.Position)
 			W.C0 = welded.Middle.CFrame:Inverse() * CJ
 			W.C1 = C[i].CFrame:Inverse() * CJ
 			W.Parent = welded.Middle
 		end
+
 		local Y = Instance.new("Weld")
 		Y.Part0 = part
 		Y.Part1 = welded.Middle
@@ -36,7 +40,7 @@ function ClientUtil:WeldModel(part: Part, welded: Model)
 	end
 
 	local h = welded:GetChildren()
-	for _, child in h do
+	for _, child: BasePart in h do
 		if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then child.Anchored = false end
 	end
 end
@@ -179,7 +183,7 @@ function ClientUtil:SetupMonster(locator: Part) : Model
 
 	if not locator:GetAttribute("SubMonster") then
 		local tierDisplay = RepS.Package.Effects.TierDisplay:Clone() :: BillboardGui
-		tierDisplay.Monster.Text = AssetBook.MonsterInfo[monster.Name].Name
+		tierDisplay.Monster.Text = MonsterBook[monster.Name].Name
 		tierDisplay.Levels.Text = "Level "..level
 		tierDisplay.Parent = monster.Head
 
@@ -205,10 +209,19 @@ function ClientUtil:SetupMonster(locator: Part) : Model
         end
     end
 
+    --- v0.9: chase, so animation controller is abandoned
+    monster.AnimationController:Destroy()
+
+    local humanoid = Instance.new("Humanoid")
+    humanoid.WalkSpeed = MonsterBook[monster.Name].Speed
+    humanoid.Parent = monster
+
+    local animator = Instance.new("Animator")
+    animator.Parent = humanoid
+
     --- animator? harder to use lol
     local ok, err = pcall(function()
-        local animator = monster.AnimationController.Animator :: Animator
-        local ref = AssetBook.MonsterInfo[monster.Name].IdleAnim
+        local ref = MonsterBook[monster.Name].IdleAnim
 
         animator:LoadAnimation(RepS.Package.Animations.MonsterAnims[ref]):Play()
     end)

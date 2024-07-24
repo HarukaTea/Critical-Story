@@ -27,8 +27,8 @@ local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true }
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.KnifeKill)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.KnifeKill })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 
 local pride = RepS.Package.MagicAssets.WarriorBlast:Clone() :: UnionOperation
 pride.CFrame = char.PrimaryPart.CFrame
@@ -51,7 +51,7 @@ local success, errorMsg = pcall(function()
 			hit = true
 
 			BuffEffectsUtil:MagicVFX(monster)
-			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
+			Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic1 })
 
 			pride:Destroy()
 

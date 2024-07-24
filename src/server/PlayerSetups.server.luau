@@ -182,7 +182,6 @@ local function setup(plr: Player)
 				local hasBadgeNow = BadgeService:UserHasBadgeAsync(plr.UserId, 783240039527287)
 
 				if hasBadgeOld and not hasBadgeNow then BadgeService:AwardBadge(plr.UserId, 783240039527287) end
-
 			end)
 		end)
 	end)

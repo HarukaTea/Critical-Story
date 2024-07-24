@@ -22,8 +22,8 @@ local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true }
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic2 })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 
 local mark = RepS.Package.MagicAssets.ArcaneMark:Clone() :: BasePart
 mark.CFrame = monster.PrimaryPart.CFrame
@@ -41,11 +41,11 @@ for _ = 1, 5 do
 		end
 
 		mark.Transparency = 0.4
-		Events.ClientTween:FireAll({ mark }, { Transparency = 0.9 }, "threeHalf")
+		Events.ClientTween.FireAll({ Objs = { mark }, Goal = { Transparency = 0.9 }, TweenInfo = "threeHalf" })
 
 		wait(0.35)
 	end)
 
 	if not success and RS:IsStudio() then warn(errorMsg) end
 end
-Events.ClientTween:FireAll({ mark }, { Transparency = 1 }, "half")
+Events.ClientTween.FireAll({ Objs = { mark }, Goal = { Transparency = 1 }, TweenInfo = "half" })

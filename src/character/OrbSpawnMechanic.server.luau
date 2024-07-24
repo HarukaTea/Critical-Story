@@ -75,11 +75,7 @@ end
 Add(HarukaLib:Hydrate(char, {
     ["Attr-InCombat"] = orbSpawnHandler
 }))
+Add(orbSpawnEmpty)
 
 --// Clear
-local function onDead()
-    orbSpawnEmpty()
-
-    Empty()
-end
-char.Humanoid.Died:Once(onDead)
+char.Humanoid.Died:Once(Empty)

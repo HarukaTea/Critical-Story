@@ -3,8 +3,8 @@
 return {
     Name = "giveexp",
     Aliases = { "exp" },
-    Description = "Give the exp to which you given.",
-    Group = "Testers",
+    Description = "Give player(s) EXP",
+    Group = "Developer",
     Args = {
         {
             Type = "players",

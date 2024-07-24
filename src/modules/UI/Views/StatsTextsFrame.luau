@@ -66,33 +66,44 @@ end
 
 local function StatText(id: string, self: table) : TextLabel
     local scope = self.scope :: Fusion.Scope
-    local char = self.char :: Model
     local charDMGStats = self.charDMGStats
-
-    table.insert(scope, HarukaLib:Hydrate(char, {
-        ["Attr-MinDMG"] = function(newDMG: number)
-            charDMGStats.MinDMG:set(newDMG)
-        end,
-        ["Attr-MaxDMG"] = function(newDMG: number)
-            charDMGStats.MaxDMG:set(newDMG)
-        end,
-        ["Attr-Magic"] = function(newMagic: number)
-            charDMGStats.Magic:set(newMagic)
-        end
-    }))
 
     return Components.TextLabel(scope, {
         Name = id.."Text",
         AutomaticSize = Enum.AutomaticSize.X,
         Size = fromScale(0, 1),
+        TextColor3 = if id == "ClassATKBuff" then Color3.fromRGB(85, 255, 255) else Color3.fromRGB(255, 255, 255),
+
         Text = Computed(scope, function(use: Fusion.Use)
             if id == "ClassATK" then
                 if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
-                    local minDMG, maxDMG = use(charDMGStats.MinDMG), use(charDMGStats.MaxDMG)
+                    local minDMG, maxDMG = use(charDMGStats.MinDMG) :: number, use(charDMGStats.MaxDMG) :: number
 
                     return if minDMG >= maxDMG then maxDMG else minDMG.."-"..maxDMG
                 else
                     return use(charDMGStats.Magic)
+                end
+
+            elseif id == "ClassATKBuff" then
+                if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
+                    local minDMG, maxDMG = use(charDMGStats.MinDMGBuff) :: number, use(charDMGStats.MaxDMGBuff) :: number
+
+                    if minDMG > 0 and maxDMG <= 0 then
+                        return "(+"..minDMG.."-0)"
+
+                    elseif minDMG <= 0 and maxDMG > 0 then
+                        return "(+0-"..maxDMG..")"
+
+                    elseif minDMG <= 0 and maxDMG <= 0 then
+                        return "(+0)"
+
+                    else
+                        return "(+"..minDMG.."-"..maxDMG..")"
+                    end
+                else
+                    local magic = use(charDMGStats.MagicBuff) :: number
+
+                    return if magic > 0 then "(+"..magic..")" else "(+0)"
                 end
 
             elseif id == "Gold" then
@@ -128,6 +139,7 @@ local function StatsTextsFrame(self: table) : Frame
 
             StatImage("ClassATK", self),
             StatText("ClassATK", self),
+            StatText("ClassATKBuff", self),
 
             StatImage("Gold", self),
             StatText("Gold", self),

@@ -40,7 +40,7 @@ function CAAttackUtil:CriticalHit(plr: Player, monster: Model, maxDmg: number, f
 		criEff.Parent = monster.PrimaryPart
         Debris:AddItem(criEff, 1)
 
-        Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Critical)
+        Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Critical })
 		ServerUtil:ShowText(char, "CRITICAL!", fromRGB(230, 241, 3))
 	end
 
@@ -189,7 +189,7 @@ function CAAttackUtil.Repeater(plr: Player, monster: Model, baseDamage: number, 
         laser.Parent = workspace.MapComponents.OrbHolders[plr.Name]
         Debris:AddItem(laser, 1)
 
-        Events.ClientTween:Fire(plr, { laser }, { Transparency = 1 }, "half")
+        Events.ClientTween.Fire(plr, { Objs = { laser }, Goal = { Transparency = 1 }, TweenInfo = "half" })
     end
 
     CAAttackUtil:DealDMG(plr, monster, baseDamage)
@@ -216,7 +216,7 @@ function CAAttackUtil.Striker(plr: Player, monster: Model, baseDamage: number)
                 shockwave.Parent = workspace
                 Debris:AddItem(shockwave, 1)
 
-                Events.ClientTween:FireAll({ shockwave }, { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, "one")
+                Events.ClientTween.FireAll({ Objs = { shockwave }, Goal = { Size = shockwave.Size + v3New(20, 0, 20), Transparency = 1 }, TweenInfo = "one" })
 
                 wait(0.25)
                 if orb and orb.PrimaryPart then plr.Character:PivotTo(orb.PrimaryPart.CFrame) end
@@ -321,7 +321,7 @@ function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: numbe
                 ignited.Parent = workspace
                 Debris:AddItem(ignited, 1)
 
-                Events.ClientTween:Fire(plr, { ignited }, { Size = Vector3.one * 77, Transparency = 1 }, "one")
+                Events.ClientTween.Fire(plr, { Objs = { ignited }, Goal = { Size = Vector3.one * 77, Transparency = 1 }, TweenInfo = "one" })
 
                 child:Destroy()
 

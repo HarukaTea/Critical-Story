@@ -5,6 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Events = require(RepS.Modules.Data.Events)
+local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
@@ -84,7 +85,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                     }),
                     Components.ImageLabel(scope, {
                         Name = "MobAvatar",
-                        Image = AssetBook.MonsterInfo[monster.Name].Icon,
+                        Image = MonsterBook[monster.Name].Icon,
                         Size = fromScale(1, 1),
                         SizeConstraint = Enum.SizeConstraint.RelativeYY,
                         BackgroundTransparency = 0,
@@ -95,7 +96,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                         Name = "MobName",
                         Position = fromScale(0.253, 0.1),
                         Size = fromScale(0.627, 0.35),
-                        Text = AssetBook.MonsterInfo[monster.Name].Name,
+                        Text = MonsterBook[monster.Name].Name,
                         TextXAlignment = Enum.TextXAlignment.Left
                     }),
                     Components.TextLabel(scope, {
@@ -136,7 +137,7 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
                             local monsterSymbols = self.charData.TargetMonsters:GetChildren() :: table
 							local monsters = {}
                             if #monsterSymbols > 1 then
-                                Events.ChangeMobTarget:Fire(monster)
+                                Events.ChangeAttackTarget.Fire({ Target = monster })
 
                                 for _, child: ObjectValue in ipairs(monsterSymbols) do
                                     if child.Value then insert(monsters, child.Value) end

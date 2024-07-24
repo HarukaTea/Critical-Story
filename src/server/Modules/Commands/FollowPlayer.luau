@@ -3,12 +3,12 @@
 return {
     Name = "followplayer",
     Description = "Follow a player and then teleport to that server.",
-    Group = "Moderators",
+    Group = "Moderator",
     Args = {
         {
             Type = "string",
             Name = "player",
-            Description = "The player username you want to follow"
+            Description = "The player you want to follow, type USERNAME"
         }
     }
 }

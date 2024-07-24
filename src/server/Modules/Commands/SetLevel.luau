@@ -3,13 +3,13 @@
 return {
     Name = "setlevel",
     Aliases = {"level"},
-    Description = "Set the level to what you want.",
-    Group = "Testers",
+    Description = "Set the level of player(s)",
+    Group = "Developer",
     Args = {
         {
             Type = "players",
             Name = "players",
-            Description = "The player you want to apply"
+            Description = "The player(s) you want to apply"
         },
         {
             Type = "number",

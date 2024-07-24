@@ -5,6 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local LocationBook = require(RepS.Modules.Data.LocationBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Children, Tween, Computed = Fusion.Children, Fusion.Tween, Fusion.Computed
@@ -38,16 +39,16 @@ local function LocationTitleFrame(self: table) : Frame
 			locationInfo.HorizonLineSize:set(fromScale(0.25, 0.07))
 			locationInfo.Shown:set(true)
 
-            locationInfo.Name:set(AssetBook.LocationInfo[location].Name)
-            locationInfo.Desc:set(AssetBook.LocationInfo[location].Desc)
+            locationInfo.Name:set(LocationBook[location].Name)
+            locationInfo.Desc:set(LocationBook[location].Desc)
 
 			wait(0.3)
 			locationInfo.OverallStrokeTrans:set(0.3)
 			locationInfo.OverallTrans:set(0)
-            if AssetBook.LocationInfo[location].RecommendLevel > self.plr:GetAttribute("Levels") + 10 then
+            if LocationBook[location].RecommendLevel > self.plr:GetAttribute("Levels") + 10 then
                 locationInfo.RLevelTrans:set(0)
                 locationInfo.RLevelStrokeTrans:set(0.3)
-                locationInfo.RLevelText:set("Recommend Level: "..AssetBook.LocationInfo[location].RecommendLevel)
+                locationInfo.RLevelText:set("Recommend Level: "..LocationBook[location].RecommendLevel)
             end
 
 			wait(0.1)
@@ -147,7 +148,7 @@ local function LocationTitleFrame(self: table) : Frame
             Components.TextLabel(scope, {
                 Name = "RecommendLevel",
                 AnchorPoint = v2New(0.5, 0),
-                Position = fromScale(0.5, 1.7),
+                Position = fromScale(0.5, 2.3),
                 Size = fromScale(1, 0.45),
                 TextColor3 = fromRGB(255, 85, 127),
 

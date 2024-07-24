@@ -25,7 +25,7 @@ StoryBook.Main = {
     },
     {
         Name = "First Steps",
-        Target = "Talk to Pioxit again",
+        Target = "Talk to Pioxit",
         Desc = "",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
@@ -34,10 +34,10 @@ StoryBook.Main = {
     },
     {
         Name = "Valiant Explorer",
-        Target = "Talk to Milk",
+        Target = "Talk to any villagers here",
         Desc = "",
-        NPC = "Milk",
-        Hint = if pos.Milk then pos.Milk else v3New(),
+        NPC = "None",
+        Hint = if pos.MonolithVillage then pos.MonolithVillage.StoryLocator1 else v3New(),
 
         Rewards = {
             EXP = 20,
@@ -46,31 +46,7 @@ StoryBook.Main = {
     },
     {
         Name = "Critical Power",
-        Target = "Learn how to combat",
-        Desc = "",
-        NPC = "Milk",
-        Hint = if pos.Milk then pos.Milk else v3New(),
-
-        Rewards = {
-            EXP = 20,
-            Gold = 100
-        }
-    },
-    {
-        Name = "The Future",
-        Target = "Talk to Milk again",
-        Desc = "",
-        NPC = "Milk",
-        Hint = if pos.Milk then pos.Milk else v3New(),
-
-        Rewards = {
-            EXP = 20,
-            Gold = 100
-        }
-    },
-    {
-        Name = "Paho - The Executor",
-        Target = "Talk to Pioxit again",
+        Target = "Go back to Pioxit",
         Desc = "",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
@@ -81,8 +57,20 @@ StoryBook.Main = {
         }
     },
     {
-        Name = "Initus Bay",
-        Target = "Coming Soon",
+        Name = "The Future",
+        Target = "Talk to Pioxit",
+        Desc = "",
+        NPC = "Pioxit",
+        Hint = if pos.Pioxit then pos.Pioxit else v3New(),
+
+        Rewards = {
+            EXP = 20,
+            Gold = 100
+        }
+    },
+    {
+        Name = "Encounter",
+        Target = "Find a way to Initus Bay",
         Desc = "",
         NPC = "None",
         Hint = v3New(),

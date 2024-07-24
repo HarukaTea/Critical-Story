@@ -7,13 +7,13 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 return {
     Name = "setclass",
     Aliases = {"class"},
-    Description = "Set the class to which you given.",
-    Group = "Testers",
+    Description = "Set the class of player(s)",
+    Group = "Developer",
     Args = {
         {
             Type = "players",
             Name = "players",
-            Description = "The player who will be set"
+            Description = "The player(s) who will be set"
         },
         function(context: table)
             local classes = {}

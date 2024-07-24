@@ -1,21 +1,21 @@
 --!nocheck
 
+local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local Events = require(SSS.Modules.Data.ServerEvents)
 local Signals = require(SSS.Modules.Data.ServerSignals)
-local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local StoryBook = require(RepS.Modules.Data.StoryBook)
+local QuestUtil = require(SSS.Modules.Utils.QuestUtil)
 
 local wait = task.wait
 
 --// Main
 local function startTheAdventure(plr: Player)
-    Events.StoryEvents:Fire(plr, "StoryMain1")
+    Events.FireStoryEvents.Fire(plr, { EventSymbol = "StoryMain1" })
 
     wait(1)
-    Events.LockCam:Fire(plr, "Reset")
+    Events.CameraScene.Fire(plr, { Part = RepS.Package.Unloads.CameraReset })
 
     wait(3)
     Signals.QuestComplete:Fire("Main", 1, plr, true)
@@ -40,6 +40,8 @@ local function firstCombat(plr: Player)
     locator.CombatEnds.Event:Connect(function()
         if locator:FindFirstChildOfClass("Model"):GetAttribute("Health") <= 0 then
             Signals.QuestComplete:Fire("Main", 4, plr, true)
+
+            Debris:AddItem(locator, 3)
         end
     end)
 end
@@ -47,21 +49,12 @@ Signals.FirstStepTutorial:Connect(firstCombat)
 
 --// Side
 local function newFactionJourney(plr: Player)
-    print("1")
     local check = false
     for _, quest: IntValue in plr.Quests:GetChildren() do
         if quest.Name == "Side" and quest.Value == 1 then check = true break end
     end
 
-    if not check then
-        print("2")
-        local intValue = Instance.new("IntConstrainedValue")
-        intValue.Name = "Side"
-        intValue.MinValue = 1
-        intValue.MaxValue = #StoryBook.Side
-        intValue.Value = 1
-        intValue.Parent = plr.Quests
-    end
+    if not check then QuestUtil:CreateNewQuest(plr, "Side", 0) end
 end
 Signals.JoinFaction:Connect(newFactionJourney)
 

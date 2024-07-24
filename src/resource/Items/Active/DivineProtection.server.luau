@@ -15,5 +15,6 @@ local ITEM_ATTRIBUTES = { CD = 18, DEFENSE_BUFF = 99, DURATION = 6 }
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic1 })
+
 BuffEffectsUtil:DefenseBuff(char, ITEM_ATTRIBUTES.DEFENSE_BUFF, ITEM_ATTRIBUTES.DURATION)

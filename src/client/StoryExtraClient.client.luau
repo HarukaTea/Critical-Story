@@ -6,7 +6,6 @@ local SoundS = game:GetService("SoundService")
 local TS = game:GetService("TweenService")
 local TestS = game:GetService("TestService")
 
-local Events = require(RepS.Modules.Data.Events)
 local Signals = require(RepS.Modules.Data.Signals)
 
 local wait = task.wait

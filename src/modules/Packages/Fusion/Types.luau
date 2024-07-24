@@ -99,8 +99,8 @@ export type Use = <T>(target: UsedAs<T>) -> T
 -- A state object whose value can be set at any time by the user.
 export type Value<T, S = T> = StateObject<T> & {
 	kind: "State",
-	set: (Value<T, S>, newValue: S, force: boolean?) -> S,
-	____phantom_setType: (never) -> S -- phantom data so this contains a T
+ 	set: (Value<T, S>, newValue: S, force: boolean?) -> S,
+	 ____phantom_setType: (never) -> S -- phantom data so this contains a T
 }
 export type ValueConstructor = <T>(
 	scope: Scope<unknown>,
@@ -228,17 +228,9 @@ export type ScopedConstructor = (() -> Scope<{}>)
 
 export type ContextualConstructor = <T>(defaultValue: T) -> Contextual<T>
 
-export type Safe = <Success, Fail>(
-	callbacks: {
-		try: () -> Success,
-		fallback: (err: unknown) -> Fail
-	}
-) -> Success | Fail
-
 export type Fusion = {
 	version: Version,
 	Contextual: ContextualConstructor,
-	Safe: Safe,
 
 	doCleanup: (Task) -> (),
 	scoped: ScopedConstructor,
@@ -272,14 +264,14 @@ export type ExternalProvider = {
 	policies: {
 		allowWebLinks: boolean
 	},
-
+	
 	logErrorNonFatal: (
 		errorString: string
 	) -> (),
 	logWarn: (
 		errorString: string
 	) -> (),
-
+	
 	doTaskImmediate: (
 		resume: () -> ()
 	) -> (),

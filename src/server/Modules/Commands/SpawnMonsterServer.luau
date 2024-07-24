@@ -2,8 +2,9 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local cfNew = CFrame.new
 
@@ -16,7 +17,7 @@ return function (context: table, monster: string, level: number, amount: number,
     if not check or not check2 or not check3 or not check4 then
         return "I guess you typed incorrectly..."
     end
-    if not AssetBook.MonsterInfo[monster] then
+    if not MonsterBook[monster] then
         return "Are you sure there is a monster called "..monster.."?"
     end
     if level > 1100 then
@@ -37,7 +38,13 @@ return function (context: table, monster: string, level: number, amount: number,
     locator:SetAttribute("SubMonster", nil)
     locator.CFrame = context.Executor.Character.PrimaryPart.CFrame * cfNew(0, -2, 0)
     locator.Transparency = 1
+    locator:SetAttribute("InCombat", true)
     locator.Parent = workspace.Monsters
+
+    Spawn(function()
+        task.wait(2)
+        locator:SetAttribute("InCombat", false)
+    end)
 
     for _ = 1, amount - 1 do
         local subLocator = RepS.Package.Unloads.MonsterLocator:Clone() :: BasePart
@@ -51,5 +58,5 @@ return function (context: table, monster: string, level: number, amount: number,
         subLocator.Parent = locator
     end
 
-    return "Level "..level.." "..AssetBook.MonsterInfo[monster].Name.." x"..amount.." spawned"
+    return "Level "..level.." "..MonsterBook[monster].Name.." x"..amount.." spawned"
 end

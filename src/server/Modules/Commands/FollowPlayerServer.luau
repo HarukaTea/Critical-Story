@@ -21,13 +21,15 @@ return function (context: table, player: string)
 
     if not check2 then return "Player not found!" end
 
+    context:Reply("Finding player...please wait...")
+
     local connection: RBXScriptConnection
     task.spawn(function()
         task.wait(5)
         if connection then
             connection:Disconnect()
 
-            Events.CreateHint:Fire(context.Executor, "Player not in this game!")
+            Events.CreateHint.Fire(context.Executor, { Hint = "Player not in this game!" })
         end
     end)
 

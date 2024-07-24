@@ -23,7 +23,7 @@ local v3New = Vector3.new
 local clamp, abs = math.clamp, math.abs
 local cfAngles = CFrame.Angles
 
-Add(RS.Heartbeat:Connect(function(deltaTime)
+Add(RS.PostSimulation:Connect(function(deltaTime)
 	local direction = HRP.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
 	local momentum = HRP.CFrame:VectorToObjectSpace(HRP.AssemblyLinearVelocity) * MOMENTUM_FACTOR
 

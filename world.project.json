@@ -11,7 +11,7 @@
         },
         "Players": {
             "$properties": {
-                "RespawnTime": 3
+                "RespawnTime": 5
             }
         },
         "ReplicatedFirst": {

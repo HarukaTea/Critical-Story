@@ -34,4 +34,4 @@ eff.CFrame = char.PrimaryPart.CFrame * cfNew(0, -1.5, 0)
 eff.Parent = workspace
 Debris:AddItem(eff, 1)
 
-Events.ClientTween:FireAll({ eff }, { Size = v3New(23, 15, 23), Transparency = 1 }, "threeHalf")
+Events.ClientTween.FireAll({ Objs = { eff }, Goal = { Size = v3New(23, 15, 23), Transparency = 1 }, TweenInfo = "threeHalf" })

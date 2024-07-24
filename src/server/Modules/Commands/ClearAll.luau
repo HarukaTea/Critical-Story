@@ -2,13 +2,13 @@
 
 return {
     Name = "clear",
-    Description = "clear a player's backpack",
-    Group = "Testers",
+    Description = "Clear a player's backpack",
+    Group = "Developer",
     Args = {
         {
             Type = "players",
             Name = "players",
-            Description = "The player you wanna clear"
+            Description = "The player(s) you wanna clear"
         }
     }
 }

@@ -174,6 +174,4 @@ local function attacking()
 		end,
 	})
 end
-
-wait(0.5)
 attacking()

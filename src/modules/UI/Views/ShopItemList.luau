@@ -28,14 +28,14 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         end
     }))
 
-    local function _handleItems(items: table)
-        self.items:set(items)
+    table.insert(scope,Events.EnterShopping.On(function(data)
+        local items = data.Items
 
+        self.items:set(items)
         self:DeselectAll()
 
         ClientUtil:OpenUIEx(self.plr, "Shop")
-    end
-    Events.EnterShopping:Connect(_handleItems)
+    end))
 
     self.itemFrame = Components.ScrollingFrame(scope, {
         Name = "Items",

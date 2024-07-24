@@ -12,7 +12,6 @@ local slotStats = {
 			Class = "Warrior",
 			LastSeenLocation = "MonolithVillage",
 			LastSeenWorld = "Mainworld",
-			Cosmetic = "None",
 
 			LvPoints = 0,
 			DMGPoints = 0,

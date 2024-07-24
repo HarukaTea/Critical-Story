@@ -3,13 +3,13 @@
 return {
     Name = "giverep",
     Aliases = { "rp" },
-    Description = "Add the reputation to which you given.",
-    Group = "Testers",
+    Description = "Give reputation for player(s)",
+    Group = "Developer",
     Args = {
         {
             Type = "players",
             Name = "players",
-            Description = "The player you want to set"
+            Description = "The player(s) you want to give"
         },
         {
             Type = "number",

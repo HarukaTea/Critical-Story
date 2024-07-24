@@ -2,7 +2,7 @@
 
 return {
     Name = "freecam",
-    Description = "Enable freecam",
-    Group = "Players",
+    Description = "Enable free camera mode, press P key to disable",
+    Group = "Player",
     Args = {}
 }

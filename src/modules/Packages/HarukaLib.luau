@@ -11,9 +11,7 @@ local Signal = require(ReplicatedStorage.Modules.Packages.Signal)
 
 local HarukaLib = {}
 
---[[
-	Convert a number to string with abbr, for example, `10000` -> `10K`
-]]
+
 function HarukaLib:NumberConvert(number: number, type: string) : string
 	local prefixes = { "", "K", "M", "B", "T", "Q", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "Ud", "Dd" }
 	local abbrFactor = math.floor(math.floor(math.log10(number)) / 3)
@@ -27,9 +25,7 @@ function HarukaLib:NumberConvert(number: number, type: string) : string
 	return tostring(number)
 end
 
---[[
-	Get player's current device, may not accurate
-]]
+
 function HarukaLib:GetDevice() : "PC" | "Mobile" | "Console" | "VR"
 	local device = "PC"
 
@@ -40,9 +36,7 @@ function HarukaLib:GetDevice() : "PC" | "Mobile" | "Console" | "VR"
 	return device
 end
 
---[[
-	Get more accurate device, instead of a type
-]]
+
 function HarukaLib:GetAccurateDevice() : "PC" | "Tablet" | "Phone" | "Xbox" | "PlayStation" | "VR"
 	local device = "PC"
 
@@ -67,27 +61,23 @@ function HarukaLib:GetAccurateDevice() : "PC" | "Tablet" | "Phone" | "Xbox" | "P
 	return device
 end
 
---[[
-	Update an attribute to a given value, equals to `Value += val`
-]]
+
 function HarukaLib:AddAttr(obj: Instance, attribute: string, val: number)
 	obj:SetAttribute(attribute, obj:GetAttribute(attribute) + val)
 end
 
---[[
-	Clear all attributes from an instance, equals to `obj:ClearAllChildren()`
-]]
+
 function HarukaLib:ClearAllAttributes(obj: Instance)
 	for attribute, _ in obj:GetAttributes() do obj:SetAttribute(attribute, nil) end
 end
 
---[[
-	Whether it's in the region with the given Vector3
-]]
+
 function HarukaLib:IsInRegion(position: Vector3, regions: table) : BasePart
 	local region: BasePart = nil
 
 	for _, child: BasePart in regions do
+		if not child:IsA("BasePart") then continue end
+
 		local point = child.CFrame:PointToObjectSpace(position)
 
 		if math.abs(point.X) < child.Size.X / 2
@@ -102,9 +92,7 @@ function HarukaLib:IsInRegion(position: Vector3, regions: table) : BasePart
 	return region
 end
 
---[[
-	Richtextify my self-created text format
-]]
+
 function HarukaLib:RichTextify(text: string) : string
 	local colorList = {
 		["<blue>"] = [[<font color="#70a1ff">]],
@@ -122,9 +110,7 @@ function HarukaLib:RichTextify(text: string) : string
 	return text
 end
 
---[[
-	A simple serializer for datastore
-]]
+
 function HarukaLib:Serialize(val: CFrame | Vector3 | Color3) : any
 	local valType = typeof(val)
 
@@ -160,9 +146,7 @@ function HarukaLib:Deserialize(val: table) : any
 	end
 end
 
---[[
-	A custom remade of `Fusion.Hydrate`, return a way to disconnect
-]]
+
 function HarukaLib:Hydrate(obj: Instance, props: table)
 	local Add, Empty = HarukaLib.Bin()
 
@@ -188,39 +172,35 @@ function HarukaLib:Hydrate(obj: Instance, props: table)
 	return Empty
 end
 
---[[
-	A custom remade of `Bin`
-]]
+
 function HarukaLib.Bin()
 	local bin = {}
 
-	local function doCleanup(tasks: any)
-		for _, item: any in tasks do
-			if typeof(item) == "Instance" then
+	local function doCleanup(item: any)
+		if typeof(item) == "Instance" then
+			item:Destroy()
+
+		elseif typeof(item) == "RBXScriptConnection" then
+			item:Disconnect()
+
+		elseif typeof(item) == "function" then
+			Spawn(item)
+
+		elseif typeof(item) == "thread" then
+			if item then task.cancel(item) end
+
+		elseif typeof(item) == "table" then
+			if typeof(item.destroy) == "function" then
+				item:destroy()
+
+			elseif typeof(task.Destroy) == "function" then
 				item:Destroy()
 
-			elseif typeof(item) == "RBXScriptConnection" then
-				item:Disconnect()
+			elseif item[1] ~= nil then
+				for index = #item, 1, -1 do
+					doCleanup(item[index])
 
-			elseif typeof(item) == "function" then
-				Spawn(item)
-
-			elseif typeof(item) == "thread" then
-				if item then task.cancel(item) end
-
-			elseif typeof(item) == "table" then
-				if typeof(item.destroy) == "function" then
-					item:destroy()
-
-				elseif typeof(task.Destroy) == "function" then
-					item:Destroy()
-
-				elseif item[1] ~= nil then
-					for index = #item, 1, -1 do
-						doCleanup(item[index])
-
-						item[index] = nil
-					end
+					item[index] = nil
 				end
 			end
 		end
@@ -238,9 +218,7 @@ function HarukaLib.Bin()
 	end
 end
 
---[[
-	A custom remade of `Clock`, provides a callback to disconnect
-]]
+
 function HarukaLib.Clock(tickTime: number, func: () -> ())
 	local nowTime = 0
 	local dropTime = tickTime * 10
@@ -264,9 +242,7 @@ function HarukaLib.Clock(tickTime: number, func: () -> ())
 	end
 end
 
---[[
-	A custom tween remade of `TweenService`, auto-play
-]]
+
 function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 	local properties = {}
 	local signal = Signal.new()
@@ -382,9 +358,7 @@ function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 	return signal
 end
 
---[[
-	Number type check in run-time, inspired by `t`
-]]
+
 function HarukaLib:TypeCheck(checkTask: "Integer" | "Min" | "Max" | "MinMax", val: any, extra: number?, extra2: number?) : boolean
 	local success = pcall(function()
 		if checkTask == "Integer" then
@@ -409,9 +383,7 @@ function HarukaLib:TypeCheck(checkTask: "Integer" | "Min" | "Max" | "MinMax", va
 	return success
 end
 
---[[
-	custom remade of `LootPlan`
-]]
+
 function HarukaLib:RollLoot(loots: { [string]: number }) : string
 	local lootList = {}
 
@@ -445,9 +417,7 @@ function HarukaLib:RollLoot(loots: { [string]: number }) : string
 	end
 end
 
---[[
-	Play a cutscene camera using bezier curve
-]]
+
 function HarukaLib:PlayCutscene(pointsFolder: Folder | Model, duration: number)
 	local camera = workspace.CurrentCamera
 	local signal = Signal.new()

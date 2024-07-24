@@ -1,6 +1,8 @@
 --!nocheck
 
-local Spawn = require(script.Parent.Spawn)
+local RepS = game:GetService("ReplicatedStorage")
+
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Promise = {}
 Promise.__index = Promise

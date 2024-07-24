@@ -66,7 +66,7 @@ local function ChatFrame(self: table) : Frame
 
         promptChatting.Enabled = true
 
-        Events.NPCChatEnded:Fire(npcChatting, seriesDoing)
+        Events.NPCChatEnded.Fire({ NPC = npcChatting, Series = seriesDoing })
 
         promptChatting = nil
         npcChatting = nil
@@ -112,7 +112,7 @@ local function ChatFrame(self: table) : Frame
             local series = if sFind(dialoguesChatting[dialogueIndexChatting], "TOWN") then "Town" else "Side"
             local questWillDo = match(dialoguesChatting[dialogueIndexChatting], "%d+")
 
-            Events.NewQuest:Fire(npcChatting, series, tonumber(questWillDo))
+            Events.NewQuest.Fire({ NPC = npcChatting, Series = series, QuestId = tonumber(questWillDo) })
 
             __endChatting()
             return
@@ -173,7 +173,9 @@ local function ChatFrame(self: table) : Frame
 
         Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
     end
-    Events.NPCChat:Connect(_startChatting)
+    table.insert(scope, Events.EnterNPCChat.On(function(data)
+        _startChatting(data.NPC, data.Prompt)
+    end))
     Signals.StartNPCChat:Connect(_startChatting)
 
     local function _chooseOption(series: number)

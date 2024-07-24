@@ -19,18 +19,6 @@ local wait = task.wait
 local tFind = table.find
 local sFind, upper = string.find, string.upper
 
-local COLORS = {
-	Passive = fromRGB(40, 98, 3),
-	Active = fromRGB(167, 111, 83),
-	Material = fromRGB(0, 130, 139),
-	Equipment = Color3.fromHex('#7b1fa2'),
-	Other = fromRGB(0, 130, 139),
-
-	Equip = fromRGB(131, 131, 65),
-	Pin = fromRGB(93, 47, 140),
-}
-local BLACKLIST = { "Equip", "Pin" }
-
 local function _checkSlot(self: table, type: string) : string
 	local classFrame = self.plrGui.AdventurerStats.Bottom.ClassFrame
 
@@ -85,6 +73,17 @@ end
 
 local function FilterButtonBackpack(id: string, self: table): TextButton
 	local scope = self.scope :: Fusion.Scope
+	local COLORS = {
+		Passive = fromRGB(40, 98, 3),
+		Active = fromRGB(167, 111, 83),
+		Material = fromRGB(0, 130, 139),
+		Equipment = Color3.fromHex('#7b1fa2'),
+		Other = fromRGB(0, 130, 139),
+
+		Equip = fromRGB(131, 131, 65),
+		Pin = fromRGB(93, 47, 140),
+	}
+	local BLACKLIST = { "Equip", "Pin" }
 
 	return Components.TextButton(scope, {
 		Name = id,
@@ -93,7 +92,7 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 		Text = Computed(scope, function(use: Fusion.Use)
 			return if tFind(BLACKLIST, id) then use(self.filterInfo[id]) else upper(id)
 		end),
-		Size = fromScale(0.116, 1),
+		Size = fromScale(0.125, 1),
 
 		[Fusion.Children] = {
 			Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.2, 0) }),
@@ -139,9 +138,9 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 				if itemType == "Cosmetic" then
 					local currentCos = self.plr:GetAttribute("Cosmetic") :: string
 					if not currentCos or currentCos == "None" then
-						Events.EquipItems:Fire("Cosmetic", "Cosmetic1", item)
+						Events.EquipItem.Fire({ ItemType = "Cosmetic", ItemSlot = "Cosmetic1", ItemId = item })
 					else
-						Events.EquipItems:Fire("ClearCosmetic", "Cosmetic1", item)
+						Events.EquipItem.Fire({ ItemType = "ClearCosmetic", ItemSlot = "Cosmetic1", ItemId = item })
 					end
 					return
 				end
@@ -159,17 +158,17 @@ local function FilterButtonBackpack(id: string, self: table): TextButton
 					self.inventory[item]:SetAttribute("Equipped", true)
 					self.inventory[item]:SetAttribute("Slot", slot)
 
-					Events.EquipItems:Fire(itemType, slot, item)
+					Events.EquipItem.Fire({ ItemType = itemType, ItemSlot = slot, ItemId = item })
 
 				elseif checkSame == "Exist" then
-					Events.EquipItems:Fire("Clear" .. itemType, sameSlot, item)
+					Events.EquipItem.Fire({ ItemType = "Clear"..itemType, ItemSlot = sameSlot, ItemId = item })
 				end
 
 			elseif id == "Pin" then
 				local item = _findItem(peek(self.itemFrame))
 				if item == "None" then return end
 
-				Events.UpdatePinnedItems:Fire(item)
+				Events.UpdatePinnedItem.Fire({ ItemId = item })
 
 			else
 				self.chosenFilter:set(id)

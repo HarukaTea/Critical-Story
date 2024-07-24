@@ -16,8 +16,6 @@ local fromRGB = Color3.fromRGB
 
 --// Setups
 local function setup()
-	musics.Overworld:Play()
-
 	for _, effect: Instance in camera:GetChildren() do
 		if effect:IsA("BlurEffect") or effect:IsA("ColorCorrectionEffect") then effect:Destroy() end
 	end
@@ -35,7 +33,7 @@ Spawn(setup)
 --// Connections
 local function onDied()
 	---// sometimes the reset button did not make server thinks player is dead
-	Events.ForceReset:Fire()
+	Events.ForceReset.Fire({})
 
 	for _, prompt: Instance in mapComponents:GetDescendants() do
 		if prompt:IsA("ProximityPrompt") and prompt.Name ~= "Chest" then prompt.Enabled = false end

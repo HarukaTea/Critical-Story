@@ -86,7 +86,7 @@ local function slimeBlast(blast: Model, noSound: boolean?)
 	if not noSound then blast.SlimeAttack:Play() end
 
 	blast.Part.Size = v3New()
-	TS:Create(blast.Part, AssetBook.TweenInfos.half, { Size = v3New(1, 6, 6) }):Play()
+	TS:Create(blast.Part, AssetBook.TweenInfos.half, { Size = v3New(1, 8, 8) }):Play()
 end
 
 local function slimeBlastFade(blast: Model)

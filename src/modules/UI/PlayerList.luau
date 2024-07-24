@@ -58,7 +58,7 @@ return function(plr: Player)
 						Name = "PlayerListFrame",
 
 						Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
-							return if use(self.isInCombat) then fromScale(0.5, 0.1) else fromScale(0.5, 1)
+							return if use(self.isInCombat) then fromScale(0.5, 0.1) else fromScale(0.5, 1.5)
 						end), AssetBook.TweenInfos.half),
 
 						[Children] = {
@@ -99,7 +99,7 @@ return function(plr: Player)
 	local function _togglePlayerList(_, inputState: Enum.UserInputState)
 		if inputState ~= Enum.UserInputState.Begin then return end
 
-		Events.ChangePlayerSetting:Fire("PlayerList")
+		Events.ChangePlayerSetting.Fire({ SettingId = "PlayerList" })
 	end
 	CAS:BindAction("TogglePlayerList", _togglePlayerList, false, Enum.KeyCode.Tab)
 

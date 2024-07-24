@@ -7,12 +7,12 @@ local RS = game:GetService("RunService")
 local SSS = game:GetService("ServerScriptService")
 local SS = game:GetService("ServerStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local Formula = require(RepS.Modules.Data.Formulas)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Promise = require(RepS.Modules.Packages.Promise)
-local StoryBook = require(RepS.Modules.Data.StoryBook)
 
 local wait = task.wait
 local floor, random, rad = math.floor, math.random, math.rad
@@ -24,19 +24,44 @@ local yAxis = Vector3.yAxis
 
 local ServerUtil = {}
 
+--// Private
+local function _optimizeModel(model: Model)
+	for _, part: BasePart in model:GetDescendants() do
+		if part:IsA("BasePart") or part:IsA("UnionOperation") or part:IsA("CornerWedgePart") then
+			part.CanCollide = false
+			part.CanQuery = false
+			part.CanTouch = false
+			part.CastShadow = false
+			part.Anchored = false
+		end
+	end
+end
+local function _equipWeapon(char: Model, weapon: Model, defaultPart: string)
+	local weldPos = weapon:GetAttribute("Position") or defaultPart
+
+	ServerUtil:WeldModel(char[weldPos], weapon)
+	_optimizeModel(weapon)
+
+	weapon.Parent = char
+end
+
+--// Public
 
 function ServerUtil:WeldModel(part: Part, welded: Model)
 	local C = welded:GetChildren()
+
 	for i = 1, #C do
 		if C[i]:IsA("BasePart") or C[i]:IsA("UnionOperation") or C[i]:IsA("CornerWedgePart") then
 			local W = instanceNew("Weld")
 			W.Part0 = welded.Middle
 			W.Part1 = C[i]
+
 			local CJ = cfNew(welded.Middle.Position)
 			W.C0 = welded.Middle.CFrame:Inverse() * CJ
 			W.C1 = C[i].CFrame:Inverse() * CJ
 			W.Parent = welded.Middle
 		end
+
 		local Y = instanceNew("Weld")
 		Y.Part0 = part
 		Y.Part1 = welded.Middle
@@ -45,7 +70,7 @@ function ServerUtil:WeldModel(part: Part, welded: Model)
 	end
 
 	local h = welded:GetChildren()
-	for _, child in h do
+	for _, child: BasePart in h do
 		if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then child.Anchored = false end
 	end
 end
@@ -54,55 +79,47 @@ end
 function ServerUtil:EquipWeapon(char: Model, forceClass: string?)
 	local plr = Players:GetPlayerFromCharacter(char)
 	local class = forceClass or plr:GetAttribute("Class") :: string
-	local styleFolder = RepS.Package.StyleWeapons[class] :: Folder
+	local styleFolder = RepS.Package.ClassWeapons[class] :: Folder
 
 	if char.Humanoid.Health <= 0 then return end
 	if plr:GetAttribute("Cosmetic") and plr:GetAttribute("Cosmetic") ~= "None" then return end
 
+	--- clear existing weapons
 	for _, child: Instance in char:GetChildren() do
 		if child:HasTag("Weapon") then child:Destroy() end
 	end
 
-	local function _equipWeapon(weapon: Model, defaultPart: string)
-		local weldPos = if weapon:GetAttribute("Position") then weapon:GetAttribute("Position") else defaultPart
-
-		ServerUtil:WeldModel(char[weldPos], weapon)
-		ServerUtil:SetCollisionGroup(weapon, "Player")
-
-		weapon.Parent = char
-	end
+	--- equip weapon
 	if char:GetAttribute("InCombat") == false then --- in case nil
-		_equipWeapon(styleFolder.WeaponUnequip:Clone(), "Torso")
-
-		if styleFolder:FindFirstChild("WeaponUnequip2") then _equipWeapon(styleFolder.WeaponUnequip2:Clone(), "Torso") end
+		_equipWeapon(char, styleFolder.WeaponUnequip:Clone(), "Torso")
+		_equipWeapon(char, styleFolder.WeaponUnequip2:Clone(), "Torso")
 
 	elseif char:GetAttribute("InCombat") then
-		_equipWeapon(styleFolder.WeaponEquipped:Clone(), "Right Arm")
-
-        if styleFolder:FindFirstChild("WeaponEquipped2") then _equipWeapon(styleFolder.WeaponEquipped2:Clone(), "Right Arm") end
+		_equipWeapon(char, styleFolder.WeaponEquipped:Clone(), "Right Arm")
+		_equipWeapon(char, styleFolder.WeaponEquipped2:Clone(), "Left Arm")
 	end
 end
 
 
 function ServerUtil:EquipArmor(char: Model, armorId: string)
 	if char.Humanoid.Health <= 0 then return end
-
 	if char:FindFirstChild("Armor") then char.Armor:Destroy() end
+	if not armorId then return end
 
+	--- clear existing weapons
 	for _, child: Instance in char:GetChildren() do
 		if child:HasTag("Weapon") then child:Destroy() end
 	end
 
-	if not armorId or armorId == "" or armorId == "None" then
-		ServerUtil:EquipWeapon(char)
-		return
-	end
-
+	--- equip armor
 	local armor = RepS.Package.Cosmetics[armorId]:Clone() :: Model
-	local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg" }
+	local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg", "Extra" }
 
 	--- wait character fully loads
 	for _, part: string in equipList do char:WaitForChild(part, 999) end
+
+	--- armor optimization
+	_optimizeModel(armor)
 
 	--- equip armor
 	local function _equipArmorPart(part: string)
@@ -139,12 +156,6 @@ function ServerUtil:EquipArmor(char: Model, armorId: string)
 	_weldWeapon("HandleLeft", "Left")
 	_weldWeapon("HandleRight", "Right")
 
-	-- equip extra
-	if armor:FindFirstChild("Extra") then _equipArmorPart("Extra") end
-
-	--- ray cancels
-	ServerUtil:SetCollisionGroup(armor, "Player")
-
 	armor.Name = "Armor"
 	armor.Parent = char
 end
@@ -168,7 +179,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 
 	if not locator:GetAttribute("SubMonster") then
 		local tierDisplay = RepS.Package.Effects.TierDisplay:Clone() :: BillboardGui
-		tierDisplay.Monster.Text = AssetBook.MonsterInfo[monster.Name].Name
+		tierDisplay.Monster.Text = MonsterBook[monster.Name].Name
 		tierDisplay.Levels.Text = "Level "..level
 		tierDisplay.Parent = monster.Head
 
@@ -177,10 +188,10 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
-	monster:SetAttribute("MaxHealth", floor(level ^ 2.3) + 39)
+	monster:SetAttribute("MaxHealth", floor(level ^ 2.3 * 1.599) + 39)
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", (floor(level ^ 1.45) + 29))
-	monster:SetAttribute("Damage", (floor(level ^ 1.4) + 4))
+	monster:SetAttribute("EXP", floor(Formula.EXP(level) / 5))
+	monster:SetAttribute("Damage", (floor(level ^ 1.35 * 1.599) + 4))
 	monster:SetAttribute("InCombat", false)
 
 	local numberDisplay = RepS.Package.Effects.Display:Clone() :: BillboardGui
@@ -296,7 +307,7 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 		resolve(position, pos)
 
 	end):Then(function(position: Vector3, pos: Vector3)
-		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 9, 2)
+		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7.5, math.random(2, 3))
 
 	end):Catch(function(err)
 		orbLocation = cfNew(0, 0, 0)
@@ -341,15 +352,23 @@ function ServerUtil:AddTargetForMonster(plr: Player, monster: Model)
 
 	ServerUtil:AddSingleTarget(plr, monster)
 
+	local mobHighlight = RepS.Package.Effects.EncounterHighlight:Clone() :: Highlight
+	mobHighlight.Adornee = monster
+	mobHighlight.Parent = monster
+	Debris:AddItem(mobHighlight, 2)
+
+	Events.ClientTween.FireAll({ Objs = { mobHighlight }, Goal = { FillTransparency = 1, OutlineTransparency = 1 }, TweenInfo = "one" })
+
 	if not char:GetAttribute("InCombat") then
 		char.CharStats.TargetMonster.Value = monster
 		char:SetAttribute("InCombat", true)
 
 		local encounterHighlight = RepS.Package.Effects.EncounterHighlight:Clone() :: Highlight
+		encounterHighlight.Adornee = char
 		encounterHighlight.Parent = char
 		Debris:AddItem(encounterHighlight, 2)
 
-		Events.ClientTween:FireAll({ encounterHighlight }, { FillTransparency = 1, OutlineTransparency = 1 }, "one")
+		Events.ClientTween.FireAll({ Objs = { encounterHighlight }, Goal = { FillTransparency = 1, OutlineTransparency = 1 }, TweenInfo = "one" })
 	end
 end
 
@@ -392,9 +411,11 @@ end
 
 function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	local inventoryFolder = plr.Inventory :: Folder
+	local isNew = false
 
 	if inventoryFolder:FindFirstChild(item) then
 		inventoryFolder[item].Value += amount
+		isNew = true
 
 	else
 		local intValue = instanceNew("IntConstrainedValue")
@@ -409,7 +430,7 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 	itemAcquiredEffect.Parent = workspace
 	Debris:AddItem(itemAcquiredEffect, 1)
 
-	Events.GiveDrop:Fire(plr, item)
+	Events.GiveDrop.Fire(plr, { ItemId = item, Amount = amount, IsNew = isNew })
 end
 
 
@@ -420,7 +441,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 
 	if attributes.COMBAT_REQ then
 		if not char:GetAttribute("InCombat") or not workspace.MapComponents.OrbHolders:FindFirstChild(plr.Name) then
-			Events.CreateHint:Fire(plr, "You can only use this during combat!")
+			Events.CreateHint.Fire(plr, { Hint = "You can only use this during combat!" })
 
 			wait()
 			script:Destroy()
@@ -429,7 +450,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	end
 	if itemInfo.Mana > 0 then
 		if char:GetAttribute("Mana") < itemInfo.Mana then
-			Events.CreateHint:Fire(plr, "You don't have enough Mana!")
+			Events.CreateHint.Fire(plr, { Hint = "You don't have enough mana!" })
 
 			wait()
 			script:Destroy()
@@ -440,7 +461,7 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	end
 	if attributes.MONSTER_REQ then
 		if not monster or not monster.PrimaryPart or not char.PrimaryPart then
-			Events.CreateHint:Fire(plr, "Can't find target enemy!")
+			Events.CreateHint.Fire(plr, { Hint = "Target is empty!" })
 
 			wait()
 			script:Destroy()
@@ -449,12 +470,12 @@ function ServerUtil:UseSkill(plr: Player, item: string, attributes: table, scrip
 	end
 
 	Debris:AddItem(script, if attributes.CD then attributes.CD else 5)
-	Events.ItemCD:Fire(plr, if attributes.CD then attributes.CD else 5, item)
+	Events.ItemCD.Fire(plr, { Cooldown = if attributes.CD then attributes.CD else 5, ItemId = item })
 
 	local itemSymbol = plr.Inventory[item] :: IntConstrainedValue
 	if not ItemBook:FindItem(item).IsSkill then itemSymbol.Value -= 1 end
 	if itemSymbol.Value <= 0 then
-		Events.EquipItems:Fire(plr, itemSymbol:GetAttribute("Slot"), "Null")
+		Events.EquipItemServer.Fire(plr, { ItemSlot = itemSymbol:GetAttribute("Slot"), ItemId = "Null" })
 		itemSymbol:Destroy()
 	end
 
@@ -488,15 +509,6 @@ function ServerUtil:SetCollisionGroup(object: Instance, group: string)
 	if object:IsA("BasePart") or object:IsA("UnionOperation") or object:IsA("CornerWedgePart") then object.CollisionGroup = group end
 
 	for _, child: Instance in object:GetChildren() do ServerUtil:SetCollisionGroup(child, group) end
-end
-
-
-function ServerUtil:GiveQuestRewards(series: string, questId: number, plr: Player)
-	for reward: string, val: number in StoryBook[series][questId].Rewards do
-		HarukaLib:AddAttr(plr, reward, val)
-
-		ServerUtil:ShowText(plr.Character, "+"..val.." "..reward, fromRGB(212, 255, 0))
-	end
 end
 
 

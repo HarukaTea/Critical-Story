@@ -20,14 +20,12 @@ local wait = task.wait
 local function bounce(hit: BasePart)
     if not hit:HasTag("Bounce") then return end
 
-    local humanoid = char.Humanoid :: Humanoid
-
     local bp = instanceNew("BodyPosition")
     bp.Name = "Bouncer"
     bp.D = 800
     bp.Position = hit.Parent.Destination.Position
     bp.MaxForce = Vector3.one * 100000
-    bp.Parent = char.Humanoid.RootPart
+    bp.Parent = char.PrimaryPart
     Debris:AddItem(bp, 1)
 
     workspace.Sounds.SFXs.Bounce:Play()

@@ -29,8 +29,8 @@ local ITEM_ATTRIBUTES = { CD = 10, COMBAT_REQ = true, MONSTER_REQ = true, HEAL_B
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic2 })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 
 BuffEffectsUtil:Heal(char, ITEM_ATTRIBUTES.HEAL_BUFF)
 
@@ -39,10 +39,10 @@ lantern.CFrame = char.Torso.CFrame * cfNew(0,0,-4)
 lantern.Parent = workspace
 Debris:AddItem(lantern, 3)
 
-Events.ClientTween:FireAll({ lantern }, { Transparency = 0 }, "twiceHalfOne")
+Events.ClientTween.FireAll({ Objs = { lantern }, Goal = { Transparency = 0 }, TweenInfo = "twiceHalfOne" })
 Spawn(function()
 	wait(1.8)
-	Events.ClientTween:FireAll({ lantern }, { Transparency = 1 }, "one")
+	Events.ClientTween.FireAll({ Objs = { lantern }, Goal = { Transparency = 1 }, TweenInfo = "one" })
 end)
 
 local success, errorMsg = pcall(function()
@@ -83,10 +83,10 @@ local success, errorMsg = pcall(function()
 		explosion.Parent = char
 		Debris:AddItem(explosion, 1)
 
-		Events.ClientTween:FireAll({ explosion }, { Size = v3New(16, 16, 16), Transparency = 0.4 }, "twiceHalf")
+		Events.ClientTween.FireAll({ Objs = { explosion }, Goal = { Size = v3New(16, 16, 16), Transparency = 0.4 }, TweenInfo = "twiceHalf" })
 		Spawn(function()
 			wait(0.2)
-			Events.ClientTween:FireAll({ explosion }, { Size = v3New(19, 19, 19), Transparency = 1 }, "half")
+			Events.ClientTween.FireAll({ Objs = { explosion }, Goal = { Size = v3New(19, 19, 19), Transparency = 1 }, TweenInfo = "half" })
 		end)
 
 		local ghost = RepS.Package.MagicAssets.GhostlyLantern.Ghost:Clone() :: MeshPart
@@ -100,10 +100,10 @@ local success, errorMsg = pcall(function()
 		bv.Velocity = ghost.CFrame.LookVector * 50
 		bv.Parent = ghost
 
-		Events.ClientTween:FireAll({ ghost }, { Size = v3New(12,12,12) }, "twiceHalfOne")
+		Events.ClientTween.FireAll({ Objs = { ghost }, Goal = { Size = v3New(12,12,12) }, TweenInfo = "twiceHalfOne" })
 		Spawn(function()
 			wait(0.8)
-			Events.ClientTween:FireAll({ ghost }, { Size = v3New(22, 22, 22), Transparency = 1 }, "half")
+			Events.ClientTween.FireAll({ Objs = { ghost }, Goal = { Size = v3New(22, 22, 22), Transparency = 1 }, TweenInfo = "half" })
 		end)
 
 		wait(0.5)

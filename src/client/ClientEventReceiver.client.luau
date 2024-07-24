@@ -15,8 +15,11 @@ local wait = task.wait
 local cfAngles = CFrame.Angles
 local rad = math.rad
 
-local function playSound(sound: Sound | string, pos: number?)
-	if sound == nil then
+
+Events.PlaySound.SetCallback(function(data)
+	local sound, timePos = data.Sound, data.TimePos
+
+	if sound.Name == "ResetSound" then
 		for _, music: Sound in workspace.Sounds:GetChildren() do
 			if music:IsA("Sound") then music:Stop() end
 		end
@@ -26,7 +29,7 @@ local function playSound(sound: Sound | string, pos: number?)
 	if sound.Playing then
 		local newSound = sound:Clone() :: Sound
 		newSound.PlayOnRemove = true
-		newSound.TimePosition = if pos then pos else 0
+		newSound.TimePosition = if timePos then timePos else 0
 		newSound.Parent = workspace
 
 		wait()
@@ -35,12 +38,13 @@ local function playSound(sound: Sound | string, pos: number?)
 	end
 
 	sound:Play()
-	if pos then sound.TimePosition = pos end
-end
-Events.PlaySound:Connect(playSound)
+	if timePos then sound.TimePosition = timePos end
+end)
 
 
-local function clientTweenPlayer(objs: table, goal: table, style: string, useHarukaTween: boolean?)
+Events.ClientTween.SetCallback(function(data)
+	local style, goal, objs, useHarukaTween = data.TweenInfo, data.Goal, data.Objs, data.UseHarukaTween
+
 	style = AssetBook.TweenInfos[style]
 
 	for _, obj: Instance in objs do
@@ -52,35 +56,33 @@ local function clientTweenPlayer(objs: table, goal: table, style: string, useHar
 			end
 		end)
 	end
-end
-Events.ClientTween:Connect(clientTweenPlayer)
+end)
 
 
-local function vfxChestUnlock(chest: Model)
+Events.ChestUnlocked.SetCallback(function(data)
 	workspace.Sounds.SFXs.ChestOpened:Play()
 
-	HarukaLib:Tween(chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) })
-end
-Events.ChestUnlocked:Connect(vfxChestUnlock)
+	HarukaLib:Tween(data.Chest.Top, AssetBook.TweenInfos.twiceHalf, { Pivot = data.Chest.Top.PrimaryPart.CFrame * cfAngles(rad(50), 0, 0) })
+end)
 
 
-local function lockCam(cam: BasePart | string)
+Events.CameraScene.SetCallback(function(data)
+	local part = data.Part
 	local camera = workspace.CurrentCamera
 
-	if cam == "Reset" then
+	if camera.Name == "CameraReset" then
 		camera.CameraType = Enum.CameraType.Custom
 		return
 	end
 
 	camera.CameraType = Enum.CameraType.Scriptable
-	camera.CFrame = cam.CFrame
-end
-Events.LockCam:Connect(lockCam)
+	camera.CFrame = part.CFrame
+end)
 
 
-local function storySignals(symbol: string)
+Events.FireStoryEvents.SetCallback(function(data)
+	local symbol = data.EventSymbol
 	if not Signals[symbol] then warn("No signal found: "..symbol) return end
 
 	Signals[symbol]:Fire(plr)
-end
-Events.StoryEvents:Connect(storySignals)
+end)

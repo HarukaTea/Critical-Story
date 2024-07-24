@@ -213,7 +213,7 @@ local function CharacterFrame(self: table): Frame
 					local cost = ((peek(playerData.Levels) - 1) * 2 - peek(playerData.LvPoints)) * 20
 
 					if peek(playerData.Gold) >= cost and cost ~= 0 then
-						Events.AddPoints:Fire("Reset")
+						Events.AddPoints.Fire({ Target = "Reset" })
 
 					elseif cost > 0 then
 						Signals.CreateHint:Fire("You don't have enough gold to reset!")

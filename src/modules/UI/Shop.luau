@@ -100,7 +100,7 @@ return function(plr: Player)
 									end
 									if item == "None" then return end
 
-									Events.BuyItems:Fire(item, amount)
+									Events.BuyItem.Fire({ ItemId = item, Amount = amount })
 									break
 								end
                             end,
@@ -131,8 +131,6 @@ return function(plr: Player)
 
 	--// Clear
 	local function _clearGarbage()
-		Events.EnterShopping:DisconnectAll()
-
 		self.itemSlotClicked:Destroy()
 
 		Fusion.doCleanup(scope)

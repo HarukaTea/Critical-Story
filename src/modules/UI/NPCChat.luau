@@ -60,8 +60,6 @@ return function(plr: Player)
 		CAS:UnbindAction("NextDialogue")
 		ClientUtil:FreezePlayerControls("Unfreeze")
 
-		Events.NPCChat:DisconnectAll()
-
 		Signals.NPCChat:DisconnectAll()
 		Signals.StartNPCChat:DisconnectAll()
 

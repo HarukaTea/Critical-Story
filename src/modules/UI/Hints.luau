@@ -87,12 +87,12 @@ return function(plr: Player)
 		},
 	})
 
-	local function _createHint(text: string, envir: string)
+	local function _createHint(text: string, option: string)
 		local past = Fusion.peek(hintsList)
 		insert(past, text)
 
 		hintsList:set(past)
-		workspace.Sounds.SFXs[if envir == "Hint" then "NewInfo" else "Error"]:Play()
+		workspace.Sounds.SFXs[if option == "Hint" then "NewInfo" else "Error"]:Play()
 
 		wait(3)
 		local now = Fusion.peek(hintsList)
@@ -100,11 +100,12 @@ return function(plr: Player)
 
 		hintsList:set(now)
 	end
-	Events.CreateHint:Connect(_createHint)
+	table.insert(scope, Events.CreateHint.On(function(data)
+		_createHint(data.Hint, data.Option)
+	end))
 	Signals.CreateHint:Connect(_createHint)
 
 	local function _onDead()
-		Events.CreateHint:DisconnectAll()
 		Signals.CreateHint:DisconnectAll()
 
 		Fusion.doCleanup(scope)

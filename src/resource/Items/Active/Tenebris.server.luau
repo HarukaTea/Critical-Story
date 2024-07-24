@@ -26,8 +26,8 @@ local ITEM_ATTRIBUTES = { CD = 6, COMBAT_REQ = true, MONSTER_REQ = true }
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic2)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic2 })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 
 local tenebrisBall = RepS.Package.MagicAssets.Tenebris.TenebrisBall:Clone() :: Part
 tenebrisBall.CFrame = char.PrimaryPart.CFrame
@@ -50,21 +50,21 @@ local success, errorMsg = pcall(function()
 			hit = true
 
 			BuffEffectsUtil:MagicVFX(monster)
-			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
+			Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic1 })
 
 			local eff = RepS.Package.MagicAssets.Tenebris.Flashed:Clone() :: BasePart
 			eff.CFrame = monster.PrimaryPart.CFrame
 			eff.Parent = workspace
 			Debris:AddItem(eff, 1)
 
-			Events.ClientTween:FireAll({ eff }, { Size = v3New(24,24,24), Transparency = 1 }, "one")
+			Events.ClientTween.FireAll({ Objs = { eff }, Goal = { Size = v3New(24,24,24), Transparency = 1 }, TweenInfo = "one" })
 
 			tenebrisBall.Spirit.Enabled = false
 			tenebrisBall.CFrame = monster.PrimaryPart.CFrame
 			tenebrisBall.Anchored = true
 			Debris:AddItem(tenebrisBall, 1)
 
-			Events.ClientTween:FireAll({ tenebrisBall }, { Size = v3New(1, 1, 1) * 9, Transparency = 1 }, "one")
+			Events.ClientTween.FireAll({ Objs = { tenebrisBall }, Goal = { Size = v3New(1, 1, 1) * 9, Transparency = 1 }, TweenInfo = "one" })
 
 			local dmg = char:GetAttribute("Magic")
 			HarukaLib:AddAttr(monster, "Health", -dmg)

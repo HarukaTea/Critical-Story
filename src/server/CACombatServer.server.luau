@@ -18,8 +18,9 @@ local wait = task.wait
 local cfNew = CFrame.new
 
 
-local function combatStartSetup(plr: Player, locator: BasePart)
-	--- if monster was occupied by another player, we will return it
+Events.CombatStart.SetCallback(function(plr, data)
+	local locator = data.Locator
+
 	if locator:GetAttribute("InCombat") then return end
 	if locator:GetAttribute("SubMonster") then return end
 
@@ -97,11 +98,11 @@ local function combatStartSetup(plr: Player, locator: BasePart)
 			if not mob:GetAttribute("InCombat") then ServerUtil:MonsterActivateCombat(mob) end
 		end
 	end
-end
-Events.CombatStart:Connect(combatStartSetup)
+end)
 
 
-local function mobTakeDMG(plr: Player, orb: Model)
+Events.MonsterTakeDMG.SetCallback(function(plr, data)
+	local orb = data.Orb
 	local char = plr.Character :: Model
 
 	--- pre checks
@@ -156,11 +157,12 @@ local function mobTakeDMG(plr: Player, orb: Model)
 			if result == extraAttacks[i].."Chance" then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 6) end
 		end
 	end)
-end
-Events.MobTakeDMG:Connect(mobTakeDMG)
+end)
 
 
-local function charTakeDMG(plr: Player, dmgPart: Model)
+Events.PlayerTakeDMG.SetCallback(function(plr, data)
+	local dmgPart = data.Projectile
+
 	if not dmgPart then return end
 	if not dmgPart.Parent then return end
     if not dmgPart:FindFirstChild("Owner") then return end
@@ -183,7 +185,7 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 		if result == "Dodge" then
 			ServerUtil:ShowText(char, "BLOCKED!", fromRGB(255, 255, 255))
 
-			Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Blocked)
+			Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Blocked })
 			return
 		end
 	end
@@ -232,5 +234,4 @@ local function charTakeDMG(plr: Player, dmgPart: Model)
 
 	humanoid:TakeDamage(dmg)
 	ServerUtil:ShowNumber(char, dmg)
-end
-Events.CharTakeDMG:Connect(charTakeDMG)
+end)

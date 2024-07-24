@@ -3,12 +3,12 @@
 return {
     Name = "ban",
     Description = "Ban a player",
-    Group = "Moderators",
+    Group = "Moderator",
     Args = {
         {
             Type = "string",
             Name = "player",
-            Description = "The player's username you wanna ban"
+            Description = "The player's USERNAME you wanna ban"
         },
         {
             Type = "number",
@@ -18,7 +18,7 @@ return {
         function(context: table)
             return {
                 Type = context.Cmdr.Util.MakeEnumType("BanReason", {
-                    "Cheating", "Offensive", "Other"
+                    "Cheating", "Offensive", "Farming", "Others"
                 }),
                 Name = "reason",
                 Description = "The reason of this ban"

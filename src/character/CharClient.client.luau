@@ -7,6 +7,7 @@ local TS = game:GetService("TweenService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
+local LocationBook = require(RepS.Modules.Data.LocationBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
@@ -19,15 +20,16 @@ local wait = task.wait
 
 local function changeLocation(location: string)
     if not location or location == "" then return end
-    if not AssetBook.LocationInfo[location] then return end
+    if not LocationBook[location] then return end
+    if plr:GetAttribute("InCutscene") then return end
 
-    Events.ChangePlayerLocation:Fire(location)
+    Events.ChangePlayerLocation.Fire({ LocationId = location })
 
     --- sounds
     Spawn(function()
         local musicLib = workspace.Sounds.OverworldMusics :: Folder
         local overworldMusic = workspace.Sounds.Overworld :: Sound
-        local targetSound = AssetBook.LocationInfo[location].Music
+        local targetSound = LocationBook[location].Music
 
         if overworldMusic.SoundId ~= musicLib[targetSound].SoundId then
             TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = 0 }):Play()
@@ -37,15 +39,13 @@ local function changeLocation(location: string)
             overworldMusic:Play()
 
             if not overworldMusic.Playing then return end
-            TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = AssetBook.LocationInfo[location].MusicVolume }):Play()
+            TS:Create(overworldMusic, AssetBook.TweenInfos.half, { Volume = LocationBook[location].MusicVolume }):Play()
         end
     end)
 
     --- lighting
     Spawn(function()
-        if plr:GetAttribute("InCutscene") then return end
-
-        local lightingInfo = AssetBook.LocationInfo[location].Lighting
+        local lightingInfo = LocationBook[location].Lighting
         if lightingInfo then TS:Create(Lighting, AssetBook.TweenInfos.one, lightingInfo):Play() end
     end)
 end
@@ -56,6 +56,8 @@ Add(char.Humanoid.Touched:Connect(function(hit: BasePart)
     if hit:HasTag("IsZone") then char:SetAttribute("CurrentRegion", hit.Name) end
 end))
 
+local currentRegion = HarukaLib:IsInRegion(char.PrimaryPart.Position, workspace.MapComponents.Zones:GetDescendants())
+char:SetAttribute("CurrentRegion", if currentRegion then currentRegion.Name else nil)
 
 local function dayNightCycle()
     if workspace:GetAttribute("WorldType") == "Everfrost" then return end

@@ -3,9 +3,10 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
+local Formula = require(RepS.Modules.Data.Formulas)
+local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
@@ -15,8 +16,6 @@ local isDead = false
 
 local wait = task.wait
 local instanceNew = Instance.new
-local floor = math.floor
-local fromRGB = Color3.fromRGB
 
 local function combatEnds()
     if monster.Parent:FindFirstChildOfClass("BindableEvent") then monster.Parent.CombatEnds:Fire() end
@@ -45,7 +44,7 @@ local function combatEnds()
             attack:RemoveTag("MonsterDMG")
         end
         for _, player: Player in combatPlrs do
-            if player then Events.ClientTween:Fire(player, attacks, { Transparency = 1 }, "one") end
+            if player then Events.ClientTween.Fire(player, { Objs = attacks, Goal = { Transparency = 1 }, TweenInfo = "one" }) end
         end
 
         for _, player: Player in combatPlrs do
@@ -59,21 +58,16 @@ local function combatEnds()
                     beatList[#beatList + 1] = otherMonster
                 end
 
-                local totalEXP = 0
-                for _, defeated: Model in beatList do
-                    totalEXP += defeated:GetAttribute("EXP")
+                for _, defeated: Model | ObjectValue in beatList do
+                    local drop = HarukaLib:RollLoot(MonsterBook[defeated.Name].Drops)
+                    local level = defeated:GetAttribute("Levels") :: number
 
-                    local drop = HarukaLib:RollLoot(AssetBook.MonsterInfo[defeated.Name].Drops)
 	                ServerUtil:GiveItem(player, drop, 1)
+
+                    HarukaLib:AddAttr(player, "EXP", Formula.EXP(level))
+                    HarukaLib:AddAttr(player, "Gold", Formula.Gold(level))
+                    HarukaLib:AddAttr(player, "RP", Formula.RP(level))
                 end
-
-                HarukaLib:AddAttr(player, "EXP", totalEXP)
-                HarukaLib:AddAttr(player, "Gold", floor(totalEXP / 2))
-                HarukaLib:AddAttr(player, "RP", floor(totalEXP / 6))
-
-                ServerUtil:ShowText(char, "+" .. totalEXP .. " EXP", fromRGB(245, 205, 48))
-                ServerUtil:ShowText(char, "+" .. floor(totalEXP / 2) .. " Gold", fromRGB(255, 255, 127))
-                ServerUtil:ShowText(char, "+" .. floor(totalEXP / 6) .. " RP", fromRGB(0, 255, 255))
 
                 --// Clear
                 char:SetAttribute("InCombat", false)
@@ -107,7 +101,7 @@ local function combatEnds()
                     local locatorSymbol = instanceNew("ObjectValue")
                     locatorSymbol.Name = monster.Name
                     locatorSymbol.Value = monster.Parent
-                    locatorSymbol:SetAttribute("EXP", monster:GetAttribute("EXP"))
+                    locatorSymbol:SetAttribute("Levels", monster:GetAttribute("Levels"))
                     locatorSymbol.Parent = child.WaitingList
 
                     for _, pastWaiting: ObjectValue in monster.WaitingList:GetChildren() do

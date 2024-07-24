@@ -22,9 +22,9 @@ local ITEM_ATTRIBUTES = { CD = 12, COMBAT_REQ = true, MONSTER_REQ = true }
 if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then return end
 
 ---
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.AnimeExplosion)
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Explosion)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.AnimeExplosion })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Explosion })
 
 BuffEffectsUtil:Burn(char, monster, 6)
 
@@ -38,8 +38,8 @@ holyBeam.CFrame = monster.PrimaryPart.CFrame
 holyBeam.Parent = workspace
 Debris:AddItem(holyBeam, 1)
 
-Events.ClientTween:FireAll({ explosion }, { Size = v3New(254, 254, 254), Transparency = 1 }, "half")
-Events.ClientTween:FireAll({ holyBeam }, { Size = v3New(), Transparency = 1 }, "onceHalf")
+Events.ClientTween.FireAll({ Objs = { explosion }, Goal = { Size = v3New(254, 254, 254), Transparency = 1 }, TweenInfo = "half" })
+Events.ClientTween.FireAll({ Objs = { holyBeam }, Goal = { Size = v3New(), Transparency = 1 }, TweenInfo = "onceHalf" })
 
 local dmg = char:GetAttribute("Magic") :: number
 

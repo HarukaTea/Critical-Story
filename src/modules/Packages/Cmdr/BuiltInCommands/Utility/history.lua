@@ -7,7 +7,7 @@ return {
 		'alias "!!|Reruns the last command." ! -1',
 	},
 	Description = "Displays previous commands from history.",
-	Group = "DefaultUtil",
+	Group = "Player",
 	Args = {
 		{
 			Type = "integer",

@@ -2,17 +2,17 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 
 return {
     Name = "spawnmonster",
     Aliases = {"spawnmob"},
-    Description = "Spawns a monster at where you stand.",
-    Group = "Testers",
+    Description = "Spawn a monster at where you stand.",
+    Group = "Developer",
     Args = {
         function(context: table)
             local monsters = {}
-            for monster: string, _ in AssetBook.MonsterInfo do
+            for monster: string, _ in MonsterBook do
                 monsters[#monsters + 1] = monster
             end
 
@@ -25,7 +25,7 @@ return {
         {
             Type = "number",
             Name = "level",
-            Description = "The level you want to fight, max is 950",
+            Description = "The level you want to fight, max is 1100",
             Default = 1
         },
         {

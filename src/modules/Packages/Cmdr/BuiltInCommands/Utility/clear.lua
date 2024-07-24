@@ -4,7 +4,7 @@ return {
 	Name = "cls",
 	Aliases = {},
 	Description = "Clear all lines above the entry line of the Cmdr window.",
-	Group = "DefaultUtil",
+	Group = "Player",
 	Args = {},
 	ClientRun = function()
 		local player = Players.LocalPlayer

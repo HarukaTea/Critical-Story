@@ -44,7 +44,7 @@ local function cmdrRegister()
         if sender ~= plr then return end
 
         if msg == "!cmds" then Cmdr:Show() end
-        if msg == "!rejoin" then Events.RejoinRequest:Fire() end
+        if msg == "!rejoin" then Events.RejoinRequest.Fire({}) end
     end)
 end
 Spawn(cmdrRegister)

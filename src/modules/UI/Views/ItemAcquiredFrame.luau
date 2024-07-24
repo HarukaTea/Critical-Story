@@ -18,21 +18,20 @@ local wait = task.wait
 local function ItemAcquiredFrame(self: table): Frame
 	local scope = self.scope :: Fusion.Scope
 
-	local function _giveDrop(item: string)
+	table.insert(scope, Events.GiveDrop.On(function(data)
+		local item = data.ItemId
+
 		local nowAdded = Fusion.peek(self.newAddedItems)
 
 		insert(nowAdded, item)
 		self.newAddedItems:set(nowAdded)
 
-		Spawn(function()
-			wait(6)
-			local afterAdded = Fusion.peek(self.newAddedItems)
+		wait(6)
+		local afterAdded = Fusion.peek(self.newAddedItems)
 
-			remove(afterAdded, tFind(afterAdded, item))
-			self.newAddedItems:set(afterAdded)
-		end)
-	end
-	Events.GiveDrop:Connect(_giveDrop)
+		remove(afterAdded, tFind(afterAdded, item))
+		self.newAddedItems:set(afterAdded)
+	end))
 
 	return Components.Frame(scope, {
 		Name = "ItemAcquiredFrame",

@@ -2,13 +2,13 @@
 
 return {
     Name = "noclip",
-    Description = "give player noclip perm",
-    Group = "Testers",
+    Description = "Noclip tool",
+    Group = "Developer",
     Args = {
         {
             Type = "player",
             Name = "player",
-            Description = "The player you wanna give perm to",
+            Description = "The player you wish to give, default is you",
             Default = "me"
         }
     }

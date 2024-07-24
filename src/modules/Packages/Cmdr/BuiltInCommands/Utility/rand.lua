@@ -2,7 +2,7 @@ return {
 	Name = "rand",
 	Aliases = {},
 	Description = "Returns a random number between min and max",
-	Group = "DefaultUtil",
+	Group = "Player",
 	Args = {
 		{
 			Type = "integer",

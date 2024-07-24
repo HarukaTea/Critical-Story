@@ -3,7 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
-local EXPFormula = require(RepS.Modules.Data.EXPFormula)
+local Formula = require(RepS.Modules.Data.Formulas)
 local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
@@ -29,7 +29,7 @@ local function AdventurerStatsPinia(self: table)
 	self.playerData = {
 		EXP = {
 			Value(plr:GetAttribute("EXP")),
-			Value(EXPFormula(plr:GetAttribute("Levels"))),
+			Value(Formula.EXP(plr:GetAttribute("Levels"))),
 		},
 		Class = Value(plr:GetAttribute("Class")),
 		Levels = Value(plr:GetAttribute("Levels")),
@@ -54,6 +54,10 @@ local function AdventurerStatsPinia(self: table)
         MinDMG = Value(char:GetAttribute("MinDMG")),
         MaxDMG = Value(char:GetAttribute("MaxDMG")),
         Magic = Value(char:GetAttribute("Magic")),
+
+		MinDMGBuff = Value(char:GetAttribute("MinDMGBuff")),
+		MaxDMGBuff = Value(char:GetAttribute("MaxDMGBuff")),
+		MagicBuff = Value(char:GetAttribute("MagicBuff")),
     }
 
 	self.charClassInfo = {
@@ -110,7 +114,7 @@ local function AdventurerStatsPinia(self: table)
 		if activeInnerCDList[slot] then return end
 
 		activeInnerCDList[slot] = true
-		Events.UseItem:Fire(Fusion.peek(self.activeEquipList[slot]))
+		Events.UseItem.Fire({ ItemId = Fusion.peek(self.activeEquipList[slot]) })
 
 		wait(1)
 		activeInnerCDList[slot] = false

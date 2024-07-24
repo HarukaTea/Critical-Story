@@ -57,8 +57,10 @@ local function playAnim(anim: string)
 
 	anims[anim]:Play()
 end
-Add(Events.PlayAnimation:Connect(playAnim))
 Add(Signals.PlayAnimation:Connect(playAnim))
+Add(Events.PlayAnimation.On(function(data)
+	playAnim(data.AnimId)
+end))
 
 --// Clear
 local function onDead()

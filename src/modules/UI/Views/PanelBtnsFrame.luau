@@ -17,7 +17,7 @@ local function PanelBtnsFrame(self: table) : Frame
 
     return Components.Frame(scope, {
         Name = "PanelBtnsFrame",
-        Position = fromScale(0.5, -0.5),
+        Position = fromScale(0.5, 0),
 		Size = fromScale(1, 1.1),
 
         [Children] = {

@@ -22,8 +22,9 @@ if ServerUtil:UseSkill(plr, script.Name, ITEM_ATTRIBUTES, script) == false then 
 
 ---
 BuffEffectsUtil:MagicVFX(monster)
-Events.PlayAnimation:Fire(plr, "MagicCastedAnim1")
-Events.PlaySound:Fire(plr, workspace.Sounds.SFXs.Magic1)
+
+Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic1 })
+Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 
 local dmg = floor(char:GetAttribute("MaxDMG")) :: number
 

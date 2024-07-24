@@ -55,7 +55,7 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 
                     workspace.Sounds.SFXs[if Fusion.peek(self.playerSettings[id]) then "SwitchOff" else "SwitchOn"]:Play()
 
-					Events.ChangePlayerSetting:Fire(id)
+					Events.ChangePlayerSetting.Fire({ SettingId = id })
 
 					--// combat things
 					if sFind(id, "Combat") then

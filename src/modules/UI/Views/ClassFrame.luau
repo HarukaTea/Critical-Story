@@ -19,7 +19,9 @@ local wait = task.wait
 local function ClassFrame(self: table) : Frame
     local scope = self.scope :: Fusion.Scope
 
-    local function _equipItem(slot: string, item: string)
+	table.insert(scope, Events.EquipItemServer.On(function(data)
+        local slot, item = data.ItemSlot, data.ItemId
+
         local index = tonumber(match(slot, "%d"))
         local checkList = if sFind(slot, "Active") then self.activeEquipList else self.passiveEquipList
         local checkList2 = if sFind(slot, "Active") then self.activeSlotList else self.passiveSlotList
@@ -28,8 +30,7 @@ local function ClassFrame(self: table) : Frame
 
         peek(checkList2[index]):SetAttribute("Equipped", if item == "Null" then false else true)
         peek(checkList2[index]):SetAttribute("ItemEquipped", if item == "Null" then nil else item)
-	end
-	Events.EquipItems:Connect(_equipItem)
+    end))
 
     local function __findSlotByItemId(item: string) : string
         for index, element: Frame in self.activeEquipList do
@@ -38,9 +39,11 @@ local function ClassFrame(self: table) : Frame
 
 		return "None"
     end
-    local function _applyCDToSlot(cd: number, item: string)
+    table.insert(scope, Events.ItemCD.On(function(data)
+        local item, cd = data.ItemId, data.Cooldown
+
         local slot, activeCDRotationList, activeCDList =
-            __findSlotByItemId(item), self.activeCDRotationList, self.activeCDList
+        __findSlotByItemId(item), self.activeCDRotationList, self.activeCDList
 
         --- final check
         if slot == "None" then return end
@@ -60,8 +63,7 @@ local function ClassFrame(self: table) : Frame
 
         activeCDList[index]:set(0)
         activeCDRotationList[index]:set(0)
-    end
-    Events.ItemCD:Connect(_applyCDToSlot)
+    end))
 
     return Components.Frame(scope, {
         Name = "ClassFrame",
