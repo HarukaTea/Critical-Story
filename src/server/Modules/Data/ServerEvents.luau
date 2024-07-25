@@ -1652,7 +1652,6 @@ local returns = table.freeze({
 	EnterNPCChat = table.freeze({
 		Fire = function(Player: Player, Value: ({
 			NPC: ((Model)?),
-			Prompt: ((ProximityPrompt)?),
 		}))
 			load_player(Player)
 			alloc(1)
@@ -1666,20 +1665,10 @@ local returns = table.freeze({
 				assert(Value.NPC:IsA("Model"))
 				table.insert(outgoing_inst, Value.NPC)
 			end
-			if Value.Prompt == nil then
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
-			else
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				assert(Value.Prompt:IsA("ProximityPrompt"))
-				table.insert(outgoing_inst, Value.Prompt)
-			end
 			player_map[Player] = save()
 		end,
 		FireAll = function(Value: ({
 			NPC: ((Model)?),
-			Prompt: ((ProximityPrompt)?),
 		}))
 			load_empty()
 			alloc(1)
@@ -1692,15 +1681,6 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				assert(Value.NPC:IsA("Model"))
 				table.insert(outgoing_inst, Value.NPC)
-			end
-			if Value.Prompt == nil then
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
-			else
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				assert(Value.Prompt:IsA("ProximityPrompt"))
-				table.insert(outgoing_inst, Value.Prompt)
 			end
 			local buff, used, inst = outgoing_buff, outgoing_used, outgoing_inst
 			for _, player in Players:GetPlayers() do
@@ -1713,7 +1693,6 @@ local returns = table.freeze({
 		end,
 		FireExcept = function(Except: Player, Value: ({
 			NPC: ((Model)?),
-			Prompt: ((ProximityPrompt)?),
 		}))
 			load_empty()
 			alloc(1)
@@ -1726,15 +1705,6 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				assert(Value.NPC:IsA("Model"))
 				table.insert(outgoing_inst, Value.NPC)
-			end
-			if Value.Prompt == nil then
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
-			else
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				assert(Value.Prompt:IsA("ProximityPrompt"))
-				table.insert(outgoing_inst, Value.Prompt)
 			end
 			local buff, used, inst = outgoing_buff, outgoing_used, outgoing_inst
 			for _, player in Players:GetPlayers() do
@@ -1749,7 +1719,6 @@ local returns = table.freeze({
 		end,
 		FireList = function(List: { Player }, Value: ({
 			NPC: ((Model)?),
-			Prompt: ((ProximityPrompt)?),
 		}))
 			load_empty()
 			alloc(1)
@@ -1762,15 +1731,6 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				assert(Value.NPC:IsA("Model"))
 				table.insert(outgoing_inst, Value.NPC)
-			end
-			if Value.Prompt == nil then
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
-			else
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				assert(Value.Prompt:IsA("ProximityPrompt"))
-				table.insert(outgoing_inst, Value.Prompt)
 			end
 			local buff, used, inst = outgoing_buff, outgoing_used, outgoing_inst
 			for _, player in List do
@@ -1783,7 +1743,6 @@ local returns = table.freeze({
 		end,
 		FireSet = function(Set: { [Player]: true }, Value: ({
 			NPC: ((Model)?),
-			Prompt: ((ProximityPrompt)?),
 		}))
 			load_empty()
 			alloc(1)
@@ -1796,15 +1755,6 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				assert(Value.NPC:IsA("Model"))
 				table.insert(outgoing_inst, Value.NPC)
-			end
-			if Value.Prompt == nil then
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
-			else
-				alloc(1)
-				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				assert(Value.Prompt:IsA("ProximityPrompt"))
-				table.insert(outgoing_inst, Value.Prompt)
 			end
 			local buff, used, inst = outgoing_buff, outgoing_used, outgoing_inst
 			for player in Set do

@@ -67,7 +67,7 @@ local function ActiveSlot(index: number, self: table): Frame
 	local function exCategoryOpened()
 		isSelecting:set(false)
 	end
-	Signals.ExCategoryOpened:Connect(exCategoryOpened)
+	table.insert(scope, Signals.ExCategoryOpened:Connect(exCategoryOpened))
 
 	self.activeSlotList[index] = Fusion.Value(scope, New(scope, "Frame")({
 		Name = "Active"..index,

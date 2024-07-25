@@ -41,11 +41,12 @@ return function(plr: Player)
 
 		[Fusion.Children] = {
 			Components.Frame(scope, {
-				Name = "Bottom",
+				Name = "BG",
 				AnchorPoint = v2New(0.5, 0.9),
 				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
+				Visible = false,
 
 				[Fusion.Children] = {
 					Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
@@ -59,9 +60,6 @@ return function(plr: Player)
 	local function _clearGarbage()
 		CAS:UnbindAction("NextDialogue")
 		ClientUtil:FreezePlayerControls("Unfreeze")
-
-		Signals.NPCChat:DisconnectAll()
-		Signals.StartNPCChat:DisconnectAll()
 
 		Fusion.doCleanup(scope)
 

@@ -23,7 +23,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 	local function exCategoryOpened()
 		isSelecting:set(false)
 	end
-	Signals.ExCategoryOpened:Connect(exCategoryOpened)
+	table.insert(scope, Signals.ExCategoryOpened:Connect(exCategoryOpened))
 
 	return Fusion.New(scope, "Frame")({
 		Name = id,

@@ -31,7 +31,6 @@ local function ChatFrame(self: table) : Frame
     local dialogueIndexChatting = 1
     local dialogueChoiceIndex = 1
     local canContinueChat = true
-    local promptChatting: ProximityPrompt = nil
     local npcChatting: Model = nil
     local seriesDoing: string = nil
 
@@ -51,8 +50,9 @@ local function ChatFrame(self: table) : Frame
     Typer.onTyperFinished:Connect(_endText)
 
     local function __endChatting()
-        self.isChatting:set(false)
         self.plr:SetAttribute("InChatting", false)
+
+        ClientUtil:OpenUIEx(self.plr, "NPCChat", true)
 
         ---// revert back to initial state
         originDialoguesChatting = nil
@@ -64,11 +64,8 @@ local function ChatFrame(self: table) : Frame
         ClientUtil:FreezePlayerControls("Unfreeze")
         CAS:UnbindAction("NextDialogue")
 
-        promptChatting.Enabled = true
-
         Events.NPCChatEnded.Fire({ NPC = npcChatting, Series = seriesDoing })
 
-        promptChatting = nil
         npcChatting = nil
         seriesDoing = nil
     end
@@ -107,6 +104,7 @@ local function ChatFrame(self: table) : Frame
             self.chatChoices:set(realChoices)
             return
         end
+
         --- enter quests
         if sFind(dialoguesChatting[dialogueIndexChatting], "QUEST") then
             local series = if sFind(dialoguesChatting[dialogueIndexChatting], "TOWN") then "Town" else "Side"
@@ -126,19 +124,24 @@ local function ChatFrame(self: table) : Frame
 
         __nextText(if Typer:IsTyping() then "Skip" else "Continue")
     end
-    local function _startChatting(npc: Model, prompt: ProximityPrompt)
-        prompt.Enabled = false
-
-        promptChatting = prompt
+    local function _startChatting(npc: Model)
         npcChatting = npc
 
         local speaker = npc.Name
         self.chatSpeaker:set(gsub(speaker, "%d+", ""))
-        self.isChatting:set(true)
         self.plr:SetAttribute("InChatting", true)
 
         ClientUtil:FreezePlayerControls("Freeze")
-        CAS:BindAction("NextDialogue", _nextDialogue, false, Enum.KeyCode.E)
+        ClientUtil:OpenUIEx(self.plr, "NPCChat", true)
+
+        CAS:BindActionAtPriority("NextDialogue", function(action: string, inputState: Enum.UserInputState)
+            if action == "NextDialogue" and inputState == Enum.UserInputState.Begin then
+                _nextDialogue(nil, inputState)
+            end
+
+            return if (self.plr:GetAttribute("IsChatting") and inputState == Enum.UserInputState.Begin) then
+                Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+        end, false, 3000, Enum.KeyCode.Space)
 
         local quests = self.plr.Quests:GetChildren() :: Folder
 
@@ -174,9 +177,9 @@ local function ChatFrame(self: table) : Frame
         Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
     end
     table.insert(scope, Events.EnterNPCChat.On(function(data)
-        _startChatting(data.NPC, data.Prompt)
+        _startChatting(data.NPC)
     end))
-    Signals.StartNPCChat:Connect(_startChatting)
+    table.insert(scope, Signals.EnterNPCChat:Connect(_startChatting))
 
     local function _chooseOption(series: number)
         dialoguesChatting = originDialoguesChatting["Choice"..dialogueChoiceIndex]["Option"..series]
@@ -186,7 +189,7 @@ local function ChatFrame(self: table) : Frame
 
         Typer:TypeText(HarukaLib:RichTextify(dialoguesChatting[dialogueIndexChatting]))
     end
-    Signals.NPCChat:Connect(_chooseOption)
+    table.insert(scope, Signals.ContinueNPCChat:Connect(_chooseOption))
 
 
     return Components.Frame(scope, {
@@ -195,10 +198,6 @@ local function ChatFrame(self: table) : Frame
         AnchorPoint = v2New(0.5, 0.9),
         Position = fromScale(0.5, -0.1),
         Size = fromScale(0.585, 2.5),
-
-        Visible = Computed(scope, function(use: Fusion.Use)
-            return use(self.isChatting)
-        end),
 
         [Fusion.Children] = {
             Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.07, 0)  }),

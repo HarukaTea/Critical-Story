@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local AssetBook = require(ReplicatedStorage.Modules.Data.AssetBook)
 local DataKeep = require(ReplicatedStorage.Modules.Packages.DataKeep)
 local ItemBook = require(ReplicatedStorage.Modules.Data.ItemBook)
 local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
@@ -97,10 +98,7 @@ local function setup(plr: Player)
 		questsData.Parent = plr
 
 		---// Load stats
-		local blackList = { "V9Transfered", "RespawnLocation" }
 		for attr: string, val: any in data.Stats do
-			if table.find(blackList, attr) then continue end
-
 			plr:SetAttribute(attr, HarukaLib:Deserialize(val))
 
 			Add(HarukaLib:Hydrate(plr, {
@@ -153,7 +151,17 @@ local function setup(plr: Player)
 		end
 
 		--// Load settings
-		for setting: string, val: any in TEMPLATE.Slot1.Settings do plr:SetAttribute(setting, val) end
+		for setting: string, val: any in TEMPLATE.Slot1.Settings do
+			plr:SetAttribute(setting, val)
+
+			Add(HarukaLib:Hydrate(plr, {
+				["Attr-"..setting] = function(newVal: any)
+					if newVal == nil then return end
+
+					keep.Data[slot].Settings[setting] = newVal
+				end
+			}))
+		end
 
 		--// Connections
 		local function _save()
@@ -183,6 +191,35 @@ local function setup(plr: Player)
 
 				if hasBadgeOld and not hasBadgeNow then BadgeService:AwardBadge(plr.UserId, 783240039527287) end
 			end)
+		end)
+
+		--// Award welcome! badge
+		Spawn(function()
+			Promise.new(function()
+				local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2362555015922939)
+
+				if not hasBadge then BadgeService:AwardBadge(plr.UserId, 2362555015922939) end
+			end)
+		end)
+
+		--// Assign role
+		Spawn(function()
+			--- alpha tester
+			local function _setCustomRole()
+				local rank = plr:GetRankInGroup(16912246)
+				plr:SetAttribute("Rank", rank)
+
+				if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
+				if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
+			end
+			Promise.new(function(resolve)
+				local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2129794607)
+
+				if hasBadge then plr:SetAttribute("Role", "Alpha Tester") end
+
+				resolve()
+
+			end):Then(_setCustomRole):Catch(_setCustomRole)
 		end)
 	end)
 end

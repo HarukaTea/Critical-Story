@@ -2,7 +2,6 @@
 
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
-local ScriptContext = game:GetService("ScriptContext")
 local TextChatService = game:GetService("TextChatService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
@@ -101,16 +100,3 @@ local function disableDefaultFreecam()
     plr:FindFirstChildOfClass("PlayerGui").Freecam:Destroy()
 end
 Spawn(disableDefaultFreecam)
-
-
-local function errorReports()
-    local function _errored(msg: string, _, _)
-        local newError = Instance.new("StringValue")
-        newError.Name = "Client"
-        newError.Value = msg
-        newError:SetAttribute("Owner", plr.Name)
-        newError.Parent = workspace.MapComponents.ScriptErrors
-    end
-    ScriptContext.Error:Connect(_errored)
-end
-Spawn(errorReports)

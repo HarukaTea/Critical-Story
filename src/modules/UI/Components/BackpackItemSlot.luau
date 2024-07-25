@@ -24,7 +24,7 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: F
 	local isSelecting = Value(scope, false)
 
 	--// Connections
-	scope[#scope + 1] = HarukaLib:Hydrate(item, {
+	table.insert(scope, HarukaLib:Hydrate(item, {
 		["Prop-Value"] = function(newAmount: number)
 			amount:set(newAmount)
 		end,
@@ -38,10 +38,10 @@ local function BackpackItemSlot(item: IntConstrainedValue, self: table, scope: F
 
 			self.filterInfo.Pin:set(if state then "UNPIN" else "PIN")
 		end
-	})
-	self.itemSlotClicked:Connect(function()
+	}))
+	table.insert(scope, self.itemSlotClicked:Connect(function()
 		isSelecting:set(false)
-	end)
+	end))
 
 	item = item.Name
 

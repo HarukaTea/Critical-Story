@@ -1,6 +1,7 @@
 --!nocheck
 
 local CAS = game:GetService("ContextActionService")
+local ProximityPromptService = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
@@ -68,10 +69,6 @@ return function(plr: Player)
 				Position = fromScale(0.5, 1),
 				Size = fromScale(1, 0.1),
 				ZIndex = 2,
-
-				Visible = Fusion.Computed(scope, function(use: Fusion.Use)
-					return not use(self.isChatting)
-				end),
 
 				[Children] = {
 					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
@@ -235,10 +232,6 @@ return function(plr: Player)
 		end,
 		["Attr-LvPoints"] = function(lvPoints: number)
 			playerData.LvPoints:set(lvPoints)
-		end,
-
-		["Attr-InChatting"] = function(newState: boolean)
-			self.isChatting:set(newState)
 		end
 	}))
 
@@ -329,14 +322,52 @@ return function(plr: Player)
         end,
     }))
 
+	local function _addPrompt(prompt: ProximityPrompt)
+		local nowPrompts = Fusion.peek(self.promptsList)
+
+		table.insert(nowPrompts, prompt)
+		self.promptsList:set(nowPrompts)
+		self.currentPromptIndex:set(1)
+	end
+	local function _removePrompt(prompt: ProximityPrompt)
+		local afterPrompts = Fusion.peek(self.promptsList)
+
+		table.remove(afterPrompts, table.find(afterPrompts, prompt))
+		self.promptsList:set(afterPrompts)
+	end
+	local function _triggerPrompt(prompt: ProximityPrompt)
+		workspace.Sounds.SFXs.Interact:Play()
+
+		prompt.Enabled = false
+		wait(1)
+		local blacklist = { "Chest", "Chat" }
+		if not table.find(blacklist, prompt.Name) then prompt.Enabled = true end
+	end
+	table.insert(scope, ProximityPromptService.PromptShown:Connect(_addPrompt))
+	table.insert(scope, ProximityPromptService.PromptHidden:Connect(_removePrompt))
+	table.insert(scope, ProximityPromptService.PromptTriggered:Connect(_triggerPrompt))
+
+	local mouse = plr:GetMouse()
+	table.insert(scope, mouse.WheelBackward:Connect(function()
+		local index = Fusion.peek(self.currentPromptIndex) :: number
+
+		self.currentPromptIndex:set(index + 1)
+		if index + 1 > #Fusion.peek(self.promptsList) then self.currentPromptIndex:set(1) end
+	end))
+	table.insert(scope, mouse.WheelForward:Connect(function()
+		local index = Fusion.peek(self.currentPromptIndex) :: number
+
+		self.currentPromptIndex:set(index - 1)
+		if index - 1 <= 0 then self.currentPromptIndex:set(#Fusion.peek(self.promptsList)) end
+	end))
+
+	--// Clear
 	local function _clearGarbage()
 		CAS:UnbindAction("ChangeMobTargetLCtrl")
 		CAS:UnbindAction("ChangeMobTargetRCtrl")
 		CAS:UnbindAction("UseItem1")
 		CAS:UnbindAction("UseItem2")
 		CAS:UnbindAction("UseItem3")
-
-		Signals.ExCategoryOpened:DisconnectAll()
 
 		Fusion.doCleanup(scope)
 

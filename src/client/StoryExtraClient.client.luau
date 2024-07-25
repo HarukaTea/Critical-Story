@@ -4,7 +4,6 @@ local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SoundS = game:GetService("SoundService")
 local TS = game:GetService("TweenService")
-local TestS = game:GetService("TestService")
 
 local Signals = require(RepS.Modules.Data.Signals)
 
@@ -41,7 +40,7 @@ local function startAdventure(plr: Player)
     Debris:AddItem(cutsceneUI, 1)
     TS:Create(cutsceneBG, tweenInfoNew(1), { BackgroundTransparency = 1 }):Play()
 
-    TestS.Ocean.Parent = workspace.Maps
+    RepS.Debris.Ocean.Parent = workspace.Maps
     TS:Create(SoundS.Musics, tweenInfoNew(1), { Volume = 0.5 }):Play()
     TS:Create(workspace.Sounds.StoryMusics.Cairn, tweenInfoNew(1), { Volume = 0 }):Play()
 

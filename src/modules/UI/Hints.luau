@@ -103,11 +103,9 @@ return function(plr: Player)
 	table.insert(scope, Events.CreateHint.On(function(data)
 		_createHint(data.Hint, data.Option)
 	end))
-	Signals.CreateHint:Connect(_createHint)
+	table.insert(scope, Signals.CreateHint:Connect(_createHint))
 
 	local function _onDead()
-		Signals.CreateHint:DisconnectAll()
-
 		Fusion.doCleanup(scope)
 	end
 	char.Humanoid.Died:Once(_onDead)

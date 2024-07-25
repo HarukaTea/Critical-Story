@@ -56,6 +56,10 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
+						FilterButton("Party", self),
+						FilterButton("Guild", self),
+						FilterButton("Packs", self),
+						FilterButton("Donation", self)
 					})
 				}
 			}),
@@ -84,6 +88,53 @@ return function(plr: Player)
 	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-InChatting"] = function(state: boolean)
 			if state then checkIfOpened() end
+		end
+	}))
+
+	local playerData, charData = self.playerData, self.charData
+	table.insert(scope, HarukaLib:Hydrate(plr, {
+		["Attr-Levels"] = function(levels: number)
+			playerData.Levels:set(levels)
+		end,
+		["Attr-LvPoints"] = function(points: number)
+			playerData.LvPoints:set(points)
+		end,
+		["Attr-DMGPoints"] = function(points: number)
+			playerData.DMG:set(points)
+		end,
+		["Attr-MagicPoints"] = function(points: number)
+			playerData.Magic:set(points)
+		end,
+		["Attr-HealthPoints"] = function(points: number)
+			playerData.Health:set(points)
+		end,
+		["Attr-ManaPoints"] = function(points: number)
+			playerData.Mana:set(points)
+		end,
+		["Attr-Gold"] = function(gold: number)
+			playerData.Gold:set(gold)
+		end
+	}))
+	table.insert(scope, HarukaLib:Hydrate(self.char, {
+		["Attr-MinDMG"] = function(dmg: number)
+			charData.MinDMG:set(dmg)
+		end,
+		["Attr-MaxDMG"] = function(dmg: number)
+			charData.MaxDMG:set(dmg)
+		end,
+		["Attr-Magic"] = function(magic: number)
+			charData.Magic:set(magic)
+		end,
+		["Attr-MaxShield"] = function(shield: number)
+			charData.Shield:set(shield)
+		end,
+		["Attr-MaxMana"] = function(mana: number)
+			charData.Mana:set(mana)
+		end
+	}))
+	table.insert(scope, HarukaLib:Hydrate(self.char.Humanoid, {
+		["Prop-MaxHealth"] = function(maxHP: number)
+			charData.Health:set(maxHP)
 		end
 	}))
 

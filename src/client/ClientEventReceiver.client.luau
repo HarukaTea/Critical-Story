@@ -16,11 +16,9 @@ local cfAngles = CFrame.Angles
 local rad = math.rad
 
 
-Events.PlaySound.SetCallback(function(data)
-	local sound, timePos = data.Sound, data.TimePos
-
+local function playSound(sound: Sound, timePos: number?)
 	if sound.Name == "ResetSound" then
-		for _, music: Sound in workspace.Sounds:GetChildren() do
+		for _, music: Sound in workspace.Sounds:GetDescendants() do
 			if music:IsA("Sound") then music:Stop() end
 		end
 		return
@@ -39,7 +37,11 @@ Events.PlaySound.SetCallback(function(data)
 
 	sound:Play()
 	if timePos then sound.TimePosition = timePos end
+end
+Events.PlaySound.SetCallback(function(data)
+	playSound(data.Sound, data.TimePos)
 end)
+Signals.PlaySound:Connect(playSound)
 
 
 Events.ClientTween.SetCallback(function(data)
@@ -66,18 +68,23 @@ Events.ChestUnlocked.SetCallback(function(data)
 end)
 
 
-Events.CameraScene.SetCallback(function(data)
-	local part = data.Part
+local function cameraScene(part: BasePart)
 	local camera = workspace.CurrentCamera
 
-	if camera.Name == "CameraReset" then
+	if part.Name == "ResetCamera" then
+		camera.CameraSubject = plr.Character.Humanoid
 		camera.CameraType = Enum.CameraType.Custom
 		return
 	end
 
 	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CameraSubject = part
 	camera.CFrame = part.CFrame
+end
+Events.CameraScene.SetCallback(function(data)
+	cameraScene(data.Part)
 end)
+Signals.CameraScene:Connect(cameraScene)
 
 
 Events.FireStoryEvents.SetCallback(function(data)

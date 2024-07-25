@@ -123,7 +123,7 @@ return function(plr: Player)
 			self.isOpen:set(state)
 		end
 	}))
-	Signals.ExCategoryOpened:Connect(function()
+	table.insert(scope, Signals.ExCategoryOpened:Connect(function()
 		for _, element: Frame in peek(self.list):GetChildren() do
 			if element:IsA("Frame") then
 				element.BackgroundColor3 = fromRGB(30, 30, 30)
@@ -132,7 +132,7 @@ return function(plr: Player)
 		end
 
 		self.playerDescVisible:set(false)
-	end)
+	end))
 	table.insert(scope, HarukaLib:Hydrate(char, {
 		["Attr-InCombat"] = function(newState: boolean)
 			self.isInCombat:set(newState)
@@ -142,8 +142,6 @@ return function(plr: Player)
 	--// Clear
 	local function _onDead()
 		CAS:UnbindAction("TogglePlayerList")
-
-		Signals.ExCategoryOpened:DisconnectAll()
 
 		Fusion.doCleanup(scope)
 

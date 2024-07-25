@@ -8,7 +8,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local SSS = game:GetService("ServerScriptService")
-local ScriptContext = game:GetService("ScriptContext")
 local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
 
@@ -57,10 +56,6 @@ local function mainSetup()
 		local orbFolder = instanceNew("Folder")
 		orbFolder.Name = "OrbHolders"
 		orbFolder.Parent = workspace.MapComponents
-
-		local errorFolder = instanceNew("Folder")
-		errorFolder.Name = "ScriptErrors"
-		errorFolder.Parent = workspace.MapComponents
 	end)
 
 	--- clear links
@@ -85,8 +80,21 @@ local function mainSetup()
 	Spawn(function()
 		for _, npc: Model in workspace.MapComponents.NPCs:GetChildren() do
 			local ref = npc:GetAttribute("Animation") or "DefaultIdle"
+			local humanoid = npc.Humanoid :: Humanoid
 
-			npc.Humanoid.Animator:LoadAnimation(RepS.Package.Animations.NPCAnims[ref]):Play()
+			humanoid.Animator:LoadAnimation(RepS.Package.Animations.NPCAnims[ref]):Play()
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
 
 			ServerUtil:SetCollisionGroup(npc, "NPC")
 		end
@@ -200,37 +208,6 @@ local function mainSetup()
 	local joinData: table?
 	Spawn(function()
 		local function _playerAdded(plr: Player)
-			--- welcome, adventurer!
-			Promise.new(function()
-				local hasBadge = BS:UserHasBadgeAsync(plr.UserId, 2129794618)
-
-				if not hasBadge then BS:AwardBadge(plr.UserId, 2129794618) end
-
-			end):Catch(function(err)
-				warn(err)
-			end)
-
-			--- alpha tester
-			local function _setCustomRole()
-				local rank = plr:GetRankInGroup(16912246)
-				plr:SetAttribute("Rank", rank)
-
-				if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
-				if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
-			end
-			Promise.new(function(resolve)
-				local hasBadge = BS:UserHasBadgeAsync(plr.UserId, 2129794607)
-
-				if hasBadge then plr:SetAttribute("Role", "Alpha Tester") end
-
-				resolve()
-
-			end):Then(_setCustomRole):Catch(function(err)
-				warn(err)
-
-				_setCustomRole()
-			end)
-
 			joinData = plr:GetJoinData().TeleportData
 		end
 		Players.PlayerAdded:Connect(_playerAdded)
@@ -255,17 +232,6 @@ local function mainSetup()
 				end
 			end
 		end)
-	end)
-
-	-- error records
-	Spawn(function()
-		local function _errored(msg: string, _, _)
-			local newError = instanceNew("StringValue")
-			newError.Name = "Server"
-			newError.Value = msg
-			newError.Parent = workspace.MapComponents.ScriptErrors
-		end
-		ScriptContext.Error:Connect(_errored)
 	end)
 
 	--- private server setup

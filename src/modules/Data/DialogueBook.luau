@@ -147,20 +147,25 @@ DialogueBook.Xiaotie = {
 
     Extra = {}
 }
-DialogueBook.Ethan = {
+DialogueBook.Paho = {
+    Main6 = {
+        "You are finally here...are you?",
+        "I'm sorry, but I don't have time to talk with you right now.",
+        "blah blah blah"
+    },
+
     Else = {
-        "Thank goodness! Finally, an adventurer passing by! I nearly got lost in the forest.",
-        "You seems familiar to me, maybe we will meet again in the future?",
-        "CHOICE 1",
+        "We will definitely meet again in the future...",
+        "in the...futu...."
+    },
 
-        Choice1 = {
-            "Why are you here?",
-
-            Option1 = {
-                "<red>to exec...</font>to complete the exploration tasks given by Faction.",
-                "Well, good luck then!"
-             }
-        }
+    Extra = {
+        Main6 = "PahoFight1"
+    }
+}
+DialogueBook.Fallen1 = {
+    Else = {
+        "Any interested? We have apples, golden apples, and ice candies."
     }
 }
 

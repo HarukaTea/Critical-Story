@@ -8,7 +8,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local SG = game:GetService("StarterGui")
 local SoundS = game:GetService("SoundService")
 local TS = game:GetService("TweenService")
-local TestS = game:GetService("TestService")
 
 local plr = Players.LocalPlayer
 
@@ -148,10 +147,10 @@ local function storylineSetup()
 
     plr.Character:PivotTo(workspace:WaitForChild("Maps", 999).StartCutscene.CutsceneLocator.CFrame)
     plr.Character:SetAttribute("CurrentRegion", "")
-    workspace.Maps.Ocean.Parent = TestS
+    workspace.Maps.Ocean.Parent = RepS.Debris
 
     wait(5)
-    Signals.StartNPCChat:Fire(workspace:WaitForChild("MapComponents", 999).NPCs.Pioxit1, RepS.Package.Unloads.FakePrompt)
+    Signals.EnterNPCChat:Fire(workspace:WaitForChild("MapComponents", 999).NPCs.Pioxit1)
 
     Debris:AddItem(cutsceneUI, 1)
     TS:Create(cutsceneBG, tweenInfoNew(1), { BackgroundTransparency = 1 }):Play()

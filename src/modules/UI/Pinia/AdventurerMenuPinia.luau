@@ -14,11 +14,19 @@ local function AdventurerMenuPinia(self: table) : table
 	end
 
     self.chosenFilter = Value("Character")
-	self.frames = { Character = Value(true), Settings = Value(false) }
+	self.frames = {
+		Character = Value(true),
+		Settings = Value(false),
+		Guild = Value(false),
+		Party = Value(false),
+		Packs = Value(false),
+		Donations = Value(false)
+	}
+	self.panelFilters = {
+		Character = Value("Attributes")
+	}
 
 	self.pointsPerAdd = Value("1")
-
-	self.errorAbsContentSize, self.errorAbsSize = Value(0), Value(0)
 
     self.playerData = {
 		Levels = Value(plr:GetAttribute("Levels")),

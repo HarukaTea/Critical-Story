@@ -16,8 +16,10 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 	local COLORS = {
 		Character = fromRGB(172, 113, 86),
 		Settings = fromRGB(53, 107, 79),
-
-		Log = fromRGB(73, 67, 167)
+		Guild = fromRGB(197, 131, 0),
+		Party = fromRGB(61, 121, 182),
+		Packs = fromRGB(115, 115, 173),
+		Donation = fromRGB(149, 149, 74)
 	}
 
 	return Components.TextButton(scope, {

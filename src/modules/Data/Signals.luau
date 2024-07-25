@@ -6,12 +6,14 @@ local Signal = require(RepS.Modules.Packages.Signal).new
 
 return {
 	CreateHint = Signal(),
+	CameraScene = Signal(),
 	ExCategoryOpened = Signal(),
 	EnableMapDetails = Signal(),
-	NPCChat = Signal(),
+	ContinueNPCChat = Signal(),
+	PlaySound = Signal(),
 	PlayAnimation = Signal(),
 	PlayerChatted = Signal(),
-	StartNPCChat = Signal(),
+	EnterNPCChat = Signal(),
 
 
 	--- story

@@ -47,6 +47,28 @@ local function firstCombat(plr: Player)
 end
 Signals.FirstStepTutorial:Connect(firstCombat)
 
+
+local function pahoFight1(plr: Player)
+    Events.PlaySound.Fire(plr, { Sound = RepS.Package.Unloads.ResetSound })
+    Events.CameraScene.Fire(plr, { Part = RepS.Package.Unloads.ResetCamera })
+
+    local locator = RepS.Package.Unloads.MonsterLocator:Clone() :: BasePart
+    locator.Name = "HardmodeWolf"
+    locator:SetAttribute("Levels", 5)
+    locator:SetAttribute("Music", "MahouShojiu")
+    locator:SetAttribute("CantRespawn", true)
+    locator:SetAttribute("ExclusivePlayer", plr.Name)
+    locator.Transparency = 1
+    locator.CFrame = workspace.Maps.MonolithGrove.StoryLocator1.CFrame * CFrame.new(0, -1.5, 0)
+    locator.Parent = workspace.Monsters
+
+    RepS.Package.Unloads.CombatEnds:Clone().Parent = locator
+
+    plr.Character:PivotTo(locator.CFrame)
+end
+Signals.PahoFight1:Connect(pahoFight1)
+
+
 --// Side
 local function newFactionJourney(plr: Player)
     local check = false
@@ -57,6 +79,7 @@ local function newFactionJourney(plr: Player)
     if not check then QuestUtil:CreateNewQuest(plr, "Side", 0) end
 end
 Signals.JoinFaction:Connect(newFactionJourney)
+
 
 --// Town
 local function gaveFurs(plr: Player)

@@ -23,7 +23,7 @@ local function PassiveSlot(index: number, self: table): Frame
 	local function exCategoryOpened()
 		isSelecting:set(false)
 	end
-	Signals.ExCategoryOpened:Connect(exCategoryOpened)
+	table.insert(scope, Signals.ExCategoryOpened:Connect(exCategoryOpened))
 
 	local children: ImageButton?
 	if HarukaLib:GetDevice() ~= "Mobile" then

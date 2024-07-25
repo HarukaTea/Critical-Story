@@ -12,7 +12,7 @@ local Signals = {
 	--- story
 	StoryMain1 = Signal(),
 	FirstStepTutorial = Signal(),
-	CompletedInitusBay = Signal(),
+	PahoFight1 = Signal(),
 
 	JoinFaction = Signal(),
 

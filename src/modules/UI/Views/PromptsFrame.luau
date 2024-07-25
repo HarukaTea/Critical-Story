@@ -1,6 +1,5 @@
 --!nocheck
 
-local PPS = game:GetService("ProximityPromptService")
 local RepS = game:GetService("ReplicatedStorage")
 
 local Components = require(RepS.Modules.UI.Vanilla)
@@ -10,38 +9,10 @@ local Prompt = require(RepS.Modules.UI.Components.Prompt)
 
 local v2New, udNew = Vector2.new, UDim.new
 local fromScale = UDim2.fromScale
-local wait = task.wait
-local insert, tFind, remove = table.insert, table.find, table.remove
 
---[[
-    TODO: multi-prompt actions
-]]
+
 local function PromptsFrame(self: table) : Frame
 	local scope = self.scope :: Fusion.Scope
-
-    local function _addPrompt(prompt: ProximityPrompt)
-		local nowPrompts = Fusion.peek(self.promptsList)
-
-		insert(nowPrompts, prompt)
-		self.promptsList:set(nowPrompts)
-	end
-	local function _removePrompt(prompt: ProximityPrompt)
-		local afterPrompts = Fusion.peek(self.promptsList)
-
-		remove(afterPrompts, tFind(afterPrompts, prompt))
-		self.promptsList:set(afterPrompts)
-	end
-	local function _triggerPrompt(prompt: ProximityPrompt)
-		workspace.Sounds.SFXs.Interact:Play()
-
-		prompt.Enabled = false
-		wait(1)
-		local blacklist = { "Chest", "PublicJoin", "PartyJoin", "Chat" }
-		if not tFind(blacklist, prompt.Name) then prompt.Enabled = true end
-	end
-	table.insert(scope, PPS.PromptShown:Connect(_addPrompt))
-	table.insert(scope, PPS.PromptHidden:Connect(_removePrompt))
-	table.insert(scope, PPS.PromptTriggered:Connect(_triggerPrompt))
 
     return Components.Frame(scope, {
         AnchorPoint = v2New(0.5, 0),
@@ -51,12 +22,13 @@ local function PromptsFrame(self: table) : Frame
 
         [Fusion.Children] = {
             Fusion.New(scope, "UIListLayout")({
-                Padding = udNew(0.2, 0),
+                Padding = udNew(0.3, 0),
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                HorizontalAlignment = Enum.HorizontalAlignment.Center
+                HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                VerticalAlignment = Enum.VerticalAlignment.Center
             }),
-            Fusion.ForValues(scope, self.promptsList, function(_, localScope: Fusion.Scope, prompt: ProximityPrompt)
-                return Prompt(prompt, 1, localScope)
+            Fusion.ForPairs(scope, self.promptsList, function(_, localScope: Fusion.Scope, index: number, prompt: ProximityPrompt)
+                return index, Prompt(prompt, index, localScope, self)
             end)
         },
     })

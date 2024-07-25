@@ -161,8 +161,7 @@ event EnterNPCChat = {
     type: Reliable,
     call: ManyAsync,
     data: struct {
-        NPC: Instance (Model)?,
-        Prompt: Instance (ProximityPrompt)?
+        NPC: Instance (Model)?
     }
 }
 event NPCChatEnded = {

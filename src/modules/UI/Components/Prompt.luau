@@ -13,12 +13,13 @@ local v2New = Vector2.new
 local fromScale = UDim2.fromScale
 local nsNew, nsKPNew = NumberSequence.new, NumberSequenceKeypoint.new
 
-local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scope) : Frame
+local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scope, self: table) : Frame
     return Components.Frame(scope, {
         Name = "Prompt",
         AnchorPoint = v2New(0.5, 0),
         BackgroundTransparency = 0,
         Size = fromScale(0.18, 1),
+        LayoutOrder = prompt:GetAttribute("Order") or 1,
 
         [Fusion.Children] = {
             Components.RoundUICorner(scope),
@@ -28,6 +29,10 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scop
             Components.UIStroke(scope, {
                 Thickness = 3,
                 Transparency = 0.3,
+
+                Enabled = Fusion.Computed(scope, function(use: Fusion.Use)
+                    return if use(self.currentPromptIndex) == index then true else false
+                end),
 
                 [Fusion.Children] = {
                     Fusion.New(scope, "UIGradient")({
@@ -42,7 +47,7 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scop
                 Position = fromScale(0.05, 0.5),
                 Size = fromScale(0.7, 0.7),
                 SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                Image = if AssetBook.PromptIcons[prompt.Name] then AssetBook.PromptIcons[prompt.Name] else AssetBook.PromptIcons.Chat
+                Image = AssetBook.PromptIcons[prompt.Name] or AssetBook.PromptIcons.Chat
             }),
             Components.TextLabel(scope, {
                 Name = "PromptText",
@@ -58,8 +63,11 @@ local function Prompt(prompt: ProximityPrompt, index: number, scope: Fusion.Scop
                 Position = fromScale(-0.18, 0.5),
                 Size = fromScale(0.8, 0.8),
                 SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                Text = "E",
-                Visible = if index == 1 and not isMobile then true else false,
+                Text = prompt.KeyboardKeyCode.Name,
+
+                Visible = Fusion.Computed(scope, function(use: Fusion.Use)
+                    return if use(self.currentPromptIndex) == index and not isMobile then true else false
+                end),
 
                 [Fusion.Children] = {
                     Components.TextUIStroke(scope, { Thickness = 3 })

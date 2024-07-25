@@ -401,13 +401,6 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.NPC = nil
 			end
-			if buffer.readu8(incoming_buff, read(1)) == 1 then
-				incoming_ipos = incoming_ipos + 1
-				value.Prompt = incoming_inst[incoming_ipos]
-				assert(value.Prompt == nil or value.Prompt:IsA("ProximityPrompt"))
-			else
-				value.Prompt = nil
-			end
 			if events[19][1] then
 				for _, cb in events[19] do
 					task.spawn(cb, value)
@@ -922,7 +915,6 @@ local returns = table.freeze({
 	EnterNPCChat = table.freeze({
 		On = function(Callback: (({
 			NPC: ((Model)?),
-			Prompt: ((ProximityPrompt)?),
 		})) -> ())
 			table.insert(events[19], Callback)
 			for _, value in event_queue[19] do

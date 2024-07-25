@@ -15,7 +15,6 @@ local function NPCChatPinia(self: table)
     self.chatSpeaker = Value("")
     self.chatChoices = Value({})
     self.triangleVisible = Value(true)
-    self.isChatting = Value(false)
 end
 
 return NPCChatPinia

@@ -53,7 +53,7 @@ local function ChatOption(option: string, icon: string, self: table, index: numb
                     workspace.Sounds.SFXs.Next:Play()
                     self.chatChoices:set({})
 
-                    Signals.NPCChat:Fire(index)
+                    Signals.ContinueNPCChat:Fire(index)
                 end
             }),
             Components.ImageLabel(scope, {

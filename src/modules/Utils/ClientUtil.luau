@@ -90,7 +90,7 @@ function ClientUtil:GetKeyStoryLocations() : table
 end
 
 
-function ClientUtil:FreezePlayerControls(action: string)
+function ClientUtil:FreezePlayerControls(action: "Freeze" | "Unfreeze")
     if action == "Freeze" then
         UIS.ModalEnabled = true
 
@@ -101,6 +101,13 @@ function ClientUtil:FreezePlayerControls(action: string)
         UIS.ModalEnabled = false
 
         CAS:UnbindAction("FreezeControl")
+    end
+end
+
+
+function ClientUtil:SetAllPromptsState(state: boolean)
+    for _, everyPrompt: Instance in workspace.MapComponents:GetDescendants() do
+        if everyPrompt:IsA("ProximityPrompt") and everyPrompt.Name ~= "Chest" then everyPrompt.Enabled = state end
     end
 end
 
@@ -123,15 +130,21 @@ function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
     local plrGui = plr:FindFirstChildOfClass("PlayerGui")
     local function _setExVisibleState(ui: ScreenGui, state: boolean)
 		ui.BG.Visible = state
-		ui.Shadow.Visible = state
+
+		if ui:FindFirstChild("Shadow") then ui.Shadow.Visible = state end
 	end
 	local function _setOthersVisibleState(state: boolean)
 		plrGui.AdventurerStats.Enabled = state
 		plrGui.PlayerList.Enabled = state
 
 		workspace.CurrentCamera.UIBlur.Enabled = not state
+
+        local blackList = { "NPCChat" }
+        if table.find(blackList, targetUI) then workspace.CurrentCamera.UIBlur.Enabled = false end
 	end
     local function _setVisible(curUI: string, ui: ScreenGui)
+        ClientUtil:SetAllPromptsState(if curUI ~= "None" then false else true)
+
 		plr:SetAttribute("CurrentMenu", curUI)
 
 		_setExVisibleState(ui, if curUI == "None" then false else true)
@@ -151,9 +164,9 @@ function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
     else
         plr:SetAttribute("CurrentMenu", targetUI)
 
-        _setExVisibleState(plrGui[targetUI], true)
+        _setVisible(targetUI, plrGui[targetUI])
 
-        local closeList = { "AdventurerMenu", "Backpack", "Shop" }
+        local closeList = { "AdventurerMenu", "Backpack", "Shop", "NPCChat" }
         for _, closeUI: string in closeList do
             if closeUI == targetUI then continue end
 

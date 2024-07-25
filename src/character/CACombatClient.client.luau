@@ -14,7 +14,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Add, Empty = HarukaLib.Bin()
-local monsterTree = {}
+local monsterTree = Octree.new()
 local locationTree = Octree.new()
 
 local char = script.Parent :: Model
@@ -30,6 +30,7 @@ local isInCombat = false
 local orbTouchCD, animStep = false, 1
 local dmgTouchCD = false
 local locatorNodes = {}
+local monsterNodes = {}
 local encounterCD = false
 local currentMonster = nil
 
@@ -64,7 +65,7 @@ local function startCombat(monster: Model)
 	musics.Overworld:Stop()
 	sfxs.EnterCombat:Play()
 
-	musics[locator:GetAttribute("Music")]:Play()
+	musics.CombatMusics[locator:GetAttribute("Music") or "Conquest"]:Play()
 end
 local function endCombat()
 	if not isInCombat then return end
@@ -75,7 +76,7 @@ local function endCombat()
 	humanoid.AutoRotate = true
 
 	--- sound actions
-	for _, sound: Sound in workspace.Sounds:GetChildren() do
+	for _, sound: Sound in workspace.Sounds:GetDescendants() do
 		if sound:IsA("Sound") then sound:Stop() end
 	end
 	if humanoid.Health <= 0 then return end
@@ -219,17 +220,21 @@ local function setup()
 		if monster:GetAttribute("SubMonster") then return end
 		repeat wait() until monster.PrimaryPart --// Low-end devices, uhhhh!
 
-		table.insert(monsterTree, monster)
+		table.insert(monsterNodes, monsterTree:CreateNode(monster.PrimaryPart.Position, monster))
 	end
 	local function _removeMonster(monster: Model)
 		if monster:GetAttribute("SubMonster") then return end
 
-		for index: number, node: any in monsterTree do
-			if node == monster then table.remove(monsterTree, index) end
+		for index: number, node: any in monsterNodes do
+			if node:GetObject() == monster then
+				node:Destroy()
+				table.remove(monsterNodes, index)
+			end
 		end
 	end
 	Add(CS:GetInstanceAddedSignal("Monster"):Connect(_addMonster))
 	Add(CS:GetInstanceRemovedSignal("Monster"):Connect(_removeMonster))
+	Add(monsterNodes)
 
 	--- add all locations
 	for _, locator: BasePart in monsterLocations:GetDescendants() do
@@ -237,7 +242,7 @@ local function setup()
 	end
 	local function _addLocation(locator: BasePart)
 		wait()
-		repeat wait() until locator
+		repeat wait() until locator --- I fear that low-end device may not work lol
 
 		table.insert(locatorNodes, locationTree:CreateNode(locator.Position, locator))
 	end
@@ -260,7 +265,8 @@ local function setup()
 		if encounterCD then return end
 		if currentMonster then return end
 
-		for _, monster: Model in monsterTree do
+		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 18)
+		for _, monster: Model in nearbyMonsters do
 			if not monster then continue end
 			if not monster.PrimaryPart then continue end
 			if monster:GetAttribute("SubMonster") then continue end
@@ -268,9 +274,6 @@ local function setup()
 				if monster:GetAttribute("ExclusivePlayer") ~= plr.Name then continue end
 			end
 			if monster:GetAttribute("InCombat") then continue end
-
-			local realDistance = plr:DistanceFromCharacter(monster.PrimaryPart.Position)
-			if realDistance > 18 or realDistance <= 0 then continue end
 
 			encounterCD = true
 			currentMonster = monster

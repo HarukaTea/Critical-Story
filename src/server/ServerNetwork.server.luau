@@ -6,7 +6,6 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local SS = game:GetService("ServerStorage")
 local TeleS = game:GetService("TeleportService")
-local TestS = game:GetService("TestService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
@@ -46,7 +45,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 	elseif prompt.Name == "Chat" then
 		local npc = prompt.Parent.Parent :: Model
 
-		Events.EnterNPCChat.Fire(plr, { NPC = npc, Prompt = prompt })
+		Events.EnterNPCChat.Fire(plr, { NPC = npc })
 
 	elseif prompt.Name == "Shop" then
 		local shop = prompt.Parent.Parent :: Model
@@ -107,7 +106,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 			})
 		end
 
-		material.Parent = TestS
+		material.Parent = RepS.Debris
 
 		ServerUtil:GiveItem(plr, finalMaterial, #material.Items:GetChildren())
 

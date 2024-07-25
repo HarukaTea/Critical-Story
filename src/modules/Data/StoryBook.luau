@@ -73,7 +73,7 @@ StoryBook.Main = {
         Target = "Find a way to Initus Bay",
         Desc = "",
         NPC = "None",
-        Hint = v3New(),
+        Hint = if pos.MonolithGrove then pos.MonolithGrove.StoryLocator1 else v3New(),
 
         Rewards = {
             EXP = 30,
@@ -104,8 +104,6 @@ StoryBook.Town = {
         Desc = "",
         NPC = "FChenP",
         Hint = v3New(),
-
-        Script = true,
 
         Rewards = {}
     },

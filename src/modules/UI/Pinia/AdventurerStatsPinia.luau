@@ -24,8 +24,6 @@ local function AdventurerStatsPinia(self: table)
 	self.charData = char:WaitForChild("CharStats", 999)
 	self.humanoid = char.Humanoid
 
-	self.isChatting = Value(false)
-
 	self.playerData = {
 		EXP = {
 			Value(plr:GetAttribute("EXP")),
@@ -93,6 +91,7 @@ local function AdventurerStatsPinia(self: table)
 	}
 
     self.promptsList = Value({})
+	self.currentPromptIndex = Value(1)
 
     self.quests = Value(self.plr:WaitForChild("Quests", 999):GetChildren())
 
