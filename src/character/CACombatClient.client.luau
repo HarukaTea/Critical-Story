@@ -127,7 +127,7 @@ local function onTouched(hit: BasePart)
 			humanoid.Jump = true
 			if char.Torso:FindFirstChild("OrbBV") then
 				char.Torso.OrbBV:Destroy()
-				char.Torso.AssemblyLinearVelocity = Vector3.zero
+				char.Torso.Velocity = Vector3.zero
 			end
 
 			local weight = orb:GetAttribute("FloatWeight") :: number

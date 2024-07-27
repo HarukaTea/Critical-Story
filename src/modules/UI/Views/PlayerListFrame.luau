@@ -26,24 +26,20 @@ local function PlayerListFrame(self: table)
             return if use(self.isOpen) then fromScale(0.875, 0) else fromScale(1.2, 0)
         end), AssetBook.TweenInfos.half),
         CanvasSize = Computed(scope, function(use: Fusion.Use)
-            return if use(self.absContentSize) > use(self.absSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
+            return if use(self.absContentSize).Y > use(self.absSize).Y then fromOffset(0, use(self.absContentSize).Y) else fromOffset(0, 0)
         end),
         ScrollingEnabled = Computed(scope, function(use: Fusion.Use)
-            return if use(self.absContentSize) > use(self.absSize) then true else false
+            return if use(self.absContentSize).Y > use(self.absSize).Y then true else false
         end),
 
-        [Fusion.OnChange("AbsoluteSize")] = function(newSize: Vector2)
-            self.absSize:set(newSize.Y)
-        end,
+        [Fusion.Out("AbsoluteSize")] = self.absSize,
 
         [Fusion.Children] = {
             Fusion.New(scope, "UIListLayout")({
                 Padding = udNew(0, 2),
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
 
-                [Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
-                    self.absContentSize:set(newSize.Y)
-                end,
+                [Fusion.Out("AbsoluteContentSize")] = self.absContentSize,
             }),
             Fusion.ForValues(scope, self.players, function(_, localScope: Fusion.Scope, player: Player)
                 return PlayerSlot(self, player, localScope)

@@ -38,9 +38,7 @@ local function ItemDescFrame(self: table): Frame
 					return use(self.itemTierColor)
 				end),
 
-				[Fusion.OnChange("AbsoluteSize")] = function(newAbSize: Vector2)
-					self.absStatSize:set(newAbSize.Y)
-				end,
+				[Fusion.Out("AbsoluteSize")] = self.absStatSize,
 			}),
 			Components.TextLabel(scope, {
 				Name = "ItemStats",
@@ -55,15 +53,11 @@ local function ItemDescFrame(self: table): Frame
 				AutomaticSize = Enum.AutomaticSize.Y,
 
 				TextSize = Computed(scope, function(use: Fusion.Use)
-					return use(self.absStatSize) - 4
+					return math.clamp(use(self.absStatSize).Y - 4, 1, 32)
 				end),
 				Text = Computed(scope, function(use: Fusion.Use)
 					return use(self.itemStats)
-				end),
-
-				[Children] = {
-					New(scope, "UITextSizeConstraint")({ MaxTextSize = 30 }),
-				},
+				end)
 			}),
 			Components.TextLabel(scope, {
 				Name = "ItemDesc",
@@ -82,12 +76,8 @@ local function ItemDescFrame(self: table): Frame
 					return use(self.itemDesc)
 				end),
 				TextSize = Computed(scope, function(use: Fusion.Use)
-					return use(self.absStatSize) - 5
-				end),
-
-				[Children] = {
-					New(scope, "UITextSizeConstraint")({ MaxTextSize = 29 }),
-				},
+					return math.clamp(use(self.absStatSize).Y - 5, 1, 30)
+				end)
 			}),
 		},
 	})

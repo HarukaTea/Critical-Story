@@ -36,10 +36,10 @@ local function BackpackItemList(self: table) : ScrollingFrame
         ClipsDescendants = false,
 
         CanvasSize = Computed(scope, function(use: Fusion.Use)
-            return if use(self.absContentSize) > use(self.absScrollSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
+            return if use(self.absContentSize).Y > use(self.absScrollSize).Y then fromOffset(0, use(self.absContentSize).Y) else fromOffset(0, 0)
         end),
         ScrollingEnabled = Computed(scope, function(use: Fusion.Use)
-            return if use(self.absContentSize) > use(self.absScrollSize) then true else false
+            return if use(self.absContentSize).Y > use(self.absScrollSize).Y then true else false
         end),
 
         [Fusion.OnEvent("ChildAdded")] = function()
@@ -53,9 +53,7 @@ local function BackpackItemList(self: table) : ScrollingFrame
             --- 1, stands for UIGridLayout
             self.noItemsShow:set(if #peek(self.itemFrame):GetChildren() == 1 then true else false)
         end,
-        [Fusion.OnChange("AbsoluteSize")] = function(newSize)
-            self.absScrollSize:set(newSize.Y)
-        end,
+        [Fusion.Out("AbsoluteSize")] = self.absScrollSize,
 
         [Fusion.Children] = {
             Fusion.New(scope, "UIGridLayout")({
@@ -66,9 +64,7 @@ local function BackpackItemList(self: table) : ScrollingFrame
                     return fromOffset(use(self.absCellSize), use(self.absCellSize))
                 end),
 
-                [Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
-                    self.absContentSize:set(newSize.Y)
-                end,
+                [Fusion.Out("AbsoluteContentSize")] = self.absContentSize
             }),
             Fusion.ForValues(scope, self.items, function(use: Fusion.Use, localScope: Fusion.Scope, item: IntValue)
                 if use(self.chosenFilter) == "Other" then

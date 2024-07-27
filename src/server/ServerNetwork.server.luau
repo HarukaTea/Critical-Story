@@ -32,6 +32,7 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		local class = prompt.Parent.Parent.Name
 
 		plr:SetAttribute("Class", class)
+		plr:SetAttribute("CLASS_UNLOCK_"..class, true)
 
 	elseif prompt.Name == "Chest" then
 		local chest = prompt.Parent.Parent :: Model
@@ -118,10 +119,8 @@ end
 PPS.PromptTriggered:Connect(promptsHandler)
 
 
-local LEVEL_CAP = 1100
-local LEVEL_POINT = 2
 local function _expCheck(exp: number, level: number) : boolean
-	return if exp > Formula.EXP(level) and level < LEVEL_CAP then true else false
+	return if exp > Formula.EXP(level) and level < Formula.LevelCap then true else false
 end
 local function levelUp(plr: Player)
 	local check = _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels"))
@@ -129,7 +128,7 @@ local function levelUp(plr: Player)
 	if check then
 		HarukaLib:AddAttr(plr, "EXP", -Formula.EXP(plr:GetAttribute("Levels")))
 		HarukaLib:AddAttr(plr, "Levels", 1)
-		HarukaLib:AddAttr(plr, "LvPoints", LEVEL_POINT)
+		HarukaLib:AddAttr(plr, "LvPoints", Formula.LevelPerPoint)
 
 		if _expCheck(plr:GetAttribute("EXP"), plr:GetAttribute("Levels")) then levelUp(plr) return end
 
@@ -157,7 +156,7 @@ Events.AddPoints.SetCallback(function(plr, data)
 
 	if option == "Reset" then
 		local level = plr:GetAttribute("Levels")
-		local cost = ((level - 1) * LEVEL_POINT - plr:GetAttribute("LvPoints")) * 20
+		local cost = ((level - 1) * Formula.LevelPerPoint - plr:GetAttribute("LvPoints")) * Formula.PointsResetCost
 
 		if plr:GetAttribute("Gold") < cost then
 			Events.CreateHint.Fire(plr, { Hint = "You don't have enough Gold to reset!" })
@@ -169,9 +168,11 @@ Events.AddPoints.SetCallback(function(plr, data)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)
 		plr:SetAttribute("ManaPoints", 0)
-		plr:SetAttribute("LvPoints", (level - 1) * LEVEL_POINT)
+		plr:SetAttribute("ShieldPoints", 0)
+		plr:SetAttribute("LvPoints", (level - 1) * Formula.LevelPerPoint)
 		return
 	end
+	if not plr:GetAttribute(option) then return end
 
 	--// Add points
 	for _ = 1, times do
@@ -398,7 +399,7 @@ Events.ChangePlayerLocation.SetCallback(function(plr, data)
 
 	plr:SetAttribute("LastSeenLocation", location)
 
-	local spawns = workspace.Maps[location].SpawnPoint :: Model
+	local spawns = workspace.Maps[location].SpawnPoints :: Model
 	if #spawns:GetChildren() > 0 then
 		local rSpawn = math.random(1, #spawns:GetChildren())
 
@@ -471,4 +472,11 @@ Events.PlaySoundServer.SetCallback(function(_, data)
 	sound:Play()
 
 	Debris:AddItem(soundPart, 10)
+end)
+
+
+Events.ChangePlayerClass.SetCallback(function(plr: Player, data)
+	local class = data.ClassId
+
+	plr:SetAttribute("Class", class)
 end)

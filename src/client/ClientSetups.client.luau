@@ -4,10 +4,10 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(RepS.Modules.Data.Events)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 local Signals = require(RepS.Modules.Data.Signals)
+local RankBook = require(RepS.Modules.Data.RankBook)
 
 local Cmdr = require(RepS:WaitForChild("CmdrClient", 999))
 
@@ -60,7 +60,6 @@ local function chatRegister()
             if not sender:IsDescendantOf(Players) then return properties end
 
             Signals.PlayerChatted:Fire(message.Text, sender)
-
             properties.PrefixText = string.format("%s", message.PrefixText)
 
             if sender:GetAttribute("Role") then
@@ -73,10 +72,10 @@ local function chatRegister()
                         Color = "#70a1ff"
                     }
                 end
-                for _, roleinfo: table in AssetBook.RankRoleInfo do
+                for _, roleinfo: table in RankBook.RankRoleInfo do
                     if roleinfo.Role == role then roleInfo = roleinfo break end
                 end
-                for _, roleinfo: table in AssetBook.CustomRoleInfo do
+                for _, roleinfo: table in RankBook.CustomRoleInfo do
                     if roleinfo.Role == role then roleInfo = roleinfo break end
                 end
 

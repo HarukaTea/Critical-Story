@@ -16,7 +16,7 @@ local function getOrCreateListener(self, dataPath)
 	local listeners = self._listeners
 
 	if not listeners[dataPath] then
-		listeners[dataPath] = Signal.new()
+		listeners[dataPath] = Signal()
 	end
 
 	return listeners[dataPath]

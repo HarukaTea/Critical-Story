@@ -21,7 +21,6 @@ local Children = Fusion.Children
 
 local Shop = {}
 Shop.__index = Shop
-Shop.__type = "Shop"
 
 local wait = task.wait
 local fromScale = UDim2.fromScale
@@ -124,7 +123,12 @@ return function(plr: Player)
 				},
 			}),
 
-			Components.BGShadow(scope)
+			Components.Frame(scope, {
+				Name = "Shadow",
+				BackgroundTransparency = 0.15,
+				ZIndex = 0,
+				Visible = false
+			})
 		},
 	})
 

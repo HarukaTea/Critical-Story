@@ -5,9 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local Signals = require(RepS.Modules.Data.Signals)
 
 local Pinia = require(RepS.Modules.UI.Pinia.NPCChatPinia)
 
@@ -15,7 +13,6 @@ local ChatFrame = require(RepS.Modules.UI.Views.ChatFrame)
 
 local NPCChat = {}
 NPCChat.__index = NPCChat
-NPCChat.__type = "NPCChat"
 
 local wait = task.wait
 local v2New = Vector2.new

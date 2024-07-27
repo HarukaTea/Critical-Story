@@ -17,7 +17,6 @@ local function BackpackPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
-
     self.inventory = plr:WaitForChild("Inventory", 999)
 
 	self.itemFrame = Value()
@@ -31,16 +30,16 @@ local function BackpackPinia(self: table)
     self.absSize = Value({ camVPSize.X * 0.71, camVPSize.Y * 0.662 })
 	self.absCellPadding = Value({ peek(self.absSize)[1] * 0.02, peek(self.absSize)[2] * 0.02 })
 	self.absCellSize = Value(peek(self.absSize)[1] / 15.58)
-	self.absScrollSize, self.absContentSize = Value(90), Value(30)
+	self.absScrollSize, self.absContentSize = Value(Vector2.new()), Value(Vector2.new())
 
-    self.itemSlotClicked = Signal.new()
+    self.itemSlotClicked = Signal()
 
     self.filterInfo = {
         Equip = Value("EQUIP"),
         Pin = Value("PIN"),
     }
 
-    self.absStatSize = Value(0)
+    self.absStatSize = Value(Vector2.new())
 	self.itemName, self.itemStats, self.itemDesc = Value(""),  Value(""), Value("")
 	self.itemTierColor = Value(fromRGB())
 

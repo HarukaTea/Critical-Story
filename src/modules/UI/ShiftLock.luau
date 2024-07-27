@@ -11,7 +11,6 @@ local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 local MobileShiftLock = {}
 MobileShiftLock.__index = MobileShiftLock
-MobileShiftLock.__type = "MobileShiftLock"
 
 local cfNew, cfAngle = CFrame.new, CFrame.Angles
 local v2New = Vector2.new

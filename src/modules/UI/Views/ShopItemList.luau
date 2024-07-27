@@ -44,15 +44,13 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
         ClipsDescendants = false,
 
         CanvasSize = Computed(scope, function(use: Fusion.Use)
-            return if use(self.absContentSize) > use(self.absScrollSize) then fromOffset(0, use(self.absContentSize)) else fromOffset(0, 0)
+            return if use(self.absContentSize).Y > use(self.absScrollSize).Y then fromOffset(0, use(self.absContentSize).Y) else fromOffset(0, 0)
         end),
         ScrollingEnabled = Computed(scope, function(use: Fusion.Use)
-            return if use(self.absContentSize) > use(self.absScrollSize) then true else false
+            return if use(self.absContentSize).Y > use(self.absScrollSize).Y then true else false
         end),
 
-        [Fusion.OnChange("AbsoluteSize")] = function(newSize)
-            self.absScrollSize:set(newSize.Y)
-        end,
+        [Fusion.Out("AbsoluteSize")] = self.absScrollSize,
 
         [Fusion.Children] = {
             Fusion.New(scope, "UIGridLayout")({
@@ -63,9 +61,7 @@ local function ShopItemList(id: string, self: table) : ScrollingFrame
                     return fromOffset(use(self.absCellSize), use(self.absCellSize))
                 end),
 
-                [Fusion.OnChange("AbsoluteContentSize")] = function(newSize)
-                    self.absContentSize:set(newSize.Y)
-                end,
+                [Fusion.Out("AbsoluteContentSize")] = self.absContentSize,
             }),
             Fusion.ForValues(scope, self.items, function(_, localScope: Fusion.Scope, item: string)
                 return ShopItemSlot(item, self, localScope)

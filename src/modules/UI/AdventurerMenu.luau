@@ -3,9 +3,11 @@
 local CAS = game:GetService("ContextActionService")
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Formula = require(RepS.Modules.Data.Formulas)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
@@ -17,9 +19,10 @@ local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottom
 local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
 local FilterButton = require(RepS.Modules.UI.Components.FilterButtonMenu)
 
+local Children = Fusion.Children
+
 local AdventurerMenu = {}
 AdventurerMenu.__index = AdventurerMenu
-AdventurerMenu.__type = "AdventurerMenu"
 
 local wait = task.wait
 
@@ -42,13 +45,13 @@ return function(plr: Player)
 		ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 		DisplayOrder = 10,
 
-		[Fusion.Children] = {
+		[Children] = {
 			Components.Frame(scope, {
 				Name = "BG",
 				Visible = false,
 				ZIndex = 2,
 
-				[Fusion.Children] = {
+				[Children] = {
 					CharacterFrame(self),
 					SettingsFrame(self),
 
@@ -56,7 +59,6 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
-						FilterButton("Party", self),
 						FilterButton("Guild", self),
 						FilterButton("Packs", self),
 						FilterButton("Donation", self)
@@ -64,7 +66,23 @@ return function(plr: Player)
 				}
 			}),
 
-			Components.BGShadow(scope)
+			Components.Frame(scope, {
+				Name = "Shadow",
+				BackgroundTransparency = 0,
+				ZIndex = 0,
+				Visible = false,
+
+				[Children] = {
+					Fusion.New(scope, "UIGradient")({
+						Transparency = NumberSequence.new({
+							NumberSequenceKeypoint.new(0, 0),
+							NumberSequenceKeypoint.new(0.4, 0.65),
+							NumberSequenceKeypoint.new(0.6, 0.65),
+							NumberSequenceKeypoint.new(1, 0)
+						})
+					})
+				}
+			})
 		},
 	})
 
@@ -93,8 +111,12 @@ return function(plr: Player)
 
 	local playerData, charData = self.playerData, self.charData
 	table.insert(scope, HarukaLib:Hydrate(plr, {
+		["Attr-Class"] = function(class: string)
+			playerData.Class:set(class)
+		end,
 		["Attr-Levels"] = function(levels: number)
 			playerData.Levels:set(levels)
+			playerData.EXP[2]:set(Formula.EXP(levels))
 		end,
 		["Attr-LvPoints"] = function(points: number)
 			playerData.LvPoints:set(points)
@@ -111,9 +133,16 @@ return function(plr: Player)
 		["Attr-ManaPoints"] = function(points: number)
 			playerData.Mana:set(points)
 		end,
+		["Attr-ShieldPoints"] = function(points: number)
+			playerData.Shield:set(points)
+		end,
 		["Attr-Gold"] = function(gold: number)
 			playerData.Gold:set(gold)
-		end
+		end,
+		["Attr-EXP"] = function(exp: number)
+			playerData.EXP[1]:set(exp)
+			playerData.EXP[2]:set(Formula.EXP(plr:GetAttribute("Levels")))
+		end,
 	}))
 	table.insert(scope, HarukaLib:Hydrate(self.char, {
 		["Attr-MinDMG"] = function(dmg: number)
@@ -130,6 +159,12 @@ return function(plr: Player)
 		end,
 		["Attr-MaxMana"] = function(mana: number)
 			charData.Mana:set(mana)
+		end,
+		["Attr-CriChance"] = function(cri: number)
+			charData.CriChance:set(cri)
+		end,
+		["Attr-CriDMG"] = function(cri: number)
+			charData.CriDMG:set(cri)
 		end
 	}))
 	table.insert(scope, HarukaLib:Hydrate(self.char.Humanoid, {
@@ -137,6 +172,14 @@ return function(plr: Player)
 			charData.Health:set(maxHP)
 		end
 	}))
+
+	local classUnlocksListener = {}
+	for class: string, _ in AssetBook.ClassInfo do
+		classUnlocksListener["Attr-CLASS_UNLOCK_"..class] = function(unlocked: boolean)
+			playerData.ClassUnlocks[class]:set(unlocked)
+		end
+	end
+	table.insert(scope, HarukaLib:Hydrate(plr, classUnlocksListener))
 
 	--// Clear
 	local function _clearGarbage()

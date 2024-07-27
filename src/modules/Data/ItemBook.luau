@@ -996,7 +996,8 @@ ItemBook.ItemImagesEx = {
     Gold = "rbxassetid://18421784947",
     EXP = "rbxassetid://16002068286",
     RP = "rbxassetid://18644493192",
-    Backpack = "rbxassetid://2970814599"
+    Backpack = "rbxassetid://2970814599",
+    ClassLock = "rbxassetid://18677759898"
 }
 
 --[[

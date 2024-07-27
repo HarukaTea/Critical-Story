@@ -1,6 +1,5 @@
 --!nocheck
 
-local BS = game:GetService("BadgeService")
 local HttpService = game:GetService("HttpService")
 local MS = game:GetService("MessagingService")
 local Players = game:GetService("Players")
@@ -11,11 +10,9 @@ local SSS = game:GetService("ServerScriptService")
 local SS = game:GetService("ServerStorage")
 local PS = game:GetService("PhysicsService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
-local Promise = require(RepS.Modules.Packages.Promise)
 
 local instanceNew = Instance.new
 local wait = task.wait
@@ -40,7 +37,6 @@ end
 Spawn(collisionRegister)
 
 local function cmdrRegister()
-	Cmdr:RegisterDefaultCommands({ "DefaultAdmin", "DefaultUtil", "DefaultDebug", "Help" })
 	Cmdr:RegisterCommandsIn(SSS.Modules.Commands)
 	Cmdr:RegisterHooksIn(SSS.Modules.Hooks)
 end
@@ -104,12 +100,9 @@ local function mainSetup()
 	Spawn(function()
 		RepS.Package.Unloads.Musics.Parent = SoundService
 		RepS.Package.Unloads.SFXs.Parent = SoundService
-		for _, sound: Sound in RepS.Package.Sounds:GetChildren() do
-			if sound.Name == "SFXs" then
-				for _, sfx in sound:GetChildren() do sfx.SoundGroup = SoundService.SFXs end
-			else
-				if sound:IsA("Sound") then sound.SoundGroup = SoundService.Musics end
-			end
+		for _, sound: Sound in RepS.Package.Sounds:GetDescendants() do
+			if sound.Parent.Name == "SFXs" then sound.SoundGroup = SoundService.SFXs continue end
+			if sound:IsA("Sound") then sound.SoundGroup = SoundService.Musics end
 		end
 		RepS.Package.Sounds.Parent = workspace
 		for _, child: Instance in RepS.Package.MonsterAttacks:GetDescendants() do

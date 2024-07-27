@@ -2,7 +2,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local Signal = require(RepS.Modules.Packages.Signal).new
+local Signal = require(RepS.Modules.Packages.Signal)
 
 return {
 	CreateHint = Signal(),

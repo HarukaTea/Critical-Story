@@ -73,9 +73,6 @@ local function AdventurerStatsPinia(self: table)
 
     self.newAddedItems = Value({})
 
-    self.levelUpShown, self.levelUpTitleShown, self.levelUpPos =
-        Value(false), Value(false), Value(fromScale(0.55, 0))
-
 	self.locationScope = Fusion.scoped({})
     self.locationInfo = {
 		Name = Value(""),

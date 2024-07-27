@@ -2,16 +2,17 @@
 
 local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RepS = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local AssetBook = require(ReplicatedStorage.Modules.Data.AssetBook)
-local DataKeep = require(ReplicatedStorage.Modules.Packages.DataKeep)
-local ItemBook = require(ReplicatedStorage.Modules.Data.ItemBook)
-local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
-local Promise = require(ReplicatedStorage.Modules.Packages.Promise)
-local StoryBook = require(ReplicatedStorage.Modules.Data.StoryBook)
-local Spawn = require(ReplicatedStorage.Modules.Packages.Spawn)
+local AssetBook = require(RepS.Modules.Data.AssetBook)
+local DataKeep = require(RepS.Modules.Packages.DataKeep)
+local ItemBook = require(RepS.Modules.Data.ItemBook)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Promise = require(RepS.Modules.Packages.Promise)
+local StoryBook = require(RepS.Modules.Data.StoryBook)
+local Spawn = require(RepS.Modules.Packages.Spawn)
+local RankBook = require(RepS.Modules.Data.RankBook)
 
 local profiles = {}
 local scopes = {}
@@ -163,6 +164,19 @@ local function setup(plr: Player)
 			}))
 		end
 
+		--// Load unlockables
+		for _, unlockedClass: string in data.ClassUnlocks do
+			plr:SetAttribute("CLASS_UNLOCK_"..unlockedClass, true)
+		end
+		local classUnlocksListener = {}
+		for class: string, _ in AssetBook.ClassInfo do
+			classUnlocksListener["Attr-CLASS_UNLOCK_"..class] = function(unlocked: boolean)
+				keep.Data[slot].ClassUnlocks[class]:set(unlocked)
+			end
+		end
+		Add(HarukaLib:Hydrate(plr, classUnlocksListener))
+
+
 		--// Connections
 		local function _save()
 			task.wait()
@@ -209,8 +223,8 @@ local function setup(plr: Player)
 				local rank = plr:GetRankInGroup(16912246)
 				plr:SetAttribute("Rank", rank)
 
-				if AssetBook.RankRoleInfo[rank] then plr:SetAttribute("Role", AssetBook.RankRoleInfo[rank].Role) end
-				if AssetBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", AssetBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
+				if RankBook.RankRoleInfo[rank] then plr:SetAttribute("Role", RankBook.RankRoleInfo[rank].Role) end
+				if RankBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", RankBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
 			end
 			Promise.new(function(resolve)
 				local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2129794607)

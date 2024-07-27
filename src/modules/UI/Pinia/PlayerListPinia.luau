@@ -14,7 +14,7 @@ local function PlayerListPinia(self: table)
 
     self.list = Value()
 
-	self.absSize, self.absContentSize = Value(90), Value(30)
+	self.absSize, self.absContentSize = Value(Vector2.new()), Value(Vector2.new())
 	self.players = Value({})
 	self.isOpen = Value(true)
 

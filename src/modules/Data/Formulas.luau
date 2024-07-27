@@ -19,9 +19,11 @@ Formulas.MonsterHP = function(level: number) : number
 end
 
 Formulas.MonsterDMG = function(level: number) : number
-    return math.floor(5 * level)
+    return math.floor(level ^ 1.3599) + 4
 end
 
 Formulas.PointsResetCost = 20
+Formulas.LevelCap = 125
+Formulas.LevelPerPoint = 2
 
 return Formulas

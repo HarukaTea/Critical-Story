@@ -132,6 +132,9 @@ if not RunService:IsRunning() then
 		ChangePlayerSetting = table.freeze({
 			SetCallback = noop
 		}),
+		ChangePlayerClass = table.freeze({
+			SetCallback = noop
+		}),
 		ChangeAttackTarget = table.freeze({
 			SetCallback = noop
 		}),
@@ -290,7 +293,7 @@ end
 
 RunService.Heartbeat:Connect(SendEvents)
 
-local events = table.create(28)
+local events = table.create(29)
 reliable.OnServerEvent:Connect(function(player, buff, inst)
 	incoming_buff = buff
 	incoming_inst = inst
@@ -345,13 +348,8 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 		elseif id == 7 then
 			local value
 			value = {}
-			if buffer.readu8(incoming_buff, read(1)) == 1 then
-				incoming_ipos = incoming_ipos + 1
-				value.Target = incoming_inst[incoming_ipos]
-				assert(value.Target == nil or value.Target:IsA("Model"))
-			else
-				value.Target = nil
-			end
+			local len_1 = buffer.readu16(incoming_buff, read(2))
+			value.ClassId = buffer.readstring(incoming_buff, read(len_1), len_1)
 			if events[7] then
 				task.spawn(events[7], player, value)
 			end
@@ -360,14 +358,27 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
 				incoming_ipos = incoming_ipos + 1
-				value.Projectile = incoming_inst[incoming_ipos]
+				value.Target = incoming_inst[incoming_ipos]
+				assert(value.Target == nil or value.Target:IsA("Model"))
 			else
-				value.Projectile = nil
+				value.Target = nil
 			end
 			if events[8] then
 				task.spawn(events[8], player, value)
 			end
-		elseif id == 10 then
+		elseif id == 9 then
+			local value
+			value = {}
+			if buffer.readu8(incoming_buff, read(1)) == 1 then
+				incoming_ipos = incoming_ipos + 1
+				value.Projectile = incoming_inst[incoming_ipos]
+			else
+				value.Projectile = nil
+			end
+			if events[9] then
+				task.spawn(events[9], player, value)
+			end
+		elseif id == 11 then
 			local value
 			value = {}
 			local len_1 = buffer.readu16(incoming_buff, read(2))
@@ -376,16 +387,16 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 			value.ItemSlot = buffer.readstring(incoming_buff, read(len_2), len_2)
 			local len_3 = buffer.readu16(incoming_buff, read(2))
 			value.ItemId = buffer.readstring(incoming_buff, read(len_3), len_3)
-			if events[10] then
-				task.spawn(events[10], player, value)
+			if events[11] then
+				task.spawn(events[11], player, value)
 			end
-		elseif id == 14 then
+		elseif id == 15 then
 			local value
 			value = {}
-			if events[14] then
-				task.spawn(events[14], player, value)
+			if events[15] then
+				task.spawn(events[15], player, value)
 			end
-		elseif id == 18 then
+		elseif id == 19 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -395,10 +406,10 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 			else
 				value.Orb = nil
 			end
-			if events[18] then
-				task.spawn(events[18], player, value)
+			if events[19] then
+				task.spawn(events[19], player, value)
 			end
-		elseif id == 20 then
+		elseif id == 21 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -414,10 +425,10 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 			else
 				value.Series = nil
 			end
-			if events[20] then
-				task.spawn(events[20], player, value)
+			if events[21] then
+				task.spawn(events[21], player, value)
 			end
-		elseif id == 21 then
+		elseif id == 22 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -430,10 +441,10 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 			local len_1 = buffer.readu16(incoming_buff, read(2))
 			value.Series = buffer.readstring(incoming_buff, read(len_1), len_1)
 			value.QuestId = buffer.readu8(incoming_buff, read(1))
-			if events[21] then
-				task.spawn(events[21], player, value)
+			if events[22] then
+				task.spawn(events[22], player, value)
 			end
-		elseif id == 23 then
+		elseif id == 24 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -444,16 +455,8 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 				value.Sound = nil
 			end
 			value.Origin = Vector3.new(buffer.readf32(incoming_buff, read(4)), buffer.readf32(incoming_buff, read(4)), buffer.readf32(incoming_buff, read(4)))
-			if events[23] then
-				task.spawn(events[23], player, value)
-			end
-		elseif id == 27 then
-			local value
-			value = {}
-			local len_1 = buffer.readu16(incoming_buff, read(2))
-			value.ItemId = buffer.readstring(incoming_buff, read(len_1), len_1)
-			if events[27] then
-				task.spawn(events[27], player, value)
+			if events[24] then
+				task.spawn(events[24], player, value)
 			end
 		elseif id == 28 then
 			local value
@@ -462,6 +465,14 @@ reliable.OnServerEvent:Connect(function(player, buff, inst)
 			value.ItemId = buffer.readstring(incoming_buff, read(len_1), len_1)
 			if events[28] then
 				task.spawn(events[28], player, value)
+			end
+		elseif id == 29 then
+			local value
+			value = {}
+			local len_1 = buffer.readu16(incoming_buff, read(2))
+			value.ItemId = buffer.readstring(incoming_buff, read(len_1), len_1)
+			if events[29] then
+				task.spawn(events[29], player, value)
 			end
 		else
 			error("Unknown event id")
@@ -474,20 +485,20 @@ unreliable.OnServerEvent:Connect(function(player, buff, inst)
 	incoming_read = 0
 	incoming_ipos = 0
 	local id = buffer.readu8(buff, read(1))
-	if id == 9 then
+	if id == 10 then
 		local value
 		value = {}
 		local len_1 = buffer.readu16(incoming_buff, read(2))
 		assert(len_1 <= 100)
 		value.LocationId = buffer.readstring(incoming_buff, read(len_1), len_1)
-		if events[9] then
-			task.spawn(events[9], player, value)
+		if events[10] then
+			task.spawn(events[10], player, value)
 		end
-	elseif id == 25 then
+	elseif id == 26 then
 		local value
 		value = {}
-		if events[25] then
-			task.spawn(events[25], player, value)
+		if events[26] then
+			task.spawn(events[26], player, value)
 		end
 	else
 		error("Unknown event id")
@@ -929,7 +940,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
 			local len_1 = #Value.ItemSlot
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -948,7 +959,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
 			local len_1 = #Value.ItemSlot
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -974,7 +985,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
 			local len_1 = #Value.ItemSlot
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1002,7 +1013,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
 			local len_1 = #Value.ItemSlot
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1028,7 +1039,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
 			local len_1 = #Value.ItemSlot
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1055,7 +1066,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
 			local len_1 = #Value.Items
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1074,7 +1085,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
 			local len_1 = #Value.Items
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1100,7 +1111,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
 			local len_1 = #Value.Items
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1128,7 +1139,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
 			local len_1 = #Value.Items
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1154,7 +1165,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
 			local len_1 = #Value.Items
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1183,7 +1194,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 14)
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, Value.Cooldown)
 			local len_1 = #Value.ItemId
@@ -1199,7 +1210,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 14)
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, Value.Cooldown)
 			local len_1 = #Value.ItemId
@@ -1222,7 +1233,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 14)
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, Value.Cooldown)
 			local len_1 = #Value.ItemId
@@ -1247,7 +1258,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 14)
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, Value.Cooldown)
 			local len_1 = #Value.ItemId
@@ -1270,7 +1281,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 13)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 14)
 			alloc(1)
 			buffer.writeu8(outgoing_buff, outgoing_apos, Value.Cooldown)
 			local len_1 = #Value.ItemId
@@ -1294,7 +1305,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 15)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
 			if Value.Part == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1311,7 +1322,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 15)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
 			if Value.Part == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1335,7 +1346,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 15)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
 			if Value.Part == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1361,7 +1372,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 15)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
 			if Value.Part == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1385,7 +1396,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 15)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
 			if Value.Part == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1411,7 +1422,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
 			if Value.Chest == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1428,7 +1439,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
 			if Value.Chest == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1452,7 +1463,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
 			if Value.Chest == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1478,7 +1489,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
 			if Value.Chest == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1502,7 +1513,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
 			if Value.Chest == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1530,7 +1541,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 18)
 			local len_1 = #Value.ItemId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1549,7 +1560,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 18)
 			local len_1 = #Value.ItemId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1575,7 +1586,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 18)
 			local len_1 = #Value.ItemId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1603,7 +1614,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 18)
 			local len_1 = #Value.ItemId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1629,7 +1640,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 17)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 18)
 			local len_1 = #Value.ItemId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1655,7 +1666,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 19)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 20)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1672,7 +1683,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 19)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 20)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1696,7 +1707,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 19)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 20)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1722,7 +1733,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 19)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 20)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1746,7 +1757,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 19)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 20)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1773,7 +1784,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 23)
 			if Value.Sound == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1800,7 +1811,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 23)
 			if Value.Sound == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1834,7 +1845,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 23)
 			if Value.Sound == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1870,7 +1881,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 23)
 			if Value.Sound == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1904,7 +1915,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 23)
 			if Value.Sound == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -1939,7 +1950,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 24)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 25)
 			local len_1 = #Value.AnimId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1952,7 +1963,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 24)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 25)
 			local len_1 = #Value.AnimId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1972,7 +1983,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 24)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 25)
 			local len_1 = #Value.AnimId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -1994,7 +2005,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 24)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 25)
 			local len_1 = #Value.AnimId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2014,7 +2025,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 24)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 25)
 			local len_1 = #Value.AnimId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2036,7 +2047,7 @@ local returns = table.freeze({
 		}))
 			load_player(Player)
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 26)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 27)
 			local len_1 = #Value.EventSymbol
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2049,7 +2060,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 26)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 27)
 			local len_1 = #Value.EventSymbol
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2069,7 +2080,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 26)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 27)
 			local len_1 = #Value.EventSymbol
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2091,7 +2102,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 26)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 27)
 			local len_1 = #Value.EventSymbol
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2111,7 +2122,7 @@ local returns = table.freeze({
 		}))
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 26)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 27)
 			local len_1 = #Value.EventSymbol
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -2169,9 +2180,9 @@ local returns = table.freeze({
 			end
 		end,
 	}),
-	ChangeAttackTarget = table.freeze({
+	ChangePlayerClass = table.freeze({
 		SetCallback = function(Callback: (Player, ({
-			Target: ((Model)?),
+			ClassId: (string),
 		})) -> ()): () -> ()
 			events[7] = Callback
 			return function()
@@ -2179,9 +2190,9 @@ local returns = table.freeze({
 			end
 		end,
 	}),
-	PlayerTakeDMG = table.freeze({
+	ChangeAttackTarget = table.freeze({
 		SetCallback = function(Callback: (Player, ({
-			Projectile: ((Instance)?),
+			Target: ((Model)?),
 		})) -> ()): () -> ()
 			events[8] = Callback
 			return function()
@@ -2189,13 +2200,23 @@ local returns = table.freeze({
 			end
 		end,
 	}),
-	ChangePlayerLocation = table.freeze({
+	PlayerTakeDMG = table.freeze({
 		SetCallback = function(Callback: (Player, ({
-			LocationId: (string),
+			Projectile: ((Instance)?),
 		})) -> ()): () -> ()
 			events[9] = Callback
 			return function()
 				events[9] = nil
+			end
+		end,
+	}),
+	ChangePlayerLocation = table.freeze({
+		SetCallback = function(Callback: (Player, ({
+			LocationId: (string),
+		})) -> ()): () -> ()
+			events[10] = Callback
+			return function()
+				events[10] = nil
 			end
 		end,
 	}),
@@ -2205,18 +2226,18 @@ local returns = table.freeze({
 			ItemSlot: (string),
 			ItemId: (string),
 		})) -> ()): () -> ()
-			events[10] = Callback
+			events[11] = Callback
 			return function()
-				events[10] = nil
+				events[11] = nil
 			end
 		end,
 	}),
 	ForceReset = table.freeze({
 		SetCallback = function(Callback: (Player, ({
 		})) -> ()): () -> ()
-			events[14] = Callback
+			events[15] = Callback
 			return function()
-				events[14] = nil
+				events[15] = nil
 			end
 		end,
 	}),
@@ -2224,9 +2245,9 @@ local returns = table.freeze({
 		SetCallback = function(Callback: (Player, ({
 			Orb: ((Model)?),
 		})) -> ()): () -> ()
-			events[18] = Callback
+			events[19] = Callback
 			return function()
-				events[18] = nil
+				events[19] = nil
 			end
 		end,
 	}),
@@ -2235,9 +2256,9 @@ local returns = table.freeze({
 			NPC: ((Model)?),
 			Series: ((string)?),
 		})) -> ()): () -> ()
-			events[20] = Callback
+			events[21] = Callback
 			return function()
-				events[20] = nil
+				events[21] = nil
 			end
 		end,
 	}),
@@ -2247,9 +2268,9 @@ local returns = table.freeze({
 			Series: (string),
 			QuestId: (number),
 		})) -> ()): () -> ()
-			events[21] = Callback
+			events[22] = Callback
 			return function()
-				events[21] = nil
+				events[22] = nil
 			end
 		end,
 	}),
@@ -2258,18 +2279,18 @@ local returns = table.freeze({
 			Sound: ((Sound)?),
 			Origin: (Vector3),
 		})) -> ()): () -> ()
-			events[23] = Callback
+			events[24] = Callback
 			return function()
-				events[23] = nil
+				events[24] = nil
 			end
 		end,
 	}),
 	RejoinRequest = table.freeze({
 		SetCallback = function(Callback: (Player, ({
 		})) -> ()): () -> ()
-			events[25] = Callback
+			events[26] = Callback
 			return function()
-				events[25] = nil
+				events[26] = nil
 			end
 		end,
 	}),
@@ -2277,9 +2298,9 @@ local returns = table.freeze({
 		SetCallback = function(Callback: (Player, ({
 			ItemId: (string),
 		})) -> ()): () -> ()
-			events[27] = Callback
+			events[28] = Callback
 			return function()
-				events[27] = nil
+				events[28] = nil
 			end
 		end,
 	}),
@@ -2287,9 +2308,9 @@ local returns = table.freeze({
 		SetCallback = function(Callback: (Player, ({
 			ItemId: (string),
 		})) -> ()): () -> ()
-			events[28] = Callback
+			events[29] = Callback
 			return function()
-				events[28] = nil
+				events[29] = nil
 			end
 		end,
 	}),

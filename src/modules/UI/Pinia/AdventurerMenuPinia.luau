@@ -2,7 +2,9 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
+local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local Formula = require(RepS.Modules.Data.Formulas)
 
 local function AdventurerMenuPinia(self: table) : table
     local plr = self.plr :: Player
@@ -18,25 +20,46 @@ local function AdventurerMenuPinia(self: table) : table
 		Character = Value(true),
 		Settings = Value(false),
 		Guild = Value(false),
-		Party = Value(false),
 		Packs = Value(false),
-		Donations = Value(false)
+		Donation = Value(false)
 	}
 	self.panelFilters = {
 		Character = Value("Attributes")
 	}
+	self.panelFilterFrames = {
+		Character = {
+			Attributes = Value(true),
+			Points = Value(false),
+			Classes = Value(false),
+			Talents = Value(false)
+		}
+	}
 
-	self.pointsPerAdd = Value("1")
+	self.classInfoAbsSize = Value(Vector2.new())
+	self.classInfoDesc = Value("")
 
     self.playerData = {
+		Class = Value(plr:GetAttribute("Class")),
 		Levels = Value(plr:GetAttribute("Levels")),
 		LvPoints = Value(plr:GetAttribute("LvPoints")),
 		DMG = Value(plr:GetAttribute("DMGPoints")),
 		Magic = Value(plr:GetAttribute("MagicPoints")),
 		Health = Value(plr:GetAttribute("HealthPoints")),
 		Mana = Value(plr:GetAttribute("ManaPoints")),
-		Gold = Value(plr:GetAttribute("Gold"))
+		Shield = Value(plr:GetAttribute("ShieldPoints")),
+		Gold = Value(plr:GetAttribute("Gold")),
+		EXP = {
+			Value(plr:GetAttribute("EXP")),
+			Value(Formula.EXP(plr:GetAttribute("Levels")))
+		},
+
+		ClassUnlocks = {
+			Warrior = Value(true)
+		}
 	}
+	for class: string, _ in AssetBook.ClassInfo do
+		self.playerData.ClassUnlocks[class] = Value(plr:GetAttribute("CLASS_UNLOCK_"..class))
+	end
 
 	self.charData = {
 		MinDMG = Value(char:GetAttribute("MinDMG")),
@@ -44,7 +67,9 @@ local function AdventurerMenuPinia(self: table) : table
 		Magic = Value(char:GetAttribute("Magic")),
 		Mana = Value(char:GetAttribute("MaxMana")),
 		Shield = Value(char:GetAttribute("MaxShield")),
-		Health = Value(char.Humanoid.MaxHealth)
+		Health = Value(char.Humanoid.MaxHealth),
+		CriChance = Value(char:GetAttribute("CriChance")),
+		CriDMG = Value(char:GetAttribute("CriDMG")),
 	}
 
     self.playerSettings = {

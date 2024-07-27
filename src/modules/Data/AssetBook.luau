@@ -38,127 +38,6 @@ AssetBook.QuestColor = {
     Town = fromRGB(255, 107, 129)
 }
 
-AssetBook.RankRoleInfo = {
-    [2] = {
-        Role = "CS Tester",
-        ChatRole = "Tester",
-        Color = "#70a1ff"
-    },
-    [3] = {
-        Role = "CS Grand Tester",
-        ChatRole = "Tester+",
-        Color = "#1e90ff"
-    },
-    [4] = {
-        Role = "CS Trello Contributor",
-        ChatRole = "Trello",
-        Color = "#5352ed"
-    },
-    [125] = {
-        Role = "CS Contributor",
-        ChatRole = "Contributor",
-        Color = "#ff6b81"
-    },
-    [126] = {
-        Role = "CS Moderator",
-        ChatRole = "Mod",
-        Color = "#ff4757"
-    },
-    [255] = {
-        Role = "CS Founder",
-        ChatRole = "Founder",
-        Color = "#ffa502"
-    },
-}
-AssetBook.CustomRoleInfo = {
-    ["68027875"] = {
-        Role = "CW Founder",
-        ChatRole = "CW Founder",
-        Color = "#ffa502"
-    },
-    ["2040399306"] = {
-        Role = "CSV Founder",
-        ChatRole = "CSV Founder",
-        Color = "#ffa502"
-    },
-    ["1097119343"] = {
-        Role = "CV Founder",
-        ChatRole = "CV Founder",
-        Color = "#ffa502"
-    },
-    ["3563941913"] = {
-        Role = "CO Founder",
-        ChatRole = "CO Founder",
-        Color = "#ffa502"
-    },
-    ["91364976"] = {
-        Role = "CR Founder",
-        ChatRole = "CR Founder",
-        Color = "#ffa502"
-    },
-
-    ["517042349"] = {
-        Role = "Abyss The Executor",
-        ChatRole = "Abyss",
-        Color = "#3742fa"
-    },
-    ["850971587"] = {
-        Role = "Alchemist User",
-        ChatRole = "Alchemist",
-        Color = "#7bed9f"
-    },
-    ["596899926"] = {
-        Role = "Mayor of Carrotopia",
-        ChatRole = "Carrot",
-        Color = "#ff7f50"
-    },
-    ["748297118"] = {
-        Role = "Known Illegal Merchant",
-        ChatRole = "Merchant",
-        Color = "#fd79a8"
-    },
-    ["332773444"] = {
-        Role = "Sigma Male",
-        ChatRole = "Sigma",
-        Color = "#74b9ff"
-    },
-    ["1196067403"] = {
-        Role = "Tree Monster Fanatic",
-        ChatRole = "Tree",
-        Color = "#2ed573"
-    },
-    ["1210467492"] = {
-        Role = "Thingamybob",
-        ChatRole = "Snow",
-        Color = "#fff"
-    },
-    ["1680347725"] = {
-        Role = "Strategist",
-        ChatRole = "Strategist",
-        Color = "#fff"
-    },
-    ["1457659888"] = {
-        Role = "Striker",
-        ChatRole = "Striker",
-        Color = "#f79f1f"
-    },
-    ["1312728712"] = {
-        Role = "Raid Shadow Legend",
-        ChatRole = "Raid Shadow",
-        Color = "#fd79a8"
-    },
-    ["1094363213"] = {
-        Role = "Ebalo",
-        ChatRole = "Ebalo",
-        Color = "#e056fd"
-    },
-    ["232313396"] = {
-        Role = "Mia",
-        ChatRole = "Mia",
-        Color = "#fd79a8"
-    }
-}
-
 AssetBook.PromptIcons = {
     Chat = "rbxassetid://13124035950",
     Exit = "rbxassetid://16458254833",
@@ -172,62 +51,86 @@ AssetBook.ClassInfo = {
 	Warrior = {
 		Image = "rbxassetid://2965862892",
 		Color = fromRGB(255, 100, 100),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 1,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Archer = {
 		Image = "rbxassetid://2965863905",
 		Color = fromRGB(100, 255, 100),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 2,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Wizard = {
 		Image = "rbxassetid://2965863231",
 		Color = fromRGB(100, 100, 254),
-        Type = "Magic"
+        Type = "Magic",
+        Order = 3,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Knight = {
 		Image = "rbxassetid://2965863677",
 		Color = fromRGB(255, 255, 50),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 4,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Rogue = {
 		Image = "rbxassetid://12284961892",
 		Color = fromRGB(255, 170, 255),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 5,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Repeater = {
 		Image = "rbxassetid://12190533959",
 		Color = fromRGB(65, 179, 255),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 6,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Striker = {
 		Image = "rbxassetid://12190535870",
 		Color = fromRGB(253, 148, 44),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 7,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Alchemist = {
 		Image = "rbxassetid://12236618949",
 		Color = fromRGB(43, 188, 93),
-        Type = "Magic"
+        Type = "Magic",
+        Order = 8,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
 	Illusionist = {
 		Image = "rbxassetid://15875390788",
 		Color = fromRGB(0, 255, 252),
-        Type = "Magic"
+        Type = "Magic",
+        Order = 9,
+        Desc = "A world is waiting for you, a hero who will change the world."
 	},
     Juggernaut = {
         Image = "rbxassetid://16654290906",
         Color = fromRGB(253, 148, 44),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 10,
+        Desc = "A world is waiting for you, a hero who will change the world."
     },
     Reaper = {
         Image = "rbxassetid://17667241921",
         Color = fromRGB(163, 39, 39),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 11,
+        Desc = "A world is waiting for you, a hero who will change the world."
     },
     WindDancer = {
         Image = "rbxassetid://18423401512",
         Color = Color3.fromHex('#70a1ff'),
-        Type = "DMG"
+        Type = "DMG",
+        Order = 12,
+        Desc = "A world is waiting for you, a hero who will change the world."
     }
 }
 

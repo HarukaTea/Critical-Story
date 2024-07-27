@@ -67,7 +67,7 @@ local function ItemCostFrame(self: table) : Frame
                     return use(self.itemCostColor)
                 end),
                 TextSize = Fusion.Computed(scope, function(use: Fusion.Use)
-                    return use(self.absStatSize) - 3
+                    return use(self.absStatSize).Y - 3
                 end)
             })
         }

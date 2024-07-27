@@ -249,15 +249,13 @@ local function ChatFrame(self: table) : Frame
                 TextWrapped = true,
                 RichText = true,
 
-                [Fusion.OnChange("AbsoluteSize")] = function(size)
-                    self.chatDialogueAbsSize:set(size.Y)
-                end,
+                [Fusion.Out("AbsoluteSize")] = self.chatDialogueAbsSize,
 
                 Text = Computed(scope, function(use: Fusion.Use)
                     return use(self.chatText)
                 end),
                 TextSize = Computed(scope, function(use: Fusion.Use)
-                    return use(self.chatDialogueAbsSize) / 2.5
+                    return use(self.chatDialogueAbsSize).Y / 2.5
                 end)
             }),
 

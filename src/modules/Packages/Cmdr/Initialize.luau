@@ -32,5 +32,4 @@ return function (cmdr)
 	cmdr:RegisterTypesIn(script.Parent.BuiltInTypes)
 
 	script.Parent.BuiltInTypes:Destroy()
-	script.Parent.BuiltInCommands.Name = "Server commands"
 end

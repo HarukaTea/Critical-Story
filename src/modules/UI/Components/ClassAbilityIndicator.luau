@@ -22,7 +22,7 @@ local function ClassAbilityIndicator(self: table) : Frame
         if class == nil then return nil end
 
         --- other classes that don't need indicators
-        local blackList = { "Repeater", "Striker", "Alchemist" }
+        local blackList = { "Repeater", "Striker", "Alchemist", "Illusionist", "WindDancer" }
         if table.find(blackList, class) then return nil end
 
         return Components.Frame(localScope, {

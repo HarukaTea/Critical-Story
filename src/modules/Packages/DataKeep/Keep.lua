@@ -245,18 +245,18 @@ function Keep.new(structure: KeepStruct, dataTemplate: {}): Keep
 			UserIds = deepCopy(structure.UserIds or DefaultKeep.UserIds),
 		},
 
-		Releasing = Signal.new(),
+		Releasing = Signal(),
 		_released = false,
 
 		_view_only = false,
 
 		_overwriting = false,
 		_releaseSessionOnOverwrite = nil,
-		Overwritten = Signal.new(),
+		Overwritten = Signal(),
 
 		_global_updates_only = false, -- if true, can access global updates but nothing else (used for global updates)
 
-		OnGlobalUpdate = Signal.new(), -- fires on a new locked global update (ready to be processed)
+		OnGlobalUpdate = Signal(), -- fires on a new locked global update (ready to be processed)
 		GlobalStateProcessor = function(_: GlobalUpdate, lock: () -> boolean, _: () -> boolean) -- by default just locks the global update (this is only ran if the keep is online)
 			lock()
 		end,
@@ -269,7 +269,7 @@ function Keep.new(structure: KeepStruct, dataTemplate: {}): Keep
 		_keep_store = nil, -- the store class that created the keep
 
 		_last_save = os.clock(),
-		Saving = Signal.new(),
+		Saving = Signal(),
 		_store_info = { Name = "", Scope = "" },
 
 		_data_template = dataTemplate,

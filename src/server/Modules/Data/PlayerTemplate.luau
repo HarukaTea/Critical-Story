@@ -17,7 +17,8 @@ local slotStats = {
 			DMGPoints = 0,
 			MagicPoints = 0,
 			ManaPoints = 0,
-			HealthPoints = 0
+			HealthPoints = 0,
+			ShieldPoints = 0
 		},
 
 		Quests = {
@@ -33,10 +34,11 @@ local slotStats = {
 			PlayerList = true,
 			MapDetails = true,
 			CombatMode = "Solo",
-			Particles = true
+			MapShadows = true
 		},
 
 		Inventory = {},
+		ClassUnlocks = { "Warrior" }
 	}
 }
 slotStats.Slot2 = slotStats.Slot1

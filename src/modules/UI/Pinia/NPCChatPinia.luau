@@ -10,7 +10,7 @@ local function NPCChatPinia(self: table)
 		return Fusion.Value(self.scope, val)
 	end
 
-    self.chatDialogueAbsSize = Value(24)
+    self.chatDialogueAbsSize = Value(Vector2.new())
     self.chatText = Value("")
     self.chatSpeaker = Value("")
     self.chatChoices = Value({})

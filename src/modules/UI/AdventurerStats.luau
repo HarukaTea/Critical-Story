@@ -12,7 +12,6 @@ local Formula = require(RepS.Modules.Data.Formulas)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
-local Signals = require(RepS.Modules.Data.Signals)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerStatsPinia)
@@ -36,7 +35,6 @@ local Children, New = Fusion.Children, Fusion.New
 
 local AdventurerStats = {}
 AdventurerStats.__index = AdventurerStats
-AdventurerStats.__type = "AdventuerStats"
 
 local wait = task.wait
 local v2New, udNew, ud2New = Vector2.new, UDim.new, UDim2.new

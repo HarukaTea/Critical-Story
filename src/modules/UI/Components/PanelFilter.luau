@@ -37,6 +37,7 @@ local function PanelFilter(id: string, panelId: string, self: table): Frame
                 Name = "Title",
                 Size = fromScale(1, 1),
                 Text = string.upper(id),
+                TextXAlignment = Enum.TextXAlignment.Left,
 
                 TextColor3 = Fusion.Computed(scope, function(use: Fusion.Use)
                     return if use(self.panelFilters[panelId]) == id then
@@ -51,6 +52,15 @@ local function PanelFilter(id: string, panelId: string, self: table): Frame
                         PaddingTop = udNew(0.1, 0)
                     })
                 }
+            }),
+
+            Components.HoverImageButton(scope, {
+                [Fusion.OnEvent("MouseButton1Click")] = function()
+                    self.panelFilters[panelId]:set(id)
+
+                    for _, filter: Fusion.Value in self.panelFilterFrames[panelId] do filter:set(false) end
+                    self.panelFilterFrames[panelId][id]:set(true)
+                end
             })
         }
     })

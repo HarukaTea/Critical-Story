@@ -20,7 +20,6 @@ local Children, Computed, peek = Fusion.Children, Fusion.Computed, Fusion.peek
 
 local PlayerList = {}
 PlayerList.__index = PlayerList
-PlayerList.__type = "PlayerList"
 
 local wait = task.wait
 local color3New, v2New, ud2New = Color3.new, Vector2.new, UDim2.new
@@ -69,7 +68,7 @@ return function(plr: Player)
 								Position = fromScale(0.875, 0),
 
 								Size = Computed(scope, function(use: Fusion.Use)
-									return ud2New(0.118, 0, 0, min(use(self.absSize), use(self.absContentSize)))
+									return ud2New(0.118, 0, 0, min(use(self.absSize).Y, use(self.absContentSize).Y))
 								end),
 								Visible = Computed(scope, function(use: Fusion.Use)
 									return use(self.isOpen)

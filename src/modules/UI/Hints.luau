@@ -13,7 +13,6 @@ local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
 
 local Hints = {}
 Hints.__index = Hints
-Hints.__type = "Hints"
 
 local wait = task.wait
 local v2New, udNew = Vector2.new, UDim.new

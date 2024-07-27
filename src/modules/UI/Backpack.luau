@@ -23,7 +23,6 @@ local Children = Fusion.Children
 
 local Backpack = {}
 Backpack.__index = Backpack
-Backpack.__type = "Backpack"
 
 local wait = task.wait
 local fromScale = UDim2.fromScale
@@ -110,7 +109,12 @@ return function(plr: Player)
 				},
 			}),
 
-			Components.BGShadow(scope)
+			Components.Frame(scope, {
+				Name = "Shadow",
+				BackgroundTransparency = 0.15,
+				ZIndex = 0,
+				Visible = false
+			})
 		},
 	})
 

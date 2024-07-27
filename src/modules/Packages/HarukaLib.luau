@@ -245,7 +245,7 @@ end
 
 function HarukaLib:Tween(object: Instance, style: TweenInfo, goal: table)
 	local properties = {}
-	local signal = Signal.new()
+	local signal = Signal()
 
 	local dataTypes = {
 		number = function(a, b, t)
@@ -420,7 +420,7 @@ end
 
 function HarukaLib:PlayCutscene(pointsFolder: Folder | Model, duration: number)
 	local camera = workspace.CurrentCamera
-	local signal = Signal.new()
+	local signal = Signal()
 
 	--// Private
 	local function _getCF(points: table, t: number) : CFrame

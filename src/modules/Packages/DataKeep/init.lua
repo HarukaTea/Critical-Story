@@ -42,9 +42,9 @@ local Store = {
 
 	CriticalState = false, -- closet thing to tracking if they are down, will be set to true after many failed requests
 	_criticalStateThreshold = 5, -- how many failed requests before we assume they are down
-	CriticalStateSignal = Signal.new(), -- fires when we enter critical state
+	CriticalStateSignal = Signal(), -- fires when we enter critical state
 
-	IssueSignal = Signal.new(), -- fires when we have an issue (issue logging)
+	IssueSignal = Signal(), -- fires when we have an issue (issue logging)
 	_issueQueue = {}, -- queue of issues to keep track of if CriticalState should activate
 	_maxIssueTime = 60, -- how long to keep issues 'valid' in the queue
 }

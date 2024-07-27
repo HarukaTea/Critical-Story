@@ -56,6 +56,14 @@ event ChangePlayerSetting = {
         SettingId: string,
     }
 }
+event ChangePlayerClass = {
+    from: Client,
+    type: Reliable,
+    call: SingleAsync,
+    data: struct {
+        ClassId: string,
+    }
+}
 event ChangeAttackTarget = {
     from: Client,
     type: Reliable,

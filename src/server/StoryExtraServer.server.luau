@@ -15,7 +15,7 @@ local function startTheAdventure(plr: Player)
     Events.FireStoryEvents.Fire(plr, { EventSymbol = "StoryMain1" })
 
     wait(1)
-    Events.CameraScene.Fire(plr, { Part = RepS.Package.Unloads.CameraReset })
+    Events.CameraScene.Fire(plr, { Part = RepS.Package.Unloads.ResetCamera })
 
     wait(3)
     Signals.QuestComplete:Fire("Main", 1, plr, true)

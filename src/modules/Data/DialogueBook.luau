@@ -150,7 +150,7 @@ DialogueBook.Xiaotie = {
 DialogueBook.Paho = {
     Main6 = {
         "You are finally here...are you?",
-        "I'm sorry, but I don't have time to talk with you right now.",
+        "blah blah blah",
         "blah blah blah"
     },
 
@@ -164,9 +164,14 @@ DialogueBook.Paho = {
     }
 }
 DialogueBook.Fallen1 = {
+    Main3 = {
+        "Any interested? We have apples, golden apples, and ice candies."
+    },
     Else = {
         "Any interested? We have apples, golden apples, and ice candies."
-    }
+    },
+
+    Extra = {}
 }
 
 return DialogueBook

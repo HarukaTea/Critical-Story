@@ -168,17 +168,4 @@ function Components.RoundUICorner(scope: Fusion.Scope) : UICorner
 	return Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.5, 0) })
 end
 
-
---// Custom
-function Components.BGShadow(scope: Fusion.Scope) : Frame
-	return Components.Frame(scope, {
-        Name = "Shadow",
-        BackgroundTransparency = 0.15,
-        ZIndex = 0,
-        Visible = false,
-
-		AutoLocalize = false,
-    })
-end
-
 return Components

@@ -3,11 +3,7 @@
 local RunService = game:GetService("RunService")
 local Util = require(script.Shared:WaitForChild("Util"))
 
-if RunService:IsServer() == false then
-	error(
-		"[Cmdr] Client scripts cannot require the server library. Please require the client library from the client to use Cmdr in your own code."
-	)
-end
+if RunService:IsServer() == false then return end
 
 local Cmdr
 do
@@ -16,7 +12,6 @@ do
 		RemoteFunction = nil,
 		RemoteEvent = nil,
 		Util = Util,
-		DefaultCommandsFolder = script.BuiltInCommands,
 	}, {
 		__index = function(self, k)
 			local r = self.Registry[k]

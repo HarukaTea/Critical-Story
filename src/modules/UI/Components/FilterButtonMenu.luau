@@ -17,7 +17,6 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 		Character = fromRGB(172, 113, 86),
 		Settings = fromRGB(53, 107, 79),
 		Guild = fromRGB(197, 131, 0),
-		Party = fromRGB(61, 121, 182),
 		Packs = fromRGB(115, 115, 173),
 		Donation = fromRGB(149, 149, 74)
 	}
@@ -42,7 +41,7 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 		[Fusion.OnEvent("MouseButton1Click")] = function()
 			self.chosenFilter:set(id)
 
-			for _, frame: any in self.frames do frame:set(false) end
+			for _, frame: Fusion.Value in self.frames do frame:set(false) end
 			self.frames[id]:set(true)
 		end,
 	})
