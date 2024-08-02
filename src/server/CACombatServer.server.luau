@@ -4,8 +4,8 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local BuffEffectsUtil = require(SSS.Modules.Utils.BuffEffectsUtil)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local CAAttackUtil = require(SSS.Modules.Utils.CAAttackUtil)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
@@ -49,13 +49,17 @@ Events.CombatStart.SetCallback(function(plr, data)
 		Promise.new(function(resolve, reject)
 			if char.Humanoid.Health <= 0 then reject() end
 			if not monster.PrimaryPart then reject() end
+			if plr == nil then reject() end
+			if not plr:IsDescendantOf(Players) then reject() end
 
 			resolve()
 
-		end):Then(function()
+		end):andThen(function()
 			local maxPlayer = 0
+			local initialHealth = monster:GetAttribute("MaxHealth") :: number
+
 			for _, player: Player in Players:GetPlayers() do
-				if maxPlayer >= 4 then break end
+				if maxPlayer >= 5 then break end
 				if player == plr then continue end
 
 				pcall(function()
@@ -68,7 +72,7 @@ Events.CombatStart.SetCallback(function(plr, data)
 							if mob:HasTag("Monster") and mob.PrimaryPart then
 								ServerUtil:AddTargetForMonster(player, mob)
 
-								HarukaLib:AddAttr(monster, "MaxHealth", monster:GetAttribute("Health"))
+								HarukaLib:AddAttr(monster, "MaxHealth", initialHealth)
 							end
 						end
 					end
@@ -78,9 +82,12 @@ Events.CombatStart.SetCallback(function(plr, data)
 			border:Destroy()
 			char.PrimaryPart.Anchored = false
 
-		end):Catch(function()
+		end):catch(function()
+			for _, mob: Model in locator:GetDescendants() do
+				if mob:HasTag("Monster") and mob.PrimaryPart then mob:Destroy()	end
+			end
+
 			locator:SetAttribute("InCombat", false)
-			monster:SetAttribute("InCombat", false)
 
 			check = false
 		end)
@@ -111,7 +118,7 @@ Events.MonsterTakeDMG.SetCallback(function(plr, data)
 		if orb.Owner.Value ~= char then reject() end
 		if (char.PrimaryPart.Position - orb.PrimaryPart.Position).Magnitude > 16 then reject() end
 
-	end):Catch(function()
+	end):catch(function()
 		check = false
 	end)
 	if not check then return end
@@ -119,7 +126,7 @@ Events.MonsterTakeDMG.SetCallback(function(plr, data)
 	--- dmg calculations
 	local monster = char.CharStats.TargetMonster.Value :: Model?
 	local class = orb:GetAttribute("Style") :: string
-	local dmgType = if orb:GetAttribute("DMGType") then orb:GetAttribute("DMGType") else AssetBook.ClassInfo[class].Type
+	local dmgType = if orb:GetAttribute("DMGType") then orb:GetAttribute("DMGType") else ClassBook.ClassInfo[class].Type
 
 	--- base damage
 	local baseDamage = 0
@@ -206,7 +213,7 @@ Events.PlayerTakeDMG.SetCallback(function(plr, data)
         local oriDmg = dmg
 		dmg = floor(oriDmg - (oriDmg * char:GetAttribute("Guard")) / 100)
 
-		ServerUtil:ShowText(char, "GUARDED!", AssetBook.ClassInfo.Knight.Color)
+		ServerUtil:ShowText(char, "GUARDED!", ClassBook.ClassInfo.Knight.Color)
 
 		char:SetAttribute("Guard", 0)
 	end

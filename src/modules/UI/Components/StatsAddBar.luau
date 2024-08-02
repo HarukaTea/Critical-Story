@@ -55,64 +55,7 @@ local function StatsAddBar(id: string, self: table, title: string, order: number
 	local scope = self.scope :: Fusion.Scope
 
 	local isSelecting = Fusion.Value(scope, false)
-	local isSelecting2 = Fusion.Value(scope, false)
 	local clickCooldown = false
-
-	local children: TextButton
-	if id ~= "ResetCost" then
-		children = Components.TextButton(scope, {
-			Name = "Add5",
-			Position = fromScale(0.9, 0),
-			Size = fromScale(0.1, 1),
-			Text = "+5",
-			AutoButtonColor = false,
-
-			TextColor3 = Computed(scope, function(use: Fusion.Use)
-				return if use(isSelecting2) then fromRGB() else barColorIds[id]
-			end),
-			BackgroundColor3 = Computed(scope, function(use: Fusion.Use)
-				return if use(isSelecting2) then fromRGB(255, 255, 255) else fromRGB()
-			end),
-
-			[Fusion.OnEvent("MouseEnter")] = function()
-				isSelecting2:set(true)
-			end,
-			[Fusion.OnEvent("MouseLeave")] = function()
-				isSelecting2:set(false)
-			end,
-			[Fusion.OnEvent("MouseButton1Click")] = function()
-				if clickCooldown then return end
-
-				clickCooldown = true
-				Spawn(function()
-					task.wait(0.1)
-					clickCooldown = false
-				end)
-
-				if peek(self.playerData.LvPoints) < 5 then
-					Signals.CreateHint:Fire("You don't have enough skill points!")
-					return
-				end
-
-				workspace.Sounds.SFXs.Ding:Play()
-				Events.AddPoints.Fire({ Target = id.."Points", Points = 5 })
-			end,
-
-			[Children] = {
-				Fusion.New(scope, "UICorner")({
-					CornerRadius = UDim.new(0.1, 0)
-				}),
-				Components.UIStroke(scope, {
-					Thickness = 3,
-					Enabled = true,
-
-					Color = Computed(scope, function(use: Fusion.Use)
-						return if use(isSelecting2) then fromRGB() else barColorIds[id]
-					end)
-				})
-			}
-		})
-	end
 
 	return Components.Frame(scope, {
 		Name = id,
@@ -127,7 +70,7 @@ local function StatsAddBar(id: string, self: table, title: string, order: number
 
 			Components.TextLabel(scope, {
 				Name = "Stats",
-				Size = fromScale(0.77, 1),
+				Size = fromScale(0.9, 1),
 				TextXAlignment = Enum.TextXAlignment.Right,
 
 				Text = Computed(scope, function(use: Fusion.Use)
@@ -164,7 +107,7 @@ local function StatsAddBar(id: string, self: table, title: string, order: number
 			}),
 			Components.TextButton(scope, {
 				Name = "Add",
-				Position = fromScale(0.78, 0),
+				Position = fromScale(0.91, 0),
 				Size = fromScale(1, 1),
 				SizeConstraint = Enum.SizeConstraint.RelativeYY,
 				FontFace = if id == "ResetCost" then
@@ -198,18 +141,45 @@ local function StatsAddBar(id: string, self: table, title: string, order: number
 						- peek(self.playerData.LvPoints)) * Formula.PointsResetCost
 
 						if cost <= 0 then return end --- fix event dupe
+						if self.plr:GetAttribute("RP") < cost then
+							Signals.CreateHint:Fire("You don't have enough RP!")
+							return
+						end
+
+						local action = HarukaLib:CreateConfirmPrompt(self.plr, "Are you sure to reset your skill points?"):Wait()
+						if action ~= "Confirmed" then return end
 
 						Events.AddPoints.Fire({ Target = "Reset" })
 						return
 					end
 
-					if peek(self.playerData.LvPoints) < 1 then
+					--- add points checks
+					local perAdd = tonumber(Fusion.peek(self.pointsPerAdd))
+					if not perAdd then
+						Signals.CreateHint:Fire("Invalid input!")
+						return
+					end
+
+					local check = HarukaLib:TypeCheck("Integer", perAdd)
+					if not check then
+						Signals.CreateHint:Fire("It must be an integer!")
+						return
+					end
+
+					local check2 = HarukaLib:TypeCheck("Min", perAdd, 0)
+					if not check2 then
+						Signals.CreateHint:Fire("It must be larger than or equal to 1!")
+						return
+					end
+
+					if peek(self.playerData.LvPoints) < perAdd then
 						Signals.CreateHint:Fire("You don't have enough skill points!")
 						return
 					end
 
+					--- finally
 					workspace.Sounds.SFXs.Ding:Play()
-					Events.AddPoints.Fire({ Target = id.."Points", Points = 1 })
+					Events.AddPoints.Fire({ Target = id.."Points", Points = perAdd })
 				end,
 
 				[Children] = {
@@ -225,9 +195,7 @@ local function StatsAddBar(id: string, self: table, title: string, order: number
 						end)
 					})
 				}
-			}),
-
-			children
+			})
 		}
 	})
 end

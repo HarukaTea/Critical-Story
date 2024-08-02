@@ -1,99 +1,119 @@
 --!nocheck
 
-local CollectionService = game:GetService("CollectionService")
 local RepS = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
 
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
-local Signals = require(RepS.Modules.Data.Signals)
 
+local PanelFilter = require(RepS.Modules.UI.Components.PanelFilter)
 local SettingToggleBtn = require(RepS.Modules.UI.Components.SettingToggleBtn)
 
+local Children, Computed = Fusion.Children, Fusion.Computed
+
+local udNew =  UDim.new
 local fromScale = UDim2.fromScale
+
+local function ListPadding(self: table) : UIListLayout
+	return Fusion.New(self.scope, "UIListLayout")({
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = udNew(0.04, 0)
+	})
+end
 
 local function SettingsFrame(self: table): Frame
 	local scope = self.scope :: Fusion.Scope
-	local playerSettings = self.playerSettings :: table
-
-	table.insert(scope, HarukaLib:Hydrate(self.plr, {
-		["Attr-CombatMode"] = function(newMode: string)
-			playerSettings.PublicCombat:set(newMode == "Public")
-		end,
-		["Attr-Musics"] = function(state: boolean)
-			playerSettings.Musics:set(state)
-
-			SoundService.Musics.Volume = if state then 1 else 0
-		end,
-		["Attr-SFXs"] = function(state: boolean)
-			playerSettings.SFXs:set(state)
-
-			SoundService.SFXs.Volume = if state then 1 else 0
-		end,
-		["Attr-PotatoMode"] = function(state: boolean)
-			playerSettings.PotatoMode:set(state)
-
-			if state == false then
-				for _, child: Instance in workspace.Maps:GetDescendants() do
-					if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
-						if child:GetAttribute("OriMaterial") then child.Material = child:GetAttribute("OriMaterial") end
-
-						child:SetAttribute("OriMaterial", nil)
-					end
-				end
-
-			elseif state then
-				for _, child: Instance in workspace.Maps:GetDescendants() do
-					if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
-						child:SetAttribute("OriMaterial", child.Material)
-
-						child.Material = Enum.Material.Plastic
-					end
-				end
-			end
-		end,
-		["Attr-PlayerList"] = function(state: boolean)
-			playerSettings.PlayerList:set(state)
-		end,
-		["Attr-MapDetails"] = function(state: boolean)
-			playerSettings.MapDetails:set(state)
-
-			Signals.EnableMapDetails:Fire(if state then "Enable" else "Disable")
-		end,
-		["Attr-Particles"] = function(state: boolean)
-			playerSettings.Particles:set(state)
-
-			for _, effect: ParticleEmitter in CollectionService:GetTagged("ParticleEffects") do
-				if effect then effect.Enabled = false end
-			end
-		end
-	}))
 
 	return Components.Frame(scope, {
 		Name = "Settings",
-		Position = fromScale(0.496, 0.567),
-		Size = fromScale(0.944, 0.627),
+		Position = fromScale(0.496, 0.531),
+		Size = fromScale(0.944, 0.7),
 
 		Visible = Fusion.Computed(scope, function(use: Fusion.Use)
 			return use(self.frames.Settings)
 		end),
 
 		[Fusion.Children] = {
-			Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.856 }),
-			Fusion.New(scope, "UIGridLayout")({
-				CellPadding = fromScale(0.1, 0.1),
-				CellSize = fromScale(0.4, 0.09),
-				SortOrder = Enum.SortOrder.LayoutOrder
-			}),
+			Fusion.New(scope, "UIAspectRatioConstraint")({ AspectRatio = 3.389 }),
 
-			SettingToggleBtn("Musics", self),
-			SettingToggleBtn("SFXs", self),
-			SettingToggleBtn("PublicCombat", self),
-			SettingToggleBtn("PotatoMode", self),
-			SettingToggleBtn("PlayerList", self),
-			SettingToggleBtn("MapDetails", self),
-			SettingToggleBtn("Particles", self)
+			Fusion.New(scope, "Frame")({
+				Name = "LeftPanel",
+				BackgroundTransparency = 1,
+				Size = fromScale(0.3, 1),
+
+				[Children] = {
+					ListPadding(self),
+
+					PanelFilter("Graphics", "Settings", self),
+					PanelFilter("Combat", "Settings", self),
+					PanelFilter("Sounds", "Settings", self),
+					PanelFilter("Misc", "Settings", self)
+				}
+			}),
+			Fusion.New(scope, "Frame")({
+				Name = "RightPanel",
+				BackgroundTransparency = 1,
+				Position = fromScale(0.3, 0),
+				Size = fromScale(0.7, 1),
+
+				[Children] = {
+					Components.Frame(scope, {
+						Name = "Graphics",
+
+						Visible = Computed(scope, function(use: Fusion.Use)
+							return use(self.panelFilterFrames.Settings.Graphics)
+						end),
+
+						[Children] = {
+							ListPadding(self),
+
+							SettingToggleBtn("MapDetails", self),
+							SettingToggleBtn("PotatoMode", self),
+							SettingToggleBtn("MapShadows", self),
+							SettingToggleBtn("TreeOptimizations", self)
+						}
+					}),
+					Components.Frame(scope, {
+						Name = "Combat",
+
+						Visible = Computed(scope, function(use: Fusion.Use)
+							return use(self.panelFilterFrames.Settings.Combat)
+						end),
+
+						[Children] = {
+							ListPadding(self),
+
+							SettingToggleBtn("PublicCombat", self),
+						}
+					}),
+					Components.Frame(scope, {
+						Name = "Sounds",
+
+						Visible = Computed(scope, function(use: Fusion.Use)
+							return use(self.panelFilterFrames.Settings.Sounds)
+						end),
+
+						[Children] = {
+							ListPadding(self),
+
+							SettingToggleBtn("Musics", self),
+							SettingToggleBtn("SFXs", self)
+						}
+					}),
+					Components.Frame(scope, {
+						Name = "Misc",
+
+						Visible = Computed(scope, function(use: Fusion.Use)
+							return use(self.panelFilterFrames.Settings.Misc)
+						end),
+
+						[Children] = {
+							ListPadding(self),
+
+							SettingToggleBtn("PlayerList", self),
+						}
+					}),
+				}
+			})
 		},
 	})
 end

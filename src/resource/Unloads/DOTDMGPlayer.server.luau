@@ -3,7 +3,6 @@
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
-local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent.Parent.Parent :: Model
@@ -21,10 +20,12 @@ ServerUtil:ShowText(char, text, color)
 local light = instanceNew("PointLight")
 light.Color = color
 light.Range = 10
+light:AddTag("ProjectileEmitter")
 light.Parent = char.PrimaryPart
 
 local particle = RepS.Package.Effects.BurnEffect:Clone() :: ParticleEmitter
 particle.Color = csNew(color)
+particle:AddTag("ProjectileEmitter")
 particle.Parent = char.PrimaryPart
 
 for _ = duration, 0, -1 do

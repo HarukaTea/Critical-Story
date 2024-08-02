@@ -105,7 +105,7 @@ local function onTouched(hit: BasePart)
 			if distance1 < 16 or distance2 < 16 or distance3 < 16 then resolve() end
 			if distance1 <= 0 or distance2 <= 0 or distance3 <= 0 then reject() end
 
-		end):Catch(function()
+		end):catch(function()
 			check = false
 		end)
 		if not check then return end

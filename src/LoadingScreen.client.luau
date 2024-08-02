@@ -117,7 +117,8 @@ local function storylineSetup()
     local Signals = require(RepS.Modules.Data.Signals)
 
     SoundS:WaitForChild("Musics", 999).Volume = 0
-    workspace:WaitForChild("Sounds", 999).StoryMusics.Cairn:Play()
+    workspace:WaitForChild("Sounds", 999).Overworld:Stop()
+    workspace.Sounds.StoryMusics.Cairn:Play()
     plr:SetAttribute("InCutscene", true)
 
     -- load white overlay

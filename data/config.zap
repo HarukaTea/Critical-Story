@@ -33,8 +33,16 @@ event CreateHint = {
     type: Unreliable,
     call: ManyAsync,
     data: struct {
+        Hint: string(..666)
+    }
+}
+event CreateFullScreenHint = {
+    from: Server,
+    type: Unreliable,
+    call: ManyAsync,
+    data: struct {
         Hint: string(..666),
-        Option: string(..10)?
+        State: boolean
     }
 }
 event ClientTween = {

@@ -55,10 +55,7 @@ return function(plr: Player)
 
 					Components.Frame(scope, {
 						Name = "PlayerListFrame",
-
-						Position = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
-							return if use(self.isInCombat) then fromScale(0.5, 0.1) else fromScale(0.5, 1.5)
-						end), AssetBook.TweenInfos.half),
+						Position = fromScale(0.5, 0.1),
 
 						[Children] = {
 							PlayerListFrame(self),
@@ -132,11 +129,6 @@ return function(plr: Player)
 
 		self.playerDescVisible:set(false)
 	end))
-	table.insert(scope, HarukaLib:Hydrate(char, {
-		["Attr-InCombat"] = function(newState: boolean)
-			self.isInCombat:set(newState)
-		end
-	}))
 
 	--// Clear
 	local function _onDead()

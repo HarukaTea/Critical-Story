@@ -43,6 +43,12 @@ end
 local function onSelected()
 	local char = Players.LocalPlayer.Character
 
+	char:SetAttribute("IsNocliping", true)
+	local animTracks = char.Humanoid.Animator:GetPlayingAnimationTracks()
+	for _, track: AnimationTrack in animTracks do
+		track:Stop(0)
+	end
+
 	if char then
 		local humanoid = char:WaitForChild("Humanoid")
         local HRP = humanoid.RootPart
@@ -72,6 +78,8 @@ local function onSelected()
 end
 
 local function onDeselected()
+	Players.LocalPlayer.Character:SetAttribute("IsNocliping", false)
+
 	selected = false
 end
 

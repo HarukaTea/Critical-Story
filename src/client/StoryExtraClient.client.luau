@@ -33,7 +33,7 @@ local function startAdventure(plr: Player)
     TS:Create(cutsceneBG, tweenInfoNew(0.5), { BackgroundTransparency = 0 }):Play()
 
     wait(1)
-    plr.Character:PivotTo(workspace.Maps.MonolithVillage.SpawnPoint.CFrame)
+    plr.Character:PivotTo(workspace.Maps.MonolithVillage.SpawnPoints.SpawnPoint.CFrame)
     plr.Character:SetAttribute("CurrentRegion", "MonolithVillage")
     plr:SetAttribute("InCutscene", nil)
 

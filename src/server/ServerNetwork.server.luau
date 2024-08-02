@@ -158,12 +158,12 @@ Events.AddPoints.SetCallback(function(plr, data)
 		local level = plr:GetAttribute("Levels")
 		local cost = ((level - 1) * Formula.LevelPerPoint - plr:GetAttribute("LvPoints")) * Formula.PointsResetCost
 
-		if plr:GetAttribute("Gold") < cost then
-			Events.CreateHint.Fire(plr, { Hint = "You don't have enough Gold to reset!" })
+		if plr:GetAttribute("RP") < cost then
+			Events.CreateHint.Fire(plr, { Hint = "You don't have enough RP to reset!" })
 			return
 		end
 
-		HarukaLib:AddAttr(plr, "Gold", -cost)
+		HarukaLib:AddAttr(plr, "RP", -cost)
 		plr:SetAttribute("DMGPoints", 0)
 		plr:SetAttribute("MagicPoints", 0)
 		plr:SetAttribute("HealthPoints", 0)

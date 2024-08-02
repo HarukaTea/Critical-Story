@@ -3,7 +3,7 @@
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Events = require(RepS.Modules.Data.Events)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Signals = require(RepS.Modules.Data.Signals)
@@ -52,7 +52,7 @@ local function playAnim(anim: string)
 	if not anims[anim] then warn(`Can't found animation: {anim} !`) return end
 
 	if anim == "MagicCastedAnim1" then
-		if AssetBook.ClassInfo[plr:GetAttribute("Class")].Type == "Magic" then anim = "MagicCastedAnim2" end
+		if ClassBook.ClassInfo[plr:GetAttribute("Class")].Type == "Magic" then anim = "MagicCastedAnim2" end
 	end
 
 	anims[anim]:Play()

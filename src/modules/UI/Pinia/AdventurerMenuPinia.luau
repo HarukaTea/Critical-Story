@@ -2,14 +2,10 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local Formula = require(RepS.Modules.Data.Formulas)
 
 local function AdventurerMenuPinia(self: table) : table
-    local plr = self.plr :: Player
-    local char = self.char :: Model
-
 	self.scope = Fusion.scoped({})
 	local function Value(val: any)
 		return Fusion.Value(self.scope, val)
@@ -20,11 +16,12 @@ local function AdventurerMenuPinia(self: table) : table
 		Character = Value(true),
 		Settings = Value(false),
 		Guild = Value(false),
-		Packs = Value(false),
+		Quests = Value(false),
 		Donation = Value(false)
 	}
 	self.panelFilters = {
-		Character = Value("Attributes")
+		Character = Value("Attributes"),
+		Settings = Value("Graphics")
 	}
 	self.panelFilterFrames = {
 		Character = {
@@ -32,54 +29,68 @@ local function AdventurerMenuPinia(self: table) : table
 			Points = Value(false),
 			Classes = Value(false),
 			Talents = Value(false)
+		},
+		Settings = {
+			Graphics = Value(true),
+			Combat = Value(false),
+			Sounds = Value(false),
+			Misc = Value(false)
 		}
 	}
 
 	self.classInfoAbsSize = Value(Vector2.new())
 	self.classInfoDesc = Value("")
 
+	self.classTalents = Value({})
+	self.currentTalent = Value({})
+	self.currentMaterialsNeeded = Value({})
+	self.talentAbsSize = Value(Vector2.new())
+
+	self.pointsPerAdd = Value("1")
+
     self.playerData = {
-		Class = Value(plr:GetAttribute("Class")),
-		Levels = Value(plr:GetAttribute("Levels")),
-		LvPoints = Value(plr:GetAttribute("LvPoints")),
-		DMG = Value(plr:GetAttribute("DMGPoints")),
-		Magic = Value(plr:GetAttribute("MagicPoints")),
-		Health = Value(plr:GetAttribute("HealthPoints")),
-		Mana = Value(plr:GetAttribute("ManaPoints")),
-		Shield = Value(plr:GetAttribute("ShieldPoints")),
-		Gold = Value(plr:GetAttribute("Gold")),
+		Class = Value("Warrior"),
+		Levels = Value(1),
+		LvPoints = Value(0),
+		DMG = Value(0),
+		Magic = Value(0),
+		Health = Value(0),
+		Mana = Value(0),
+		Shield = Value(0),
+		Gold = Value(0),
 		EXP = {
-			Value(plr:GetAttribute("EXP")),
-			Value(Formula.EXP(plr:GetAttribute("Levels")))
+			Value(0),
+			Value(0)
 		},
 
 		ClassUnlocks = {
 			Warrior = Value(true)
 		}
 	}
-	for class: string, _ in AssetBook.ClassInfo do
-		self.playerData.ClassUnlocks[class] = Value(plr:GetAttribute("CLASS_UNLOCK_"..class))
+	for class: string, _ in ClassBook.ClassInfo do
+		self.playerData.ClassUnlocks[class] = Value(false)
 	end
 
 	self.charData = {
-		MinDMG = Value(char:GetAttribute("MinDMG")),
-		MaxDMG = Value(char:GetAttribute("MaxDMG")),
-		Magic = Value(char:GetAttribute("Magic")),
-		Mana = Value(char:GetAttribute("MaxMana")),
-		Shield = Value(char:GetAttribute("MaxShield")),
-		Health = Value(char.Humanoid.MaxHealth),
-		CriChance = Value(char:GetAttribute("CriChance")),
-		CriDMG = Value(char:GetAttribute("CriDMG")),
+		MinDMG = Value(0),
+		MaxDMG = Value(0),
+		Magic = Value(0),
+		Mana = Value(0),
+		Shield = Value(0),
+		Health = Value(0),
+		CriChance = Value(0),
+		CriDMG = Value(0),
 	}
 
     self.playerSettings = {
-		Musics = Value(plr:GetAttribute("Musics")),
-		SFXs = Value(plr:GetAttribute("SFXs")),
-		PublicCombat = Value(plr:GetAttribute("CombatMode") == "Public"),
-		PotatoMode = Value(plr:GetAttribute("PotatoMode")),
-		PlayerList = Value(plr:GetAttribute("PlayerList")),
-		MapDetails = Value(plr:GetAttribute("MapDetails")),
-		Particles = Value(plr:GetAttribute("Particles"))
+		Musics = Value(true),
+		SFXs = Value(true),
+		PublicCombat = Value(false),
+		PotatoMode = Value(false),
+		PlayerList = Value(true),
+		MapDetails = Value(true),
+		MapShadows = Value(true),
+		TreeOptimizations = Value(true)
 	}
 end
 

@@ -27,18 +27,9 @@ local slotStats = {
 			Town = {}
 		},
 
-		Settings = {
-			Musics = true,
-			SFXs = true,
-			PotatoMode = false,
-			PlayerList = true,
-			MapDetails = true,
-			CombatMode = "Solo",
-			MapShadows = true
-		},
-
 		Inventory = {},
-		ClassUnlocks = { "Warrior" }
+		ClassUnlocks = { Warrior = true },
+		WorldUnlocks = { Mainworld = true },
 	}
 }
 slotStats.Slot2 = slotStats.Slot1

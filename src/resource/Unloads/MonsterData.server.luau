@@ -67,6 +67,11 @@ local function combatEnds()
                     HarukaLib:AddAttr(player, "EXP", Formula.EXP(level))
                     HarukaLib:AddAttr(player, "Gold", Formula.Gold(level))
                     HarukaLib:AddAttr(player, "RP", Formula.RP(level))
+
+                     --// Award badge
+                    if MonsterBook[defeated.Name].BadgeId then
+                        ServerUtil:GiveBadge({ MonsterBook[defeated.Name].BadgeId }, player)
+                    end
                 end
 
                 --// Clear

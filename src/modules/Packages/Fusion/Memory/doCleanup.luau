@@ -1,6 +1,7 @@
 --!strict
 --!nolint LocalUnused
 --!nolint LocalShadow
+local cancel = task.cancel
 local task = nil -- Disable usage of Roblox's task scheduler
 
 --[[
@@ -39,6 +40,10 @@ local function doCleanup(
 	elseif typeof(task) == "function" then
 		task()
 
+	-- case 7: threads
+	elseif typeof(task) == "thread" then
+		if task then cancel(task) end
+
 	elseif typeof(task) == "table" then
 		local task = (task :: any) :: {Destroy: (...unknown) -> (...unknown)?, destroy: (...unknown) -> (...unknown)?}
 
@@ -63,7 +68,7 @@ local function doCleanup(
 			end
 		end
 	end
-	
+
 	alreadyDestroying[task] = nil
 end
 

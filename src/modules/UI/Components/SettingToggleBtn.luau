@@ -23,26 +23,35 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 		PotatoMode = "Low Detail Mode",
 		PlayerList = "Player List",
 		MapDetails = "Map Details",
-		Particles = "Particles"
+		MapShadows = "Global Shadows",
+		TreeOptimizations = "Tree Optimizations",
 	}
     local isSelecting = Fusion.Value(scope, false)
 
     return Components.Frame(scope, {
 		Name = id,
+		Size = fromScale(1, 0.08),
 
 		[Children] = {
 			Components.TextLabel(scope, {
 				Name = "Title",
 				Size = fromScale(0.65, 1),
 				Text = TEXTS[id],
-				TextXAlignment = Enum.TextXAlignment.Left
+				TextXAlignment = Enum.TextXAlignment.Left,
+
+				[Children] = {
+					Fusion.New(scope, "UIPadding")({
+						PaddingBottom = UDim.new(0.05, 0),
+						PaddingTop = UDim.new(0.05, 0),
+					})
+				}
 			}),
 			Components.HoverImageButton(scope, {
 				Name = "SwitchBG",
 				BackgroundTransparency = 0,
 				AnchorPoint = v2New(),
-				Position = fromScale(0.7, 0),
-				Size = fromScale(0.2, 1),
+				Position = fromScale(0.8, 0),
+				Size = fromScale(0.1, 1),
 
 				[OnEvent("MouseEnter")] = function()
 					isSelecting:set(true)
@@ -90,17 +99,36 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 				Name = "Switch",
 				BackgroundTransparency = 0,
 				AnchorPoint = v2New(),
-				Size = fromScale(0.1, 1),
+				Size = fromScale(0.05, 1),
 
 				BackgroundColor3 = Tween(scope, Computed(scope, function(use: Fusion.Use)
 					return if use(self.playerSettings[id]) then fromRGB(80, 161, 118) else fromRGB(214, 71, 107)
 				end), AssetBook.TweenInfos.threeHalf),
 				Position = Tween(scope, Computed(scope, function(use: Fusion.Use)
-					return if use(self.playerSettings[id]) then fromScale(0.8, 0) else fromScale(0.7, 0)
+					return if use(self.playerSettings[id]) then fromScale(0.85, 0) else fromScale(0.8, 0)
 				end), AssetBook.TweenInfos.twiceHalf),
 
 				[Children] = { Components.RoundUICorner(scope) }
-			})
+			}),
+
+			Components.Frame(scope, {
+                Name = "BGShadows",
+                AnchorPoint = Vector2.new(0, 0.5),
+                Position = fromScale(-0.02, 0.5),
+                Size = fromScale(0.8, 1.2),
+                BackgroundTransparency = 0,
+                ZIndex = 0,
+
+                [Children] = {
+                    Components.RoundUICorner(scope),
+                    Fusion.New(scope, "UIGradient")({
+                        Transparency = NumberSequence.new({
+                            NumberSequenceKeypoint.new(0, 0),
+                            NumberSequenceKeypoint.new(1, 1)
+                        })
+                    })
+                }
+            }),
 		}
 	})
 end

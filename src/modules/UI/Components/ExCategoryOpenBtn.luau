@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
@@ -29,7 +30,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 		Name = id,
 		BackgroundColor3 = color3New(),
 		Position = if id == "Menu" then fromScale(0.355, -1.1) else fromScale(0.71, -1.1),
-		Size = fromScale(1, 1),
+		Size = fromScale(0.65, 0.65),
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
 
 		Visible = Computed(scope, function(use: Fusion.Use)
@@ -51,7 +52,7 @@ local function ExCategoryOpenBtn(id: string, self: table): Frame
 					if id == "Backpack" then
 						return ItemBook.ItemImagesEx.Backpack
 					else
-						return AssetBook.ClassInfo[use(self.playerData.Class)].Image
+						return ClassBook.ClassInfo[use(self.playerData.Class)].Image
 					end
 				end),
 				ImageColor3 = if id == "Menu" then color3New(1, 1, 1) else fromRGB(148, 148, 148),

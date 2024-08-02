@@ -64,19 +64,25 @@ local function setup()
     ServerUtil:SetCollisionGroup(char, "Player")
 
     --// Spawn to the nearest respawn point
-    if not RS:IsStudio() then
-        local area = plr:GetAttribute("LastSeenLocation") :: string
-        if not workspace.Maps:FindFirstChild(area) then return end
+    pcall(function()
+        if not RS:IsStudio() then
+            local area = plr:GetAttribute("LastSeenLocation") :: string
+            if not workspace.Maps:FindFirstChild(area) then return end
 
-        char:PivotTo(cfNew(workspace.Maps[area].SpawnPoint.Position))
-    end
+            char:PivotTo(cfNew(workspace.Maps[area].SpawnPoints.SpawnPoint.Position))
+        end
+    end)
 end
+Spawn(setup)
+
 
 local function cosmeticSetup()
     local cosmetic = plr:GetAttribute("Cosmetic") :: string?
 
     if cosmetic and cosmetic ~= "None" then ServerUtil:EquipArmor(char, cosmetic) end
 end
+Spawn(cosmeticSetup)
+
 
 local function classAttributesSetup()
     --- warrior
@@ -106,12 +112,10 @@ local function classAttributesSetup()
 
     _createFolder("AlchemistCreations", char)
 end
+Spawn(classAttributesSetup)
+
 
 local function charAttributesSetup()
-    setup()
-    cosmeticSetup()
-    classAttributesSetup()
-
     local function manaCheck(mana: number)
         local maxMana = char:GetAttribute("MaxMana") :: number
 
@@ -123,51 +127,10 @@ local function charAttributesSetup()
         if shield > 0 and isBroken then isBroken = false end
         if shield >= maxShield then char:SetAttribute("Shield", maxShield) end
 
-        if shield <= 0 and not isBroken then
+        if shield <= 0 and not isBroken and maxShield > 0 then
             isBroken = true
 
             Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.ShieldBroken })
-        end
-    end
-
-    local function updateMinDMG()
-        char:SetAttribute("MinDMG", 5 + plr:GetAttribute("DMGPoints") + char:GetAttribute("MinDMGBuff"))
-    end
-    local function updateMaxDMG()
-        char:SetAttribute("MaxDMG", 10 + (plr:GetAttribute("DMGPoints") * 2) + char:GetAttribute("MaxDMGBuff"))
-    end
-    local function updateMagic()
-        char:SetAttribute("Magic", 10 + (plr:GetAttribute("MagicPoints") * 2) + char:GetAttribute("MagicBuff"))
-    end
-    local function updateShield()
-        char:SetAttribute("MaxShield", char:GetAttribute("ShieldBuff"))
-    end
-    local function updateMana()
-        char:SetAttribute("MaxMana", floor(plr:GetAttribute("ManaPoints") * 20) + 100 + char:GetAttribute("ManaBuff"))
-    end
-    local function updateHP()
-        humanoid.MaxHealth = 50 * plr:GetAttribute("HealthPoints") + 100 + char:GetAttribute("HealthBuff")
-        humanoid.Health = humanoid.MaxHealth
-    end
-    local function updateSpeed()
-        local baseSpeed = if char:GetAttribute("InCombat") then 30 else 40
-
-        humanoid.WalkSpeed = baseSpeed + char:GetAttribute("SpeedBuff")
-    end
-    local function updateJump(jump: number)
-        humanoid.JumpPower = 50 + jump
-    end
-    local function levelReqCheck()
-        local level = plr:GetAttribute("Levels") :: number
-
-        if plr:GetAttribute("EXP") > Formula.EXP(level) then
-            if lvUpCD then return end
-
-            lvUpCD = true
-            Signals.LevelUp:Fire(plr)
-
-            wait(1)
-            lvUpCD = false
         end
     end
 
@@ -215,6 +178,48 @@ local function charAttributesSetup()
     end
     Add(healthEmpty)
 
+    local function updateMinDMG()
+        char:SetAttribute("MinDMG", Formula.PlayerDMGMin(plr:GetAttribute("DMGPoints")) + char:GetAttribute("MinDMGBuff"))
+    end
+    local function updateMaxDMG()
+        char:SetAttribute("MaxDMG", Formula.PlayerDMGMax(plr:GetAttribute("DMGPoints")) + char:GetAttribute("MaxDMGBuff"))
+    end
+    local function updateMagic()
+        char:SetAttribute("Magic", Formula.PlayerMagic(plr:GetAttribute("MagicPoints")) + char:GetAttribute("MagicBuff"))
+    end
+    local function updateShield()
+        char:SetAttribute("MaxShield", Formula.PlayerShield(plr:GetAttribute("ShieldPoints")) + char:GetAttribute("ShieldBuff"))
+
+        shieldRepair()
+    end
+    local function updateMana()
+        char:SetAttribute("MaxMana", Formula.PlayerMana(plr:GetAttribute("ManaPoints")) + char:GetAttribute("ManaBuff"))
+    end
+    local function updateHP()
+        humanoid.MaxHealth = Formula.PlayerHP(plr:GetAttribute("HealthPoints")) + char:GetAttribute("HealthBuff")
+
+        healthRecover()
+    end
+    local function updateSpeed()
+        local baseSpeed = if char:GetAttribute("InCombat") then 30 else 40
+
+        humanoid.WalkSpeed = baseSpeed + char:GetAttribute("SpeedBuff")
+    end
+    local function updateJump(jump: number)
+        humanoid.JumpPower = 50 + jump
+    end
+    local function levelReqCheck()
+        if plr:GetAttribute("EXP") > Formula.EXP(plr:GetAttribute("Levels")) then
+            if lvUpCD then return end
+
+            lvUpCD = true
+            Signals.LevelUp:Fire(plr)
+
+            wait(1)
+            lvUpCD = false
+        end
+    end
+
     local function clearClassAttrs()
         char:SetAttribute("Combo", 0)
         char:SetAttribute("Stack", 0)
@@ -226,7 +231,7 @@ local function charAttributesSetup()
         char.AlchemistCreations:ClearAllChildren()
     end
     local function spawnProtect()
-        BuffEffectsUtil:SpeedBuff(char, 1.2, 5, true)
+
     end
 
     --// Setups
@@ -252,6 +257,7 @@ local function charAttributesSetup()
         ["Attr-MagicPoints"] = updateMagic,
         ["Attr-HealthPoints"] = updateHP,
         ["Attr-ManaPoints"] = updateMana,
+        ["Attr-ShieldPoints"] = updateShield,
 
         ["Attr-EXP"] = levelReqCheck,
 

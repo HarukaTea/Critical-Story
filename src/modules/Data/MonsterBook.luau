@@ -5,7 +5,6 @@ local MonsterBook = {
         Name = "Spike Fox",
         Icon = "rbxassetid://13886503379",
         IdleAnim = "SpikeWolfIdle",
-        Speed = 30,
 
         Drops = {
             SpikyFur = 80,
@@ -16,7 +15,6 @@ local MonsterBook = {
         Name = "Spike Wolf",
         Icon = "rbxassetid://16483664838",
         IdleAnim = "SpikeWolfIdle",
-        Speed = 30,
 
         Drops = {
             SpikyFur = 70,
@@ -27,7 +25,6 @@ local MonsterBook = {
         Name = "Thorn Wolf",
         Icon = "rbxassetid://16483664838",
         IdleAnim = "SpikeWolfIdle",
-        Speed = 30,
 
         Drops = {
             SpikyFur = 60,
@@ -38,7 +35,7 @@ local MonsterBook = {
         Name = "Hardmode Wolf",
         Icon = "rbxassetid://15688333545",
         IdleAnim = "SpikeWolfIdle",
-        Speed = 30,
+        BadgeId = 2212542348620168,
 
         Drops = {
             BlackFur = 90,
@@ -50,7 +47,6 @@ local MonsterBook = {
         Name = "Kitsune",
         Icon = "rbxassetid://17543155124",
         IdleAnim = "SpikeWolfIdle",
-        Speed = 30,
 
         Drops = {
             KitsuneFur = 60,
@@ -60,8 +56,8 @@ local MonsterBook = {
     Stalker = {
         Name = "Stalker",
         Icon = "rbxassetid://17543156640",
-        IdleAnim = "SlimeIdle",
-        Speed = 0,
+        IdleAnim = "None",
+        BadgeId = 3246343070171491,
 
         Drops = {
             StalkerLeaf = 60,
@@ -73,7 +69,6 @@ local MonsterBook = {
         Name = "Green Slime",
         Icon = "rbxassetid://15951815518",
         IdleAnim = "SlimeIdle",
-        Speed = 16,
 
         Drops = {
             SlimeGel = 80,
@@ -84,7 +79,6 @@ local MonsterBook = {
         Name = "Blue Slime",
         Icon = "rbxassetid://16483649460",
         IdleAnim = "SlimeIdle",
-        Speed = 16,
 
         Drops = {
             SlimeGel = 70,
@@ -95,7 +89,6 @@ local MonsterBook = {
         Name = "Lapis Slime",
         Icon = "rbxassetid://16483649287",
         IdleAnim = "SlimeIdle",
-        Speed = 16,
 
         Drops = {
             SlimeGel = 60,
@@ -106,7 +99,6 @@ local MonsterBook = {
         Name = "Purple Slime",
         Icon = "rbxassetid://16483649160",
         IdleAnim = "SlimeIdle",
-        Speed = 16,
 
         Drops = {
             SlimeGel = 50,
@@ -117,7 +109,7 @@ local MonsterBook = {
         Name = "Crimson Slime",
         Icon = "rbxassetid://17543155439",
         IdleAnim = "SlimeIdle",
-        Speed = 16,
+        BadgeId = 2422984775435251,
 
         Drops = {
             CrimsonSlimeCore = 90,

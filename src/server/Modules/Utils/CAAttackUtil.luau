@@ -5,6 +5,7 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
@@ -49,7 +50,7 @@ end
 
 
 function CAAttackUtil:DealDMG(plr: Player, monster: Model, dmg: number, noCri: boolean?) : string
-    ServerUtil:ShowNumber(monster, dmg, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
+    ServerUtil:ShowNumber(monster, dmg, ClassBook.ClassInfo[plr:GetAttribute("Class")].Color)
 
     HarukaLib:AddAttr(monster, "Health", -dmg)
 
@@ -73,7 +74,7 @@ function CAAttackUtil.Warrior(plr: Player, monster: Model, baseDamage: number)
 		comboEff.Parent = monster.PrimaryPart
 		Debris:AddItem(comboEff, 1)
 
-        ServerUtil:ShowText(char, "COMBO!", AssetBook.ClassInfo.Warrior.Color)
+        ServerUtil:ShowText(char, "COMBO!", ClassBook.ClassInfo.Warrior.Color)
 
         CAAttackUtil:DealDMG(plr, monster, finalDamage)
 	else
@@ -129,7 +130,7 @@ function CAAttackUtil.Wizard(plr: Player, monster: Model, baseDamage: number)
 
         BuffEffectsUtil:MagicVFX(monster)
 
-        ServerUtil:ShowText(char, "BURST!", AssetBook.ClassInfo.Wizard.Color)
+        ServerUtil:ShowText(char, "BURST!", ClassBook.ClassInfo.Wizard.Color)
 
         CAAttackUtil:DealDMG(plr, monster, floor(baseDamage * 3), true)
     end
@@ -243,7 +244,7 @@ local function _createAlchemy(char: Model, color: string)
             if created.Name == "Green" then g += 1 end
         end
 
-        ServerUtil:ShowText(char, "ALCHEMY!", AssetBook.ClassInfo.Alchemist.Color)
+        ServerUtil:ShowText(char, "ALCHEMY!", ClassBook.ClassInfo.Alchemist.Color)
 
         char.AlchemistCreations:ClearAllChildren()
 
@@ -333,7 +334,7 @@ function CAAttackUtil.Illusionist(plr: Player, monster: Model, baseDamage: numbe
 
                         local explosionDMG = floor(baseDamage / 2)
 
-                        ServerUtil:ShowNumber(targetMonster.Value, explosionDMG, AssetBook.ClassInfo[plr:GetAttribute("Class")].Color)
+                        ServerUtil:ShowNumber(targetMonster.Value, explosionDMG, ClassBook.ClassInfo[plr:GetAttribute("Class")].Color)
 
                         HarukaLib:AddAttr(targetMonster.Value, "Health", -explosionDMG)
                     end
@@ -355,7 +356,7 @@ function CAAttackUtil.Juggernaut(plr: Player, monster: Model, baseDamage: number
     if char:GetAttribute("Rage") >= 100 then
         char:SetAttribute("Rage", 100)
 
-        ServerUtil:ShowText(char, "RAGING!", AssetBook.ClassInfo.Juggernaut.Color)
+        ServerUtil:ShowText(char, "RAGING!", ClassBook.ClassInfo.Juggernaut.Color)
 
         Spawn(function()
             while wait(0.015) do
@@ -401,7 +402,7 @@ function CAAttackUtil.Reaper(plr: Player, monster: Model, baseDamage: number)
     if char:GetAttribute("LifeStolen") >= 100 then
         char:SetAttribute("LifeStolen", 0)
 
-        ServerUtil:ShowText(char, "LIFE STOLE!", AssetBook.ClassInfo.Reaper.Color)
+        ServerUtil:ShowText(char, "LIFE STOLE!", ClassBook.ClassInfo.Reaper.Color)
 
         BuffEffectsUtil:Heal(char, char.Humanoid.MaxHealth)
         CAAttackUtil:DealDMG(plr, monster, char.Humanoid.Health)

@@ -30,6 +30,8 @@ local function LocationTitleFrame(self: table) : Frame
 
     local function _showCurrentLocation(location: string)
         if not location or location == "" then return end
+        if not LocationBook[location] then return end
+
 		local locationInfo = self.locationInfo
 
         Fusion.doCleanup(self.locationScope)

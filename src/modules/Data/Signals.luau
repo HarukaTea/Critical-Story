@@ -2,10 +2,11 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local Signal = require(RepS.Modules.Packages.Signal)
+local Signal = require(RepS.Modules.Packages.Signal).new
 
 return {
 	CreateHint = Signal(),
+	CreateFullScreenHint = Signal(),
 	CameraScene = Signal(),
 	ExCategoryOpened = Signal(),
 	EnableMapDetails = Signal(),
@@ -14,7 +15,6 @@ return {
 	PlayAnimation = Signal(),
 	PlayerChatted = Signal(),
 	EnterNPCChat = Signal(),
-
 
 	--- story
 	StoryMain1 = Signal()

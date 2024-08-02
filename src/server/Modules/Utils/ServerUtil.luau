@@ -1,5 +1,6 @@
 --!nocheck
 
+local BadgeService = game:GetService("BadgeService")
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
@@ -13,6 +14,7 @@ local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Promise = require(RepS.Modules.Packages.Promise)
+local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local wait = task.wait
 local floor, random, rad = math.floor, math.random, math.rad
@@ -116,7 +118,11 @@ function ServerUtil:EquipArmor(char: Model, armorId: string)
 	local equipList = { "Head", "Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg", "Extra" }
 
 	--- wait character fully loads
-	for _, part: string in equipList do char:WaitForChild(part, 999) end
+	for _, part: string in equipList do
+		if part == "Extra" then continue end
+
+		char:WaitForChild(part, 999)
+	end
 
 	--- armor optimization
 	_optimizeModel(armor)
@@ -306,13 +312,13 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 
 		resolve(position, pos)
 
-	end):Then(function(position: Vector3, pos: Vector3)
+	end):andThen(function(position: Vector3, pos: Vector3)
 		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7.5, math.random(2, 3))
 
-	end):Catch(function(err)
+	end):catch(function(err)
 		orbLocation = cfNew(0, 0, 0)
 
-		warn("[Orb System]: "..err)
+		warn(`[Orb System]: {err}`)
 	end)
 
 	return orbLocation
@@ -387,7 +393,8 @@ function ServerUtil:ShowNumber(target: Model, number: number, color: Color3?, si
 		eff.Display.Text.TextScaled = true
 	end
 
-	eff.Display.Text.Text = if number == 0 then "Miss" else number
+	eff.Display.Text.Rotation = math.random(-1, 1)
+	eff.Display.Text.Text = if number == 0 then "MISS" else number
 	eff.CFrame = target.PrimaryPart.CFrame * cfNew(random(-5, 5), random(0, 2), random(-5, 5))
 	eff.Parent = workspace
 
@@ -402,6 +409,7 @@ function ServerUtil:ShowText(char: Model, info: string, color: Color3)
 	local eff = RepS.Package.Effects.Text:Clone() :: Part
 	eff.Display.Text.Text = info
 	eff.Display.Text.TextColor3 = color
+	eff.Display.Text.Rotation = math.random(-1, 1)
 	eff.CFrame = char.PrimaryPart.CFrame * cfNew(random(-5, 5), random(0, 2), random(-5, 5))
 	eff.Parent = workspace
 
@@ -529,6 +537,23 @@ function ServerUtil.MobBehaviorTree(monster: Model, funcs: table)
 	end)
 
 	if not success and RS:IsStudio() then warn(errorMsg) end
+end
+
+
+function ServerUtil:GiveBadge(badgeInfo: table, plr: Player, extraFunc: () -> ())
+	Spawn(function()
+		pcall(function()
+			local hasBadgeNew = BadgeService:UserHasBadgeAsync(plr.UserId, badgeInfo[1])
+			local hasBadgeOld = true
+			if badgeInfo[2] then hasBadgeOld = BadgeService:UserHasBadgeAsync(plr.UserId, badgeInfo[2]) end
+
+			if not hasBadgeNew and hasBadgeOld then
+				BadgeService:AwardBadge(plr.UserId, badgeInfo[1])
+			end
+
+			if extraFunc then extraFunc() end
+		end)
+	end)
 end
 
 return ServerUtil

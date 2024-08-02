@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -86,7 +87,7 @@ local function AlchemistAbilityIndicator(self: table) : Frame
                         Components.RoundUICorner(localScope),
                         Components.Frame(localScope, {
                             Name = "TweenBar",
-                            BackgroundColor3 = AssetBook.ClassInfo.Alchemist.Color,
+                            BackgroundColor3 = ClassBook.ClassInfo.Alchemist.Color,
                             BackgroundTransparency = 0,
 
                             Size = Fusion.Tween(localScope, Fusion.Computed(localScope, function(localUse: Fusion.Use)

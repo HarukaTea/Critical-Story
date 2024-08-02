@@ -2,7 +2,7 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 
 return {
     Name = "setclass",
@@ -17,7 +17,7 @@ return {
         },
         function(context: table)
             local classes = {}
-            for class: string, _ in AssetBook.ClassInfo do
+            for class: string, _ in ClassBook.ClassInfo do
                 classes[#classes + 1] = class
             end
 

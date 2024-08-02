@@ -4,14 +4,16 @@ local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
-local Events = require(RepS.Modules.Data.Events)
 local Fusion = require(RepS.Modules.Packages.Fusion)
-local ItemBook = require(RepS.Modules.Data.ItemBook)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 
+local ClassesRightPanel = require(RepS.Modules.UI.Components.ClassesRightPanel)
+local PointsCenterPanel = require(RepS.Modules.UI.Components.PointsCenterPanel)
 local PanelFilter = require(RepS.Modules.UI.Components.PanelFilter)
 local StatsViewBar = require(RepS.Modules.UI.Components.StatsViewBar)
 local StatsAddBar = require(RepS.Modules.UI.Components.StatsAddBar)
+local TalentBar = require(RepS.Modules.UI.Components.TalentBar)
+local TalentMaterialSlot = require(RepS.Modules.UI.Components.TalentMaterialSlot)
+local TalentsCenterPanel = require(RepS.Modules.UI.Components.TalentsCenterPanel)
 
 local Children, New, Computed = Fusion.Children, Fusion.New, Fusion.Computed
 
@@ -49,6 +51,17 @@ local function CharacterFrame(self: table): Frame
 					PanelFilter("Points", "Character", self),
 					PanelFilter("Classes", "Character", self),
 					PanelFilter("Talents", "Character", self)
+				}
+			}),
+			Fusion.New(scope, "Frame")({
+				Name = "CenterPanel",
+				BackgroundTransparency = 1,
+				Size = fromScale(0.38, 1),
+				Position = fromScale(0.3, 0),
+
+				[Children] = {
+					PointsCenterPanel(self),
+					TalentsCenterPanel(self)
 				}
 			}),
 			Fusion.New(scope, "Frame")({
@@ -137,79 +150,8 @@ local function CharacterFrame(self: table): Frame
 						end),
 
 						[Children] = {
-							Fusion.New(scope, "Frame")({
-								Name = "ClassList",
-								BackgroundTransparency = 1,
-								Size = fromScale(1, 0.15),
+							ClassesRightPanel(self),
 
-								[Children] = {
-									Fusion.New(scope, "UIGridLayout")({
-										CellPadding = fromScale(0.04, 0.1),
-										CellSize = fromScale(0.135, 0.9),
-										SortOrder = Enum.SortOrder.LayoutOrder
-									}),
-
-									Fusion.ForPairs(scope, AssetBook.ClassInfo, function(_, localScope: Fusion.Scope, class: string, info: table)
-										local isSelecting = Fusion.Value(localScope, false)
-										local clickCD = false
-
-										return class, Components.Frame(localScope, {
-											Name = class,
-											BackgroundColor3 = fromRGB(),
-											BackgroundTransparency = 0,
-											LayoutOrder = info.Order,
-
-											[Children] = {
-												Components.RoundUICorner(scope),
-												Components.UIStroke(scope, {
-													Thickness = 3,
-													Enabled = true,
-
-													Transparency = Fusion.Tween(localScope, Computed(localScope, function(use: Fusion.Use)
-														if use(self.playerData.Class) == class then
-															return 0.3
-														else
-															return if use(isSelecting) then 0.3 else 1
-														end
-													end), AssetBook.TweenInfos.twiceHalf),
-												}),
-												Components.HoverImageButton(scope, {
-													Image = Computed(localScope, function(use: Fusion.Use)
-														if use(self.playerData.ClassUnlocks[class]) then
-															return info.Image
-														else
-															return ItemBook.ItemImagesEx.ClassLock
-														end
-													end),
-
-													[Fusion.OnEvent("MouseEnter")] = function()
-														isSelecting:set(true)
-													end,
-													[Fusion.OnEvent("MouseLeave")] = function()
-														isSelecting:set(false)
-													end,
-													[Fusion.OnEvent("MouseButton1Click")] = function()
-														if clickCD then return end
-
-														clickCD = true
-														Spawn(function()
-															task.wait(0.15)
-															clickCD = false
-														end)
-
-														if self.plr:GetAttribute("CLASS_UNLOCK_"..class) then
-															self.classInfoDesc:set(info.Desc)
-															Events.ChangePlayerClass.Fire({ ClassId = class })
-														else
-															self.classInfoDesc:set("LOCKED")
-														end
-													end
-												})
-											}
-										})
-									end)
-								}
-							}),
 							Components.TextLabel(scope, {
 								Name = "ClassDesc",
 								Position = fromScale(0, 0.5),
@@ -237,7 +179,52 @@ local function CharacterFrame(self: table): Frame
 
 						Visible = Computed(scope, function(use: Fusion.Use)
 							return use(self.panelFilterFrames.Character.Talents)
-						end)
+						end),
+
+						[Children] = {
+							Fusion.New(scope, "UIListLayout")({
+								SortOrder = Enum.SortOrder.LayoutOrder,
+								Padding = udNew(0.04, 0)
+							}),
+
+							Fusion.ForPairs(scope, self.classTalents, function(_, localScope: Fusion.Scope, index: number, talent: table)
+								return index, TalentBar(index, talent, self, localScope)
+							end),
+
+							Components.TextButton(scope, {
+								Name = "UpgradeButton",
+								LayoutOrder = 5,
+								Size = fromScale(1, 0.07),
+								BackgroundColor3 = fromRGB(159, 159, 79),
+								Text = "UPGRADE",
+
+								Visible = Computed(scope, function(use: Fusion.Use)
+									return if use(self.currentTalent).Id then true else false
+								end),
+
+								[Children] = {
+									Fusion.New(scope, "UICorner")({ CornerRadius = udNew(0.1, 0) }),
+								}
+							}),
+							Components.Frame(scope, {
+								Name = "MaterialsNeeded",
+								Size = fromScale(1, 0.165),
+								LayoutOrder = 6,
+
+								[Children] = {
+									Fusion.New(scope, "UIListLayout")({
+										SortOrder = Enum.SortOrder.LayoutOrder,
+										Padding = udNew(0.04, 0),
+										FillDirection = Enum.FillDirection.Horizontal,
+										HorizontalAlignment = Enum.HorizontalAlignment.Left,
+									}),
+
+									Fusion.ForPairs(scope, self.currentMaterialsNeeded, function(_, localScope: Fusion.Scope, index: number, material: table)
+										return index, TalentMaterialSlot(index, material, localScope)
+									end)
+								}
+							})
+						}
 					})
 				}
 			})

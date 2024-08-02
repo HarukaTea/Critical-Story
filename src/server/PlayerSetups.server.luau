@@ -1,23 +1,27 @@
 --!nocheck
 
-local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
+local SSS = game:GetService("ServerScriptService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
-local DataKeep = require(RepS.Modules.Packages.DataKeep)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local Promise = require(RepS.Modules.Packages.Promise)
+local ProfileService = require(RepS.Modules.Packages.ProfileService)
 local StoryBook = require(RepS.Modules.Data.StoryBook)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
-local RankBook = require(RepS.Modules.Data.RankBook)
 
 local profiles = {}
 local scopes = {}
 
-local TEMPLATE = require(ServerScriptService.Modules.Data.PlayerTemplate)
+local TEMPLATE = require(SSS.Modules.Data.PlayerTemplate)
+local EXTRA_TEMPLATE = require(SSS.Modules.Data.ExtraPlayerTemplate)
+
+local profileStore = ProfileService.GetProfileStore("CS_1599MKK40_VCA_TEST", TEMPLATE)
+
+--// Private
 
 local function _getSlot(plr: Player) : "Slot1" | "Slot2" | "Slot3"
 	local joinData = plr:GetJoinData().TeleportData :: table?
@@ -60,35 +64,29 @@ local function _saveData(plr: Player)
 	profiles[plr].Data[slot].Quests = quests
 end
 
-local dataKeepStore = DataKeep.GetStore("CS_1599MKK40", TEMPLATE)
-
 local function setup(plr: Player)
-	dataKeepStore:LoadKeep("Player_"..plr.UserId):andThen(function(keep)
-		if keep == nil then
-			plr:Kick("Data loaded failed! This is a rare error, please try again later.")
-		end
+	Promise.new(function(resolve, reject)
+		local profile = profileStore:LoadProfileAsync("Player_"..plr.UserId)
 
-		keep:Reconcile()
-		keep:AddUserId(plr.UserId)
+		if profile then resolve(profile) else reject("Profile is nil") end
 
-		keep.Releasing:Connect(function(state)
-			state:andThen(function()
-				plr:Kick("Your session has been released, maybe rejoin later?")
-			end)
-		end)
+	end):andThen(function(profile)
+		profile:Reconcile()
+		profile:AddUserId(plr.UserId)
 
 		if not plr:IsDescendantOf(Players) then
-			keep:Release()
+			profile:Release()
 			return
 		end
 
-		profiles[plr] = keep
+		profiles[plr] = profile
+		print("Loaded data for player: "..plr.UserId)
 
 		local slot = _getSlot(plr)
+		local data = profile.Data[slot] :: table
+
 		local Add, Empty = HarukaLib.Bin()
 		scopes[plr] = Empty
-
-		local data = keep.Data[slot]
 
 		local backpackData = Instance.new("Folder")
 		backpackData.Name = "Inventory"
@@ -106,7 +104,7 @@ local function setup(plr: Player)
 				["Attr-"..attr] = function(newStats: any)
 					if newStats == nil then return end --// We have false boolean data
 
-					keep.Data[slot].Stats[attr] = HarukaLib:Serialize(newStats)
+					profile.Data[slot].Stats[attr] = HarukaLib:Serialize(newStats)
 				end
 			}))
 		end
@@ -152,29 +150,29 @@ local function setup(plr: Player)
 		end
 
 		--// Load settings
-		for setting: string, val: any in TEMPLATE.Slot1.Settings do
-			plr:SetAttribute(setting, val)
-
-			Add(HarukaLib:Hydrate(plr, {
-				["Attr-"..setting] = function(newVal: any)
-					if newVal == nil then return end
-
-					keep.Data[slot].Settings[setting] = newVal
-				end
-			}))
+		for setting: string, value: any in EXTRA_TEMPLATE.Settings do
+			plr:SetAttribute(setting, value)
 		end
 
 		--// Load unlockables
-		for _, unlockedClass: string in data.ClassUnlocks do
+		for unlockedClass: string, state: boolean in data.ClassUnlocks do
+			if not state then continue end
+
 			plr:SetAttribute("CLASS_UNLOCK_"..unlockedClass, true)
 		end
 		local classUnlocksListener = {}
-		for class: string, _ in AssetBook.ClassInfo do
-			classUnlocksListener["Attr-CLASS_UNLOCK_"..class] = function(unlocked: boolean)
-				keep.Data[slot].ClassUnlocks[class]:set(unlocked)
+		for class: string, _ in ClassBook.ClassInfo do
+			classUnlocksListener["Attr-CLASS_UNLOCK_"..class] = function(state: boolean)
+				if not state then return end
+
+				profile.Data[slot].ClassUnlocks[class] = true
 			end
 		end
 		Add(HarukaLib:Hydrate(plr, classUnlocksListener))
+
+		--// Unlock worlds
+		local currentWorld = workspace:GetAttribute("WorldType") or "Mainworld"
+		profile.Data[slot].WorldUnlocks[currentWorld] = true
 
 
 		--// Connections
@@ -192,52 +190,56 @@ local function setup(plr: Player)
 			HarukaLib:AddAttr(plr, "PlayTime", 1)
 		end))
 
-		--// Finish
-		plr:SetAttribute("LastSeenWorld", workspace:GetAttribute("WorldType") or "Mainworld")
-		plr:SetAttribute("PlayerDataLoaded", true)
-
-
-		--// Check if player has alpha tester badge (from legacy)
-		Spawn(function()
-			Promise.new(function()
-				local hasBadgeOld = BadgeService:UserHasBadgeAsync(plr.UserId, 2129794607)
-				local hasBadgeNow = BadgeService:UserHasBadgeAsync(plr.UserId, 783240039527287)
-
-				if hasBadgeOld and not hasBadgeNow then BadgeService:AwardBadge(plr.UserId, 783240039527287) end
-			end)
-		end)
-
-		--// Award welcome! badge
-		Spawn(function()
-			Promise.new(function()
-				local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2362555015922939)
-
-				if not hasBadge then BadgeService:AwardBadge(plr.UserId, 2362555015922939) end
-			end)
-		end)
-
 		--// Assign role
 		Spawn(function()
-			--- alpha tester
-			local function _setCustomRole()
-				local rank = plr:GetRankInGroup(16912246)
-				plr:SetAttribute("Rank", rank)
-
-				if RankBook.RankRoleInfo[rank] then plr:SetAttribute("Role", RankBook.RankRoleInfo[rank].Role) end
-				if RankBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", RankBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
-			end
-			Promise.new(function(resolve)
-				local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2129794607)
-
-				if hasBadge then plr:SetAttribute("Role", "Alpha Tester") end
-
-				resolve()
-
-			end):Then(_setCustomRole):Catch(_setCustomRole)
+			local rank = plr:GetRankInGroup(16912246)
+			plr:SetAttribute("Rank", rank)
 		end)
+
+		--// Finish
+		plr:SetAttribute("LastSeenWorld", currentWorld)
+		plr:SetAttribute("PlayerDataLoaded", true)
+
+	end):catch(function(msg)
+		plr:Kick("Your data failed to load, please try again later?")
+
+		warn(`[DATA LOAD]: {msg}`)
+	end)
+
+	--// Check if player has alpha tester badge (from legacy)
+	ServerUtil:GiveBadge({ 783240039527287, 2129794607 }, plr)
+
+	--// Award welcome! badge
+	ServerUtil:GiveBadge({ 2362555015922939 }, plr)
+
+	--// Former savior badge
+	ServerUtil:GiveBadge({ 3950161757254227, 2132605760 }, plr)
+
+	--// Hardmode wolf badge
+	ServerUtil:GiveBadge({ 2212542348620168, 3730879662265300 }, plr)
+
+	--// Crimson Slime badge
+	ServerUtil:GiveBadge({ 2422984775435251, 3235712599678594 }, plr)
+
+	--// Check if it's founder Milk
+	Spawn(function()
+		if plr.UserId == 304008764 then
+			for _, player: Player in Players:GetPlayers() do
+				--// Met the owner badge
+				ServerUtil:GiveBadge({ 3537691008965081 }, player)
+			end
+		end
+
+		--- when a new player joins, give TA the owner badge
+		for _, player: Player in Players:GetPlayers() do
+			if player.UserId == 304008764 then
+				--// Met the owner badge
+				ServerUtil:GiveBadge({ 3537691008965081 }, plr)
+				break
+			end
+		end
 	end)
 end
-
 local function clear(plr: Player)
 	--- check if player is combating
 	pcall(function()
@@ -257,20 +259,10 @@ local function clear(plr: Player)
 	pcall(_saveData, plr)
 	if scopes[plr] then scopes[plr]() end
 	if profiles[plr] then profiles[plr]:Release() end
-
-	scopes[plr] = nil
-	profiles[plr] = nil
 end
+
+for _, plr in Players:GetPlayers() do
+	Spawn(setup, plr)
+end
+Players.PlayerAdded:Connect(setup)
 Players.PlayerRemoving:Connect(clear)
-
-
---- in case player joined before server starts
-dataKeepStore:andThen(function(store)
-	dataKeepStore = store
-
-	for _, player: Player in Players:GetPlayers() do
-		Spawn(setup, player)
-	end
-
-	Players.PlayerAdded:Connect(setup)
-end)

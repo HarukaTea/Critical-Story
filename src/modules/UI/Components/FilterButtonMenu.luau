@@ -17,7 +17,7 @@ local function FilterButtonMenu(id: string, self: table): TextButton
 		Character = fromRGB(172, 113, 86),
 		Settings = fromRGB(53, 107, 79),
 		Guild = fromRGB(197, 131, 0),
-		Packs = fromRGB(115, 115, 173),
+		Quests = fromRGB(115, 115, 173),
 		Donation = fromRGB(149, 149, 74)
 	}
 

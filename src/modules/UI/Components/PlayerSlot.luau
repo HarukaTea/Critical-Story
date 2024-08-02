@@ -4,6 +4,7 @@ local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -42,7 +43,7 @@ local function PlayerSlot(self: table, player: Player, scope: Fusion.Scope): Fra
 				Size = fromScale(0.13, 0.665),
 
 				Image = Fusion.Computed(scope, function(use: Fusion.Use)
-					return AssetBook.ClassInfo[use(class)].Image
+					return ClassBook.ClassInfo[use(class)].Image
 				end),
 
 				[Children] = { Components.RoundUICorner(scope) },
@@ -86,7 +87,7 @@ local function PlayerSlot(self: table, player: Player, scope: Fusion.Scope): Fra
 
 					self.displayName:set(player.DisplayName)
 					self.userName:set("@" .. player.Name)
-					self.classImage:set(AssetBook.ClassInfo[Fusion.peek(class)].Image)
+					self.classImage:set(ClassBook.ClassInfo[Fusion.peek(class)].Image)
 					self.level:set("Lv."
 						.. player:GetAttribute("Levels")
 						.. " - "

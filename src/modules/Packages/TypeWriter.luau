@@ -41,8 +41,8 @@ function TypeWriter.new()
 	self.running = false
 	self.speed = 0.01
 
-	self.onTextUpdated = Signal()
-	self.onTyperFinished = Signal()
+	self.onTextUpdated = Signal.new()
+	self.onTyperFinished = Signal.new()
 
 	return self
 end

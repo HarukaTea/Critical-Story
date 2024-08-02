@@ -17,7 +17,7 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-local nowDMG = char:GetAttribute("Damage"):: number
+local nowDMG = char:GetAttribute("Damage") :: number
 local theoryDMG = floor(nowDMG * power - nowDMG)
 
 HarukaLib:AddAttr(char, "Damage", theoryDMG)

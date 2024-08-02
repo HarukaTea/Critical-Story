@@ -1,6 +1,7 @@
 --!nocheck
 
 if workspace:GetAttribute("WorldType") ~= "Mainworld" then return end
+if true then return end
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

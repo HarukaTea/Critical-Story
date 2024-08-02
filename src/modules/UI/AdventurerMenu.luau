@@ -1,14 +1,17 @@
 --!nocheck
 
 local CAS = game:GetService("ContextActionService")
+local Lighting = game:GetService("Lighting")
 local RepS = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Formula = require(RepS.Modules.Data.Formulas)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local Signals = require(RepS.Modules.Data.Signals)
 
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
 
@@ -59,8 +62,8 @@ return function(plr: Player)
 					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
+						FilterButton("Quests", self),
 						FilterButton("Guild", self),
-						FilterButton("Packs", self),
 						FilterButton("Donation", self)
 					})
 				}
@@ -113,6 +116,10 @@ return function(plr: Player)
 	table.insert(scope, HarukaLib:Hydrate(plr, {
 		["Attr-Class"] = function(class: string)
 			playerData.Class:set(class)
+
+			self.classTalents:set(ClassBook.ClassInfo[class].Talents or {})
+			self.currentTalent:set({})
+			self.currentMaterialsNeeded:set({})
 		end,
 		["Attr-Levels"] = function(levels: number)
 			playerData.Levels:set(levels)
@@ -141,7 +148,6 @@ return function(plr: Player)
 		end,
 		["Attr-EXP"] = function(exp: number)
 			playerData.EXP[1]:set(exp)
-			playerData.EXP[2]:set(Formula.EXP(plr:GetAttribute("Levels")))
 		end,
 	}))
 	table.insert(scope, HarukaLib:Hydrate(self.char, {
@@ -173,8 +179,70 @@ return function(plr: Player)
 		end
 	}))
 
+	local playerSettings = self.playerSettings
+	table.insert(scope, HarukaLib:Hydrate(self.plr, {
+		["Attr-CombatMode"] = function(newMode: string)
+			playerSettings.PublicCombat:set(newMode == "Public")
+		end,
+		["Attr-Musics"] = function(state: boolean)
+			playerSettings.Musics:set(state)
+
+			SoundService.Musics.Volume = if state then 0.5 else 0
+		end,
+		["Attr-SFXs"] = function(state: boolean)
+			playerSettings.SFXs:set(state)
+
+			SoundService.SFXs.Volume = if state then 0.5 else 0
+		end,
+		["Attr-PotatoMode"] = function(state: boolean)
+			playerSettings.PotatoMode:set(state)
+
+			if state == false then
+				for _, child: Instance in workspace.Maps:GetDescendants() do
+					if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
+						if child:GetAttribute("OriMaterial") then child.Material = child:GetAttribute("OriMaterial") end
+
+						child:SetAttribute("OriMaterial", nil)
+					end
+				end
+
+			elseif state then
+				for _, child: Instance in workspace.Maps:GetDescendants() do
+					if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
+						child:SetAttribute("OriMaterial", child.Material)
+
+						child.Material = Enum.Material.Plastic
+					end
+				end
+			end
+		end,
+		["Attr-PlayerList"] = function(state: boolean)
+			playerSettings.PlayerList:set(state)
+		end,
+		["Attr-MapDetails"] = function(state: boolean)
+			playerSettings.MapDetails:set(state)
+
+			Signals.EnableMapDetails:Fire(if state then "Enable" else "Disable")
+		end,
+		["Attr-MapShadows"] = function(state: boolean)
+			if state == nil then return end
+
+			playerSettings.MapShadows:set(state)
+
+			for _, child: Instance in workspace:GetDescendants() do
+				if child:IsA("BasePart") or child:IsA("UnionOperation") or child:IsA("CornerWedgePart") then
+					child.CastShadow = state
+				end
+			end
+			Lighting.GlobalShadows = state
+		end,
+		["Attr-TreeOptimizations"] = function(state: boolean)
+			playerSettings.TreeOptimizations:set(state)
+		end
+	}))
+
 	local classUnlocksListener = {}
-	for class: string, _ in AssetBook.ClassInfo do
+	for class: string, _ in ClassBook.ClassInfo do
 		classUnlocksListener["Attr-CLASS_UNLOCK_"..class] = function(unlocked: boolean)
 			playerData.ClassUnlocks[class]:set(unlocked)
 		end

@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 
@@ -52,7 +53,7 @@ local function ClassAbilityIndicator(self: table) : Frame
                         Components.RoundUICorner(localScope),
                         Components.Frame(localScope, {
                             Name = "TweenBar",
-                            BackgroundColor3 = AssetBook.ClassInfo[class].Color,
+                            BackgroundColor3 = ClassBook.ClassInfo[class].Color,
                             BackgroundTransparency = 0,
 
                             Size = Fusion.Tween(localScope, Computed(localScope, function(localUse: Fusion.Use)
@@ -105,7 +106,7 @@ local function ClassAbilityIndicator(self: table) : Frame
                             return localUse(self.charClassInfo.Reaper).."% LIFE STOLEN"
                         end
                     end),
-                    TextColor3 = AssetBook.ClassInfo[class].Color,
+                    TextColor3 = ClassBook.ClassInfo[class].Color,
 
                     [Children] = { Components.TextUIStroke(localScope, { Thickness = 2 }) }
                 })

@@ -14,7 +14,6 @@ local animations = ReplicatedStorage.Package.Animations.CharAnims :: Folder
 local animator = char.Humanoid:WaitForChild("Animator") :: Animator
 
 repeat task.wait() until plr:GetAttribute("PlayerDataLoaded")
-repeat task.wait() until char:GetAttribute("CharDataLoaded")
 
 local class = plr:GetAttribute("Class") :: string
 
@@ -31,6 +30,8 @@ local oldAnim: AnimationTrack
 --// Private
 
 local function startAnim(anim: AnimationTrack, transitionTime: number)
+	if char:GetAttribute("IsNocliping") then return end
+
 	if oldAnim ~= anim then
 		if oldAnim then oldAnim:Stop(transitionTime) end
 		if anim then anim:Play(transitionTime) end

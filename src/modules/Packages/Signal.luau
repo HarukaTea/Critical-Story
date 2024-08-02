@@ -1,9 +1,12 @@
+--!optimize 2
 --!nocheck
+--!native
 
 export type Connection<U...> = {
 	Connected: boolean,
 
 	Disconnect: (self: Connection<U...>) -> (),
+	Destroy: (self: Connection<U...>) -> (),
 }
 
 export type Signal<T...> = {
@@ -86,10 +89,12 @@ local function connect<T..., U...>(self: Signal<T...>, fn: (...any) -> (), ...: 
 	end
 	self._head = cn
 
-	return function ()
-		cn.Disconnect(cn) --- bin will not detect .Destroy function
-		--- so we have to do it manually
+	--// Allow for bin to collect garbage
+	cn.Destroy = function()
+		cn:Disconnect()
 	end
+
+	return cn
 end
 
 local function once<T..., U...>(self: Signal<T...>, fn: (...any) -> (), ...: U...)
@@ -208,7 +213,6 @@ end
 
 local function destroy<T...>(self: Signal<T...>)
 	disconnectAll(self)
-
 	local cn = self.RBXScriptConnection
 	if cn then
 		rbxDisconnect(cn)
@@ -217,13 +221,19 @@ local function destroy<T...>(self: Signal<T...>)
 end
 
 --\\ Constructors
-
 function Signal.new<T...>(): Signal<T...>
 	return setmetatable({ _head = false }, Signal)
 end
 
---\\ Methods
+function Signal.wrap<T...>(signal: RBXScriptSignal): Signal<T...>
+	local wrapper = setmetatable({ _head = false }, Signal)
+	wrapper.RBXScriptConnection = rbxConnect(signal, function(...)
+		fire(wrapper, ...)
+	end)
+	return wrapper
+end
 
+--\\ Methods
 Signal.Connect = connect
 Signal.Once = once
 Signal.Wait = wait
@@ -231,4 +241,4 @@ Signal.Fire = fire
 Signal.DisconnectAll = disconnectAll
 Signal.Destroy = destroy
 
-return Signal.new
+return { new = Signal.new, wrap = Signal.wrap }

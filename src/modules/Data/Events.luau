@@ -118,6 +118,9 @@ if not RunService:IsRunning() then
 		CreateHint = table.freeze({
 			On = noop
 		}),
+		CreateFullScreenHint = table.freeze({
+			On = noop
+		}),
 		ClientTween = table.freeze({
 			SetCallback = noop
 		}),
@@ -221,27 +224,29 @@ end
 
 RunService.Heartbeat:Connect(SendEvents)
 
-local events = table.create(29)
-local event_queue: { [number]: { any } } = table.create(29)
+local events = table.create(30)
+local event_queue: { [number]: { any } } = table.create(30)
 events[4] = {}
 event_queue[4] = {}
+events[5] = {}
 event_queue[5] = {}
-events[12] = {}
-event_queue[12] = {}
+event_queue[6] = {}
 events[13] = {}
 event_queue[13] = {}
 events[14] = {}
 event_queue[14] = {}
-event_queue[16] = {}
+events[15] = {}
+event_queue[15] = {}
 event_queue[17] = {}
-events[18] = {}
 event_queue[18] = {}
-events[20] = {}
-event_queue[20] = {}
-event_queue[23] = {}
-events[25] = {}
-event_queue[25] = {}
-event_queue[27] = {}
+events[19] = {}
+event_queue[19] = {}
+events[21] = {}
+event_queue[21] = {}
+event_queue[24] = {}
+events[26] = {}
+event_queue[26] = {}
+event_queue[28] = {}
 reliable.OnClientEvent:Connect(function(buff, inst)
 	incoming_buff = buff
 	incoming_inst = inst
@@ -250,7 +255,7 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 	local len = buffer.len(buff)
 	while incoming_read < len do
 		local id = buffer.readu8(buff, read(1))
-		if id == 5 then
+		if id == 6 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -279,32 +284,32 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.UseHarukaTween = nil
 			end
-			if events[5] then
-				task.spawn(events[5], value)
+			if events[6] then
+				task.spawn(events[6], value)
 			else
-				table.insert(event_queue[5], value)
-				if #event_queue[5] > 64 then
-					warn(`[ZAP] {#event_queue[5]} events in queue for ClientTween. Did you forget to attach a listener?`)
+				table.insert(event_queue[6], value)
+				if #event_queue[6] > 64 then
+					warn(`[ZAP] {#event_queue[6]} events in queue for ClientTween. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 12 then
+		elseif id == 13 then
 			local value
 			value = {}
 			local len_1 = buffer.readu16(incoming_buff, read(2))
 			value.ItemSlot = buffer.readstring(incoming_buff, read(len_1), len_1)
 			local len_2 = buffer.readu16(incoming_buff, read(2))
 			value.ItemId = buffer.readstring(incoming_buff, read(len_2), len_2)
-			if events[12][1] then
-				for _, cb in events[12] do
+			if events[13][1] then
+				for _, cb in events[13] do
 					task.spawn(cb, value)
 				end
 			else
-				table.insert(event_queue[12], value)
-				if #event_queue[12] > 64 then
-					warn(`[ZAP] {#event_queue[12]} events in queue for EquipItemServer. Did you forget to attach a listener?`)
+				table.insert(event_queue[13], value)
+				if #event_queue[13] > 64 then
+					warn(`[ZAP] {#event_queue[13]} events in queue for EquipItemServer. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 13 then
+		elseif id == 14 then
 			local value
 			value = {}
 			value.Items = {}
@@ -315,22 +320,6 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 				val_1 = buffer.readstring(incoming_buff, read(len_2), len_2)
 				value.Items[i_1] = val_1
 			end
-			if events[13][1] then
-				for _, cb in events[13] do
-					task.spawn(cb, value)
-				end
-			else
-				table.insert(event_queue[13], value)
-				if #event_queue[13] > 64 then
-					warn(`[ZAP] {#event_queue[13]} events in queue for EnterShopping. Did you forget to attach a listener?`)
-				end
-			end
-		elseif id == 14 then
-			local value
-			value = {}
-			value.Cooldown = buffer.readu8(incoming_buff, read(1))
-			local len_1 = buffer.readu16(incoming_buff, read(2))
-			value.ItemId = buffer.readstring(incoming_buff, read(len_1), len_1)
 			if events[14][1] then
 				for _, cb in events[14] do
 					task.spawn(cb, value)
@@ -338,10 +327,26 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				table.insert(event_queue[14], value)
 				if #event_queue[14] > 64 then
-					warn(`[ZAP] {#event_queue[14]} events in queue for ItemCD. Did you forget to attach a listener?`)
+					warn(`[ZAP] {#event_queue[14]} events in queue for EnterShopping. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 16 then
+		elseif id == 15 then
+			local value
+			value = {}
+			value.Cooldown = buffer.readu8(incoming_buff, read(1))
+			local len_1 = buffer.readu16(incoming_buff, read(2))
+			value.ItemId = buffer.readstring(incoming_buff, read(len_1), len_1)
+			if events[15][1] then
+				for _, cb in events[15] do
+					task.spawn(cb, value)
+				end
+			else
+				table.insert(event_queue[15], value)
+				if #event_queue[15] > 64 then
+					warn(`[ZAP] {#event_queue[15]} events in queue for ItemCD. Did you forget to attach a listener?`)
+				end
+			end
+		elseif id == 17 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -351,15 +356,15 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.Part = nil
 			end
-			if events[16] then
-				task.spawn(events[16], value)
+			if events[17] then
+				task.spawn(events[17], value)
 			else
-				table.insert(event_queue[16], value)
-				if #event_queue[16] > 64 then
-					warn(`[ZAP] {#event_queue[16]} events in queue for CameraScene. Did you forget to attach a listener?`)
+				table.insert(event_queue[17], value)
+				if #event_queue[17] > 64 then
+					warn(`[ZAP] {#event_queue[17]} events in queue for CameraScene. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 17 then
+		elseif id == 18 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -369,32 +374,32 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.Chest = nil
 			end
-			if events[17] then
-				task.spawn(events[17], value)
+			if events[18] then
+				task.spawn(events[18], value)
 			else
-				table.insert(event_queue[17], value)
-				if #event_queue[17] > 64 then
-					warn(`[ZAP] {#event_queue[17]} events in queue for ChestUnlocked. Did you forget to attach a listener?`)
+				table.insert(event_queue[18], value)
+				if #event_queue[18] > 64 then
+					warn(`[ZAP] {#event_queue[18]} events in queue for ChestUnlocked. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 18 then
+		elseif id == 19 then
 			local value
 			value = {}
 			local len_1 = buffer.readu16(incoming_buff, read(2))
 			value.ItemId = buffer.readstring(incoming_buff, read(len_1), len_1)
 			value.Amount = buffer.readu16(incoming_buff, read(2))
 			value.IsNew = buffer.readu8(incoming_buff, read(1)) == 1
-			if events[18][1] then
-				for _, cb in events[18] do
+			if events[19][1] then
+				for _, cb in events[19] do
 					task.spawn(cb, value)
 				end
 			else
-				table.insert(event_queue[18], value)
-				if #event_queue[18] > 64 then
-					warn(`[ZAP] {#event_queue[18]} events in queue for GiveDrop. Did you forget to attach a listener?`)
+				table.insert(event_queue[19], value)
+				if #event_queue[19] > 64 then
+					warn(`[ZAP] {#event_queue[19]} events in queue for GiveDrop. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 20 then
+		elseif id == 21 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -404,17 +409,17 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.NPC = nil
 			end
-			if events[20][1] then
-				for _, cb in events[20] do
+			if events[21][1] then
+				for _, cb in events[21] do
 					task.spawn(cb, value)
 				end
 			else
-				table.insert(event_queue[20], value)
-				if #event_queue[20] > 64 then
-					warn(`[ZAP] {#event_queue[20]} events in queue for EnterNPCChat. Did you forget to attach a listener?`)
+				table.insert(event_queue[21], value)
+				if #event_queue[21] > 64 then
+					warn(`[ZAP] {#event_queue[21]} events in queue for EnterNPCChat. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 23 then
+		elseif id == 24 then
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
@@ -429,40 +434,40 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.TimePos = nil
 			end
-			if events[23] then
-				task.spawn(events[23], value)
+			if events[24] then
+				task.spawn(events[24], value)
 			else
-				table.insert(event_queue[23], value)
-				if #event_queue[23] > 64 then
-					warn(`[ZAP] {#event_queue[23]} events in queue for PlaySound. Did you forget to attach a listener?`)
+				table.insert(event_queue[24], value)
+				if #event_queue[24] > 64 then
+					warn(`[ZAP] {#event_queue[24]} events in queue for PlaySound. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 25 then
+		elseif id == 26 then
 			local value
 			value = {}
 			local len_1 = buffer.readu16(incoming_buff, read(2))
 			value.AnimId = buffer.readstring(incoming_buff, read(len_1), len_1)
-			if events[25][1] then
-				for _, cb in events[25] do
+			if events[26][1] then
+				for _, cb in events[26] do
 					task.spawn(cb, value)
 				end
 			else
-				table.insert(event_queue[25], value)
-				if #event_queue[25] > 64 then
-					warn(`[ZAP] {#event_queue[25]} events in queue for PlayAnimation. Did you forget to attach a listener?`)
+				table.insert(event_queue[26], value)
+				if #event_queue[26] > 64 then
+					warn(`[ZAP] {#event_queue[26]} events in queue for PlayAnimation. Did you forget to attach a listener?`)
 				end
 			end
-		elseif id == 27 then
+		elseif id == 28 then
 			local value
 			value = {}
 			local len_1 = buffer.readu16(incoming_buff, read(2))
 			value.EventSymbol = buffer.readstring(incoming_buff, read(len_1), len_1)
-			if events[27] then
-				task.spawn(events[27], value)
+			if events[28] then
+				task.spawn(events[28], value)
 			else
-				table.insert(event_queue[27], value)
-				if #event_queue[27] > 64 then
-					warn(`[ZAP] {#event_queue[27]} events in queue for FireStoryEvents. Did you forget to attach a listener?`)
+				table.insert(event_queue[28], value)
+				if #event_queue[28] > 64 then
+					warn(`[ZAP] {#event_queue[28]} events in queue for FireStoryEvents. Did you forget to attach a listener?`)
 				end
 			end
 		else
@@ -482,13 +487,6 @@ unreliable.OnClientEvent:Connect(function(buff, inst)
 		local len_1 = buffer.readu16(incoming_buff, read(2))
 		assert(len_1 <= 666)
 		value.Hint = buffer.readstring(incoming_buff, read(len_1), len_1)
-		if buffer.readu8(incoming_buff, read(1)) == 1 then
-			local len_2 = buffer.readu16(incoming_buff, read(2))
-			assert(len_2 <= 10)
-			value.Option = buffer.readstring(incoming_buff, read(len_2), len_2)
-		else
-			value.Option = nil
-		end
 		if events[4][1] then
 			for _, cb in events[4] do
 				task.spawn(cb, value)
@@ -497,6 +495,23 @@ unreliable.OnClientEvent:Connect(function(buff, inst)
 			table.insert(event_queue[4], value)
 			if #event_queue[4] > 64 then
 				warn(`[ZAP] {#event_queue[4]} events in queue for CreateHint. Did you forget to attach a listener?`)
+			end
+		end
+	elseif id == 5 then
+		local value
+		value = {}
+		local len_1 = buffer.readu16(incoming_buff, read(2))
+		assert(len_1 <= 666)
+		value.Hint = buffer.readstring(incoming_buff, read(len_1), len_1)
+		value.State = buffer.readu8(incoming_buff, read(1)) == 1
+		if events[5][1] then
+			for _, cb in events[5] do
+				task.spawn(cb, value)
+			end
+		else
+			table.insert(event_queue[5], value)
+			if #event_queue[5] > 64 then
+				warn(`[ZAP] {#event_queue[5]} events in queue for CreateFullScreenHint. Did you forget to attach a listener?`)
 			end
 		end
 	else
@@ -566,7 +581,7 @@ local returns = table.freeze({
 			SettingId: (string),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 6)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 7)
 			local len_1 = #Value.SettingId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -579,7 +594,7 @@ local returns = table.freeze({
 			ClassId: (string),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 7)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 8)
 			local len_1 = #Value.ClassId
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -592,7 +607,7 @@ local returns = table.freeze({
 			Target: ((Model)?),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 8)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 9)
 			if Value.Target == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -609,7 +624,7 @@ local returns = table.freeze({
 			Projectile: ((Instance)?),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 9)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 10)
 			if Value.Projectile == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -627,7 +642,7 @@ local returns = table.freeze({
 			local saved = save()
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 10)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
 			local len_1 = #Value.LocationId
 			assert(len_1 <= 100)
 			alloc(2)
@@ -647,7 +662,7 @@ local returns = table.freeze({
 			ItemId: (string),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 11)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 12)
 			local len_1 = #Value.ItemType
 			alloc(2)
 			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
@@ -669,7 +684,7 @@ local returns = table.freeze({
 		Fire = function(Value: ({
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 15)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 16)
 		end,
 	}),
 	MonsterTakeDMG = table.freeze({
@@ -677,7 +692,7 @@ local returns = table.freeze({
 			Orb: ((Model)?),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 19)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 20)
 			if Value.Orb == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -695,7 +710,7 @@ local returns = table.freeze({
 			Series: ((string)?),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 21)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -726,7 +741,7 @@ local returns = table.freeze({
 			QuestId: (number),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 22)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 23)
 			if Value.NPC == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -751,7 +766,7 @@ local returns = table.freeze({
 			Origin: (Vector3),
 		}))
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 24)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 25)
 			if Value.Sound == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -775,7 +790,7 @@ local returns = table.freeze({
 			local saved = save()
 			load_empty()
 			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 26)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 27)
 			local buff = buffer.create(outgoing_used)
 			buffer.copy(buff, 0, outgoing_buff, 0, outgoing_used)
 			unreliable:FireServer(buff, outgoing_inst)
@@ -783,19 +798,6 @@ local returns = table.freeze({
 		end,
 	}),
 	UseItem = table.freeze({
-		Fire = function(Value: ({
-			ItemId: (string),
-		}))
-			alloc(1)
-			buffer.writeu8(outgoing_buff, outgoing_apos, 28)
-			local len_1 = #Value.ItemId
-			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
-			alloc(len_1)
-			buffer.writestring(outgoing_buff, outgoing_apos, Value.ItemId, len_1)
-		end,
-	}),
-	UpdatePinnedItem = table.freeze({
 		Fire = function(Value: ({
 			ItemId: (string),
 		}))
@@ -808,10 +810,22 @@ local returns = table.freeze({
 			buffer.writestring(outgoing_buff, outgoing_apos, Value.ItemId, len_1)
 		end,
 	}),
+	UpdatePinnedItem = table.freeze({
+		Fire = function(Value: ({
+			ItemId: (string),
+		}))
+			alloc(1)
+			buffer.writeu8(outgoing_buff, outgoing_apos, 30)
+			local len_1 = #Value.ItemId
+			alloc(2)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
+			alloc(len_1)
+			buffer.writestring(outgoing_buff, outgoing_apos, Value.ItemId, len_1)
+		end,
+	}),
 	CreateHint = table.freeze({
 		On = function(Callback: (({
 			Hint: (string),
-			Option: ((string)?),
 		})) -> ())
 			table.insert(events[4], Callback)
 			for _, value in event_queue[4] do
@@ -823,6 +837,21 @@ local returns = table.freeze({
 			end
 		end,
 	}),
+	CreateFullScreenHint = table.freeze({
+		On = function(Callback: (({
+			Hint: (string),
+			State: (boolean),
+		})) -> ())
+			table.insert(events[5], Callback)
+			for _, value in event_queue[5] do
+				task.spawn(Callback, value)
+			end
+			event_queue[5] = {}
+			return function()
+				table.remove(events[5], table.find(events[5], Callback))
+			end
+		end,
+	}),
 	ClientTween = table.freeze({
 		SetCallback = function(Callback: (({
 			Objs: (({ (Instance) })?),
@@ -830,13 +859,13 @@ local returns = table.freeze({
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),
 		})) -> ()): () -> ()
-			events[5] = Callback
-			for _, value in event_queue[5] do
+			events[6] = Callback
+			for _, value in event_queue[6] do
 				task.spawn(Callback, value)
 			end
-			event_queue[5] = {}
+			event_queue[6] = {}
 			return function()
-				events[5] = nil
+				events[6] = nil
 			end
 		end,
 	}),
@@ -844,20 +873,6 @@ local returns = table.freeze({
 		On = function(Callback: (({
 			ItemSlot: (string),
 			ItemId: (string),
-		})) -> ())
-			table.insert(events[12], Callback)
-			for _, value in event_queue[12] do
-				task.spawn(Callback, value)
-			end
-			event_queue[12] = {}
-			return function()
-				table.remove(events[12], table.find(events[12], Callback))
-			end
-		end,
-	}),
-	EnterShopping = table.freeze({
-		On = function(Callback: (({
-			Items: ({ (string) }),
 		})) -> ())
 			table.insert(events[13], Callback)
 			for _, value in event_queue[13] do
@@ -869,10 +884,9 @@ local returns = table.freeze({
 			end
 		end,
 	}),
-	ItemCD = table.freeze({
+	EnterShopping = table.freeze({
 		On = function(Callback: (({
-			Cooldown: (number),
-			ItemId: (string),
+			Items: ({ (string) }),
 		})) -> ())
 			table.insert(events[14], Callback)
 			for _, value in event_queue[14] do
@@ -884,23 +898,24 @@ local returns = table.freeze({
 			end
 		end,
 	}),
-	CameraScene = table.freeze({
-		SetCallback = function(Callback: (({
-			Part: ((BasePart)?),
-		})) -> ()): () -> ()
-			events[16] = Callback
-			for _, value in event_queue[16] do
+	ItemCD = table.freeze({
+		On = function(Callback: (({
+			Cooldown: (number),
+			ItemId: (string),
+		})) -> ())
+			table.insert(events[15], Callback)
+			for _, value in event_queue[15] do
 				task.spawn(Callback, value)
 			end
-			event_queue[16] = {}
+			event_queue[15] = {}
 			return function()
-				events[16] = nil
+				table.remove(events[15], table.find(events[15], Callback))
 			end
 		end,
 	}),
-	ChestUnlocked = table.freeze({
+	CameraScene = table.freeze({
 		SetCallback = function(Callback: (({
-			Chest: ((Model)?),
+			Part: ((BasePart)?),
 		})) -> ()): () -> ()
 			events[17] = Callback
 			for _, value in event_queue[17] do
@@ -912,19 +927,33 @@ local returns = table.freeze({
 			end
 		end,
 	}),
+	ChestUnlocked = table.freeze({
+		SetCallback = function(Callback: (({
+			Chest: ((Model)?),
+		})) -> ()): () -> ()
+			events[18] = Callback
+			for _, value in event_queue[18] do
+				task.spawn(Callback, value)
+			end
+			event_queue[18] = {}
+			return function()
+				events[18] = nil
+			end
+		end,
+	}),
 	GiveDrop = table.freeze({
 		On = function(Callback: (({
 			ItemId: (string),
 			Amount: (number),
 			IsNew: (boolean),
 		})) -> ())
-			table.insert(events[18], Callback)
-			for _, value in event_queue[18] do
+			table.insert(events[19], Callback)
+			for _, value in event_queue[19] do
 				task.spawn(Callback, value)
 			end
-			event_queue[18] = {}
+			event_queue[19] = {}
 			return function()
-				table.remove(events[18], table.find(events[18], Callback))
+				table.remove(events[19], table.find(events[19], Callback))
 			end
 		end,
 	}),
@@ -932,13 +961,13 @@ local returns = table.freeze({
 		On = function(Callback: (({
 			NPC: ((Model)?),
 		})) -> ())
-			table.insert(events[20], Callback)
-			for _, value in event_queue[20] do
+			table.insert(events[21], Callback)
+			for _, value in event_queue[21] do
 				task.spawn(Callback, value)
 			end
-			event_queue[20] = {}
+			event_queue[21] = {}
 			return function()
-				table.remove(events[20], table.find(events[20], Callback))
+				table.remove(events[21], table.find(events[21], Callback))
 			end
 		end,
 	}),
@@ -947,13 +976,13 @@ local returns = table.freeze({
 			Sound: ((Sound)?),
 			TimePos: ((number)?),
 		})) -> ()): () -> ()
-			events[23] = Callback
-			for _, value in event_queue[23] do
+			events[24] = Callback
+			for _, value in event_queue[24] do
 				task.spawn(Callback, value)
 			end
-			event_queue[23] = {}
+			event_queue[24] = {}
 			return function()
-				events[23] = nil
+				events[24] = nil
 			end
 		end,
 	}),
@@ -961,13 +990,13 @@ local returns = table.freeze({
 		On = function(Callback: (({
 			AnimId: (string),
 		})) -> ())
-			table.insert(events[25], Callback)
-			for _, value in event_queue[25] do
+			table.insert(events[26], Callback)
+			for _, value in event_queue[26] do
 				task.spawn(Callback, value)
 			end
-			event_queue[25] = {}
+			event_queue[26] = {}
 			return function()
-				table.remove(events[25], table.find(events[25], Callback))
+				table.remove(events[26], table.find(events[26], Callback))
 			end
 		end,
 	}),
@@ -975,13 +1004,13 @@ local returns = table.freeze({
 		SetCallback = function(Callback: (({
 			EventSymbol: (string),
 		})) -> ()): () -> ()
-			events[27] = Callback
-			for _, value in event_queue[27] do
+			events[28] = Callback
+			for _, value in event_queue[28] do
 				task.spawn(Callback, value)
 			end
-			event_queue[27] = {}
+			event_queue[28] = {}
 			return function()
-				events[27] = nil
+				events[28] = nil
 			end
 		end,
 	}),

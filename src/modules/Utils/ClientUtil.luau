@@ -136,11 +136,6 @@ function ClientUtil:OpenUIEx(plr: Player, targetUI: string, isForce: boolean?)
 	local function _setOthersVisibleState(state: boolean)
 		plrGui.AdventurerStats.Enabled = state
 		plrGui.PlayerList.Enabled = state
-
-		workspace.CurrentCamera.UIBlur.Enabled = not state
-
-        local blackList = { "NPCChat" }
-        if table.find(blackList, targetUI) then workspace.CurrentCamera.UIBlur.Enabled = false end
 	end
     local function _setVisible(curUI: string, ui: ScreenGui)
         ClientUtil:SetAllPromptsState(if curUI ~= "None" then false else true)
@@ -222,21 +217,12 @@ function ClientUtil:SetupMonster(locator: Part) : Model
         end
     end
 
-    --- v0.9: chase, so animation controller is abandoned
-    monster.AnimationController:Destroy()
-
-    local humanoid = Instance.new("Humanoid")
-    humanoid.WalkSpeed = MonsterBook[monster.Name].Speed
-    humanoid.Parent = monster
-
-    local animator = Instance.new("Animator")
-    animator.Parent = humanoid
-
     --- animator? harder to use lol
     local ok, err = pcall(function()
         local ref = MonsterBook[monster.Name].IdleAnim
+        if ref == "None" then return end
 
-        animator:LoadAnimation(RepS.Package.Animations.MonsterAnims[ref]):Play()
+        monster.AnimationController.Animator:LoadAnimation(RepS.Package.Animations.MonsterAnims[ref]):Play()
     end)
     if not ok then warn(err) end
 

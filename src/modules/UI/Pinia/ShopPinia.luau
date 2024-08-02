@@ -22,7 +22,7 @@ local function BackpackPinia(self: table)
 	self.absCellSize = Value(peek(self.absSize)[1] / 15.58)
 	self.absScrollSize, self.absContentSize = Value(Vector2.new()), Value(Vector2.new())
 
-    self.itemSlotClicked = Signal()
+    self.itemSlotClicked = Signal.new()
 
     self.absStatSize = Value(Vector2.new())
 	self.itemName, self.itemStats, self.itemDesc = Value(""),  Value(""), Value("")

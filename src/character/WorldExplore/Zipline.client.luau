@@ -18,7 +18,7 @@ local curvePointsSet = {}
 
 local function setupZipline()
     for _, child: Instance in workspace:WaitForChild("MapComponents", 999).Ziplines:GetDescendants() do
-        if child.Name == "Zipline" and child:IsA("Model") then
+        if child:HasTag("Zipline") and child:IsA("Model") then
             --- sort points
             local points = {} :: { BasePart }
             for _, point: BasePart in child:GetChildren() do
@@ -75,8 +75,8 @@ local function setupZipline()
                 segment.Anchored = true
                 segment.CanCollide = false
                 segment.CanQuery = false
-                segment.Material = child:GetAttribute("Material")
-                segment.Color = child:GetAttribute("Color")
+                segment.Material = Enum.Material.Fabric
+                segment.Color = Color3.new()
 
                 segments[count] = segment
                 table.insert(segmentPoints, curvePoints:CalculatePositionAt(i - increment))
@@ -94,8 +94,7 @@ local function setupZipline()
                     local segmentCFrame = CFrame.new((start + endPoint) * 0.5, endPoint)
                     local segmentLength = (endPoint - start).Magnitude
 
-					local width = child:GetAttribute("Width") :: number
-                    segments[i].Size = Vector3.new(width, width, segmentLength)
+                    segments[i].Size = Vector3.new(0.25, 0.25, segmentLength)
                     segments[i].Parent = child
 					Add(segments[i])
 
@@ -138,23 +137,20 @@ Add(char.Humanoid.RootPart.Touched:Connect(function(hit: BasePart)
 		humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 		humanoid.AutoRotate = false
 
-		local sparklePart: BasePart
-		if hit.Parent:GetAttribute("Sparkle") then
-			sparklePart = Instance.new("Part")
-			sparklePart.Name = "SparklePart"
-			sparklePart.CanQuery = false
-			sparklePart.CanTouch = false
-			sparklePart.CanCollide = false
-			sparklePart.Size = Vector3.one * 0.2
-			sparklePart.Anchored = true
-			sparklePart.Transparency = 1
+		local sparklePart = Instance.new("Part")
+		sparklePart.Name = "SparklePart"
+		sparklePart.CanQuery = false
+		sparklePart.CanTouch = false
+		sparklePart.CanCollide = false
+		sparklePart.Size = Vector3.one * 0.2
+		sparklePart.Anchored = true
+		sparklePart.Transparency = 1
 
-			local sparkle = Instance.new("Sparkles")
-			sparkle.SparkleColor = Color3.fromRGB(255, 179, 0)
-			sparkle.Parent = sparklePart
+		local sparkle = Instance.new("Sparkles")
+		sparkle.SparkleColor = Color3.fromRGB(255, 179, 0)
+		sparkle.Parent = sparklePart
 
-			sparklePart.Parent = char
-		end
+		sparklePart.Parent = char
 
 		local bp = Instance.new("BodyPosition")
 		bp.Position = char.PrimaryPart.Position
@@ -164,7 +160,6 @@ Add(char.Humanoid.RootPart.Touched:Connect(function(hit: BasePart)
 
 		local previousCF = CFrame.new()
 		local curveT = 0
-		local startRiding = tick()
 		local cancelRide = false
 
 		while curveT <= 1 and task.wait() do
@@ -206,9 +201,6 @@ Add(char.Humanoid.RootPart.Touched:Connect(function(hit: BasePart)
 				else
 					curveT += rideTime * scaleFrameDt
 				end
-			end
-			if tick() - startRiding >= 0.1 and humanoid.Jump then
-				cancelRide = true
 			end
 		end
 

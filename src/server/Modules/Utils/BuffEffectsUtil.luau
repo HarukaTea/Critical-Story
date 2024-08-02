@@ -192,6 +192,9 @@ function BuffEffectsUtil:PurifyBuff(char: Model)
 	for _, buff: Script in char.CharStats.EffectsList:GetChildren() do
 		if AssetBook.BuffInfo[buff.Name].Type == "Debuff" then buff:Destroy() end
 	end
+	for _, child: ParticleEmitter in char:GetDescendants() do
+		if child:HasTag("ProjectileEmitter") then child:Destroy() end
+	end
 end
 
 return BuffEffectsUtil

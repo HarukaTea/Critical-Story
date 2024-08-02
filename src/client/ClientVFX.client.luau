@@ -1,7 +1,6 @@
 --!nocheck
 
 local CS = game:GetService("CollectionService")
-local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
@@ -9,8 +8,6 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Signals = require(RepS.Modules.Data.Signals)
 local WindLines = require(RepS.Modules.Packages.Atmosphere.WindLines)
 local WindShake = require(RepS.Modules.Packages.Atmosphere.WindShake)
-
-local plr = Players.LocalPlayer
 
 local instanceNew = Instance.new
 local v3New = Vector3.new
@@ -31,13 +28,6 @@ local function fadeEffect(effect: ParticleEmitter)
     if effect then effect.Enabled = false end
 end
 CS:GetInstanceAddedSignal("GlobalEffects"):Connect(fadeEffect)
-
---- global settings
-local function disableEffect(effect: ParticleEmitter)
-    wait()
-    if effect then effect.Enabled = plr:GetAttribute("Particles") end
-end
-CS:GetInstanceAddedSignal("ParticleEffects"):Connect(disableEffect)
 
 --- text fade
 local function fadeText(text: BasePart)
@@ -70,10 +60,21 @@ local function enableWinds()
         WindDirection = v3New(1, 0, 0.3),
         WindPower = 0.5
     })
-    for _, child: Instance in workspace:GetDescendants() do
+
+    for _, child: Instance in workspace:WaitForChild("Maps", 999):GetDescendants() do
         if child:IsA("Model") and string.find(child.Name, "Tree") then
             for _, treePart: BasePart in child:GetDescendants() do
                 if not treePart:IsA("BasePart") then continue end
+
+                if treePart.Material == Enum.Material.Grass then WindShake:AddObjectShake(treePart) end
+            end
+        end
+    end
+    for _, child: Instance in RepS.Debris.Trees:GetChildren() do
+        if child:IsA("Model") and string.find(child.Name, "Tree") then
+            for _, treePart: BasePart in child:GetDescendants() do
+                if not treePart:IsA("BasePart") then continue end
+
                 if treePart.Material == Enum.Material.Grass then WindShake:AddObjectShake(treePart) end
             end
         end

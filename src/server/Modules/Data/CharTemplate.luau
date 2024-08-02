@@ -8,13 +8,13 @@ return {
     Mana = 100,
     MaxMana = 100,
     Shield = 0,
-    MaxShield = 1,
+    MaxShield = 0,
     Defense = 0,
 
     --- States
     InCombat = false,
     OrbSpawnTime = 3,
-    OrbLifeTime = 15,
+    OrbLifeTime = 12,
     CurrentState = "None",
     ShieldRepairing = false,
     HPRecovering = false,

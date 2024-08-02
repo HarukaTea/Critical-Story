@@ -102,6 +102,7 @@ local function mainSetup()
 		RepS.Package.Unloads.SFXs.Parent = SoundService
 		for _, sound: Sound in RepS.Package.Sounds:GetDescendants() do
 			if sound.Parent.Name == "SFXs" then sound.SoundGroup = SoundService.SFXs continue end
+			if sound.Parent.Name == "StoryMusics" then continue end
 			if sound:IsA("Sound") then sound.SoundGroup = SoundService.Musics end
 		end
 		RepS.Package.Sounds.Parent = workspace

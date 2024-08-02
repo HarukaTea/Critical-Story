@@ -24,7 +24,6 @@ local PromptsFrame = require(RepS.Modules.UI.Views.PromptsFrame)
 local PlayerEffectsList = require(RepS.Modules.UI.Views.PlayerEffectsList)
 local QuestFrame = require(RepS.Modules.UI.Views.QuestFrame)
 local StatsTextsFrame = require(RepS.Modules.UI.Views.StatsTextsFrame)
-local PanelBtnsFrame = require(RepS.Modules.UI.Views.PanelBtnsFrame)
 
 local AlchemistAbilityIndicator = require(RepS.Modules.UI.Components.AlchemistAbilityIndicator)
 local ClassAbilityIndicator = require(RepS.Modules.UI.Components.ClassAbilityIndicator)
@@ -137,8 +136,7 @@ return function(plr: Player)
 				[Children] = {
 					New(scope, "UIAspectRatioConstraint")({ AspectRatio = 25.697 }),
 
-					LocationTitleFrame(self),
-					PanelBtnsFrame(self)
+					LocationTitleFrame(self)
 				}
 			}),
 			Components.Frame(scope, {

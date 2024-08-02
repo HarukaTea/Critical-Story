@@ -3,6 +3,7 @@
 local RepS = game:GetService("ReplicatedStorage")
 
 local AssetBook = require(RepS.Modules.Data.AssetBook)
+local ClassBook = require(RepS.Modules.Data.ClassBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
@@ -31,7 +32,7 @@ local function StatImage(id: string, self: table) : ImageLabel
 
         Image = Computed(scope, function(use: Fusion.Use)
             if id == "ClassATK" then
-                return AssetBook.ClassInfo[use(self.playerData.Class)].Image
+                return ClassBook.ClassInfo[use(self.playerData.Class)].Image
 
             elseif id == "Gold" then
                 return ItemBook.ItemImagesEx.Gold
@@ -75,7 +76,7 @@ local function StatText(id: string, self: table) : TextLabel
 
         Text = Computed(scope, function(use: Fusion.Use)
             if id == "ClassATK" then
-                if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
+                if ClassBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
                     local minDMG, maxDMG = use(charDMGStats.MinDMG) :: number, use(charDMGStats.MaxDMG) :: number
 
                     return if minDMG >= maxDMG then maxDMG else minDMG.."-"..maxDMG
@@ -84,7 +85,7 @@ local function StatText(id: string, self: table) : TextLabel
                 end
 
             elseif id == "ClassATKBuff" then
-                if AssetBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
+                if ClassBook.ClassInfo[use(self.playerData.Class)].Type == "DMG" then
                     local minDMG, maxDMG = use(charDMGStats.MinDMGBuff) :: number, use(charDMGStats.MaxDMGBuff) :: number
 
                     if minDMG > 0 and maxDMG <= 0 then

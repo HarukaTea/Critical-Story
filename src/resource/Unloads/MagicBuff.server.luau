@@ -1,12 +1,16 @@
 --!nocheck
 
+local Players = game:GetService("Players")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
+local Formula = require(RepS.Modules.Data.Formulas)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
 local char = script.Parent.Parent.Parent :: Model
+local plr = Players:GetPlayerFromCharacter(char)
+
 local color = script:GetAttribute("Color") :: Color3
 local text = script:GetAttribute("Text") :: string
 local duration = script:GetAttribute("Duration") :: number
@@ -17,10 +21,10 @@ local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
 
-local nowMagicBuff = char:GetAttribute("MagicBuff") :: number
-local nowMagic = char:GetAttribute("Magic") - nowMagicBuff :: number
-
+local magicPoints = plr:GetAttribute("MagicPoints") :: number
+local nowMagic = Formula.PlayerMagic(magicPoints)
 local theoryMagic = floor(nowMagic * power - nowMagic)
+
 HarukaLib:AddAttr(char, "MagicBuff", theoryMagic)
 
 wait(duration)
