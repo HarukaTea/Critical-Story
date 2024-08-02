@@ -2,10 +2,10 @@
 
 local RepS = game:GetService("ReplicatedStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local Fusion = require(RepS.Modules.Packages.Fusion)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local StatusEffectBook = require(RepS.Modules.Data.StatusEffectBook)
 
 local Children = Fusion.Children
 
@@ -30,7 +30,7 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
 				Position = if direction == "Right" then fromScale(-1, 0) else fromScale(0, 0),
 				Size = fromScale(2, 1),
 				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
-                ImageColor3 = AssetBook.BuffInfo[effect.Name].Color,
+                ImageColor3 = StatusEffectBook.BuffInfo[effect.Name].Color,
 
 				[Children] = {
 					Fusion.New(info[2], "UIGradient")({
@@ -66,7 +66,7 @@ local function EffectIndicator(effect: Script, scope: Fusion.Scope) : ImageLabel
         BackgroundTransparency = 0,
         Size = fromScale(1, 1),
 		SizeConstraint = Enum.SizeConstraint.RelativeYY,
-        Image = AssetBook.BuffInfo[effect.Name].Icon,
+        Image = StatusEffectBook.BuffInfo[effect.Name].Icon,
 
         [Children] = {
             Components.RoundUICorner(scope),

@@ -6,9 +6,9 @@ local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local SS = game:GetService("ServerStorage")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
+local StatusEffectBook = require(RepS.Modules.Data.StatusEffectBook)
 
 local floor = math.floor
 local fromRGB = Color3.fromRGB
@@ -69,7 +69,40 @@ function BuffEffectsUtil:Heal(char: Model, healPower: number)
 end
 
 
-function BuffEffectsUtil:Burn(char: Model, monster: Model, duration: number, isPlayer: boolean?)
+function BuffEffectsUtil:HealBuff(char: Model, level: number, duration: number, isMob: boolean?)
+	if isMob then if char:GetAttribute("Health") <= 0 then return end end
+	if not isMob then if char.Humanoid.Health <= 0 then return end end
+
+	local buff: Script
+	if isMob then
+		buff = SS.Resources.Unloads.HealBuffMob:Clone()
+		buff:SetAttribute("HealDMG", floor(char:GetAttribute("MaxHealth") * 0.1))
+	else
+		buff = SS.Resources.Unloads.HealBuff:Clone()
+		buff:SetAttribute("HealDMG", floor(char.Humanoid.MaxHealth * 0.2))
+	end
+	buff:SetAttribute("Power", level)
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("MaxDuration", duration)
+	buff.Name = "HealBuff"
+	buff.Parent = if isMob then char.EffectsList else char.CharStats.EffectsList
+end
+
+
+function BuffEffectsUtil:ManaBuff(char: Model, level: number, duration: number)
+	if char.Humanoid.Health <= 0 then return end
+
+	local buff = SS.Resources.Unloads.ManaBuff:Clone()
+	buff:SetAttribute("HealDMG", floor(char:GetAttribute("MaxMana") * 0.15))
+	buff:SetAttribute("Power", level)
+	buff:SetAttribute("Duration", duration)
+	buff:SetAttribute("MaxDuration", duration)
+	buff.Name = "ManaBuff"
+	buff.Parent = char.CharStats.EffectsList
+end
+
+
+function BuffEffectsUtil:Burn(char: Model, monster: Model, level: number, duration: number, isPlayer: boolean?)
 	if char.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
@@ -77,13 +110,12 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, duration: number, isP
 	if isPlayer then
 		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
-		debuff:SetAttribute("Power", 0.5)
+		debuff:SetAttribute("Power", level)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 4))
-		debuff:SetAttribute("Power", 0.25)
+		debuff:SetAttribute("Power", level)
 	end
-	debuff:SetAttribute("Power", 0.25)
 	debuff:SetAttribute("Duration", duration)
 	debuff:SetAttribute("MaxDuration", duration)
 	debuff:SetAttribute("Color", fromRGB(255, 85, 0))
@@ -93,7 +125,7 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, duration: number, isP
 end
 
 
-function BuffEffectsUtil:Poison(char: Model, monster: Model, duration: number, isPlayer: boolean?)
+function BuffEffectsUtil:Poison(char: Model, monster: Model, level: number, duration: number, isPlayer: boolean?)
 	if char.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
@@ -101,11 +133,11 @@ function BuffEffectsUtil:Poison(char: Model, monster: Model, duration: number, i
 	if isPlayer then
 		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
-		debuff:SetAttribute("Power", 0.5)
+		debuff:SetAttribute("Power", level)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 4))
-		debuff:SetAttribute("Power", 0.25)
+		debuff:SetAttribute("Power", level)
 	end
 	debuff:SetAttribute("Duration", duration)
 	debuff:SetAttribute("MaxDuration", duration)
@@ -117,11 +149,8 @@ end
 
 
 function BuffEffectsUtil:AttackBuff(char: Model, attackPower: number, duration: number, isMob: boolean?)
-	if isMob then
-		if not char:FindFirstChild("EffectsList") then return end
-	else
-		if char.Humanoid.Health <= 0 then return end
-	end
+	if isMob then if char:GetAttribute("Health") <= 0 then return end end
+	if not isMob then if char.Humanoid.Health <= 0 then return end end
 
 	local buff: Script
 	if isMob then
@@ -188,9 +217,11 @@ function BuffEffectsUtil:DefenseBuff(char: Model, def: number, duration: number)
 end
 
 
-function BuffEffectsUtil:PurifyBuff(char: Model)
-	for _, buff: Script in char.CharStats.EffectsList:GetChildren() do
-		if AssetBook.BuffInfo[buff.Name].Type == "Debuff" then buff:Destroy() end
+function BuffEffectsUtil:PurifyBuff(char: Model, isMob: boolean?)
+	local folder = if isMob then char.EffectsList else char.CharStats.EffectsList
+
+	for _, buff: Script in folder:GetChildren() do
+		if StatusEffectBook.BuffInfo[buff.Name].Type == "Debuff" then buff:Destroy() end
 	end
 	for _, child: ParticleEmitter in char:GetDescendants() do
 		if child:HasTag("ProjectileEmitter") then child:Destroy() end

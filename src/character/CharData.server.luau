@@ -231,7 +231,8 @@ local function charAttributesSetup()
         char.AlchemistCreations:ClearAllChildren()
     end
     local function spawnProtect()
-
+        BuffEffectsUtil:HealBuff(char, 1, 4, false)
+        BuffEffectsUtil:ManaBuff(char, 1, 4)
     end
 
     --// Setups

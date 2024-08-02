@@ -13,7 +13,7 @@ local pos = ClientUtil:GetKeyStoryLocations()
 StoryBook.Main = {
     {
         Name = "The Beginning",
-        Target = "Learn more about this world",
+        Target = "Learn more about critical <blue>realm</font>",
         Desc = "",
         NPC = "Pioxit1",
         Hint = v3New(),
@@ -25,7 +25,7 @@ StoryBook.Main = {
     },
     {
         Name = "First Steps",
-        Target = "Talk to Pioxit",
+        Target = "Talk to <blue>Pioxit</font>",
         Desc = "",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
@@ -34,7 +34,7 @@ StoryBook.Main = {
     },
     {
         Name = "Valiant Explorer",
-        Target = "Talk to any villagers here",
+        Target = "Talk to <blue>any villagers</font> here",
         Desc = "",
         NPC = "None",
         Hint = if pos.MonolithVillage then pos.MonolithVillage.StoryLocator1 else v3New(),
@@ -46,7 +46,7 @@ StoryBook.Main = {
     },
     {
         Name = "Critical Power",
-        Target = "Go back to Pioxit",
+        Target = "Go back to <blue>Pioxit</font>",
         Desc = "",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
@@ -58,7 +58,7 @@ StoryBook.Main = {
     },
     {
         Name = "The Future",
-        Target = "Talk to Pioxit",
+        Target = "Talk to <blue>Pioxit</font> again",
         Desc = "",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
@@ -70,7 +70,7 @@ StoryBook.Main = {
     },
     {
         Name = "Encounter",
-        Target = "Find a way to Initus Bay",
+        Target = "Find a way to <yellow>Initus Bay</font>",
         Desc = "",
         NPC = "None",
         Hint = if pos.MonolithGrove then pos.MonolithGrove.StoryLocator1 else v3New(),

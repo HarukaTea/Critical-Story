@@ -101,7 +101,7 @@ end
 
 function HarukaLib:RichTextify(text: string) : string
 	if not text then return "" end
-	
+
 	local colorList = {
 		["<blue>"] = [[<font color="#70a1ff">]],
 		["<purple>"] = [[<font color="#5352ed">]],
@@ -482,6 +482,11 @@ function HarukaLib:PlayCutscene(pointsFolder: Folder | Model, duration: number)
 	end)
 
 	return signal
+end
+
+
+function HarukaLib:CalculateTick(n: number) : number
+	if n == 1 then return 25 else return math.floor(HarukaLib:CalculateTick(n - 1) / 2) end
 end
 
 
