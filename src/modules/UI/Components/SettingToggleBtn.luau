@@ -25,6 +25,7 @@ local function SettingToggleBtn(id: string, self: table) : Frame
 		MapDetails = "Map Details",
 		MapShadows = "Global Shadows",
 		TreeOptimizations = "Tree Optimizations",
+		HideRole = "Hide Role"
 	}
     local isSelecting = Fusion.Value(scope, false)
 

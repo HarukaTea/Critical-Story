@@ -78,8 +78,6 @@ local function combatEnds()
                 char:SetAttribute("InCombat", false)
                 charStats.TargetMonster.Value = nil
 
-                BuffEffectsUtil:PurifyBuff(char)
-
                 for _, orbFolder: Folder in workspace.MapComponents.OrbHolders:GetChildren() do
                     if orbFolder.Name == player.Name then orbFolder:Destroy() end
                 end

@@ -259,6 +259,7 @@ Events.EquipItem.SetCallback(function(plr, data)
 		plr:SetAttribute("Cosmetic", "None")
 
 		ServerUtil:EquipArmor(char, nil)
+		ServerUtil:EquipWeapon(char)
 	end
 end)
 
@@ -399,13 +400,17 @@ Events.ChangePlayerLocation.SetCallback(function(plr, data)
 
 	plr:SetAttribute("LastSeenLocation", location)
 
-	local spawns = workspace.Maps[location].SpawnPoints :: Model
-	if #spawns:GetChildren() > 0 then
-		local rSpawn = math.random(1, #spawns:GetChildren())
+	local singleSpawn = workspace.Maps[location]:FindFirstChild("SpawnPoint") :: BasePart
+	if singleSpawn then plr:SetAttribute("RespawnLocation", singleSpawn.Position) return end
 
-		for index: number, spawnPoint: BasePart in ipairs(spawns:GetChildren()) do
-			if index == rSpawn then plr:SetAttribute("RespawnLocation", spawnPoint.Position) end
-		end
+	local spawns = workspace.Maps[location]:FindFirstChild("SpawnPoints") :: Model
+	if not spawns then return end
+	if #spawns:GetChildren() <= 0 then return end
+
+	local rSpawn = math.random(1, #spawns:GetChildren())
+
+	for index: number, spawnPoint: BasePart in ipairs(spawns:GetChildren()) do
+		if index == rSpawn then plr:SetAttribute("RespawnLocation", spawnPoint.Position) end
 	end
 end)
 
@@ -426,6 +431,10 @@ Events.ChangePlayerSetting.SetCallback(function(plr, data)
 	end
 
 	plr:SetAttribute(id, not plr:GetAttribute(id))
+
+	if id == "HideRole" then
+		if plr:GetAttribute("HideRole") then plr:SetAttribute("Role", nil) else	ServerUtil:SetRole(plr) end
+	end
 end)
 
 

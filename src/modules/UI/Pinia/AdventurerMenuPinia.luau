@@ -48,6 +48,16 @@ local function AdventurerMenuPinia(self: table) : table
 
 	self.pointsPerAdd = Value("1")
 
+	self.packListAbsSize, self.packListAbsContentSize = Value(Vector2.new()), Value(Vector2.new())
+	self.donationListAbsSize, self.donationListAbsContentSize = Value(Vector2.new()), Value(Vector2.new())
+	self.donationList = Value({})
+
+	self.questListAbsSize, self.questListAbsContentSize = Value(Vector2.new()), Value(Vector2.new())
+	self.questList = Value({})
+	self.questDescAbsSize = Value(Vector2.new())
+	self.questDesc, self.questRewardsList = Value(""), Value({})
+	self.questRewardsListAbsSize, self.questRewardsListAbsContentSize = Value(Vector2.new()), Value(Vector2.new())
+
     self.playerData = {
 		Class = Value("Warrior"),
 		Levels = Value(1),
@@ -90,7 +100,8 @@ local function AdventurerMenuPinia(self: table) : table
 		PlayerList = Value(true),
 		MapDetails = Value(true),
 		MapShadows = Value(true),
-		TreeOptimizations = Value(true)
+		TreeOptimizations = Value(true),
+		HideRole = Value(false)
 	}
 end
 

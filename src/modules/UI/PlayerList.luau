@@ -108,6 +108,7 @@ return function(plr: Player)
 	---// Listening events
 	table.insert(scope, Players.PlayerAdded:Connect(function(player)
 		repeat wait() until player:GetAttribute("PlayerDataLoaded")
+		if self == nil then return end
 
 		self.players:set(Players:GetPlayers())
 	end))

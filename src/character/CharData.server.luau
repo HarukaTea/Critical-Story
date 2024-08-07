@@ -69,7 +69,7 @@ local function setup()
             local area = plr:GetAttribute("LastSeenLocation") :: string
             if not workspace.Maps:FindFirstChild(area) then return end
 
-            char:PivotTo(cfNew(workspace.Maps[area].SpawnPoints.SpawnPoint.Position))
+            char:PivotTo(cfNew(plr:GetAttribute("RespawnLocation")))
         end
     end)
 end
@@ -209,8 +209,15 @@ local function charAttributesSetup()
         humanoid.JumpPower = 50 + jump
     end
     local function levelReqCheck()
-        if plr:GetAttribute("EXP") > Formula.EXP(plr:GetAttribute("Levels")) then
+        local level = plr:GetAttribute("Levels") :: number
+
+        if plr:GetAttribute("EXP") > Formula.EXP(level) then
             if lvUpCD then return end
+
+            if level >= Formula.LevelCap then
+                plr:SetAttribute("EXP", 0)
+                return
+            end
 
             lvUpCD = true
             Signals.LevelUp:Fire(plr)
@@ -231,17 +238,18 @@ local function charAttributesSetup()
         char.AlchemistCreations:ClearAllChildren()
     end
     local function spawnProtect()
-        BuffEffectsUtil:HealBuff(char, 1, 4, false)
-        BuffEffectsUtil:ManaBuff(char, 1, 4)
+        BuffEffectsUtil:SpeedBuff(char, 1.15, 4, true)
+        BuffEffectsUtil:HealBuff(char, 1, false)
+        BuffEffectsUtil:ManaBuff(char, 1)
     end
 
     --// Setups
     Spawn(updateMinDMG)
     Spawn(updateMaxDMG)
     Spawn(updateMagic)
-    Spawn(updateShield, true)
+    Spawn(updateShield)
     Spawn(updateHP)
-    Spawn(updateMana, true)
+    Spawn(updateMana)
     Spawn(updateSpeed)
     Spawn(updateJump, 0)
     Spawn(levelReqCheck)

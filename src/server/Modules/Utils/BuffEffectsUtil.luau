@@ -63,61 +63,59 @@ function BuffEffectsUtil:Heal(char: Model, healPower: number)
 	char.Humanoid.Health += floor(char.Humanoid.MaxHealth * healPower)
 
 	local healEff = RepS.Package.Effects.HealEffect:Clone() :: BasePart
-	healEff.CFrame = char.PrimaryPart.CFrame
-	healEff.Parent = workspace
+	healEff.Parent = char.PrimaryPart
 	Debris:AddItem(healEff, 1)
 end
 
 
-function BuffEffectsUtil:HealBuff(char: Model, level: number, duration: number, isMob: boolean?)
+function BuffEffectsUtil:HealBuff(char: Model, level: number, isMob: boolean?)
 	if isMob then if char:GetAttribute("Health") <= 0 then return end end
 	if not isMob then if char.Humanoid.Health <= 0 then return end end
 
 	local buff: Script
 	if isMob then
-		buff = SS.Resources.Unloads.HealBuffMob:Clone()
+		buff = SS.Resources.Unloads.HealBuff:Clone()
 		buff:SetAttribute("HealDMG", floor(char:GetAttribute("MaxHealth") * 0.1))
+		buff:SetAttribute("IsMob", true)
 	else
 		buff = SS.Resources.Unloads.HealBuff:Clone()
 		buff:SetAttribute("HealDMG", floor(char.Humanoid.MaxHealth * 0.2))
 	end
 	buff:SetAttribute("Power", level)
-	buff:SetAttribute("Duration", duration)
-	buff:SetAttribute("MaxDuration", duration)
+	buff:SetAttribute("MaxDuration", 6)
 	buff.Name = "HealBuff"
 	buff.Parent = if isMob then char.EffectsList else char.CharStats.EffectsList
 end
 
 
-function BuffEffectsUtil:ManaBuff(char: Model, level: number, duration: number)
+function BuffEffectsUtil:ManaBuff(char: Model, level: number)
 	if char.Humanoid.Health <= 0 then return end
 
 	local buff = SS.Resources.Unloads.ManaBuff:Clone()
 	buff:SetAttribute("HealDMG", floor(char:GetAttribute("MaxMana") * 0.15))
 	buff:SetAttribute("Power", level)
-	buff:SetAttribute("Duration", duration)
-	buff:SetAttribute("MaxDuration", duration)
+	buff:SetAttribute("MaxDuration", 6)
 	buff.Name = "ManaBuff"
 	buff.Parent = char.CharStats.EffectsList
 end
 
 
-function BuffEffectsUtil:Burn(char: Model, monster: Model, level: number, duration: number, isPlayer: boolean?)
+function BuffEffectsUtil:Burn(char: Model, monster: Model, level: number, isPlayer: boolean?)
 	if char.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
 	local debuff: Script
 	if isPlayer then
-		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
-		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+		debuff = SS.Resources.Unloads.DOTDMG:Clone()
+		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 4))
 		debuff:SetAttribute("Power", level)
+		debuff:SetAttribute("IsPlayer", true)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 4))
 		debuff:SetAttribute("Power", level)
 	end
-	debuff:SetAttribute("Duration", duration)
-	debuff:SetAttribute("MaxDuration", duration)
+	debuff:SetAttribute("MaxDuration", 6)
 	debuff:SetAttribute("Color", fromRGB(255, 85, 0))
 	debuff:SetAttribute("Text", "BURN!")
 	debuff.Name = "Burn"
@@ -125,22 +123,22 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, level: number, durati
 end
 
 
-function BuffEffectsUtil:Poison(char: Model, monster: Model, level: number, duration: number, isPlayer: boolean?)
+function BuffEffectsUtil:Poison(char: Model, monster: Model, level: number, isPlayer: boolean?)
 	if char.Humanoid.Health <= 0 then return end
 	if not monster:FindFirstChild("EffectsList") then return end
 
 	local debuff: Script
 	if isPlayer then
-		debuff = SS.Resources.Unloads.DOTDMGPlayer:Clone()
-		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 2))
+		debuff = SS.Resources.Unloads.DOTDMG:Clone()
+		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 4))
 		debuff:SetAttribute("Power", level)
+		debuff:SetAttribute("IsPlayer", true)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 4))
 		debuff:SetAttribute("Power", level)
 	end
-	debuff:SetAttribute("Duration", duration)
-	debuff:SetAttribute("MaxDuration", duration)
+	debuff:SetAttribute("MaxDuration", 6)
 	debuff:SetAttribute("Color", fromRGB(55, 66, 250))
 	debuff:SetAttribute("Text", "POISON!")
 	debuff.Name = "Poison"
@@ -185,19 +183,15 @@ function BuffEffectsUtil:MagicBuff(char: Model, power: number, duration: number)
 end
 
 
-function BuffEffectsUtil:SpeedBuff(char: Model, exSpeed: number, duration: number, noSound: boolean?)
+function BuffEffectsUtil:SpeedBuff(char: Model, power: number, duration: number, noSound: boolean?)
 	local buff = SS.Resources.Unloads.SpeedBuff:Clone() :: Script
 
 	buff:SetAttribute("Duration", duration)
 	buff:SetAttribute("MaxDuration", duration)
-	buff:SetAttribute("Power", exSpeed)
+	buff:SetAttribute("Power", power)
 	buff:SetAttribute("Color", fromRGB(255, 255, 0))
 	buff:SetAttribute("Text", "SPEED UP!")
 	buff.Parent = char.CharStats.EffectsList
-
-	local speedEffect = RepS.Package.Effects.SpeedEffect:Clone() :: ParticleEmitter
-	speedEffect.Parent = char.PrimaryPart
-	Debris:AddItem(speedEffect, duration)
 
 	if not noSound then _playUpSound(char) end
 end

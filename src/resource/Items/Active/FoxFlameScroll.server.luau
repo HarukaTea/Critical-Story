@@ -50,7 +50,7 @@ local success, errorMsg = pcall(function()
 		if (fireBall.Position - monster.PrimaryPart.Position).Magnitude <= 4 then
 			hit = true
 
-			BuffEffectsUtil:Burn(char, monster, 2, 12)
+			BuffEffectsUtil:Burn(char, monster, 2)
 			BuffEffectsUtil:MagicVFX(monster)
 			Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Magic1 })
 

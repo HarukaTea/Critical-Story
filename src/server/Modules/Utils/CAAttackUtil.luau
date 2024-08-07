@@ -251,7 +251,7 @@ local function _createAlchemy(char: Model, color: string)
         if r >= 3 then
             if not char.CharStats.TargetMonster.Value then return end
 
-            BuffEffectsUtil:Burn(char, char.CharStats.TargetMonster.Value, 1, 12)
+            BuffEffectsUtil:Burn(char, char.CharStats.TargetMonster.Value, 1)
 
         elseif b >= 3 then
             BuffEffectsUtil:RestoreMana(char, char:GetAttribute("MaxMana"))
@@ -392,7 +392,7 @@ function CAAttackUtil.JuggernautHeal(plr: Player)
     BuffEffectsUtil:Heal(plr.Character, plr.Character:GetAttribute("MaxHealth"))
 end
 function CAAttackUtil.JuggernautPierce(plr: Player, monster: Model)
-    BuffEffectsUtil:Burn(plr.Character, monster, 1, 6)
+    BuffEffectsUtil:Burn(plr.Character, monster, 1)
 end
 
 function CAAttackUtil.Reaper(plr: Player, monster: Model, baseDamage: number)
@@ -414,7 +414,7 @@ function CAAttackUtil.Reaper(plr: Player, monster: Model, baseDamage: number)
 end
 
 function CAAttackUtil.FireStaff(plr: Player, monster: Model)
-    BuffEffectsUtil:Burn(plr.Character, monster, 1, 6)
+    BuffEffectsUtil:Burn(plr.Character, monster, 1)
 end
 
 return CAAttackUtil

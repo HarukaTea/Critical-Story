@@ -33,7 +33,7 @@ local function startAdventure(plr: Player)
     TS:Create(cutsceneBG, tweenInfoNew(0.5), { BackgroundTransparency = 0 }):Play()
 
     wait(1)
-    plr.Character:PivotTo(workspace.Maps.MonolithVillage.SpawnPoints.SpawnPoint.CFrame)
+    plr.Character:PivotTo(workspace.Maps.MonolithVillage.SpawnPoint.CFrame)
     plr.Character:SetAttribute("CurrentRegion", "MonolithVillage")
     plr:SetAttribute("InCutscene", nil)
 
@@ -44,7 +44,7 @@ local function startAdventure(plr: Player)
     TS:Create(SoundS.Musics, tweenInfoNew(1), { Volume = 0.5 }):Play()
     TS:Create(workspace.Sounds.StoryMusics.Cairn, tweenInfoNew(1), { Volume = 0 }):Play()
 
-    workspace.Sounds.Overworld:Play()
+    workspace.Sounds.Overworld.Volume = 0.5
     wait(2)
     workspace.Sounds.StoryMusics.Cairn:Stop()
 end

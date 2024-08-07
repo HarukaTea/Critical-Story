@@ -3,8 +3,8 @@
 local fromRGB = Color3.fromRGB
 
 local default = {
-    Ambient = fromRGB(118, 110, 91),
-    OutdoorAmbient = fromRGB(76, 58, 35),
+    Ambient = fromRGB(127, 127, 127),
+    OutdoorAmbient = fromRGB(198, 198, 198),
     FogColor = fromRGB(106, 185, 221),
     FogEnd = 2000
 }

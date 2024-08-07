@@ -13,8 +13,8 @@ local pos = ClientUtil:GetKeyStoryLocations()
 StoryBook.Main = {
     {
         Name = "The Beginning",
-        Target = "Learn more about critical <blue>realm</font>",
-        Desc = "",
+        Target = "Learn more about <blue>Critical Realm</font>",
+        Desc = "When you wake up, you find yourself in another world. It is quite evident that <blue>a brand new adventure</font> is waiting for you.",
         NPC = "Pioxit1",
         Hint = v3New(),
 
@@ -26,7 +26,7 @@ StoryBook.Main = {
     {
         Name = "First Steps",
         Target = "Talk to <blue>Pioxit</font>",
-        Desc = "",
+        Desc = "Then, go forward, for it seems you have no other choice, do you?",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
 
@@ -35,7 +35,7 @@ StoryBook.Main = {
     {
         Name = "Valiant Explorer",
         Target = "Talk to <blue>any villagers</font> here",
-        Desc = "",
+        Desc = "Are there really people in this <blue>dense valley</font>?",
         NPC = "None",
         Hint = if pos.MonolithVillage then pos.MonolithVillage.StoryLocator1 else v3New(),
 
@@ -47,7 +47,7 @@ StoryBook.Main = {
     {
         Name = "Critical Power",
         Target = "Go back to <blue>Pioxit</font>",
-        Desc = "",
+        Desc = "It seems this world still holds other secrets, waiting for you to <blue>explore</font>...",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
 
@@ -59,7 +59,7 @@ StoryBook.Main = {
     {
         Name = "The Future",
         Target = "Talk to <blue>Pioxit</font> again",
-        Desc = "",
+        Desc = "Now, it's time to embark on your own <yellow>story</font>.",
         NPC = "Pioxit",
         Hint = if pos.Pioxit then pos.Pioxit else v3New(),
 
@@ -70,10 +70,10 @@ StoryBook.Main = {
     },
     {
         Name = "Encounter",
-        Target = "Find a way to <yellow>Initus Bay</font>",
-        Desc = "",
+        Target = "Coming Soon",
+        Desc = "<red>Pioxit</font> has mentioned there would be danger... but never mind, let's get through this <blue>grove</font> and find the village first.",
         NPC = "None",
-        Hint = if pos.MonolithGrove then pos.MonolithGrove.StoryLocator1 else v3New(),
+        Hint = v3New(),
 
         Rewards = {
             EXP = 30,
@@ -83,42 +83,11 @@ StoryBook.Main = {
 }
 
 StoryBook.Side = {
-    {
-        Name = "Faction",
-        Target = "Coming soon",
-        Desc = "",
-        NPC = "None",
-        Hint = v3New(),
-
-        Rewards = {
-            EXP = 20,
-            Gold = 100
-        }
-    }
+    ---
 }
 
 StoryBook.Town = {
-    {
-        Name = "Fox Hunt",
-        Target = "Get 6 Spiky Fur",
-        Desc = "",
-        NPC = "FChenP",
-        Hint = v3New(),
-
-        Rewards = {}
-    },
-    {
-        Name = "Fox Hunt",
-        Target = "Return to FChenP",
-        Desc = "",
-        NPC = "FChenP",
-        Hint = if pos.FChenP then pos.FChenP else v3New(),
-
-        Rewards = {
-            EXP = 40,
-            Gold = 150
-        }
-    }
+    ---
 }
 
 return StoryBook

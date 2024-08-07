@@ -1,5 +1,6 @@
 --!nocheck
 
+local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
@@ -15,6 +16,10 @@ local power = script:GetAttribute("Power") :: number
 local wait = task.wait
 
 ServerUtil:ShowText(char, text, color)
+
+local speedEffect = RepS.Package.Effects.SpeedEffect:Clone() :: ParticleEmitter
+speedEffect.Parent = char.PrimaryPart
+Debris:AddItem(speedEffect, duration)
 
 local afterSpeed = 30 * power - 30
 HarukaLib:AddAttr(char, "SpeedBuff", afterSpeed)

@@ -202,8 +202,8 @@ Events.PlayerTakeDMG.SetCallback(function(plr, data)
     char:SetAttribute("CurrentState", "Hit")
 
     --- some extra damage
-    if dmgPart:HasTag("Burn") then BuffEffectsUtil:Burn(char, monster, 1, 6, true) end
-    if dmgPart:HasTag("Poison") then BuffEffectsUtil:Poison(char, monster, 1, 6, true) end
+    if dmgPart:HasTag("Burn") then BuffEffectsUtil:Burn(char, monster, 1, true) end
+    if dmgPart:HasTag("Poison") then BuffEffectsUtil:Poison(char, monster, 1, true) end
 
     --- defense reduce
     dmg = floor(dmg * (100 - char:GetAttribute("Defense")) / 100)

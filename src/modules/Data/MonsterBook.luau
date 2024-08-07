@@ -116,6 +116,17 @@ local MonsterBook = {
             CrimsonSlimeFang = 10
         }
     },
+    SkyboundSlime = {
+        Name = "Skybound Slime",
+        Icon = "rbxassetid://18831198702",
+        IdleAnim = "SlimeIdle",
+        BadgeId = 1686200209412673,
+
+        Drops = {
+            CrimsonSlimeCore = 90,
+            CrimsonSlimeFang = 10
+        }
+    }
 }
 
 return MonsterBook

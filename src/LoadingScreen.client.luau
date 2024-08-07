@@ -6,7 +6,6 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local RepS = game:GetService("ReplicatedStorage")
 local SG = game:GetService("StarterGui")
-local SoundS = game:GetService("SoundService")
 local TS = game:GetService("TweenService")
 
 local plr = Players.LocalPlayer
@@ -116,9 +115,15 @@ local function storylineSetup()
 
     local Signals = require(RepS.Modules.Data.Signals)
 
-    SoundS:WaitForChild("Musics", 999).Volume = 0
-    workspace:WaitForChild("Sounds", 999).Overworld:Stop()
+    local sound = workspace:WaitForChild("Sounds", 999).Overworld :: Sound
+    local playThread = task.spawn(function()
+        while true do
+            task.wait()
+            sound.Volume = 0
+        end
+    end)
     workspace.Sounds.StoryMusics.Cairn:Play()
+
     plr:SetAttribute("InCutscene", true)
 
     -- load white overlay
@@ -140,7 +145,8 @@ local function storylineSetup()
     wait(1)
     local camera = workspace.CurrentCamera
     camera.CameraType = Enum.CameraType.Scriptable
-    camera.CFrame = cfNew(-10015, 55.3, 9989.6, -0.722, 0.0125, 0.69, -0, 1, -0.018, -0.691, -0.013, -0.721)
+    camera.CameraSubject = workspace:WaitForChild("Maps", 999).StartCutscene.CameraLocator1
+    camera.CFrame = workspace.Maps.StartCutscene.CameraLocator1.CFrame
 
     plr:FindFirstChildOfClass("PlayerGui"):WaitForChild("NPCChat", 999)
 
@@ -155,5 +161,9 @@ local function storylineSetup()
 
     Debris:AddItem(cutsceneUI, 1)
     TS:Create(cutsceneBG, tweenInfoNew(1), { BackgroundTransparency = 1 }):Play()
+
+    Signals.StoryMain1:Once(function()
+        if playThread then task.cancel(playThread) end
+    end)
 end
 storylineSetup()

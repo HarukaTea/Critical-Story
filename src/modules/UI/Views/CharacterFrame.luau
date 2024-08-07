@@ -50,7 +50,7 @@ local function CharacterFrame(self: table): Frame
 					PanelFilter("Attributes", "Character", self),
 					PanelFilter("Points", "Character", self),
 					PanelFilter("Classes", "Character", self),
-					PanelFilter("Talents", "Character", self)
+					--PanelFilter("Talents", "Character", self)
 				}
 			}),
 			Fusion.New(scope, "Frame")({
@@ -90,6 +90,7 @@ local function CharacterFrame(self: table): Frame
 								Name = "EXPBar",
 								Size = fromScale(1, 0.02),
 								LayoutOrder = 2,
+								BackgroundTransparency = 0,
 
 								[Children] = {
 									Components.RoundUICorner(scope),

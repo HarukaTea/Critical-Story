@@ -26,7 +26,7 @@ Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.AnimeExplosion })
 Events.PlayAnimation.Fire(plr, { AnimId = "MagicCastedAnim1" })
 Events.PlaySound.Fire(plr, { Sound = workspace.Sounds.SFXs.Explosion })
 
-BuffEffectsUtil:Burn(char, monster, 1, 6)
+BuffEffectsUtil:Burn(char, monster, 1)
 
 local explosion = RepS.Package.MagicAssets.HolySmite.Explosion:Clone() :: BasePart
 explosion.CFrame = monster.PrimaryPart.CFrame

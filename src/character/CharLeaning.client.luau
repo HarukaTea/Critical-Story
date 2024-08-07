@@ -25,7 +25,7 @@ local cfAngles = CFrame.Angles
 
 Add(RS.PostSimulation:Connect(function(deltaTime)
 	local direction = HRP.CFrame:VectorToObjectSpace(humanoid.MoveDirection)
-	local momentum = HRP.CFrame:VectorToObjectSpace(HRP.AssemblyLinearVelocity) * MOMENTUM_FACTOR
+	local momentum = HRP.CFrame:VectorToObjectSpace(HRP.Velocity) * MOMENTUM_FACTOR
 
 	momentum = v3New(clamp(abs(momentum.X), MIN_MOMENTUM, MAX_MOMENTUM), 0, clamp(abs(momentum.Z), MIN_MOMENTUM, MAX_MOMENTUM))
 

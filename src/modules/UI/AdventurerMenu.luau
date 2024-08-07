@@ -16,7 +16,9 @@ local Signals = require(RepS.Modules.Data.Signals)
 local Pinia = require(RepS.Modules.UI.Pinia.AdventurerMenuPinia)
 
 local CharacterFrame = require(RepS.Modules.UI.Views.CharacterFrame)
+local DonationFrame = require(RepS.Modules.UI.Views.DonationFrame)
 local SettingsFrame = require(RepS.Modules.UI.Views.SettingsFrame)
+local QuestsFrame = require(RepS.Modules.UI.Views.QuestListFrame)
 
 local ExCategoryBottomBtns = require(RepS.Modules.UI.Components.ExCategoryBottomBtns)
 local ExCategoryTitle = require(RepS.Modules.UI.Components.ExCategoryTitle)
@@ -57,13 +59,16 @@ return function(plr: Player)
 				[Children] = {
 					CharacterFrame(self),
 					SettingsFrame(self),
+					QuestsFrame(self),
+
+					DonationFrame(self),
 
 					ExCategoryTitle("Menu", self),
 					ExCategoryBottomBtns("Left", self, {
 						FilterButton("Character", self),
 						FilterButton("Settings", self),
 						FilterButton("Quests", self),
-						FilterButton("Guild", self),
+						--FilterButton("Guild", self),
 						FilterButton("Donation", self)
 					})
 				}
@@ -238,6 +243,9 @@ return function(plr: Player)
 		end,
 		["Attr-TreeOptimizations"] = function(state: boolean)
 			playerSettings.TreeOptimizations:set(state)
+		end,
+		["Attr-HideRole"] = function(state: boolean)
+			playerSettings.HideRole:set(state)
 		end
 	}))
 
@@ -248,6 +256,24 @@ return function(plr: Player)
 		end
 	end
 	table.insert(scope, HarukaLib:Hydrate(plr, classUnlocksListener))
+
+	local function updateDonationList()
+		wait()
+		self.donationList:set(workspace.MapComponents.Donations:GetChildren())
+	end
+	table.insert(scope, workspace.MapComponents.Donations.ChildAdded:Connect(updateDonationList))
+	table.insert(scope, workspace.MapComponents.Donations.ChildRemoved:Connect(updateDonationList))
+	updateDonationList()
+
+	local function updateQuests()
+        wait()
+        self.questList:set(plr.Quests:GetChildren())
+		self.questRewardsList:set({})
+		self.questDesc:set("")
+    end
+    table.insert(scope, plr.Quests.ChildAdded:Connect(updateQuests))
+    table.insert(scope, plr.Quests.ChildRemoved:Connect(updateQuests))
+	updateQuests()
 
 	--// Clear
 	local function _clearGarbage()

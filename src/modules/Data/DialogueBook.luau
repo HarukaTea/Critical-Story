@@ -90,50 +90,6 @@ DialogueBook.Pioxit = {
 }
 
 --// Town
-DialogueBook.FChenP = {
-    ---// Monolith Grove
-    Town1 = {
-        "I guess you haven't completed it, right?"
-    },
-    Town2 = {
-        "Great work! Thanks for the help!"
-    },
-
-    Else = {
-        "Hi, explorer, could you do me a favor?",
-        "CHOICE 1",
-
-        Choice1 = {
-            "Sure, what is that?",
-            "EXIT Sorry, I'm not ready right now.",
-
-            Option1 = {
-                "The quest is simple, can you bring 6 Spiky Fur?",
-                "CHOICE 2"
-            },
-            Option2 = {
-                "Sure, you can come back whenever you want."
-            }
-        },
-        Choice2 = {
-            "QUEST Sure, I'll do it.",
-            "EXIT I have something else to do.",
-
-            Option1 = {
-                "Alright, I'll wait for you, good luck then!",
-                "QUEST TOWN 1"
-            },
-            Option2 = {
-                "Sure, you can come back whenever you want."
-            }
-        }
-    },
-
-    Extra = {
-        Town2 = "FChenPTown2"
-    }
-}
-
 
 --// Villagers
 DialogueBook.Xiaotie = {
@@ -146,22 +102,6 @@ DialogueBook.Xiaotie = {
     },
 
     Extra = {}
-}
-DialogueBook.Paho = {
-    Main6 = {
-        "You are finally here...are you?",
-        "blah blah blah",
-        "blah blah blah"
-    },
-
-    Else = {
-        "We will definitely meet again in the future...",
-        "in the...futu...."
-    },
-
-    Extra = {
-        Main6 = "PahoFight1"
-    }
 }
 DialogueBook.Fallen1 = {
     Main3 = {

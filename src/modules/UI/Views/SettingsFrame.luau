@@ -110,6 +110,7 @@ local function SettingsFrame(self: table): Frame
 							ListPadding(self),
 
 							SettingToggleBtn("PlayerList", self),
+							SettingToggleBtn("HideRole", self)
 						}
 					}),
 				}

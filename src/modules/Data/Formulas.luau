@@ -3,15 +3,18 @@
 local Formulas = {}
 
 Formulas.EXP = function(level: number) : number
-    return math.floor(777 * math.log10(level) + 300)
+    --// V0.9: return math.floor(777 * math.log10(level) + 300)
+    return math.floor(level ^ 1.65) + 59
 end
 
 Formulas.Gold = function(level: number) : number
-    return math.ceil(5.1599 * level)
+    ---//V0.9: return math.ceil(5.1599 * level)
+    return math.ceil(Formulas.EXP(level) / 1.5)
 end
 
 Formulas.RP = function(level: number) : number
-    return math.ceil(1.599 * level)
+    --//V0.9: return math.ceil(1.599 * level)
+    return math.ceil(Formulas.EXP(level) / 5)
 end
 
 Formulas.MonsterHP = function(level: number) : number
@@ -46,7 +49,7 @@ Formulas.PlayerMana = function(point: number)
 end
 
 Formulas.PointsResetCost = 20
-Formulas.LevelCap = 125
+Formulas.LevelCap = 1100
 Formulas.LevelPerPoint = 2
 
 return Formulas

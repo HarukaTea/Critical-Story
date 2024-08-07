@@ -9,6 +9,7 @@ local slotStats = {
 			RP = 0,
 			PlayTime = 0,
 
+			Cosmetic = "None",
 			Class = "Warrior",
 			LastSeenLocation = "MonolithVillage",
 			LastSeenWorld = "Mainworld",
@@ -25,6 +26,16 @@ local slotStats = {
 			Main = 1,
 			Side = {},
 			Town = {}
+		},
+
+		GamepassOwned = {},
+		Donation = 0,
+
+		Guild = {
+			Name = "",
+			Tier = 1,
+			GuildIcon = "",
+			Infamy = 0
 		},
 
 		Inventory = {},

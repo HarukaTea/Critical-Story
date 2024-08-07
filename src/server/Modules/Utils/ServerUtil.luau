@@ -15,6 +15,7 @@ local MonsterBook = require(RepS.Modules.Data.MonsterBook)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Promise = require(RepS.Modules.Packages.Promise)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local RankBook = require(RepS.Modules.Data.RankBook)
 
 local wait = task.wait
 local floor, random, rad = math.floor, math.random, math.rad
@@ -105,13 +106,14 @@ end
 
 function ServerUtil:EquipArmor(char: Model, armorId: string)
 	if char.Humanoid.Health <= 0 then return end
-	if char:FindFirstChild("Armor") then char.Armor:Destroy() end
-	if not armorId then return end
 
-	--- clear existing weapons
+	--- clear existing armors
+	if char:FindFirstChild("Armor") then char.Armor:Destroy() end
 	for _, child: Instance in char:GetChildren() do
 		if child:HasTag("Weapon") then child:Destroy() end
 	end
+
+	if not armorId then return end
 
 	--- equip armor
 	local armor = RepS.Package.Cosmetics[armorId]:Clone() :: Model
@@ -426,16 +428,21 @@ function ServerUtil:GiveItem(plr: Player, item: string, amount: number)
 		isNew = true
 
 	else
+		local itemType = ItemBook:FindItem(item).Type
+		local maxAmount = 1
+
+		if itemType == "Active" then if not ItemBook:FindItem(item).IsSkill then maxAmount = 999 end end
+		if itemType == "Material" then maxAmount = 999 end
+
 		local intValue = instanceNew("IntConstrainedValue")
 		intValue.Name = item
-		intValue.MaxValue = if ItemBook:FindItem(item).IsSkill then 1 else 999
+		intValue.MaxValue = maxAmount
 		intValue.Value = amount
 		intValue.Parent = inventoryFolder
 	end
 
-	local itemAcquiredEffect = RepS.Package.Effects.ItemAcquiredEffect:Clone() :: BasePart
-	itemAcquiredEffect.CFrame = plr.Character.PrimaryPart.CFrame
-	itemAcquiredEffect.Parent = workspace
+	local itemAcquiredEffect = RepS.Package.Effects.ItemAcquiredEffect:Clone() :: ParticleEmitter
+	itemAcquiredEffect.Parent = plr.Character.PrimaryPart
 	Debris:AddItem(itemAcquiredEffect, 1)
 
 	Events.GiveDrop.Fire(plr, { ItemId = item, Amount = amount, IsNew = isNew })
@@ -554,6 +561,25 @@ function ServerUtil:GiveBadge(badgeInfo: table, plr: Player, extraFunc: () -> ()
 			if extraFunc then extraFunc() end
 		end)
 	end)
+end
+
+
+function ServerUtil:SetRole(plr: Player)
+	local function _setCustomRole()
+		local rank = plr:GetRankInGroup(16912246)
+		plr:SetAttribute("Rank", rank)
+
+		if RankBook.RankRoleInfo[rank] then plr:SetAttribute("Role", RankBook.RankRoleInfo[rank].Role) end
+		if RankBook.CustomRoleInfo[tostring(plr.UserId)] then plr:SetAttribute("Role", RankBook.CustomRoleInfo[tostring(plr.UserId)].Role) end
+	end
+	Promise.new(function(resolve)
+		local hasBadge = BadgeService:UserHasBadgeAsync(plr.UserId, 2129794607)
+
+		if hasBadge then plr:SetAttribute("Role", "Alpha Tester") end
+
+		resolve()
+
+	end):andThen(_setCustomRole):catch(_setCustomRole)
 end
 
 return ServerUtil

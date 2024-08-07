@@ -52,7 +52,7 @@ local function ProgressCircle(direction: string, effect: Script, info: table) : 
 end
 
 local function EffectIndicator(effect: Script, scope: Fusion.Scope) : ImageLabel
-	local maxDuration = effect:GetAttribute("MaxDuration")
+	local maxDuration = effect:GetAttribute("MaxDuration") or 0.1
 	local percentage = Fusion.Value(scope, 1)
 	Spawn(function()
 		for _ = maxDuration, 0.1, -0.1 do

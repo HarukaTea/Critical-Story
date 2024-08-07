@@ -35,8 +35,13 @@ local function _spawnOrb()
         if class == "Alchemist" then
             orb = orbAttack["AlchemistOrb" .. random(1, 3)]:Clone() :: Model
         else
-            orb = orbAttack[class .. "Orb"]:Clone() :: Model
+            if not orbAttack:FindFirstChild(class.."Orb") then
+                orb = orbAttack.RepeaterOrb:Clone() :: Model
+            else
+                orb = orbAttack[class .. "Orb"]:Clone() :: Model
+            end
         end
+
         _placeOrb(orb, ServerUtil:GenerateOrbPos(monster.Value))
     end
 end

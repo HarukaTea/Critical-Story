@@ -16,8 +16,10 @@ local humanoid = char.Humanoid :: Humanoid
 local isRiding = false
 local curvePointsSet = {}
 
+if not workspace:WaitForChild("MapComponents", 999):FindFirstChild("Ziplines") then return end
+
 local function setupZipline()
-    for _, child: Instance in workspace:WaitForChild("MapComponents", 999).Ziplines:GetDescendants() do
+    for _, child: Instance in workspace.MapComponents.Ziplines:GetDescendants() do
         if child:HasTag("Zipline") and child:IsA("Model") then
             --- sort points
             local points = {} :: { BasePart }
