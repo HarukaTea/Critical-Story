@@ -31,17 +31,29 @@ local MonsterBook = {
             SpikyQuills = 40
         }
     },
+    ElderWolf = {
+        Name = "Elder Wolf",
+        Icon = "rbxassetid://18857836675",
+        IdleAnim = "SpikeWolfIdle",
+
+        Drops = {
+            ElderWolfFur = 60,
+            ElderWolfQuills = 40
+        }
+    },
     HardmodeWolf = {
         Name = "Hardmode Wolf",
         Icon = "rbxassetid://15688333545",
         IdleAnim = "SpikeWolfIdle",
-        BadgeId = 2212542348620168,
+        --// V0.9: BadgeId = 2212542348620168,
+        BadgeId = 3730879662265300,
 
         Drops = {
             BlackFur = 90,
             BlackwolfNecklace = 10
         }
     },
+
 
     Kitsune = {
         Name = "Kitsune",
@@ -57,7 +69,17 @@ local MonsterBook = {
         Name = "Stalker",
         Icon = "rbxassetid://17543156640",
         IdleAnim = "None",
-        BadgeId = 3246343070171491,
+        --// V0.9: BadgeId = 3246343070171491,
+
+        Drops = {
+            StalkerLeaf = 60,
+            StalkerLog = 40,
+        }
+    },
+    FrozenStalker = {
+        Name = "Frozen Stalker",
+        Icon = "",
+        IdleAnim = "None",
 
         Drops = {
             StalkerLeaf = 60,
@@ -77,43 +99,54 @@ local MonsterBook = {
     },
     BlueSlime = {
         Name = "Blue Slime",
-        Icon = "rbxassetid://16483649460",
+        Icon = "",
         IdleAnim = "SlimeIdle",
 
         Drops = {
             SlimeGel = 70,
-            SlimeCore = 30
+            HealthPotion = 30
         }
     },
     LapisSlime = {
         Name = "Lapis Slime",
-        Icon = "rbxassetid://16483649287",
+        Icon = "",
         IdleAnim = "SlimeIdle",
 
         Drops = {
             SlimeGel = 60,
-            SlimeCore = 40
+            HealthPotion = 40
         }
     },
     PurpleSlime = {
         Name = "Purple Slime",
-        Icon = "rbxassetid://16483649160",
+        Icon = "rbxassetid://18859513334",
         IdleAnim = "SlimeIdle",
 
         Drops = {
             SlimeGel = 50,
-            SlimeCore = 50
+            MagicPotion = 50
         }
     },
     CrimsonSlime = {
         Name = "Crimson Slime",
         Icon = "rbxassetid://17543155439",
         IdleAnim = "SlimeIdle",
-        BadgeId = 2422984775435251,
+        --// V0.9: BadgeId = 2422984775435251,
+        BadgeId = 3235712599678594,
 
         Drops = {
             CrimsonSlimeCore = 90,
             CrimsonSlimeFang = 10
+        }
+    },
+    IceSlime = {
+        Name = "Ice Slime",
+        Icon = "",
+        IdleAnim = "SlimeIdle",
+
+        Drops = {
+            IceSlimeCore = 50,
+            IceCandy = 50
         }
     },
     SkyboundSlime = {
@@ -123,8 +156,8 @@ local MonsterBook = {
         BadgeId = 1686200209412673,
 
         Drops = {
-            CrimsonSlimeCore = 90,
-            CrimsonSlimeFang = 10
+            SlimeGel = 50,
+            SlimeCore = 50
         }
     }
 }

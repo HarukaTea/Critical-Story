@@ -108,13 +108,12 @@ function BuffEffectsUtil:Burn(char: Model, monster: Model, level: number, isPlay
 	if isPlayer then
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 4))
-		debuff:SetAttribute("Power", level)
 		debuff:SetAttribute("IsPlayer", true)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
-		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 4))
-		debuff:SetAttribute("Power", level)
+		debuff:SetAttribute("Damage", floor(char:GetAttribute("Magic") / 4.5))
 	end
+	debuff:SetAttribute("Power", level)
 	debuff:SetAttribute("MaxDuration", 6)
 	debuff:SetAttribute("Color", fromRGB(255, 85, 0))
 	debuff:SetAttribute("Text", "BURN!")
@@ -131,13 +130,12 @@ function BuffEffectsUtil:Poison(char: Model, monster: Model, level: number, isPl
 	if isPlayer then
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
 		debuff:SetAttribute("Damage", floor(monster:GetAttribute("Damage") / 4))
-		debuff:SetAttribute("Power", level)
 		debuff:SetAttribute("IsPlayer", true)
 	else
 		debuff = SS.Resources.Unloads.DOTDMG:Clone()
-		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 4))
-		debuff:SetAttribute("Power", level)
+		debuff:SetAttribute("Damage", floor(char:GetAttribute("MaxDMG") / 4.5))
 	end
+	debuff:SetAttribute("Power", level)
 	debuff:SetAttribute("MaxDuration", 6)
 	debuff:SetAttribute("Color", fromRGB(55, 66, 250))
 	debuff:SetAttribute("Text", "POISON!")

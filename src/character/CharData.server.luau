@@ -116,6 +116,12 @@ Spawn(classAttributesSetup)
 
 
 local function charAttributesSetup()
+    local function hpCheck()
+        local hp = char.Humanoid.Health :: number
+        local maxHP = char.Humanoid.MaxHealth :: number
+
+        if hp > maxHP then char.Humanoid.Health = maxHP end
+    end
     local function manaCheck(mana: number)
         local maxMana = char:GetAttribute("MaxMana") :: number
 
@@ -218,6 +224,9 @@ local function charAttributesSetup()
                 plr:SetAttribute("EXP", 0)
                 return
             end
+            if level >= 949 then
+                ServerUtil:GiveBadge({ 2132605760 }, plr)
+            end
 
             lvUpCD = true
             Signals.LevelUp:Fire(plr)
@@ -239,8 +248,8 @@ local function charAttributesSetup()
     end
     local function spawnProtect()
         BuffEffectsUtil:SpeedBuff(char, 1.15, 4, true)
-        BuffEffectsUtil:HealBuff(char, 1, false)
-        BuffEffectsUtil:ManaBuff(char, 1)
+        BuffEffectsUtil:HealBuff(char, 2, false)
+        BuffEffectsUtil:ManaBuff(char, 2)
     end
 
     --// Setups
@@ -299,6 +308,10 @@ local function charAttributesSetup()
                 healthRecover()
             end
         end
+    }))
+    Add(HarukaLib:Hydrate(char.Humanoid, {
+        ["Prop-MaxHealth"] = hpCheck,
+        ["Prop-Health"] = hpCheck
     }))
 
     Spawn(spawnProtect)

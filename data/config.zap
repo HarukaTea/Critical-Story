@@ -50,7 +50,7 @@ event ClientTween = {
     type: Reliable,
     call: SingleAsync,
     data: struct {
-        Objs: Instance[]?,
+        Objs: unknown,
         Goal: unknown,
         TweenInfo: string,
         UseHarukaTween: boolean?

@@ -161,7 +161,7 @@ Events.MonsterTakeDMG.SetCallback(function(plr, data)
 				["None"] = 100 - charCurrentChance
 			})
 
-			if result == extraAttacks[i].."Chance" then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 6) end
+			if result == extraAttacks[i].."Chance" then BuffEffectsUtil[extraAttacks[i]](BuffEffectsUtil, char, monster, 1) end
 		end
 	end)
 end)

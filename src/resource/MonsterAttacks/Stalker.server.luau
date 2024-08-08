@@ -1,11 +1,9 @@
 --!nocheck
 
-local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local wait = task.wait
 local cfNew, cfAngles = CFrame.new, CFrame.Angles
@@ -14,53 +12,61 @@ local v3New = Vector3.new
 
 local monster = script.Parent :: Model
 
-local function stalkerShot(target: Model)
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
+local STALKER_SP_PROJECTILE = monster:GetAttribute("SPProjectile") :: string
 
-	local blast = RepS.Package.MonsterAttacks.WoodLand.Stalker1:Clone() :: Model
+local function lookAt(target: Model)
+	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
+	monster.PrimaryPart.Orientation *= v3New(0, 1, 1)
+end
+
+local function stalkerShot(target: Model)
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
+
+	local blast: Model
+	if STALKER_SP_PROJECTILE then
+		blast = RepS.Package.MonsterAttacks.WoodLand[STALKER_SP_PROJECTILE].Stalker1:Clone() :: Model
+	else
+		blast = RepS.Package.MonsterAttacks.WoodLand.Stalker1:Clone() :: Model
+	end
 	blast.Owner.Value = monster
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector) * cfNew(random(-10,10), 0, random(-10,10)))
 	blast.Parent = monster.AttackHolder.Value
 end
 
-local function stalkerRain(target: Model)
-	local rangePos = ServerUtil:FindPartOnRay(target.PrimaryPart.Position + v3New(random(-15, 15), 10, random(-15, 15)))
+local function stalkerBite(target: Model)
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
 
-	local rangeTip = RepS.Package.MonsterAttacks.Wolf.SpikeWolf2Range:Clone() :: Part
-	rangeTip.Position = rangePos
-	rangeTip.Owner.Value = monster
-	rangeTip.Parent = monster.AttackHolder.Value
+	lookAt(target)
 
-	Debris:AddItem(rangeTip, 1)
+	local blast = RepS.Package.MonsterAttacks.WoodLand.StalkerBite:Clone() :: Model
+	blast.Owner.Value = monster
+	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector) * cfNew(0, 3, 0))
+	blast:PivotTo(cfNew(blast.Base.Position, monster.PrimaryPart.Position))
+	blast:PivotTo(blast.Base.CFrame * cfAngles(0, rad(random(-180, 180)), 0))
+	blast.Parent = monster.AttackHolder.Value
 
-	Spawn(function()
-		wait(0.5)
-		for _ = 1, random(5, 6) do
-			local post = ServerUtil:FindPartOnRay(rangePos + v3New(random(-15, 15), 10, random(-15, 15)))
-
-			local blast = RepS.Package.MonsterAttacks.WoodLand.StalkerRainball:Clone() :: Model
-			blast:PivotTo(cfNew(post, post + blast.Base.CFrame.LookVector))
-			blast:PivotTo(cfNew(post) * cfAngles(0, rad(random(1, 360)), 0))
-			blast.Owner.Value = monster
-			blast.Parent = monster.AttackHolder.Value
-
-			Debris:AddItem(blast, 10)
-		end
-	end)
+	local blast2 = RepS.Package.MonsterAttacks.WoodLand.StalkerBite:Clone() :: Model
+	blast2.Owner.Value = monster
+	blast2:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector) * cfNew(0, 3, 0) * CFrame.fromEulerAnglesXYZ(90, 0, 0))
+	blast2:PivotTo(cfNew(blast2.Base.Position, monster.PrimaryPart.Position))
+	blast2:PivotTo(blast2.Base.CFrame * cfAngles(0, rad(random(-180, 180)), 0))
+	blast2.Parent = monster.AttackHolder.Value
 end
 
 local function attacking()
 	ServerUtil.MobBehaviorTree(monster, {
 		function (target: Model) : boolean
-			for _ = 1, random(3, 8) do
+			for _ = 1, 16 do
 				stalkerShot(target)
-				wait(0.2)
+				wait(0.03)
 			end
 		end,
 
 		function (target: Model) : boolean
-			stalkerRain(target)
-			wait(1)
+			for _ = 1, 2 do
+				stalkerBite(target)
+				wait(0.6)
+			end
 		end
 	})
 end

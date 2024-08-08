@@ -17,7 +17,7 @@ local v3New = Vector3.new
 
 
 local function moving(target: Model)
-	local post = ServerUtil:FindPartOnRay(monster.Parent.Position + v3New(random(-32,32), 0, random(-32,32)))
+	local post = ServerUtil:FindPartOnRay(monster.Parent.Position + v3New(random(-32,32), 0, random(-32,32)), { target })
 
 	monster:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector) * cfNew(0, 1.5, 0))
 	monster:PivotTo(cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position))
@@ -40,7 +40,7 @@ end
 local function bite(target)
 	wolfBiteAnim:Play()
 
-	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position)
+	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
 
 	monster:PivotTo(cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position))
 	monster.PrimaryPart.Orientation *= v3New(0, 1, 1)
@@ -60,7 +60,7 @@ local function attacking()
 				wait(0.2)
 			end
 
-			return false
+			return true
 		end,
 
 		function (target: Model) : boolean
@@ -71,7 +71,7 @@ local function attacking()
 		end,
 
 		function (target: Model) : boolean
-			for _ = 1,3 do
+			for _ = 1, 3 do
 				bite(target)
 				wait(0.2)
 			end

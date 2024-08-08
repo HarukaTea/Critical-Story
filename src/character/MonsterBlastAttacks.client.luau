@@ -1,7 +1,6 @@
 --!nocheck
 
 local CS = game:GetService("CollectionService")
-local Debris = game:GetService("Debris")
 local RepS = game:GetService("ReplicatedStorage")
 local RS = game:GetService("RunService")
 local TS = game:GetService("TweenService")
@@ -52,6 +51,20 @@ local function wolfBite(blast: Model)
 	HarukaLib:Tween(blast.Fang2, AssetBook.TweenInfos.twiceHalf, { Pivot = blast.Fang2.Base.CFrame * CFrame.new(0, 0, -6) })
 end
 
+local function stalkerBite(blast: Model)
+	blast.WolfSound:Play()
+
+	TS:Create(blast.Fang1.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
+	TS:Create(blast.Fang2.Part, AssetBook.TweenInfos.half, { Transparency = 0 }):Play()
+
+	wait(0.5)
+	local spin = if math.random(1, 2) == 1 then 10 else -10
+
+	HarukaLib:Tween(blast, AssetBook.TweenInfos.fourOneHalf, { Pivot = blast.Base.CFrame * CFrame.Angles(0, spin, 0) })
+	HarukaLib:Tween(blast.Fang1, AssetBook.TweenInfos.fourOneHalf, { Pivot = blast.Fang1.Base.CFrame * CFrame.new(0, 0, -24) })
+	HarukaLib:Tween(blast.Fang2, AssetBook.TweenInfos.fourOneHalf, { Pivot = blast.Fang2.Base.CFrame * CFrame.new(0, 0, -24) })
+end
+
 
 --// Slimes
 local function slimeShot(blast: Model, monster: Model)
@@ -95,21 +108,18 @@ local function slimeBlastFade(blast: Model)
 	end
 end
 
-local function slimeDive(blast: Model)
-	blast.SlimeAttack:Play()
-
-	for i = 1, 2 do
-		local size = if i == 1 then Vector3.new(20, 1, 20) else Vector3.new(4, 1, 4)
-
-		TS:Create(blast["Position" .. i], AssetBook.TweenInfos.twiceHalf, { Size = size }):Play()
-	end
-end
-
 local function slimeSpin(blast: Model)
 	TS:Create(blast.Blast1, AssetBook.TweenInfos.twiceHalf, { Size = v3New(16, 16, 16) }):Play()
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Size = v3New(22, 26, 26) }):Play()
 	TS:Create(blast.Blast1, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 	TS:Create(blast.Blast2, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
+end
+
+local function skyboundSlimeLaser(blast: Model)
+	blast.PrimaryPart.Transparency = 0
+
+	wait(0.2)
+	TS:Create(blast.PrimaryPart, AssetBook.TweenInfos.twiceHalf, { Transparency = 1 }):Play()
 end
 
 
@@ -137,9 +147,8 @@ local function vfxHandler(blast: Model | BasePart)
 		elseif style == "SpikeWolf4" then
 			wolfBite(blast)
 
-		elseif style == "SpikeWolf5" then
-			spikeShot(blast)
-
+		elseif style == "StalkerBite" then
+			stalkerBite(blast)
 
 
 		elseif style == "Slime1" then
@@ -149,13 +158,6 @@ local function vfxHandler(blast: Model | BasePart)
 			wait(0.5)
 			slimeWave(blast)
 
-		elseif style == "Slime3" then
-			wait(0.5)
-			slimeDive(blast)
-
-		elseif style == "Slime4" then
-			slimeShot(blast, blast.Owner.Value)
-
 		elseif style == "SlimeSpin" then
 			slimeSpin(blast)
 
@@ -164,6 +166,9 @@ local function vfxHandler(blast: Model | BasePart)
 
 			wait(8)
 			slimeBlastFade(blast)
+
+		elseif style == "SkyboundSlime1Laser" then
+			skyboundSlimeLaser(blast)
 		end
 	end)
 

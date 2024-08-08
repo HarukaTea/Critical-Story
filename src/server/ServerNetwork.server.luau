@@ -7,7 +7,6 @@ local SSS = game:GetService("ServerScriptService")
 local SS = game:GetService("ServerStorage")
 local TeleS = game:GetService("TeleportService")
 
-local AssetBook = require(RepS.Modules.Data.AssetBook)
 local DialogueBook = require(RepS.Modules.Data.DialogueBook)
 local Events = require(SSS.Modules.Data.ServerEvents)
 local Formula = require(RepS.Modules.Data.Formulas)
@@ -61,21 +60,22 @@ local function promptsHandler(prompt: ProximityPrompt, plr: Player)
 		Events.EnterShopping.Fire(plr, { Items = items })
 
 	elseif prompt.Name == "Travel" then
-		local world = prompt:GetAttribute("Destination") :: string
-		local worldId = AssetBook.WorldInfo[world]
-
 		if prompt:GetAttribute("Require") then
 			if not plr.Inventory:FindFirstChild(prompt:GetAttribute("Require")) then
-				Events.CreateHint.Fire(plr, { Hint = "You don't have a ticket!" })
+				Events.CreateHint.Fire(plr, { Hint = `You don't have {prompt:GetAttribute("Require")}!` })
 				return
 			end
 		end
-		local joinData = plr:GetJoinData().TeleportData :: table?
-		local slotChosen = if joinData then joinData[1] else "Slot1"
 
-		local teleportOptions = instanceNew("TeleportOptions")
-		teleportOptions:SetTeleportData({ slotChosen })
-		TeleS:TeleportAsync(worldId, { plr }, teleportOptions)
+		Spawn(function()
+			Events.CreateFullScreenHint.Fire(plr, { Hint = "TRAVELLING...", State = true })
+
+			wait(0.5)
+			plr.Character:PivotTo(prompt.Destination.Value.CFrame)
+
+			wait(1)
+			Events.CreateFullScreenHint.Fire(plr, { Hint = "...", State = false })
+		end)
 
 	elseif prompt.Name == "Material" then
 		local hasTool = false

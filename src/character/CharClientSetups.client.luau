@@ -11,6 +11,7 @@ local Signals = require(RepS.Modules.Data.Signals)
 local char = script.Parent :: Model
 local camera = workspace.CurrentCamera
 local musics = workspace:WaitForChild("Sounds", 999) :: Folder
+local mapComponents = workspace:WaitForChild("MapComponents", 999) :: Folder
 local effects = RepS.Package.Effects :: Folder
 
 local fromRGB = Color3.fromRGB
@@ -22,6 +23,8 @@ local function setup()
 	for _, effect: Instance in camera:GetChildren() do
 		if effect:IsA("BlurEffect") or effect:IsA("ColorCorrectionEffect") then effect:Destroy() end
 	end
+	for _, folder: Folder in mapComponents.CombatHolders:GetChildren() do folder:Destroy() end
+	for _, folder: Folder in mapComponents.OrbHolders:GetChildren() do folder:Destroy() end
 
 	ClientUtil:SetAllPromptsState(true)
 

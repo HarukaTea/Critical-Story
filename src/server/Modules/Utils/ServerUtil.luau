@@ -198,7 +198,7 @@ function ServerUtil:SetupMonster(locator: Part, forceLevel: number?) : Model
 
 	monster:SetAttribute("MaxHealth", Formula.MonsterHP(level))
 	monster:SetAttribute("Health", monster:GetAttribute("MaxHealth"))
-	monster:SetAttribute("EXP", floor(Formula.EXP(level) / 5))
+	monster:SetAttribute("EXP", floor(Formula.EXP(level) / 5) * Formula.GlobalEXPMultiplier)
 	monster:SetAttribute("Damage", Formula.MonsterDMG(level))
 	monster:SetAttribute("InCombat", false)
 
@@ -305,12 +305,15 @@ end
 
 
 function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
-	local orbLocation: CFrame
+	local orbLocation = cfNew(0, 0, 0)
+
+	if not monster then return orbLocation end
+	if not monster.PrimaryPart then return orbLocation end
 
 	Promise.new(function(resolve)
 		local position = if monster:GetAttribute("SubMonster") then monster.Parent.Parent.Position else monster.Parent.Position
 		local ray = rayNew(position, cfNew(position, position + v3New(random(-40, 40), 0, random(-40, 40))).LookVector.Unit * random(5, 40))
-		local hit, pos = workspace:FindPartOnRay(ray)
+		local _, pos = workspace:FindPartOnRayWithIgnoreList(ray, workspace.Monsters:GetDescendants())
 
 		resolve(position, pos)
 
@@ -318,8 +321,6 @@ function ServerUtil:GenerateOrbPos(monster: Model) : CFrame
 		orbLocation = cfNew(pos, pos + cfNew(position).LookVector) * cfNew(0, 7.5, math.random(2, 3))
 
 	end):catch(function(err)
-		orbLocation = cfNew(0, 0, 0)
-
 		warn(`[Orb System]: {err}`)
 	end)
 
@@ -505,7 +506,7 @@ function ServerUtil:FindPartOnRay(givenPos: Vector3, ignoreList: table?) : Vecto
 	while wait() do
 		local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
 		if hit then
-			if not (hit.Parent:HasTag("Terrain") or hit.Parent.Name == "Terrain")
+			if not hit.Parent:HasTag("Terrain")
 				or not hit.CanCollide
 				or hit.Transparency >= 0.5 then
 

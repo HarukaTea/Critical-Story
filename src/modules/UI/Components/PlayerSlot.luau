@@ -23,6 +23,8 @@ local function PlayerSlot(self: table, player: Player, scope: Fusion.Scope): Fra
 
 	scope[#scope + 1] = HarukaLib:Hydrate(player, {
 		["Attr-Class"] = function(newClass: string)
+			if newClass == nil then return end
+
 			class:set(newClass)
 		end
 	})

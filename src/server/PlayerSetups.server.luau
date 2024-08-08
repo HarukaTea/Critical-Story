@@ -136,7 +136,7 @@ local function setup(plr: Player)
 			intValue.Parent = questsData
 		end
 		for questType: string, questId: number in data.QuestsV3 do
-			if StoryBook[questType][questId] == nil then continue end
+			if StoryBook[questType][questId] == nil and questType ~= "Main" then continue end
 
 			if questType == "Town" or questType == "Side" then
 				for _, separateQuest: number in questId do
@@ -258,6 +258,8 @@ local function setup(plr: Player)
 	--// Assign role
 	Spawn(function()
 		ServerUtil:SetRole(plr)
+
+		ServerUtil:GiveBadge({ 2129794618 }, plr)
 	end)
 
 	--// apply all old badges: V0.9

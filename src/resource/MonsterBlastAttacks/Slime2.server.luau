@@ -7,7 +7,6 @@ local SSS = game:GetService("ServerScriptService")
 local AssetBook = require(ReplicatedStorage.Modules.Data.AssetBook)
 local HarukaLib = require(ReplicatedStorage.Modules.Packages.HarukaLib)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
-local Spawn = require(ReplicatedStorage.Modules.Packages.Spawn)
 
 local model = script.Parent :: Model
 local char = model.Owner.Value :: Model
@@ -39,7 +38,7 @@ pcall(function()
 			if child.Name == "Position"..i then
 				local post = ServerUtil:FindPartOnRay(child.Position + v3New(0, 10, 0), { model })
 
-				Spawn(function()
+				task.spawn(function()
 					local blast = model.Projectile.Value:Clone()
 					blast.Owner.Value = model.Owner.Value
 					blast:PivotTo(cfNew(post, post + child.CFrame.LookVector) * CFrame.Angles(0, math.rad(math.random(1, 360)), 0))
@@ -63,4 +62,3 @@ pcall(function()
 		end
 	end
 end)
-

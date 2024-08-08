@@ -259,6 +259,8 @@ return function(plr: Player)
 
 	local function updateDonationList()
 		wait()
+		if not self then return end
+
 		self.donationList:set(workspace.MapComponents.Donations:GetChildren())
 	end
 	table.insert(scope, workspace.MapComponents.Donations.ChildAdded:Connect(updateDonationList))

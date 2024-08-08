@@ -18,6 +18,7 @@ local random = math.random
 local v3New = Vector3.new
 
 local SLIME_COLOR = monster:GetAttribute("SlimeColor")
+local SLIME_SP_PROJECTILE = monster:GetAttribute("SPProjectile")
 
 local function lookAt(target: Model)
 	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
@@ -27,7 +28,6 @@ end
 local function slimeShot(target: Model)
 	blastAnim:Play()
 
-	--- shot
 	local post = ServerUtil:FindPartOnRay(target.PrimaryPart.Position, { target })
 
 	local blast = RepS.Package.MonsterAttacks.Slime.Slime1:Clone() :: Model
@@ -35,9 +35,7 @@ local function slimeShot(target: Model)
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	if monster:GetAttribute("SPProjectile") then
-		blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
-	end
+	if SLIME_SP_PROJECTILE then blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[SLIME_SP_PROJECTILE] end
 
 	blast.Parent = monster.AttackHolder.Value
 
@@ -46,7 +44,7 @@ local function slimeShot(target: Model)
 	bv.MaxForce = v3New(1, 1, 1) * math.huge
 	bv.Velocity = v3New(0, 1, 0) * 35
 	bv.Parent = monster.PrimaryPart
-	Debris:AddItem(bv, 0.01)
+	Debris:AddItem(bv, 0.1)
 end
 
 local function slimeWave(target: Model)
@@ -58,9 +56,7 @@ local function slimeWave(target: Model)
 	blast:PivotTo(cfNew(post, post + monster.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	if monster:GetAttribute("SPProjectile") then
-		blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
-	end
+	if SLIME_SP_PROJECTILE then blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[SLIME_SP_PROJECTILE] end
 
 	blast.Parent = monster.AttackHolder.Value
 end
@@ -73,9 +69,7 @@ local function slimeBarrage(target: Model)
 	blast:PivotTo(cfNew(post, post + target.PrimaryPart.CFrame.LookVector))
 
 	blast:SetAttribute("SlimeColor", SLIME_COLOR)
-	if monster:GetAttribute("SPProjectile") then
-		blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
-	end
+	if SLIME_SP_PROJECTILE then blast.Projectile.Value = RepS.Package.MonsterAttacks.Slime[SLIME_SP_PROJECTILE] end
 
 	blast.Parent = monster.AttackHolder.Value
 
@@ -87,9 +81,7 @@ local function slimeBarrage(target: Model)
 		blastR:PivotTo(cfNew(postR, postR + target.PrimaryPart.CFrame.LookVector))
 
 		blastR:SetAttribute("SlimeColor", SLIME_COLOR)
-		if monster:GetAttribute("SPProjectile") then
-			blastR.Projectile.Value = RepS.Package.MonsterAttacks.Slime[monster:GetAttribute("SPProjectile")]
-		end
+		if SLIME_SP_PROJECTILE then blastR.Projectile.Value = RepS.Package.MonsterAttacks.Slime[SLIME_SP_PROJECTILE] end
 
 		blastR.Parent = monster.AttackHolder.Value
 	end
@@ -113,59 +105,28 @@ end
 local function attacking()
 	ServerUtil.MobBehaviorTree(monster, {
 		function (target: Model) : boolean
-			local comboRandom = random(1, 3)
-
-			if comboRandom == 1 then
-				slimeWave(target)
-				wait(1) --- lag fix
-
-			elseif comboRandom == 2 then
-				if monster.Name == "GreenSlime" then return nil end
-
-				slimeBarrage(target)
-
-			else return nil
-			end
-
-			return true
-		end,
-
-		function (target: Model) : boolean
-			if random(1, 2) == 1 then
-				slimeWave(target)
-				wait(1)
-				return true
-			end
-
-			return nil
-		end,
-
-		function (target: Model) : boolean
 			for _ = 1, random(2, 3) do
 				lookAt(target)
 
 				for _ = 1, 3 do
 					slimeShot(target)
-					wait(1)
+					wait(0.8)
 				end
 
 				wait(0.5)
 			end
-
-			return true
 		end,
 
 		function (target: Model) : boolean
 			for _ = 1, random(1, 3) do
 				slimeWave(target)
-				wait(2)
+				wait(1.2)
 			end
-
-			return true
 		end,
 
 		function (target: Model) : boolean
-			if monster.Name == "GreenSlime" then return nil end
+			local blackList = { "GreenSlime", "BlueSlime" }
+			if table.find(blackList, monster.Name) then return true end
 
 			for _ = 1, random(2,4) do
                 slimeBarrage(target)

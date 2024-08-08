@@ -51,5 +51,6 @@ end
 Formulas.PointsResetCost = 20
 Formulas.LevelCap = 1100
 Formulas.LevelPerPoint = 2
+Formulas.GlobalEXPMultiplier = 21
 
 return Formulas

@@ -43,6 +43,8 @@ local function refreshLeaderboard()
 
     local top50 = _getTop50Players()
     for rank: number, data: table in ipairs(top50) do
+        if (data.Donation or 0) <= 0 then continue end
+
         pcall(function()
             local val = Instance.new("IntValue")
             val.Name = data.PlayerId

@@ -13,6 +13,7 @@ local PS = game:GetService("PhysicsService")
 local Cmdr = require(RepS.Modules.Packages.Cmdr)
 local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 local Spawn = require(RepS.Modules.Packages.Spawn)
+local Promise = require(RepS.Modules.Packages.Promise)
 
 local instanceNew = Instance.new
 local wait = task.wait
@@ -53,6 +54,13 @@ local function mainSetup()
 		orbFolder.Name = "OrbHolders"
 		orbFolder.Parent = workspace.MapComponents
 	end)
+
+	--- clear trees
+	for _, obj: Instance in workspace.Maps:GetDescendants() do
+		if obj:IsA("Model") and string.find(obj.Name, "Tree") then
+			obj.Parent = RepS.Debris.Trees
+		end
+	end
 
 	--- clear links
 	Spawn(function()
@@ -255,12 +263,12 @@ local function mainSetup()
 	Spawn(function()
 		if RS:IsStudio() then return end
 
-		local success = pcall(function()
-			local serverInfo = HttpService:GetAsync("https://ipapi.co/json", true)
+		Promise.new(function()
+			local serverInfo = HttpService:GetAsync("https://ipconfig.io/json", false)
 
 			if serverInfo then
-				local realInfo = HttpService:JSONDecode(serverInfo)
-				local serverLocation = realInfo.country
+				local realInfo = HttpService:JSONDecode(serverInfo) :: table
+				local serverLocation = realInfo["country_iso"] :: string
 
 				if serverLocation then
 					RepS.Package.ServerLocation.Value = serverLocation
@@ -268,13 +276,12 @@ local function mainSetup()
 					print("Server Location: "..serverLocation)
 				end
 			end
-		end)
 
-		if not success then
+		end):catch(function()
 			warn("Failed to fetch Server Location.")
 
 			RepS.Package.ServerLocation.Value = "Unknown"
-		end
+		end)
 	end)
 end
 mainSetup()

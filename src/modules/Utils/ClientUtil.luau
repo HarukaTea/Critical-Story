@@ -200,6 +200,7 @@ function ClientUtil:SetupMonster(locator: Part) : Model
 		monster:SetAttribute("SubMonster", true)
 	end
 
+	monster:SetAttribute("WorldDisplay", true)
 	monster:SetAttribute("InCombat", false)
 
 	for _, child: Instance in monster:GetChildren() do

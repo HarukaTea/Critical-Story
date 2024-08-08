@@ -46,8 +46,12 @@ local function changeLocation(location: string)
     --- lighting
     Spawn(function()
         local lightingInfo = LocationBook[location].Lighting
+
         if lightingInfo then TS:Create(Lighting, AssetBook.TweenInfos.one, lightingInfo):Play() end
     end)
+
+    --- extra func
+    plr:SetAttribute("Evernight", if LocationBook[location].Evernight then true else nil)
 end
 Add(HarukaLib:Hydrate(char, {
     ["Attr-CurrentRegion"] = changeLocation
@@ -60,8 +64,6 @@ local currentRegion = HarukaLib:IsInRegion(char.PrimaryPart.Position, workspace.
 char:SetAttribute("CurrentRegion", if currentRegion then currentRegion.Name else nil)
 
 local function dayNightCycle()
-    if workspace:GetAttribute("WorldType") == "Everfrost" then return end
-
     local cycleTime, minutesInADay = 12 * 60, 24 * 60
     local startTime = tick() - (Lighting:GetMinutesAfterMidnight() / minutesInADay) * cycleTime
     local endTime = startTime + cycleTime
@@ -74,6 +76,8 @@ local function dayNightCycle()
             startTime = endTime
             endTime = startTime + cycleTime
         end
+
+        if plr:GetAttribute("Evernight") then Lighting.ClockTime = 0 return end
 
         Lighting:SetMinutesAfterMidnight((currentTime - startTime) * timeRatio)
     end))

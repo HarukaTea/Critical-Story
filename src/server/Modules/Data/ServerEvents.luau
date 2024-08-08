@@ -710,7 +710,7 @@ local returns = table.freeze({
 	}),
 	ClientTween = table.freeze({
 		Fire = function(Player: Player, Value: ({
-			Objs: (({ (Instance) })?),
+			Objs: ((unknown)),
 			Goal: ((unknown)),
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),
@@ -724,13 +724,7 @@ local returns = table.freeze({
 			else
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				local len_1 = #Value.Objs
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
-				for i_1 = 1, len_1 do
-					local val_1 = Value.Objs[i_1]
-					table.insert(outgoing_inst, val_1)
-				end
+				table.insert(outgoing_inst, Value.Objs)
 			end
 			if Value.Goal == nil then
 				alloc(1)
@@ -740,11 +734,11 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				table.insert(outgoing_inst, Value.Goal)
 			end
-			local len_2 = #Value.TweenInfo
+			local len_1 = #Value.TweenInfo
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_2)
-			alloc(len_2)
-			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_2)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
+			alloc(len_1)
+			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_1)
 			if Value.UseHarukaTween == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -757,7 +751,7 @@ local returns = table.freeze({
 			player_map[Player] = save()
 		end,
 		FireAll = function(Value: ({
-			Objs: (({ (Instance) })?),
+			Objs: ((unknown)),
 			Goal: ((unknown)),
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),
@@ -771,13 +765,7 @@ local returns = table.freeze({
 			else
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				local len_1 = #Value.Objs
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
-				for i_1 = 1, len_1 do
-					local val_1 = Value.Objs[i_1]
-					table.insert(outgoing_inst, val_1)
-				end
+				table.insert(outgoing_inst, Value.Objs)
 			end
 			if Value.Goal == nil then
 				alloc(1)
@@ -787,11 +775,11 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				table.insert(outgoing_inst, Value.Goal)
 			end
-			local len_2 = #Value.TweenInfo
+			local len_1 = #Value.TweenInfo
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_2)
-			alloc(len_2)
-			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_2)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
+			alloc(len_1)
+			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_1)
 			if Value.UseHarukaTween == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -811,7 +799,7 @@ local returns = table.freeze({
 			end
 		end,
 		FireExcept = function(Except: Player, Value: ({
-			Objs: (({ (Instance) })?),
+			Objs: ((unknown)),
 			Goal: ((unknown)),
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),
@@ -825,13 +813,7 @@ local returns = table.freeze({
 			else
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				local len_1 = #Value.Objs
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
-				for i_1 = 1, len_1 do
-					local val_1 = Value.Objs[i_1]
-					table.insert(outgoing_inst, val_1)
-				end
+				table.insert(outgoing_inst, Value.Objs)
 			end
 			if Value.Goal == nil then
 				alloc(1)
@@ -841,11 +823,11 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				table.insert(outgoing_inst, Value.Goal)
 			end
-			local len_2 = #Value.TweenInfo
+			local len_1 = #Value.TweenInfo
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_2)
-			alloc(len_2)
-			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_2)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
+			alloc(len_1)
+			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_1)
 			if Value.UseHarukaTween == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -867,7 +849,7 @@ local returns = table.freeze({
 			end
 		end,
 		FireList = function(List: { Player }, Value: ({
-			Objs: (({ (Instance) })?),
+			Objs: ((unknown)),
 			Goal: ((unknown)),
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),
@@ -881,13 +863,7 @@ local returns = table.freeze({
 			else
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				local len_1 = #Value.Objs
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
-				for i_1 = 1, len_1 do
-					local val_1 = Value.Objs[i_1]
-					table.insert(outgoing_inst, val_1)
-				end
+				table.insert(outgoing_inst, Value.Objs)
 			end
 			if Value.Goal == nil then
 				alloc(1)
@@ -897,11 +873,11 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				table.insert(outgoing_inst, Value.Goal)
 			end
-			local len_2 = #Value.TweenInfo
+			local len_1 = #Value.TweenInfo
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_2)
-			alloc(len_2)
-			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_2)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
+			alloc(len_1)
+			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_1)
 			if Value.UseHarukaTween == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)
@@ -921,7 +897,7 @@ local returns = table.freeze({
 			end
 		end,
 		FireSet = function(Set: { [Player]: true }, Value: ({
-			Objs: (({ (Instance) })?),
+			Objs: ((unknown)),
 			Goal: ((unknown)),
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),
@@ -935,13 +911,7 @@ local returns = table.freeze({
 			else
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
-				local len_1 = #Value.Objs
-				alloc(2)
-				buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
-				for i_1 = 1, len_1 do
-					local val_1 = Value.Objs[i_1]
-					table.insert(outgoing_inst, val_1)
-				end
+				table.insert(outgoing_inst, Value.Objs)
 			end
 			if Value.Goal == nil then
 				alloc(1)
@@ -951,11 +921,11 @@ local returns = table.freeze({
 				buffer.writeu8(outgoing_buff, outgoing_apos, 1)
 				table.insert(outgoing_inst, Value.Goal)
 			end
-			local len_2 = #Value.TweenInfo
+			local len_1 = #Value.TweenInfo
 			alloc(2)
-			buffer.writeu16(outgoing_buff, outgoing_apos, len_2)
-			alloc(len_2)
-			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_2)
+			buffer.writeu16(outgoing_buff, outgoing_apos, len_1)
+			alloc(len_1)
+			buffer.writestring(outgoing_buff, outgoing_apos, Value.TweenInfo, len_1)
 			if Value.UseHarukaTween == nil then
 				alloc(1)
 				buffer.writeu8(outgoing_buff, outgoing_apos, 0)

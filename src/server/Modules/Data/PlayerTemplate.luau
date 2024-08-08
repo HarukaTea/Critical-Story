@@ -22,7 +22,7 @@ local slotStats = {
 			ShieldPoints = 0
 		},
 
-		Quests = {
+		QuestsV3 = {
 			Main = 1,
 			Side = {},
 			Town = {}

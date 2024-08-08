@@ -1,113 +1,111 @@
-local char = script.Parent
+--!nocheck
 
-function lookat(target)
-	char.HumanoidRootPart.CFrame = CFrame.new(char.HumanoidRootPart.Position, target.HumanoidRootPart.Position)
-	char.HumanoidRootPart.Orientation = char.HumanoidRootPart.Orientation * Vector3.new(0, 1, 1)
-end
-function attacking()
-	if script.Parent.CanAttack.Value == true then
-		wait(1)
-		if char.TargetPlayers:FindFirstChildOfClass("ObjectValue") then
-			local list = char.TargetPlayers:GetChildren()
-			local target = list[math.random(1, #list)]
+local RepS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
 
-			local attackrandom = math.random(1, 3)
+local ServerUtil = require(SSS.Modules.Utils.ServerUtil)
 
-			if attackrandom == 1 or attackrandom == 2 then
-				local comborandom = math.random(1, 2)
-				if comborandom == 1 then
-					slimecirculate(target.Value)
-					wait(0.5)
-				end
-				for q = 1, math.random(2, 3) do
-					lookat(target.Value)
-					slimerepulseblast(target.Value)
-					wait(0.5)
-				end
-			end
-			if attackrandom == 3 then
-				for i = 1, math.random(1, 3) do
-					slimecirculatedash(target.Value)
-				end
-			end
-			attacking()
-		end
-	else
-		repeat
-			wait(0.5)
-		until script.Parent.CanAttack.Value == true
-		if script.Parent.CanAttack.Value == true then
-			attacking()
-		end
-	end
+local monster = script.Parent :: Model
+
+local wait = task.wait
+local cfNew = CFrame.new
+local random = math.random
+local v3New = Vector3.new
+
+local function lookAt(target: Model)
+	monster.PrimaryPart.CFrame = cfNew(monster.PrimaryPart.Position, target.PrimaryPart.Position)
+	monster.PrimaryPart.Orientation *= v3New(0, 1, 1)
 end
 
-function slimerepulseblast(target)
-	if game.Workspace:FindFirstChild(target.Name) then
-		local blast = game.ReplicatedStorage.Package.MonsterAttacks.ArkusMonsters.SkyboundSlime1:Clone()
+local function slimeRepulseBlast(target: Model)
+	lookAt(target)
+
+	local blast = RepS.Package.MonsterAttacks.Slime.SkyboundSlime1:Clone()
+	blast.Target.Value = target
+	blast.Owner.Value = monster
+	blast.Part.CFrame = monster.PrimaryPart.CFrame
+	blast.Parent = monster.AttackHolder.Value
+end
+
+local function slimeCirculate(target: Model)
+	lookAt(target)
+
+	local angle = 45 + 90
+	for _ = 1, 3 do
+		local blast = RepS.Package.MonsterAttacks.Slime.SkyboundSlime2:Clone()
+		blast.Owner.Value = monster
 		blast.Target.Value = target
-		blast.Owner.Value = char
-		blast.Part.CFrame = char.HumanoidRootPart.CFrame
-		blast.Parent = char.Holder.Value
+		blast:PivotTo(monster.PrimaryPart.CFrame * CFrame.fromEulerAnglesXYZ(0, angle, 0))
+		blast.Parent = monster.AttackHolder.Value
+
+		angle -= 45
+	end
+
+	angle = 265 - 90
+	lookAt(target)
+	for _ = 1, 3 do
+		local blast = RepS.Package.MonsterAttacks.Slime.SkyboundSlime2:Clone()
+		blast.Owner.Value = monster
+		blast.Target.Value = target
+		blast:PivotTo(monster.PrimaryPart.CFrame * CFrame.fromEulerAnglesXYZ(0, angle, 0))
+		blast.Parent = monster.AttackHolder.Value
+
+		angle -= 45
 	end
 end
 
-function slimecirculate(target)
-	if game.Workspace:FindFirstChild(target.Name) then
-		lookat(target)
-		local Angle = 45 + 90
-		for i = 1, 3 do
-			local blast = game.ReplicatedStorage.Package.MonsterAttacks.ArkusMonsters.SkyboundSlimeCirculate:Clone()
-			blast.Owner.Value = char
+local function slimeCirculateDash(target: Model)
+	for _ = 1, 3 do
+		local post = monster.Parent.Position + Vector3.new(random(-32, 32), 0, random(-32, 32))
+
+		monster:PivotTo(cfNew(post))
+		lookAt(target)
+
+		local angle = 60 + 90
+		for _ = 1, 2 do
+			local blast = game.ReplicatedStorage.Package.MonsterAttacks.Slime.SkyboundSlime2:Clone()
+			blast.Owner.Value = monster
 			blast.Target.Value = target
-			blast:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.fromEulerAnglesXYZ(0, Angle, 0))
-			blast.Parent = char.Holder.Value
-			Angle = Angle - 45
+			blast:PivotTo(monster.PrimaryPart.CFrame * CFrame.fromEulerAnglesXYZ(0, angle, 0))
+			blast.Parent = monster.AttackHolder.Value
+
+			angle -= 120
 		end
-		Angle = 265 - 90
-		lookat(target)
-		for i = 1, 3 do
-			local blast = game.ReplicatedStorage.Package.MonsterAttacks.ArkusMonsters.SkyboundSlimeCirculate:Clone()
-			blast.Owner.Value = char
+
+		angle = 280 - 90
+		lookAt(target)
+		for _ = 1, 2 do
+			local blast = game.ReplicatedStorage.Package.MonsterAttacks.Slime.SkyboundSlime2:Clone()
+			blast.Owner.Value = monster
 			blast.Target.Value = target
-			blast:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.fromEulerAnglesXYZ(0, Angle, 0))
-			blast.Parent = char.Holder.Value
-			Angle = Angle - 45
+			blast:PivotTo(monster.PrimaryPart.CFrame * CFrame.fromEulerAnglesXYZ(0, angle, 0))
+			blast.Parent = monster.AttackHolder.Value
+
+			angle -= 120
 		end
+		wait(0.5)
 	end
 end
 
-function slimecirculatedash(target)
-	if game.Workspace:FindFirstChild(target.Name) then
-		for i = 1, 3 do
-			local post = char.Parent.Position + Vector3.new(math.random(-32, 32), 0, math.random(-32, 32))
-			--char:SetPrimaryPartCFrame(CFrame.new(post,post+target.HumanoidRootPart.CFrame.lookVector)*CFrame.new(0,1.5,0)*CFrame.Angles(0,math.random(1,360)*math.pi/180,0)*CFrame.new(0,0,math.random(20,24)))
-			char:SetPrimaryPartCFrame(CFrame.new(post))
-			char:SetPrimaryPartCFrame(CFrame.new(char.HumanoidRootPart.Position, target.HumanoidRootPart.Position))
-
-			local Angle = 60 + 90
-			for i = 1, 2 do
-				local blast = game.ReplicatedStorage.Package.MonsterAttacks.ArkusMonsters.SkyboundSlimeCirculate:Clone()
-				blast.Owner.Value = char
-				blast.Target.Value = target
-				blast:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.fromEulerAnglesXYZ(0, Angle, 0))
-				blast.Parent = char.Holder.Value
-				Angle = Angle - 120
-			end
-			Angle = 280 - 90
-			lookat(target)
-			for i = 1, 2 do
-				local blast = game.ReplicatedStorage.Package.MonsterAttacks.ArkusMonsters.SkyboundSlimeCirculate:Clone()
-				blast.Owner.Value = char
-				blast.Target.Value = target
-				blast:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.fromEulerAnglesXYZ(0, Angle, 0))
-				blast.Parent = char.Holder.Value
-				Angle = Angle - 120
-			end
+local function attacking()
+	ServerUtil.MobBehaviorTree(monster, {
+		function (target: Model) : boolean
+			slimeCirculate(target)
 			wait(0.5)
-		end
-	end
-end
+		end,
 
-wait(0.5)
+		function (target: Model) : boolean
+			for _ = 1, random(2, 3) do
+				slimeRepulseBlast(target)
+				wait(0.5)
+			end
+		end,
+
+		function (target: Model) : boolean
+			for _ = 1, random(1, 3) do
+				slimeCirculateDash(target)
+			end
+		end,
+	})
+end
 attacking()

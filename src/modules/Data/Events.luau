@@ -259,15 +259,8 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			local value
 			value = {}
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
-				value.Objs = {}
-				local len_1 = buffer.readu16(incoming_buff, read(2))
-				for i_1 = 1, len_1 do
-					local val_1
-					incoming_ipos = incoming_ipos + 1
-					val_1 = incoming_inst[incoming_ipos]
-					assert(val_1 ~= nil)
-					value.Objs[i_1] = val_1
-				end
+				incoming_ipos = incoming_ipos + 1
+				value.Objs = incoming_inst[incoming_ipos]
 			else
 				value.Objs = nil
 			end
@@ -277,8 +270,8 @@ reliable.OnClientEvent:Connect(function(buff, inst)
 			else
 				value.Goal = nil
 			end
-			local len_2 = buffer.readu16(incoming_buff, read(2))
-			value.TweenInfo = buffer.readstring(incoming_buff, read(len_2), len_2)
+			local len_1 = buffer.readu16(incoming_buff, read(2))
+			value.TweenInfo = buffer.readstring(incoming_buff, read(len_1), len_1)
 			if buffer.readu8(incoming_buff, read(1)) == 1 then
 				value.UseHarukaTween = buffer.readu8(incoming_buff, read(1)) == 1
 			else
@@ -854,7 +847,7 @@ local returns = table.freeze({
 	}),
 	ClientTween = table.freeze({
 		SetCallback = function(Callback: (({
-			Objs: (({ (Instance) })?),
+			Objs: ((unknown)),
 			Goal: ((unknown)),
 			TweenInfo: (string),
 			UseHarukaTween: ((boolean)?),

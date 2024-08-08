@@ -6,10 +6,13 @@ local AssetBook = require(RepS.Modules.Data.AssetBook)
 local Components = require(RepS.Modules.UI.Vanilla)
 local ClientUtil = require(RepS.Modules.Utils.ClientUtil)
 local Fusion = require(RepS.Modules.Packages.Fusion)
+local HarukaLib = require(RepS.Modules.Packages.HarukaLib)
 local ItemBook = require(RepS.Modules.Data.ItemBook)
 local Spawn = require(RepS.Modules.Packages.Spawn)
 
 local Children = Fusion.Children
+
+local isMobile = HarukaLib:GetDevice() == "Mobile"
 
 local fromScale = UDim2.fromScale
 local v2New = Vector2.new
@@ -71,7 +74,7 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 
 						Transparency = Fusion.Tween(scope, Fusion.Computed(scope, function(use: Fusion.Use)
 							return if use(isSelecting) then 0.3 else 1
-						end), AssetBook.TweenInfos.twiceHalfOne)
+						end), AssetBook.TweenInfos.twiceHalf)
 					}),
 					Components.ImageLabel(scope, {
 						Name = "Icon",
@@ -101,6 +104,8 @@ local function ItemBar(item: string, scope: Fusion.Scope): Frame
 					}),
 
 					Components.HoverImageButton(scope, {
+						Visible = if isMobile then false else true,
+
 						[Fusion.OnEvent("MouseEnter")] = function()
 							isSelecting:set(true)
 						end,

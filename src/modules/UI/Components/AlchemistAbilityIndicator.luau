@@ -11,7 +11,7 @@ local fromScale = UDim2.fromScale
 
 local function AlchemistAbilityIndicator(self: table) : Frame
     local scope = self.scope :: Fusion.Scope
-    local creations = self.char.AlchemistCreations :: Folder
+    local creations = self.char:WaitForChild("AlchemistCreations") :: Folder
 
     local function _handleCreations()
         task.wait()

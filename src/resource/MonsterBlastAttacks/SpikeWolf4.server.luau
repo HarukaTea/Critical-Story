@@ -6,7 +6,8 @@ local wait = task.wait
 
 pcall(function()
     wait(0.5)
-    model:AddTag("MonsterDMG")
+    model.Fang1:AddTag("MonsterDMG")
+    model.Fang2:AddTag("MonsterDMG")
 
     wait(2)
     model:Destroy()

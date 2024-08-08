@@ -54,6 +54,9 @@ local function MonsterBar(monster: Model, self: table, scope: Fusion.Scope) : Fr
 
     local function _setEffectsChildren()
 		wait()
+        if not monster then return end
+        if not monster.PrimaryPart then return end
+
 		info.EffectsList:set(monster.EffectsList:GetChildren())
 	end
     scope[#scope + 1] = monster.EffectsList.ChildAdded:Connect(_setEffectsChildren)

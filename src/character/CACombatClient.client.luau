@@ -144,10 +144,10 @@ local function onTouched(hit: BasePart)
 			Signals.PlayAnimation:Fire(`{orb:GetAttribute("Style")}Anim{animStep}`)
 
 			local monster = char.CharStats.TargetMonster.Value :: Model?
-			if monster then
-				ClientUtil:HitVFX(char.CharStats.TargetMonster.Value)
-
+			if monster and monster.PrimaryPart then
 				char.PrimaryPart.CFrame = cfNew(char.PrimaryPart.Position, monster.PrimaryPart.Position)
+
+				ClientUtil:HitVFX(monster)
 			end
 		end
 
@@ -211,9 +211,6 @@ Add(CS:GetInstanceAddedSignal("OrbHolder"):Connect(orbFolderHandler))
 
 --// Setup
 local function setup()
-	for _, folder: Folder in mapComponents.CombatHolders:GetChildren() do folder:Destroy() end
-	for _, folder: Folder in mapComponents.OrbHolders:GetChildren() do folder:Destroy() end
-
 	--- add all mobs
 	local function _addMonster(monster: Model)
 		wait()
@@ -265,7 +262,7 @@ local function setup()
 		if encounterCD then return end
 		if currentMonster then return end
 
-		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 18)
+		local nearbyMonsters = monsterTree:RadiusSearch(char.PrimaryPart.Position, 22)
 		for _, monster: Model in nearbyMonsters do
 			if not monster then continue end
 			if not monster.PrimaryPart then continue end
